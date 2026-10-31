@@ -1,0 +1,59 @@
+# Host readings for the disk budget's basis (read only), lab host, 2026-10-20T05:29:13Z
++ containerlab version
+version: 0.81.1
+commit: 1e15948d5
+date: 2026-10-15T08:17:35Z
++ docker info --format {{.DockerRootDir}}
+/var/lib/docker
++ df -h /root/sfab/labs/dev/m2/state /var/lib/docker /root/sfab/images
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/md1p1      3.5T  3.0T  286G  92% /
+/dev/md1p1      3.5T  3.0T  286G  92% /
+/dev/md1p1      3.5T  3.0T  286G  92% /
++ stat -c "%n dev=%d" (state/, the data root, the image store)
+/root/sfab/labs/dev/m2/state dev=66311
+/var/lib/docker dev=66311
+/root/sfab/images dev=66311
++ cd /root/sfab/labs/dev/m1; du -sh state; then du -sh on each entry of state/ and of state/nodes/, one call each
+328M	state
+4.0K	state/images.json
+0	state/lock
+584K	state/logs
+322M	state/nodes
+4.0K	state/preflight.last
+5.6M	state/run
+20K	state/secrets
+4.0K	state/secrets.env
+4.0K	state/shared
+8.0K	state/stage
+148M	state/nodes/gpu1
+175M	state/nodes/gpu2
++ ls -la /root/sfab/labs/dev/m1/state/nodes/gpu1
+total 150904
+drwxr-xr-x 3 root root      4096 Oct 14 16:51 .
+drwxr-xr-x 4 root root      4096 Oct 14 14:22 ..
+-rw-r--r-- 1 root root        65 Oct 14 14:25 base.id
+-rw-r--r-- 1 root root     85292 Oct 14 16:59 console.log
+-rw-r--r-- 1 root root     85220 Oct 14 16:27 console.log.1
+-rw-r--r-- 1 root root 153944064 Oct 14 16:59 root.qcow2
+drwxr-xr-x 3 root root      4096 Oct 14 16:51 seed
+-rw-r--r-- 1 root root    505856 Oct 14 16:51 seed.iso
++ du -sh /root/sfab/images/registry-data; ls -la /root/sfab/labs/images/registry/data
+4.6G	/root/sfab/images/registry-data
+lrwxrwxrwx 1 root root 31 Oct 20 02:35 /root/sfab/labs/images/registry/data -> /root/sfab/images/registry-data
++ docker image ls --format "{{.Repository}}:{{.Tag}} {{.ID}} {{.Size}}" sfab/serving
+(no line: sfab/serving is not built)
++ grep -n persist|overlay /launch.py in vrnetlab/truenas_truenas:27.0.0-RC.1
+20:BOOT_DISK = "/truenas.qcow2"
+85:    PERSIST_DIR = "/persist"
+91:        if not install_mode and os.path.isdir(self.PERSIST_DIR):
+92:            # vrnetlab puts the primary overlay next to the base image, so the base is linked into the persistent dir
+93:            self.disk_dir = self.PERSIST_DIR
+94:            disk_image = os.path.join(self.PERSIST_DIR, os.path.basename(BOOT_DISK))
+130:            path = os.path.join(self.disk_dir, f"data{n}.qcow2")
++ sed -n 364,368p /vrnetlab.py in vrnetlab/dell_sonic:4.6.0
+            overlay_disk_image = f"/snapshot-data/vm{self.num}/disk-overlay.qcow2"
+            base_disk = snapshot_disk
+            base_format = "qcow2"
+        else:
+            overlay_disk_image = re.sub(r"(\.[^.]+$)", r"-overlay\1", disk_image)

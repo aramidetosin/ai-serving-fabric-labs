@@ -1,0 +1,43 @@
+# break-4a (Chapter 4, exercise 4): the no-translation rule for the public address removed.
+#
+# no-nat-public sits above internet-snat and matches the inside zones' traffic to the public
+# address, translating nothing. Without it, internet-snat matches a node's request to the public
+# address and rewrites the source to the uplink interface's address, which is that same public
+# address: source equal to destination, a LAND attack, which the firewall discards. User requests
+# keep working (the enterprise's path to the users' VIP crosses no source NAT), so nothing but the
+# nodes' own requests to the public address shows the fault, and only the global counters name it.
+#
+# The break deletes the rule through the XML API and commits. record: reads the drop counters'
+# delta view (its baseline), pings the public address ten times from k8s-cp2, reads the delta view
+# again (the drop counters that moved during those pings) and the NAT rulebase, then pings it in
+# three passes with show counter global read before and after each, and runs ten requests from the
+# enterprise client to the users' hostname. Every show counter global read starts the firewall's
+# next delta sampling, so no full counter read sits between the two delta views (ch04/RESULTS.md, problem 7).
+# The heal puts the rendered rule back where the render places it (before internet-snat) and
+# commits, and its record runs the same reads.
+# Every check that reads flow_policy_nat_land first looks for the name in this firewall's own
+# counter table: the name is relied on only once the firewall has printed it.
+title: the no-translation rule for the public address removed
+exercise: 4
+since: 4
+break:
+  - panos_api: {del: nat, rule: no-nat-public}
+record:
+  - fw_show: {lines: [show counter global filter delta yes severity drop]}
+  - probe_ping: {id: node-delta, from: k8s-cp2, to: public, count: 10, interval_s: 0.5, timeout_s: 1, passes: 1}
+  - fw_show: {lines: [show counter global filter delta yes severity drop, show running nat-policy]}
+  - probe_ping: {id: node-public, from: k8s-cp2, to: public, count: 10, interval_s: 0.5, timeout_s: 1, passes: 3, counters: [flow_policy_nat_land]}
+  - probe_http: {id: users, from: ent-client, hostname: llm, path: "/echo?msg=sfab-break-4a", count: 10, interval_s: 0.5, timeout_s: 10, passes: 1}
+expect_broken:
+  - probe_share: {probe: node-delta, failing: all}
+  - probe_share: {probe: node-public, failing: all}
+  - counter: {name: flow_policy_nat_land, probe: node-public, rise: true}
+  - probe_share: {probe: users, failing: none}
+heal:
+  - panos_api: {set: nat, rule: no-nat-public}
+expect_healed:
+  - rule_order: {}
+  - probe_share: {probe: node-delta, failing: none}
+  - probe_share: {probe: node-public, failing: none}
+  - counter: {name: flow_policy_nat_land, probe: node-public, rise: false}
+  - probe_share: {probe: users, failing: none}

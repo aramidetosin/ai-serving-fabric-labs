@@ -1,0 +1,80 @@
+== 1 containerlab ${VAR} expansion, and devices: on kind linux
+  PASS  fw: USERNAME and PASSWORD in the container env are ${SFAB_FW_USER} and ${SFAB_FW_PASSWORD} expanded from state/secrets.env (presence and sha256 only: settle/1-fw-env.txt)
+  PASS  fw: the launcher's own --password is not SFAB_FW_PASSWORD: the PA-VM keeps the paloalto_panos kind's default credentials, and the expanded env is never read (settle/1-fw-env.txt)
+  PASS  the last containerlab deploy log kept (settle/1-deploy.log, from up-20261014T153907Z.log)
+  PASS  gpu1: devices: [/dev/kvm, /dev/net/tun] accepted on kind linux, both character devices in the container (settle/1-gpu1-devices.txt)
+  PASS  gpu2: devices: [/dev/kvm, /dev/net/tun] accepted on kind linux, both character devices in the container (settle/1-gpu2-devices.txt)
+== 2 the credentials dell_sonic gets
+  PASS  every switch container got --username admin and a password that is not SFAB_SW_PASSWORD: the topology passes none, so it is containerlab's dell_sonic default (settle/2-switch-credentials.txt)
+  PASS  fe-sw1: show version over SSH with the container's own credentials: Software Version : 4.6.0-Enterprise_Base (settle/2-fe-sw1-show-version.txt)
+  PASS  fe-sw2: show version over SSH with the container's own credentials: Software Version : 4.6.0-Enterprise_Base (settle/2-fe-sw2-show-version.txt)
+  PASS  oob-sw: show version over SSH with the container's own credentials: Software Version : 4.6.0-Enterprise_Base (settle/2-oob-sw-show-version.txt)
+  PASS  rail-sw1: show version over SSH with the container's own credentials: Software Version : 4.6.0-Enterprise_Base (settle/2-rail-sw1-show-version.txt)
+  PASS  rail-sw2: show version over SSH with the container's own credentials: Software Version : 4.6.0-Enterprise_Base (settle/2-rail-sw2-show-version.txt)
+== 3 the first rows of spec/klish-normalize.yaml
+  PASS  fe-sw1: parity 0 missing of 55 rendered lines with the empty normalize table; 18 running lines in the rendered blocks that no rendered line accounts for (settle/3-fe-sw1-parity.txt)
+  PASS  fe-sw2: parity 0 missing of 55 rendered lines with the empty normalize table; 18 running lines in the rendered blocks that no rendered line accounts for (settle/3-fe-sw2-parity.txt)
+  PASS  oob-sw: parity 0 missing of 14 rendered lines with the empty normalize table; 9 running lines in the rendered blocks that no rendered line accounts for (settle/3-oob-sw-parity.txt)
+  PASS  rail-sw1: parity 0 missing of 37 rendered lines with the empty normalize table; 24 running lines in the rendered blocks that no rendered line accounts for (settle/3-rail-sw1-parity.txt)
+  PASS  rail-sw2: parity 0 missing of 37 rendered lines with the empty normalize table; 24 running lines in the rendered blocks that no rendered line accounts for (settle/3-rail-sw2-parity.txt)
+== 5 the pair facing the firewall's ae1
+  PASS  fw: ethernet1/1 listed in show lacp aggregate-ethernet all (settle/5-fw-lacp.txt)
+  PASS  fw: ethernet1/2 listed in show lacp aggregate-ethernet all (settle/5-fw-lacp.txt)
+  PASS  fw: the LACP partner is the pair's mclag-system-mac 02:5a:00:00:00:01 (settle/5-fw-lacp.txt)
+  PASS  fe-sw1: PortChannel10 (U) with Ethernet2(P) (settle/5-fe-sw1-portchannel-summary.txt)
+  PASS  fe-sw2: PortChannel10 (U) with Ethernet2(P) (settle/5-fe-sw2-portchannel-summary.txt)
+  PASS  fw eth1 (ae1 member): 8 SYNs from gpu1 to 10.20.1.1:443 tagged 802.1Q VLAN 100 (settle/5-fw-eth1.txt)
+  PASS  fw eth2 (ae1 member): 8 SYNs from gpu1 to 10.20.1.1:443 tagged 802.1Q VLAN 100 (settle/5-fw-eth2.txt)
+== 6 the MCLAG keepalive in VRF mgmt under the final launcher
+  PASS  fe-sw1: session up, keepalive in VRF mgmt from 172.21.40.11 to 172.21.40.12 (settle/6-fe-sw1-mclag-brief.txt)
+  PASS  fe-sw2: session up, keepalive in VRF mgmt from 172.21.40.12 to 172.21.40.11 (settle/6-fe-sw2-mclag-brief.txt)
+== 7 mtu 9216 with mclag 1 on PortChannel10
+  PASS  fe-sw1: KLISH kept mtu 9216 on PortChannel10 beside mclag 1 and the trunk, and on its member Ethernet2 (settle/7-fe-sw1-mtu.txt)
+  PASS  fe-sw1: the switch added no mtu line to PortChannel1 (the peer link stays at the default)
+  PASS  fe-sw2: KLISH kept mtu 9216 on PortChannel10 beside mclag 1 and the trunk, and on its member Ethernet2 (settle/7-fe-sw2-mtu.txt)
+  PASS  fe-sw2: the switch added no mtu line to PortChannel1 (the peer link stays at the default)
+== 8 ip vrf mgmt on the switches that carry only VLANs
+  PASS  oob-sw: show ip interfaces lists only Management0, in VRF mgmt; show ip route prints nothing (settle/8-oob-sw-show-ip-interfaces.txt, settle/8-oob-sw-show-ip-route.txt)
+  PASS  rail-sw1: show ip interfaces lists only Management0, in VRF mgmt; show ip route prints nothing (settle/8-rail-sw1-show-ip-interfaces.txt, settle/8-rail-sw1-show-ip-route.txt)
+  PASS  rail-sw2: show ip interfaces lists only Management0, in VRF mgmt; show ip route prints nothing (settle/8-rail-sw2-show-ip-interfaces.txt, settle/8-rail-sw2-show-ip-route.txt)
+== 9 the PA-VM's startup steps
+  PASS  fw: the image's launcher committed the startup file itself (its log line is in settle/9-fw-launcher.txt); fw-startup.py was not needed
+  PASS  fw: all 1 rule descriptions the render sets are in the running configuration (settle/9-fw-config-set.txt)
+  PASS  fw: jumbo frames: the CLI says Jumbo-Frame mode: on, the XML API answers on (settle/9-fw-jumbo-xml.xml)
+  PASS  fw: the text the audit parses kept: settle/5-fw-lacp.txt and settle/9-fw-show-interface-ae1.100.txt
+== 11 the launcher's extra end
+  PASS  fe-sw1: the only error in the typed session is "% Error: Invalid input detected" after the launcher's own end (the file already ended with end; the log shows it 2 times, once per echo) (settle/11-fe-sw1-typed-session.txt)
+  PASS  fe-sw2: the only error in the typed session is "% Error: Invalid input detected" after the launcher's own end (the file already ended with end; the log shows it 2 times, once per echo) (settle/11-fe-sw2-typed-session.txt)
+  PASS  oob-sw: the only error in the typed session is "% Error: Invalid input detected" after the launcher's own end (the file already ended with end; the log shows it 2 times, once per echo) (settle/11-oob-sw-typed-session.txt)
+  PASS  rail-sw1: the only error in the typed session is "% Error: Invalid input detected" after the launcher's own end (the file already ended with end; the log shows it 2 times, once per echo) (settle/11-rail-sw1-typed-session.txt)
+  PASS  rail-sw2: the only error in the typed session is "% Error: Invalid input detected" after the launcher's own end (the file already ended with end; the log shows it 2 times, once per echo) (settle/11-rail-sw2-typed-session.txt)
+== 12 the steps that SKIP until their part exists
+  PASS  up ran without the memory watchdog: common/host/mem-watchdog.sh is not present (settle/12-stage-lines.txt)
+  PASS  boot's node-sync step printed SKIP: common/host/node-sync.sh is not present (settle/12-stage-lines.txt)
+  PASS  the latest audit, sfab-m1_audit_20261014T155320Z, has no SKIP line: neither step leaves one there
+== 4 guest-side TX checksum offload
+  PASS  TCP gpu1 to gpu2 over bond0 (10.20.1.22) with the guests' TX offload off: iperf3 receiver [redacted: throughput], 1596 retransmits over 3 s (settle/4-tcp-off-bond0.txt)
+  PASS  TCP gpu1 to gpu2 over rail1 (10.21.1.12) with the guests' TX offload off: iperf3 receiver [redacted: throughput], 1435 retransmits over 3 s (settle/4-tcp-off-rail1.txt)
+  PASS  TCP gpu1 to gpu2 over relay (10.21.2.12) with the guests' TX offload off: iperf3 receiver [redacted: throughput], 1882 retransmits over 3 s (settle/4-tcp-off-relay.txt)
+  PASS  guest TX checksum offload turned on in gpu1 and gpu2 (settle/4-gpu1-guest-tx-on.txt)
+  PASS  TCP gpu1 to gpu2 over bond0 (10.20.1.22) with the guests' TX offload on: iperf3 receiver [redacted: throughput], 1597 retransmits over 3 s (settle/4-tcp-on-bond0.txt)
+  PASS  TCP gpu1 to gpu2 over rail1 (10.21.1.12) with the guests' TX offload on: iperf3 receiver [redacted: throughput], 1668 retransmits over 3 s (settle/4-tcp-on-rail1.txt)
+  PASS  TCP gpu1 to gpu2 over relay (10.21.2.12) with the guests' TX offload on: iperf3 receiver [redacted: throughput], 2050 retransmits over 3 s (settle/4-tcp-on-relay.txt)
+  PASS  guest TX checksum offload off again in gpu1 and gpu2, as netsetup.sh leaves it (settle/4-gpu1-guest-tx-off.txt)
+== 10 the vm-node image, end to end
+  PASS  gpu1: root disk an overlay of the baked base b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705, image sfab/vm-node:1-k8s1.35.8 (85c7107872fd)
+  PASS  gpu1: every data NIC bridged with group_fwd_mask 0x4004 (the host kernel took it; no tc fallback) (settle/10-gpu1-wiring.txt)
+  PASS  gpu1: hostname gpu1; netplan's rule from 172.21.40.111 lookup 150 and the management default in table 150 on first boot (settle/10-gpu1-netplan.txt)
+  PASS  gpu2: root disk an overlay of the baked base b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705, image sfab/vm-node:1-k8s1.35.8 (85c7107872fd)
+  PASS  gpu2: every data NIC bridged with group_fwd_mask 0x4004 (the host kernel took it; no tc fallback) (settle/10-gpu2-wiring.txt)
+  PASS  gpu2: hostname gpu2; netplan's rule from 172.21.40.112 lookup 150 and the management default in table 150 on first boot (settle/10-gpu2-netplan.txt)
+  PASS  rail 1 to rail 2 through the relay: 9000-byte DF ping gpu1 ns gpu1 to gpu2 (10.21.2.12) 3 packets transmitted, 3 received (settle/10-relay-rail1-to-rail2-9000.txt)
+  PASS  rail 2 to rail 3 through the relay: 9000-byte DF ping gpu1 ns gpu2 to gpu2 (10.21.3.12) 3 packets transmitted, 3 received (settle/10-relay-rail2-to-rail3-9000.txt)
+  PASS  rail 3 to rail 4 through the relay: 9000-byte DF ping gpu1 ns gpu3 to gpu2 (10.21.4.12) 3 packets transmitted, 3 received (settle/10-relay-rail3-to-rail4-9000.txt)
+  PASS  rail 4 to rail 5 through the relay: 9000-byte DF ping gpu1 ns gpu4 to gpu2 (10.21.5.12) 3 packets transmitted, 3 received (settle/10-relay-rail4-to-rail5-9000.txt)
+  PASS  rail 5 to rail 6 through the relay: 9000-byte DF ping gpu1 ns gpu5 to gpu2 (10.21.6.12) 3 packets transmitted, 3 received (settle/10-relay-rail5-to-rail6-9000.txt)
+  PASS  rail 6 to rail 7 through the relay: 9000-byte DF ping gpu1 ns gpu6 to gpu2 (10.21.7.12) 3 packets transmitted, 3 received (settle/10-relay-rail6-to-rail7-9000.txt)
+  PASS  rail 7 to rail 8 through the relay: 9000-byte DF ping gpu1 ns gpu7 to gpu2 (10.21.8.12) 3 packets transmitted, 3 received (settle/10-relay-rail7-to-rail8-9000.txt)
+  PASS  rail 8 to rail 1 through the relay: 9000-byte DF ping gpu1 ns gpu8 to gpu2 (10.21.1.12) 3 packets transmitted, 3 received (settle/10-relay-rail8-to-rail1-9000.txt)
+  PASS  gpu2: after a guest reboot every NIC has the same name and MAC, named by the .link files (netsetup renamed none) (settle/10-gpu2-links-after-reboot.txt)
+== RESULT: 67 passed, 0 failed, 0 known platform limitation(s), 0 skipped

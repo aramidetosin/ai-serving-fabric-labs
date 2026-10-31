@@ -1,0 +1,136 @@
+# serving-layer manifests for sfab-ch06: rendered by serving.py from serving.env
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+    tarnwick.example/model: chat
+spec:
+  selector:
+    tarnwick.example/model: chat
+    tarnwick.example/role: server
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: staff
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+    tarnwick.example/model: staff
+spec:
+  selector:
+    tarnwick.example/model: staff
+    tarnwick.example/role: server
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-a
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+    tarnwick.example/model: chat
+    tarnwick.example/copy: a
+spec:
+  selector:
+    tarnwick.example/model: chat
+    tarnwick.example/copy: a
+    tarnwick.example/role: server
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-b
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+    tarnwick.example/model: chat
+    tarnwick.example/copy: b
+spec:
+  selector:
+    tarnwick.example/model: chat
+    tarnwick.example/copy: b
+    tarnwick.example/role: server
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-c
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+    tarnwick.example/model: chat
+    tarnwick.example/copy: c
+spec:
+  selector:
+    tarnwick.example/model: chat
+    tarnwick.example/copy: c
+    tarnwick.example/role: server
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: staff-a
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+    tarnwick.example/model: staff
+    tarnwick.example/copy: a
+spec:
+  selector:
+    tarnwick.example/model: staff
+    tarnwick.example/copy: a
+    tarnwick.example/role: server
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: staff-b
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+    tarnwick.example/model: staff
+    tarnwick.example/copy: b
+spec:
+  selector:
+    tarnwick.example/model: staff
+    tarnwick.example/copy: b
+    tarnwick.example/role: server
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+    protocol: TCP

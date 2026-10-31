@@ -1,0 +1,243 @@
+Script started on 2026-10-28 21:25:55+00:00 [COMMAND="make drills PASSES=3" TERM="tmux-256color" TTY="/dev/pts/1" COLUMNS="80" LINES="24"]
+/root/sfab/labs/ai-serving-fabric-labs/ch06/drills.sh  --passes 3
+== pass 1, drill dark-switch: every port of rail-sw1 shut with interface range under the Gateway probe, held, then no shutdown
+drill: pass 1 dark-switch (every port of rail-sw1 shut with interface range under the Gateway probe, held, then no shutdown)
+  PASS  pass 1 dark-switch: the serving layer whole before the fault: every pod of the table Ready, every Service holding its servers, every rail switch's rendered ports up (poll 2)
+  PASS  pass 1 dark-switch: KLISH interface range Ethernet0-7, shutdown accepted on rail-sw1 (Ethernet0,Ethernet1,Ethernet2,Ethernet3,Ethernet4,Ethernet5,Ethernet6,Ethernet7)
+  PASS  pass 1 dark-switch: no shutdown accepted on rail-sw1 after 40 s
+  PASS  pass 1 dark-switch: every Service held all its servers again 17.9 s after the restore's session began
+  PASS  pass 1 dark-switch: the serving layer whole again after the drill: every pod of the table Ready, every Service holding its servers, every rail switch's rendered ports up (poll 2)
+  PASS  pass 1 dark-switch: rail-sw1 after the restore: parity, 0 missing lines
+  PASS  pass 1 dark-switch: audit.sh --quick after the drill: RESULT: 320 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+  PASS  pass 1 dark-switch: Service chat: chat-c-server-0 left it 4.2 to 5.2 s after the shut session began (the readiness bound: a probe every 2 s, out after 2 failures, each up to 2 s, then the removal's propagation)
+  PASS  pass 1 dark-switch: ... and came back 16.9 to 17.9 s after the restore session began
+  PASS  pass 1 dark-switch: Service chat: chat-a-server-0, chat-b-server-0 stayed in it throughout (125 reads, one every 1 s)
+  PASS  pass 1 dark-switch: Service chat-a: chat-a-server-0 stayed in it throughout (125 reads, one every 1 s)
+  PASS  pass 1 dark-switch: Service chat-b: chat-b-server-0 stayed in it throughout (125 reads, one every 1 s)
+  PASS  pass 1 dark-switch: Service chat-c: chat-c-server-0 left it 4.2 to 5.2 s after the shut session began (the readiness bound: a probe every 2 s, out after 2 failures, each up to 2 s, then the removal's propagation)
+  PASS  pass 1 dark-switch: ... and came back 16.9 to 17.9 s after the restore session began
+  PASS  pass 1 dark-switch: Service staff: staff-a-server-0, staff-b-server-0 stayed in it throughout (125 reads, one every 1 s)
+  PASS  pass 1 dark-switch: Service staff-a: staff-a-server-0 stayed in it throughout (125 reads, one every 1 s)
+  PASS  pass 1 dark-switch: Service staff-b: staff-b-server-0 stayed in it throughout (125 reads, one every 1 s)
+  KNOWN pass 1 dark-switch: chat-a, staff-b on rail-sw1's rails stayed in their Services: each copy's RPC runs inside its node through the rail NIC's macvlan bridge, and a KLISH shutdown drops no carrier at the rail NICs (on hardware the NICs would lose carrier and these copies would leave too; each model's copies on the other rail switch's rails would answer): L9
+  PASS  pass 1 dark-switch: chat through gw-users: 0 of 59 requests failed (59 answered; 19 of 19 sent while rail-sw1 dark answered)
+  PASS  pass 1 dark-switch: ... none needed a router retry (the slowest answer took 54.883 s)
+  PASS  pass 1 dark-switch: staff through gw-users: 0 of 4 requests failed (4 answered; 2 of 2 sent while rail-sw1 dark answered)
+  PASS  pass 1 dark-switch: ... none needed a router retry (the slowest answer took 60.195 s)
+dark-switch, pass 1: serve-dark on rail-sw1 (Ethernet0, Ethernet1, Ethernet2, Ethernet3, Ethernet4, Ethernet5, Ethernet6, Ethernet7); shut session 3.209 s, restore session 3.779 s, every Service whole 17.915 s after the restore's session began
+copies out: chat-c; copies left: chat-a, chat-b, staff-a, staff-b (on the dark rails but inside one node: chat-a, staff-b)
+  Service chat: chat-c-server-0 left 4.2 to 5.2 s after the cut, back 16.9 to 17.9 s after the restore; chat-a-server-0, chat-b-server-0 stayed
+  Service chat-a: chat-a-server-0 stayed
+  Service chat-b: chat-b-server-0 stayed
+  Service chat-c: chat-c-server-0 left 4.2 to 5.2 s after the cut, back 16.9 to 17.9 s after the restore
+  Service staff: staff-a-server-0, staff-b-server-0 stayed
+  Service staff-a: staff-a-server-0 stayed
+  Service staff-b: staff-b-server-0 stayed
+  chat: 59 of 59 answered, 0 failed (before 13/13, at the cut 2/2, down 19/19, at the restore 1/1, returning 7/7, after 17/17); router retries: 0
+  staff: 4 of 4 answered, 0 failed (before 1/1, down 2/2, after 1/1); router retries: 0
+  (times in seconds on the lab host's clock; a Service's change is bracketed by the read before it)
+  KNOWN pass 1 dark-switch: a KLISH shutdown drops no carrier at the GPU NICs, so the dead rail shows only as silence: readiness over the rail is the only detector (rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP): L9
+== pass 1, drill worker-port: the rail-sw1 port facing chat-c's worker on k8s-gpu2 shut while chat-a and chat-b answer, held, then no shutdown
+drill: pass 1 worker-port (the rail-sw1 port facing chat-c's worker on k8s-gpu2 shut while chat-a and chat-b answer, held, then no shutdown)
+  PASS  pass 1 worker-port: the serving layer whole before the fault: every pod of the table Ready, every Service holding its servers, every rail switch's rendered ports up (poll 2)
+  PASS  pass 1 worker-port: KLISH interface Ethernet7, shutdown accepted on rail-sw1 (Ethernet7)
+  PASS  pass 1 worker-port: no shutdown accepted on rail-sw1 after 40 s
+  PASS  pass 1 worker-port: every Service held all its servers again 7.5 s after the restore's session began
+  PASS  pass 1 worker-port: the serving layer whole again after the drill: every pod of the table Ready, every Service holding its servers, every rail switch's rendered ports up (poll 2)
+  PASS  pass 1 worker-port: rail-sw1 after the restore: parity, 0 missing lines
+  PASS  pass 1 worker-port: audit.sh --quick after the drill: RESULT: 320 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+  PASS  pass 1 worker-port: Service chat: chat-c-server-0 left it 6.9 to 7.9 s after the shut session began (the readiness bound: a probe every 2 s, out after 2 failures, each up to 2 s, then the removal's propagation)
+  PASS  pass 1 worker-port: ... and came back 6.5 to 7.5 s after the restore session began
+  PASS  pass 1 worker-port: Service chat: chat-a-server-0, chat-b-server-0 stayed in it throughout (126 reads, one every 1 s)
+  PASS  pass 1 worker-port: Service chat-a: chat-a-server-0 stayed in it throughout (126 reads, one every 1 s)
+  PASS  pass 1 worker-port: Service chat-b: chat-b-server-0 stayed in it throughout (126 reads, one every 1 s)
+  PASS  pass 1 worker-port: Service chat-c: chat-c-server-0 left it 6.9 to 7.9 s after the shut session began (the readiness bound: a probe every 2 s, out after 2 failures, each up to 2 s, then the removal's propagation)
+  PASS  pass 1 worker-port: ... and came back 6.5 to 7.5 s after the restore session began
+  PASS  pass 1 worker-port: Service staff: staff-a-server-0, staff-b-server-0 stayed in it throughout (126 reads, one every 1 s)
+  PASS  pass 1 worker-port: Service staff-a: staff-a-server-0 stayed in it throughout (126 reads, one every 1 s)
+  PASS  pass 1 worker-port: Service staff-b: staff-b-server-0 stayed in it throughout (126 reads, one every 1 s)
+  PASS  pass 1 worker-port: chat through gw-users: 0 of 54 requests failed (54 answered; 18 of 18 sent while rail-sw1 Ethernet7 shut answered)
+  PASS  pass 1 worker-port: ... none needed a router retry (the slowest answer took 4.092 s)
+  PASS  pass 1 worker-port: staff through gw-users: 0 of 4 requests failed (4 answered; 1 of 1 sent while rail-sw1 Ethernet7 shut answered)
+  PASS  pass 1 worker-port: ... none needed a router retry (the slowest answer took 58.871 s)
+worker-port, pass 1: worker-port on rail-sw1 (Ethernet7); shut session 3.748 s, restore session 3.488 s, every Service whole 7.524 s after the restore's session began
+copies out: chat-c; copies left: chat-a, chat-b, staff-a, staff-b
+  Service chat: chat-c-server-0 left 6.9 to 7.9 s after the cut, back 6.5 to 7.5 s after the restore; chat-a-server-0, chat-b-server-0 stayed
+  Service chat-a: chat-a-server-0 stayed
+  Service chat-b: chat-b-server-0 stayed
+  Service chat-c: chat-c-server-0 left 6.9 to 7.9 s after the cut, back 6.5 to 7.5 s after the restore
+  Service staff: staff-a-server-0, staff-b-server-0 stayed
+  Service staff-a: staff-a-server-0 stayed
+  Service staff-b: staff-b-server-0 stayed
+  chat: 54 of 54 answered, 0 failed (before 14/14, at the cut 2/2, down 18/18, at the restore 1/1, returning 2/2, after 17/17); router retries: 0
+  staff: 4 of 4 answered, 0 failed (before 1/1, at the cut 1/1, down 1/1, after 1/1); router retries: 0
+  (times in seconds on the lab host's clock; a Service's change is bracketed by the read before it)
+  KNOWN pass 1 worker-port: a KLISH shutdown drops no carrier at the GPU NICs, so the dead rail shows only as silence: readiness over the rail is the only detector (rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP): L9
+== pass 1, drill rail-move: chat-a's worker0 moved to rail 5 in the table; the audit fails first, then the table is restored
+drill: pass 1 rail-move (chat-a's worker0 moved to rail 5 in the table; the audit fails first, then the table is restored)
+  PASS  pass 1 rail-move: chat-a-worker0-0's row moved in the table from rail 3 to rail 5 (SERVING_POD_02='chat-a-worker0-0 chat a worker 0 k8s-gpu1 5 rail5 10.21.5.102/24 dec-place-chat 02:5a:fe:05:00:66')
+  PASS  pass 1 rail-move: the recipe refuses to render the manifests from it: serving.py: copy chat-a spans the attachments ['rail3', 'rail5']: every pod of a copy sits on one rail
+  PASS  pass 1 rail-move: audit.sh against the moved table fails first, nothing in the cluster having moved: RESULT: 313 passed, 7 failed, 0 known platform limitation(s), 0 skipped (7 FAIL lines, chat-a-worker0-0 named)
+  PASS  pass 1 rail-move: audit.sh against the table as rendered, restored: RESULT: 320 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+== pass 2, drill dark-switch: every port of rail-sw1 shut with interface range under the Gateway probe, held, then no shutdown
+drill: pass 2 dark-switch (every port of rail-sw1 shut with interface range under the Gateway probe, held, then no shutdown)
+  PASS  pass 2 dark-switch: the serving layer whole before the fault: every pod of the table Ready, every Service holding its servers, every rail switch's rendered ports up (poll 2)
+  PASS  pass 2 dark-switch: KLISH interface range Ethernet0-7, shutdown accepted on rail-sw1 (Ethernet0,Ethernet1,Ethernet2,Ethernet3,Ethernet4,Ethernet5,Ethernet6,Ethernet7)
+  PASS  pass 2 dark-switch: no shutdown accepted on rail-sw1 after 40 s
+  PASS  pass 2 dark-switch: every Service held all its servers again 8.8 s after the restore's session began
+  PASS  pass 2 dark-switch: the serving layer whole again after the drill: every pod of the table Ready, every Service holding its servers, every rail switch's rendered ports up (poll 2)
+  PASS  pass 2 dark-switch: rail-sw1 after the restore: parity, 0 missing lines
+  PASS  pass 2 dark-switch: audit.sh --quick after the drill: RESULT: 320 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+  PASS  pass 2 dark-switch: Service chat: chat-c-server-0 left it 6.2 to 7.2 s after the shut session began (the readiness bound: a probe every 2 s, out after 2 failures, each up to 2 s, then the removal's propagation)
+  PASS  pass 2 dark-switch: ... and came back 7.7 to 8.8 s after the restore session began
+  PASS  pass 2 dark-switch: Service chat: chat-a-server-0, chat-b-server-0 stayed in it throughout (123 reads, one every 1 s)
+  PASS  pass 2 dark-switch: Service chat-a: chat-a-server-0 stayed in it throughout (123 reads, one every 1 s)
+  PASS  pass 2 dark-switch: Service chat-b: chat-b-server-0 stayed in it throughout (123 reads, one every 1 s)
+  PASS  pass 2 dark-switch: Service chat-c: chat-c-server-0 left it 6.2 to 7.2 s after the shut session began (the readiness bound: a probe every 2 s, out after 2 failures, each up to 2 s, then the removal's propagation)
+  PASS  pass 2 dark-switch: ... and came back 7.7 to 8.8 s after the restore session began
+  PASS  pass 2 dark-switch: Service staff: staff-a-server-0, staff-b-server-0 stayed in it throughout (123 reads, one every 1 s)
+  PASS  pass 2 dark-switch: Service staff-a: staff-a-server-0 stayed in it throughout (123 reads, one every 1 s)
+  PASS  pass 2 dark-switch: Service staff-b: staff-b-server-0 stayed in it throughout (123 reads, one every 1 s)
+  KNOWN pass 2 dark-switch: chat-a, staff-b on rail-sw1's rails stayed in their Services: each copy's RPC runs inside its node through the rail NIC's macvlan bridge, and a KLISH shutdown drops no carrier at the rail NICs (on hardware the NICs would lose carrier and these copies would leave too; each model's copies on the other rail switch's rails would answer): L9
+  PASS  pass 2 dark-switch: chat through gw-users: 0 of 54 requests failed (54 answered; 19 of 19 sent while rail-sw1 dark answered)
+  PASS  pass 2 dark-switch: ... none needed a router retry (the slowest answer took 4.128 s)
+  PASS  pass 2 dark-switch: staff through gw-users: 0 of 4 requests failed (4 answered; 2 of 2 sent while rail-sw1 dark answered)
+  PASS  pass 2 dark-switch: ... none needed a router retry (the slowest answer took 31.666 s)
+dark-switch, pass 2: serve-dark on rail-sw1 (Ethernet0, Ethernet1, Ethernet2, Ethernet3, Ethernet4, Ethernet5, Ethernet6, Ethernet7); shut session 3.493 s, restore session 3.921 s, every Service whole 8.756 s after the restore's session began
+copies out: chat-c; copies left: chat-a, chat-b, staff-a, staff-b (on the dark rails but inside one node: chat-a, staff-b)
+  Service chat: chat-c-server-0 left 6.2 to 7.2 s after the cut, back 7.7 to 8.8 s after the restore; chat-a-server-0, chat-b-server-0 stayed
+  Service chat-a: chat-a-server-0 stayed
+  Service chat-b: chat-b-server-0 stayed
+  Service chat-c: chat-c-server-0 left 6.2 to 7.2 s after the cut, back 7.7 to 8.8 s after the restore
+  Service staff: staff-a-server-0, staff-b-server-0 stayed
+  Service staff-a: staff-a-server-0 stayed
+  Service staff-b: staff-b-server-0 stayed
+  chat: 54 of 54 answered, 0 failed (before 14/14, at the cut 1/1, down 19/19, at the restore 2/2, returning 2/2, after 16/16); router retries: 0
+  staff: 4 of 4 answered, 0 failed (before 1/1, down 2/2, after 1/1); router retries: 0
+  (times in seconds on the lab host's clock; a Service's change is bracketed by the read before it)
+  KNOWN pass 2 dark-switch: a KLISH shutdown drops no carrier at the GPU NICs, so the dead rail shows only as silence: readiness over the rail is the only detector (rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP): L9
+== pass 2, drill worker-port: the rail-sw1 port facing chat-c's worker on k8s-gpu2 shut while chat-a and chat-b answer, held, then no shutdown
+drill: pass 2 worker-port (the rail-sw1 port facing chat-c's worker on k8s-gpu2 shut while chat-a and chat-b answer, held, then no shutdown)
+  PASS  pass 2 worker-port: the serving layer whole before the fault: every pod of the table Ready, every Service holding its servers, every rail switch's rendered ports up (poll 2)
+  PASS  pass 2 worker-port: KLISH interface Ethernet7, shutdown accepted on rail-sw1 (Ethernet7)
+  PASS  pass 2 worker-port: no shutdown accepted on rail-sw1 after 40 s
+  PASS  pass 2 worker-port: every Service held all its servers again 7.9 s after the restore's session began
+  PASS  pass 2 worker-port: the serving layer whole again after the drill: every pod of the table Ready, every Service holding its servers, every rail switch's rendered ports up (poll 2)
+  PASS  pass 2 worker-port: rail-sw1 after the restore: parity, 0 missing lines
+  PASS  pass 2 worker-port: audit.sh --quick after the drill: RESULT: 320 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+  PASS  pass 2 worker-port: Service chat: chat-c-server-0 left it 6.2 to 7.2 s after the shut session began (the readiness bound: a probe every 2 s, out after 2 failures, each up to 2 s, then the removal's propagation)
+  PASS  pass 2 worker-port: ... and came back 6.9 to 7.9 s after the restore session began
+  PASS  pass 2 worker-port: Service chat: chat-a-server-0, chat-b-server-0 stayed in it throughout (125 reads, one every 1 s)
+  PASS  pass 2 worker-port: Service chat-a: chat-a-server-0 stayed in it throughout (125 reads, one every 1 s)
+  PASS  pass 2 worker-port: Service chat-b: chat-b-server-0 stayed in it throughout (125 reads, one every 1 s)
+  PASS  pass 2 worker-port: Service chat-c: chat-c-server-0 left it 6.2 to 7.2 s after the shut session began (the readiness bound: a probe every 2 s, out after 2 failures, each up to 2 s, then the removal's propagation)
+  PASS  pass 2 worker-port: ... and came back 6.9 to 7.9 s after the restore session began
+  PASS  pass 2 worker-port: Service staff: staff-a-server-0, staff-b-server-0 stayed in it throughout (125 reads, one every 1 s)
+  PASS  pass 2 worker-port: Service staff-a: staff-a-server-0 stayed in it throughout (125 reads, one every 1 s)
+  PASS  pass 2 worker-port: Service staff-b: staff-b-server-0 stayed in it throughout (125 reads, one every 1 s)
+  PASS  pass 2 worker-port: chat through gw-users: 0 of 54 requests failed (54 answered; 18 of 18 sent while rail-sw1 Ethernet7 shut answered)
+  PASS  pass 2 worker-port: ... none needed a router retry (the slowest answer took 56.063 s)
+  PASS  pass 2 worker-port: staff through gw-users: 0 of 4 requests failed (4 answered; 1 of 1 sent while rail-sw1 Ethernet7 shut answered)
+  PASS  pass 2 worker-port: ... none needed a router retry (the slowest answer took 55.661 s)
+worker-port, pass 2: worker-port on rail-sw1 (Ethernet7); shut session 3.615 s, restore session 3.544 s, every Service whole 7.863 s after the restore's session began
+copies out: chat-c; copies left: chat-a, chat-b, staff-a, staff-b
+  Service chat: chat-c-server-0 left 6.2 to 7.2 s after the cut, back 6.9 to 7.9 s after the restore; chat-a-server-0, chat-b-server-0 stayed
+  Service chat-a: chat-a-server-0 stayed
+  Service chat-b: chat-b-server-0 stayed
+  Service chat-c: chat-c-server-0 left 6.2 to 7.2 s after the cut, back 6.9 to 7.9 s after the restore
+  Service staff: staff-a-server-0, staff-b-server-0 stayed
+  Service staff-a: staff-a-server-0 stayed
+  Service staff-b: staff-b-server-0 stayed
+  chat: 54 of 54 answered, 0 failed (before 14/14, at the cut 2/2, down 18/18, at the restore 2/2, returning 2/2, after 16/16); router retries: 0
+  staff: 4 of 4 answered, 0 failed (before 1/1, at the cut 1/1, down 1/1, after 1/1); router retries: 0
+  (times in seconds on the lab host's clock; a Service's change is bracketed by the read before it)
+  KNOWN pass 2 worker-port: a KLISH shutdown drops no carrier at the GPU NICs, so the dead rail shows only as silence: readiness over the rail is the only detector (rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP): L9
+== pass 2, drill rail-move: chat-a's worker0 moved to rail 5 in the table; the audit fails first, then the table is restored
+drill: pass 2 rail-move (chat-a's worker0 moved to rail 5 in the table; the audit fails first, then the table is restored)
+  PASS  pass 2 rail-move: chat-a-worker0-0's row moved in the table from rail 3 to rail 5 (SERVING_POD_02='chat-a-worker0-0 chat a worker 0 k8s-gpu1 5 rail5 10.21.5.102/24 dec-place-chat 02:5a:fe:05:00:66')
+  PASS  pass 2 rail-move: the recipe refuses to render the manifests from it: serving.py: copy chat-a spans the attachments ['rail3', 'rail5']: every pod of a copy sits on one rail
+  PASS  pass 2 rail-move: audit.sh against the moved table fails first, nothing in the cluster having moved: RESULT: 313 passed, 7 failed, 0 known platform limitation(s), 0 skipped (7 FAIL lines, chat-a-worker0-0 named)
+  PASS  pass 2 rail-move: audit.sh against the table as rendered, restored: RESULT: 320 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+== pass 3, drill dark-switch: every port of rail-sw1 shut with interface range under the Gateway probe, held, then no shutdown
+drill: pass 3 dark-switch (every port of rail-sw1 shut with interface range under the Gateway probe, held, then no shutdown)
+  PASS  pass 3 dark-switch: the serving layer whole before the fault: every pod of the table Ready, every Service holding its servers, every rail switch's rendered ports up (poll 2)
+  PASS  pass 3 dark-switch: KLISH interface range Ethernet0-7, shutdown accepted on rail-sw1 (Ethernet0,Ethernet1,Ethernet2,Ethernet3,Ethernet4,Ethernet5,Ethernet6,Ethernet7)
+  PASS  pass 3 dark-switch: no shutdown accepted on rail-sw1 after 40 s
+  PASS  pass 3 dark-switch: every Service held all its servers again 7.4 s after the restore's session began
+  PASS  pass 3 dark-switch: the serving layer whole again after the drill: every pod of the table Ready, every Service holding its servers, every rail switch's rendered ports up (poll 2)
+  PASS  pass 3 dark-switch: rail-sw1 after the restore: parity, 0 missing lines
+  PASS  pass 3 dark-switch: audit.sh --quick after the drill: RESULT: 320 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+  PASS  pass 3 dark-switch: Service chat: chat-c-server-0 left it 6.8 to 7.8 s after the shut session began (the readiness bound: a probe every 2 s, out after 2 failures, each up to 2 s, then the removal's propagation)
+  PASS  pass 3 dark-switch: ... and came back 6.4 to 7.4 s after the restore session began
+  PASS  pass 3 dark-switch: Service chat: chat-a-server-0, chat-b-server-0 stayed in it throughout (124 reads, one every 1 s)
+  PASS  pass 3 dark-switch: Service chat-a: chat-a-server-0 stayed in it throughout (124 reads, one every 1 s)
+  PASS  pass 3 dark-switch: Service chat-b: chat-b-server-0 stayed in it throughout (124 reads, one every 1 s)
+  PASS  pass 3 dark-switch: Service chat-c: chat-c-server-0 left it 6.8 to 7.8 s after the shut session began (the readiness bound: a probe every 2 s, out after 2 failures, each up to 2 s, then the removal's propagation)
+  PASS  pass 3 dark-switch: ... and came back 6.4 to 7.4 s after the restore session began
+  PASS  pass 3 dark-switch: Service staff: staff-a-server-0, staff-b-server-0 stayed in it throughout (124 reads, one every 1 s)
+  PASS  pass 3 dark-switch: Service staff-a: staff-a-server-0 stayed in it throughout (124 reads, one every 1 s)
+  PASS  pass 3 dark-switch: Service staff-b: staff-b-server-0 stayed in it throughout (124 reads, one every 1 s)
+  KNOWN pass 3 dark-switch: chat-a, staff-b on rail-sw1's rails stayed in their Services: each copy's RPC runs inside its node through the rail NIC's macvlan bridge, and a KLISH shutdown drops no carrier at the rail NICs (on hardware the NICs would lose carrier and these copies would leave too; each model's copies on the other rail switch's rails would answer): L9
+  PASS  pass 3 dark-switch: chat through gw-users: 0 of 53 requests failed (53 answered; 19 of 19 sent while rail-sw1 dark answered)
+  PASS  pass 3 dark-switch: ... none needed a router retry (the slowest answer took 5.953 s)
+  PASS  pass 3 dark-switch: staff through gw-users: 0 of 4 requests failed (4 answered; 2 of 2 sent while rail-sw1 dark answered)
+  PASS  pass 3 dark-switch: ... none needed a router retry (the slowest answer took 56.144 s)
+dark-switch, pass 3: serve-dark on rail-sw1 (Ethernet0, Ethernet1, Ethernet2, Ethernet3, Ethernet4, Ethernet5, Ethernet6, Ethernet7); shut session 3.527 s, restore session 3.822 s, every Service whole 7.416 s after the restore's session began
+copies out: chat-c; copies left: chat-a, chat-b, staff-a, staff-b (on the dark rails but inside one node: chat-a, staff-b)
+  Service chat: chat-c-server-0 left 6.8 to 7.8 s after the cut, back 6.4 to 7.4 s after the restore; chat-a-server-0, chat-b-server-0 stayed
+  Service chat-a: chat-a-server-0 stayed
+  Service chat-b: chat-b-server-0 stayed
+  Service chat-c: chat-c-server-0 left 6.8 to 7.8 s after the cut, back 6.4 to 7.4 s after the restore
+  Service staff: staff-a-server-0, staff-b-server-0 stayed
+  Service staff-a: staff-a-server-0 stayed
+  Service staff-b: staff-b-server-0 stayed
+  chat: 53 of 53 answered, 0 failed (before 14/14, at the cut 1/1, down 19/19, at the restore 2/2, returning 1/1, after 16/16); router retries: 0
+  staff: 4 of 4 answered, 0 failed (before 1/1, down 2/2, after 1/1); router retries: 0
+  (times in seconds on the lab host's clock; a Service's change is bracketed by the read before it)
+  KNOWN pass 3 dark-switch: a KLISH shutdown drops no carrier at the GPU NICs, so the dead rail shows only as silence: readiness over the rail is the only detector (rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP): L9
+== pass 3, drill worker-port: the rail-sw1 port facing chat-c's worker on k8s-gpu2 shut while chat-a and chat-b answer, held, then no shutdown
+drill: pass 3 worker-port (the rail-sw1 port facing chat-c's worker on k8s-gpu2 shut while chat-a and chat-b answer, held, then no shutdown)
+  PASS  pass 3 worker-port: the serving layer whole before the fault: every pod of the table Ready, every Service holding its servers, every rail switch's rendered ports up (poll 2)
+  PASS  pass 3 worker-port: KLISH interface Ethernet7, shutdown accepted on rail-sw1 (Ethernet7)
+  PASS  pass 3 worker-port: no shutdown accepted on rail-sw1 after 40 s
+  PASS  pass 3 worker-port: every Service held all its servers again 16.6 s after the restore's session began
+  PASS  pass 3 worker-port: the serving layer whole again after the drill: every pod of the table Ready, every Service holding its servers, every rail switch's rendered ports up (poll 2)
+  PASS  pass 3 worker-port: rail-sw1 after the restore: parity, 0 missing lines
+  PASS  pass 3 worker-port: audit.sh --quick after the drill: RESULT: 320 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+  PASS  pass 3 worker-port: Service chat: chat-c-server-0 left it 5.9 to 6.9 s after the shut session began (the readiness bound: a probe every 2 s, out after 2 failures, each up to 2 s, then the removal's propagation)
+  PASS  pass 3 worker-port: ... and came back 15.6 to 16.6 s after the restore session began
+  PASS  pass 3 worker-port: Service chat: chat-a-server-0, chat-b-server-0 stayed in it throughout (127 reads, one every 1 s)
+  PASS  pass 3 worker-port: Service chat-a: chat-a-server-0 stayed in it throughout (127 reads, one every 1 s)
+  PASS  pass 3 worker-port: Service chat-b: chat-b-server-0 stayed in it throughout (127 reads, one every 1 s)
+  PASS  pass 3 worker-port: Service chat-c: chat-c-server-0 left it 5.9 to 6.9 s after the shut session began (the readiness bound: a probe every 2 s, out after 2 failures, each up to 2 s, then the removal's propagation)
+  PASS  pass 3 worker-port: ... and came back 15.6 to 16.6 s after the restore session began
+  PASS  pass 3 worker-port: Service staff: staff-a-server-0, staff-b-server-0 stayed in it throughout (127 reads, one every 1 s)
+  PASS  pass 3 worker-port: Service staff-a: staff-a-server-0 stayed in it throughout (127 reads, one every 1 s)
+  PASS  pass 3 worker-port: Service staff-b: staff-b-server-0 stayed in it throughout (127 reads, one every 1 s)
+  PASS  pass 3 worker-port: chat through gw-users: 0 of 59 requests failed (59 answered; 18 of 18 sent while rail-sw1 Ethernet7 shut answered)
+  PASS  pass 3 worker-port: ... none needed a router retry (the slowest answer took 55.383 s)
+  PASS  pass 3 worker-port: staff through gw-users: 0 of 4 requests failed (4 answered; 1 of 1 sent while rail-sw1 Ethernet7 shut answered)
+  PASS  pass 3 worker-port: ... none needed a router retry (the slowest answer took 59.79 s)
+worker-port, pass 3: worker-port on rail-sw1 (Ethernet7); shut session 3.685 s, restore session 3.552 s, every Service whole 16.602 s after the restore's session began
+copies out: chat-c; copies left: chat-a, chat-b, staff-a, staff-b
+  Service chat: chat-c-server-0 left 5.9 to 6.9 s after the cut, back 15.6 to 16.6 s after the restore; chat-a-server-0, chat-b-server-0 stayed
+  Service chat-a: chat-a-server-0 stayed
+  Service chat-b: chat-b-server-0 stayed
+  Service chat-c: chat-c-server-0 left 5.9 to 6.9 s after the cut, back 15.6 to 16.6 s after the restore
+  Service staff: staff-a-server-0, staff-b-server-0 stayed
+  Service staff-a: staff-a-server-0 stayed
+  Service staff-b: staff-b-server-0 stayed
+  chat: 59 of 59 answered, 0 failed (before 14/14, at the cut 2/2, down 18/18, at the restore 1/1, returning 7/7, after 17/17); router retries: 0
+  staff: 4 of 4 answered, 0 failed (before 1/1, at the cut 1/1, down 1/1, after 1/1); router retries: 0
+  (times in seconds on the lab host's clock; a Service's change is bracketed by the read before it)
+  KNOWN pass 3 worker-port: a KLISH shutdown drops no carrier at the GPU NICs, so the dead rail shows only as silence: readiness over the rail is the only detector (rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP): L9
+== pass 3, drill rail-move: chat-a's worker0 moved to rail 5 in the table; the audit fails first, then the table is restored
+drill: pass 3 rail-move (chat-a's worker0 moved to rail 5 in the table; the audit fails first, then the table is restored)
+  PASS  pass 3 rail-move: chat-a-worker0-0's row moved in the table from rail 3 to rail 5 (SERVING_POD_02='chat-a-worker0-0 chat a worker 0 k8s-gpu1 5 rail5 10.21.5.102/24 dec-place-chat 02:5a:fe:05:00:66')
+  PASS  pass 3 rail-move: the recipe refuses to render the manifests from it: serving.py: copy chat-a spans the attachments ['rail3', 'rail5']: every pod of a copy sits on one rail
+  PASS  pass 3 rail-move: audit.sh against the moved table fails first, nothing in the cluster having moved: RESULT: 313 passed, 7 failed, 0 known platform limitation(s), 0 skipped (7 FAIL lines, chat-a-worker0-0 named)
+  PASS  pass 3 rail-move: audit.sh against the table as rendered, restored: RESULT: 320 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+== RESULT: 138 passed, 0 failed, 9 known platform limitation(s), 0 skipped
+== result set: ch06/audits/sfab-ch06_drills_20261028T212555Z
+
+Script done on 2026-10-28 22:12:44+00:00 [COMMAND_EXIT_CODE="0"]

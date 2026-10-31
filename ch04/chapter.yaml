@@ -1,0 +1,97 @@
+# Chapter 4, "Firewall-Hosted Gateways" (FRAMEWORK.md 6.3, third row), lab sfab-ch04.
+#
+# Build A's one-tenant state with the slice chapter 3's lab runs (milestone M2's): the firewall with
+# every wire it has in this state (ae1 to the pair, ethernet1/3 to the out-of-band switch,
+# ethernet1/4 to the enterprise client, ethernet1/5 to the uplink router), the cluster whose
+# Gateways sit behind it, the operator's client and the registry beyond the uplink, and TrueNAS,
+# whose management address is the storage management rule's live target. The chapter prints the
+# firewall, so it deploys whole (FRAMEWORK.md 1.4, step 7). Serving stays off: the requests reach
+# the test backend behind both Gateways. It extends chapter 3's lab: the same deploy, with the
+# chapter 4 audit, trace, drills and break.
+lab: sfab-ch04
+profile: a
+state: one
+slice:
+  nodes: [fe, rail, oob, fw, k8s-gpu1, k8s-gpu2, k8s-cp1, k8s-cp2, k8s-cp3, bastion, inet-registry, uplink-rtr, ops-client, web-client, ent-client, truenas1]
+features: {k8s: true, serving: false, storage_setup: true}
+prints: [fw]
+extends: ch03
+variants: {}
+
+# The firewall trace (trace.sh, common/trace/lib-fwtrace.sh; rendered to gen/trace.json). Proof
+# moves from probes to state: one HTTPS request from each side of the firewall, each a real request
+# whose connection the client holds open hold_s after the reply, so the session table still lists
+# it. While it is held the trace reads its session (show session all filtered on the client's
+# address and pinned source port, then show session id); after the client closes it, its traffic
+# log line, which PAN-OS writes at session end. The enterprise client reaches the users' VIP, no
+# translation; the operator's client reaches the internal Gateway's VIP through the IPsec tunnel
+# from its site router into zone operator-vpn, untranslated (build A revision 2: nothing is published on
+# the public address; the operator's resolver holds no name for it, so the name is pinned to the
+# VIP, as the audit's population probe pins it).
+#
+# Then a node's image pull: k8s-gpu2 pulls the node helm image, which only the init node holds, by
+# digest through its registry mirror on the operator side. The pull is captured on both ae1 legs
+# (tagged 100, the node's own source address) and on the uplink, the firewall's ethernet1/5, where
+# internet-snat has rewritten the source to the public address; the same TCP sequence number ties
+# the two. The image is removed again after, so the next trace pulls it whole.
+trace:
+  sessions:
+    - id: enterprise
+      client: ent-client
+      gateway: gw-users
+      hostname: llm
+      path: /echo?msg=sfab-ch04-enterprise
+      sport: 42443
+      hold_s: 30
+      expect: {status: 200, rule: staff-to-users-gateway, from_zone: enterprise, to_zone: ingress}
+    - id: operator
+      client: ops-client
+      gateway: gw-internal
+      hostname: llm
+      path: /echo?msg=sfab-ch04-operator
+      sport: 42444
+      hold_s: 30
+      expect: {status: 200, rule: operator-to-internal-gateway, from_zone: operator-vpn, to_zone: ingress}
+  pull:
+    node: k8s-gpu2
+    image: node_helm
+    points:
+      - {id: 1-fw-ae1-leg1, node: fw, eth: eth1, vlan: 100, group: inside}
+      - {id: 1-fw-ae1-leg2, node: fw, eth: eth2, vlan: 100, group: inside}
+      - {id: 2-fw-ethernet1-5, node: fw, eth: eth5, vlan: none}
+    expect: {rule: nodes-to-registry, nat_rule: internet-snat, from_zone: k8s-nodes, to_zone: uplink}
+
+# The drills (drills.sh, common/drill/lib-fwdrill.sh; rendered to gen/drills.json). Each changes the
+# firewall live through the XML API, its restore pushed first, and puts the render back after.
+#
+#   land        no-nat-public removed, so internet-snat matches a node's request to the public
+#               address and rewrites its source to that same address: the firewall discards it as
+#               a LAND attack. k8s-cp2 pings the public address with the rule in place (answered),
+#               then without it, with show counter global read before and after each probe, a
+#               packet-diag capture at the receive and drop stages filtered on the probe's two
+#               addresses, and host-side captures on the bundle's legs and the uplink; then the
+#               rule goes back where the render puts it and the probe is answered again. The
+#               counter is relied on only once its name is seen in this firewall's own counter table.
+#   ntp-uplink  the firewall's own NTP service route moved to the uplink interface, with the DNS
+#               route, whose server is the same address, dns-res1: moved alone, the NTP route left
+#               the firewall's NTP on the DNS route's source (ch04/RESULTS.md, problem 5). Its NTP
+#               and DNS to dns-res1 now leave with the public address as their source; a name looked
+#               up through the firewall makes the DNS query at once, and the traffic log is read
+#               until deny-all-log's lines for both appear (zone uplink to zone services); then the
+#               routes go back and the firewall's NTP and DNS are seen allowed again from ae1.130,
+#               the services interface.
+drills:
+  probes:
+    public: {from: k8s-cp2, to: public, count: 5, interval_s: 0.5, timeout_s: 1}
+  timing: {settle_s: 5, ntp_wait_s: 300, log_pause_s: 10}
+  list:
+    - id: land
+      title: no-nat-public removed, a node's requests to the public address discarded as a LAND attack
+      nat_removed: no-nat-public
+      counter: flow_policy_nat_land
+      probe: public
+      capture: [receive, drop]
+    - id: ntp-uplink
+      title: the firewall's own NTP and DNS sent from the uplink by their service routes, dropped by deny-all-log
+      service_route: {service: ntp, interface: ethernet1/5, with: [dns]}
+      expect_rule: deny-all-log

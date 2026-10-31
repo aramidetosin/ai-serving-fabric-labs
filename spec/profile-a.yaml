@@ -1,0 +1,1353 @@
+# Tarnwick, build A: the enterprise pod (FRAMEWORK.md sections 1.1 to 1.5).
+#
+# State "one" (chapters 1 to 7) is fixed: every chapter of it sees all of it. State "many"
+# (chapters 8 to 11) is cumulative: an element with when: "many>=9" appears from chapter 9 on.
+#
+# Every element may carry:
+#   when:     the states and steps it exists in, for example one, "many>=9", "one | many<=8"
+#   decision: the decision id chapter 2 stamps into rule descriptions, labels and zone comments
+#   since:    the chapter that teaches it (metadata only, it selects nothing)
+#
+# Port numbers never move under a slice: k8s-cp1 is eth4 (Ethernet3) on both pair switches in
+# every lab. This file holds no secrets. Edit it, then run `make render` in the lab.
+
+profile: a
+build: A
+
+# domain is the enterprise's own corporate domain, which the platform does not own; zone is the
+# subdomain delegated to the platform: every serving and
+# infrastructure name of the lab lives under it, written by the platform's own authoritative pair,
+# and nothing is published at the corporate apex (no wildcard there or anywhere).
+org:
+  name: Tarnwick
+  domain: tarnwick.example
+  zone: ai.tarnwick.example
+  short: tw
+  label_domain: tarnwick.example
+
+mgmt:
+  network: sfab-a-mgmt
+  subnet: 172.21.40.0/24
+  gw: 1
+  bridge: sfab-a-mgmt
+
+states:
+  one:
+    steps: [1, 2, 3, 4, 5, 6, 7]
+    step_mode: fixed
+    features: {k8s: true, serving: true, storage_setup: true}
+  many:
+    steps: [8, 9, 10, 11]
+    step_mode: cumulative
+    features: {k8s: true, serving: true, storage_setup: true}
+
+# What each feature pulls into a slice (FRAMEWORK 1.4 step 4), and the features it needs.
+# A Kubernetes lab holds the services every node and the bastion use: the authoritative pair, the
+# two resolvers (which also serve time) and the time reference upstream of them.
+features:
+  k8s:           {nodes: [k8s-cp1, k8s-cp2, k8s-cp3, k8s-ingress1, k8s-ingress2, bastion, inet-registry, uplink-rtr, dns-auth1, dns-auth2, dns-res1, dns-res2, inet-ntp]}
+  serving:       {features: [k8s], nodes: [k8s-gpu1, k8s-gpu2]}
+  storage_setup: {features: [k8s], nodes: [truenas1]}
+
+# ---------------------------------------------------------------------------------------------
+# Addressing plan (FRAMEWORK 1.5). scope: internal must be RFC 1918; external must be RFC 5737
+# or RFC 3849; mgmt is the containerlab management network. mtu is the segment's one IP MTU: every
+# member of it, the firewall's unit included, uses that MTU (validate checks it), and the firewall
+# routes between segments of different MTU, where path MTU discovery works.
+segments:
+  - {id: mgmt,         prefix: 172.21.40.0/24,  scope: mgmt,     desc: containerlab management network sfab-a-mgmt}
+  - {id: nodes,        prefix: 10.20.1.0/24,    scope: internal, vlan: 100, mtu: 9000, desc: "nodes: the control, GPU and ingress nodes, and the API VIP"}
+  - {id: ingress,      prefix: 10.20.11.0/24,   scope: internal, vlan: 110, mtu: 1500, desc: "ingress: the ingress nodes' units and the Gateway VIPs"}
+  - {id: storage-data, prefix: 10.20.12.0/24,   scope: internal, vlan: 120, mtu: 9000, desc: "storage data, Layer 2 only: TrueNAS's data bond and the GPU nodes' units"}
+  - {id: stor-mgmt,    prefix: 10.20.2.0/24,    scope: internal, vlan: 200, mtu: 1500, desc: "storage management: TrueNAS's API, and only there"}
+  - {id: bastion,      prefix: 10.20.3.0/24,    scope: internal, vlan: 300, mtu: 1500, desc: "the jump host's own VLAN, the firewall's administrative interface"}
+  - {id: services-a,   prefix: 10.20.13.0/24,   scope: internal, vlan: 130, mtu: 1500, desc: "services, first segment: dns-auth1 and dns-res1"}
+  - {id: services-b,   prefix: 10.20.14.0/24,   scope: internal, vlan: 131, mtu: 1500, desc: "services, second segment: dns-auth2 and dns-res2"}
+  - {id: oob,          prefix: 10.20.9.0/24,    scope: internal, vlan: 90,  mtu: 1500, desc: out-of-band BMC VLAN}
+  # The pair's own keepalive addresses, in the keepalive VRF on the pair only and never routed: a /31
+  # on the dedicated keepalive link and a /31 on the backup keepalive's VLAN interface (pairs.fe).
+  - {id: pair-keepalive, prefix: 10.20.255.0/24, scope: internal, desc: "the MCLAG pair's keepalive addresses, VRF VrfMclagKa on the pair only"}
+  - {id: rail1,      prefix: 10.21.1.0/24,    scope: internal, vlan: 101}
+  - {id: rail2,      prefix: 10.21.2.0/24,    scope: internal, vlan: 102}
+  - {id: rail3,      prefix: 10.21.3.0/24,    scope: internal, vlan: 103}
+  - {id: rail4,      prefix: 10.21.4.0/24,    scope: internal, vlan: 104}
+  - {id: rail5,      prefix: 10.21.5.0/24,    scope: internal, vlan: 105}
+  - {id: rail6,      prefix: 10.21.6.0/24,    scope: internal, vlan: 106}
+  - {id: rail7,      prefix: 10.21.7.0/24,    scope: internal, vlan: 107}
+  - {id: rail8,      prefix: 10.21.8.0/24,    scope: internal, vlan: 108}
+  - {id: relay,      prefix: 10.21.250.0/24,  scope: internal, node_local: true, desc: "in-node relay, the same on every GPU node"}
+  - {id: pods,       prefix: 10.22.0.0/16,    scope: internal}
+  - {id: services,   prefix: 10.23.0.0/16,    scope: internal}
+  # The enterprise LAN holds two hosts, the staff client and the corporate resolver, each on its own
+  # firewall port (FRAMEWORK 1.5: a segment with more than one host is a SONiC access switch or a
+  # router with one port per host; here the firewall is that router): one /30 per firewall port.
+  - {id: enterprise, prefix: 10.24.10.0/24,   scope: internal, per_port: 30, mtu: 1500, desc: "enterprise LAN, one /30 per firewall port"}
+  - {id: uplink,     prefix: 198.51.100.0/29, scope: external, mtu: 1500, desc: "uplink, the firewall's public address is .2"}
+  - {id: operator,   prefix: 192.0.2.0/26,    scope: external, per_port: 30, mtu: 1500, desc: "the uplink side's hosts, one /30 per router port"}
+  # The operator's site: the LAN behind its VPN router (ops-gw), which the IPsec tunnel protects; and
+  # an internet host that is not the operator, outside that prefix.
+  - {id: operator-site, prefix: 192.0.2.0/30,  scope: external, within: operator, mtu: 1500, desc: "the operator's site LAN behind ops-gw, the tunnel's remote prefix"}
+  - {id: web,           prefix: 192.0.2.16/30, scope: external, within: operator, mtu: 1500, desc: "an internet host outside the operator's prefix"}
+  - {id: isp,        prefix: 198.51.100.8/30, scope: external, when: "many>=9", desc: ISP link}
+  - {id: internet,   prefix: 203.0.113.0/26,  scope: external, per_port: 30, when: "many>=9", desc: "internet users, one /30 per router port"}
+  - {id: v6-org,     prefix: "2001:db8:a::/48", scope: external, reserved: true, desc: IPv6 only where a chapter answers AAAA}
+  - {id: v6-public,  prefix: "2001:db8:f::/48", scope: external, reserved: true, when: "many>=9", desc: "the ISP and internet users, IPv6"}
+
+vlans:
+  - {id: 100, name: nodes,     segment: nodes,     gw: fw/ae1.100, since: 3}
+  - {id: 110, name: ingress,   segment: ingress,   gw: fw/ae1.110, since: 3}
+  - {id: 120, name: storage-data, segment: storage-data, since: 3}
+  - {id: 200, name: stor-mgmt, segment: stor-mgmt, gw: fw/ae1.200, since: 3}
+  - {id: 300, name: bastion,   segment: bastion,   gw: fw/ae1.300, since: 3}
+  - {id: 130, name: services-a, segment: services-a, gw: fw/ae1.130, since: 1}
+  - {id: 131, name: services-b, segment: services-b, gw: fw/ae1.131, since: 1}
+  - {id: 90,  name: oob,       segment: oob,       gw: fw/ethernet1/3, since: 15}
+  - {id: 101, name: rail1, segment: rail1, since: 5}
+  - {id: 102, name: rail2, segment: rail2, since: 5}
+  - {id: 103, name: rail3, segment: rail3, since: 5}
+  - {id: 104, name: rail4, segment: rail4, since: 5}
+  - {id: 105, name: rail5, segment: rail5, since: 5}
+  - {id: 106, name: rail6, segment: rail6, since: 5}
+  - {id: 107, name: rail7, segment: rail7, since: 5}
+  - {id: 108, name: rail8, segment: rail8, since: 5}
+
+# Rail r is VLAN 10r with no gateway; GPU node n holds .(10+n) on every rail.
+rails:
+  - {r: 1, vlan: 101, segment: rail1}
+  - {r: 2, vlan: 102, segment: rail2}
+  - {r: 3, vlan: 103, segment: rail3}
+  - {r: 4, vlan: 104, segment: rail4}
+  - {r: 5, vlan: 105, segment: rail5}
+  - {r: 6, vlan: 106, segment: rail6}
+  - {r: 7, vlan: 107, segment: rail7}
+  - {r: 8, vlan: 108, segment: rail8}
+
+# The in-node relay (chapter 5): namespace gpuR holds a macvlan on rail NIC railR with the rail
+# address, and a veth "relay" to bridge relay0 with .R in the relay segment; a route to each
+# other rail goes via the sibling namespace, pinned to the namespace's own rail address.
+relay:
+  segment: relay
+  bridge: relay0
+  mtu: 9000
+  rp_filter: 2
+  ip_forward: 1
+
+# ---------------------------------------------------------------------------------------------
+# Switches. Container ethN is Ethernet(N-1) up to 48 (ports.native).
+switches:
+  fe-sw1:   {role: mclag_member, group: fe,   pair: fe, mgmt: 11, since: 3}
+  fe-sw2:   {role: mclag_member, group: fe,   pair: fe, mgmt: 12, since: 3}
+  rail-sw1: {role: rail_vlan,    group: rail, rails: [1, 3, 5, 7], mgmt: 21, since: 5}
+  rail-sw2: {role: rail_vlan,    group: rail, rails: [2, 4, 6, 8], mgmt: 22, since: 5}
+  oob-sw:   {role: oob_access,   group: oob,  vlan: 90, mgmt: 31, since: 15}
+
+# The pair (build A revision 2; chapter 3's lab proved each line on SONiC 4.6.0). The MCLAG
+# session runs over a dedicated routed
+# link (eth13, Ethernet12) in its own VRF, never over the management port (Dell KB 000191811: "using
+# the management interface does not offer redundancy"); a backup keepalive session runs over a VLAN
+# interface carried on the peer link only (VLAN 3966: 4.6.0 reserves 3967 to 4094; the VLAN
+# interface needs mclag-separate-ip, or both ends share the active's MAC). The first member takes
+# the first address of each /31. passthrough keeps Management0 on the harness address the stages
+# reach the switch on; nothing of the pair's own runs over it.
+pairs:
+  fe:
+    members: [fe-sw1, fe-sw2]
+    domain: 1
+    system_mac: "02:5a:00:00:00:01"
+    peer_link: {pc: 1, eth: [1, 2]}
+    trunk_vlans: [100, 110, 120, 130, 131, 200, 300]
+    keepalive:
+      vrf: VrfMclagKa
+      segment: pair-keepalive
+      link: {eth: 13, prefix: 10.20.255.0/31}
+      backup: {vlan: 3966, prefix: 10.20.255.4/31, interval: 1}
+    passthrough: true
+    decision: dec-pair-l2-only
+    since: 3
+
+# Layer 2 hygiene on the pair and the rail switches (build A revision 2, Chapter 3): every port at
+# 9216, the platform maximum, so a frame of any VLAN fits (the peer link and the host PortChannels
+# included; a member takes its PortChannel's MTU); PVST, with every host-facing PortChannel and
+# rail access port an edge port (portfast) whose BPDU guard shuts it on any BPDU; the peer link
+# (outside spanning tree under MCLAG) and the firewall's trunk are not edge ports. Storm control in
+# kbps per member and access port (SONiC 4.6.0 refuses it on a PortChannel). The out-of-band switch
+# stays as it was.
+l2:
+  roles: [mclag_member, rail_vlan]
+  port_mtu: 9216
+  stp: pvst
+  edge: true
+  storm_control_kbps: {broadcast: 10000, unknown-unicast: 10000, unknown-multicast: 10000}
+
+# The pair's port plan (chapter 3's lab), the same ports on both switches:
+#   eth1-2 peer link (PortChannel1)      eth3 firewall ae1 (PortChannel10, trunk)
+#   eth13 the dedicated keepalive link (Ethernet12, routed, VRF VrfMclagKa)
+#   eth4-6 k8s-cp1-3 (PortChannel11-13)    eth7-8 k8s-gpu1-2 (PortChannel21-22, VLAN 100, 120 tagged)
+#   eth9 bastion (PortChannel30)         eth10-11 TrueNAS data bond (PortChannel31, VLAN 120, 2 per switch)
+#   eth12 TrueNAS management bond (PortChannel32, VLAN 200, one leg per switch)
+#   eth14-15 k8s-ingress1-2 (PortChannel14-15, VLAN 100, 110 tagged)
+#   eth16-19 the services hosts dns-auth1, dns-res1, dns-auth2, dns-res2 (PortChannel41-44), access VLAN 130 or 131
+# The out-of-band switch: eth1-2 k8s-gpu1-2, eth3 firewall, eth4-6 k8s-cp1-3, eth7-8 k8s-ingress1-2. The bastion
+# has no leg in the BMC VLAN: it reaches the BMCs through the firewall from its own VLAN.
+# The rail switches: k8s-gpu1 on eth1-4, k8s-gpu2 on eth5-8, in the order of the switch's rails.
+
+# ---------------------------------------------------------------------------------------------
+# Appliances: the PA-VM and TrueNAS. attach: lists each wire; to: a pair puts nics[0..k-1] on
+# the first member and nics[k..2k-1] on the second, at the same port numbers.
+appliances:
+  fw:
+    kind: paloalto_panos
+    group: fw
+    mgmt: 40
+    since: 4
+    attach:
+      - {id: ae1, to: fe, pc: 10, eth: 3, nics: [eth1, eth2], mode: trunk, vlans: [100, 110, 130, 131, 200, 300], mtu: 9216, decision: dec-fw-every-gateway}
+      - {id: oob, to: oob-sw, eth: 3, nic: eth3, vlan: 90}
+      - {id: enterprise, to: ent-client, nic: eth4, peer_nic: eth1}
+      - {id: enterprise-dns, to: ent-dns, nic: eth7, peer_nic: eth1}
+      - {id: uplink, to: uplink-rtr, nic: eth5, peer_nic: eth1}
+      - {id: isp, to: isp-rtr, nic: eth6, peer_nic: eth1, when: "many>=9"}
+
+  truenas1:
+    kind: truenas
+    group: storage
+    mgmt: 121
+    since: 3
+    attach:
+      - {id: data, to: fe, pc: 31, eth: [10, 11], nics: [eth1, eth2, eth3, eth4], mode: access, vlan: 120}
+      - {id: mgmt, to: fe, pc: 32, eth: 12, nics: [eth5, eth6], mode: access, vlan: 200}
+    # Storage data on its own Layer 2 VLAN (120, no gateway), storage management on VLAN 200 behind
+    # the firewall (NIST SP 800-209: data access apart from management). The API answers on the
+    # management address only, and the CSI driver reaches it there through the firewall; the data
+    # bond carries NFS and NVMe/TCP to the GPU nodes' VLAN 120 units and nothing else. Both legs of
+    # each bond are on different switches, so no port of TrueNAS is an orphan.
+    storage:
+      product: truenas
+      data: {segment: storage-data, octet: 31, nics: [eth1, eth2, eth3, eth4], mtu: 9000, lacp: {rate: fast, hash: layer3+4}}
+      mgmt_if: {segment: stor-mgmt, octet: 31, nics: [eth5, eth6], lacp: {rate: fast, hash: layer3+4}}
+      gateway: fw/ae1.200
+      # The management return route goes in first, so the setup script keeps its session while
+      # the gateway moves (via: qemu-user is the vrnetlab VM's user-mode NIC gateway).
+      routes:
+        - {id: mgmt-return, dest: mgmt, via: qemu-user, first: true}
+      dns: [dns-res1, dns-res2]
+      ntp: [dns-res1, dns-res2]
+      pool: tank
+      data_disks: 4
+      data_disk_size: 100G
+      arc_max_mb: 6144
+      services: [nfs, nvmet]
+      datasets: [k8s/nvmeof, k8s/nvmeof-snaps, k8s/nfs, k8s/nfs-snaps]
+      csi: {user: democratic-csi, api: mgmt, classes: [nvmeof, nfs], default_class: nvmeof}
+      decision: dec-storage-data-address
+
+# ---------------------------------------------------------------------------------------------
+# Hosts. A vm-node or bastion uses the conventional NICs (common.yaml guest.nics): bond on
+# eth1 and eth2, out-of-band on eth3, rails from eth4. bond: {pc, eth} puts the bond on both
+# pair switches at that port; oob_eth is the out-of-band switch port; rails: {switch_eth} is
+# the first of the node's four ports on each rail switch. octet is the host's address in its
+# VLAN (vlan, default 100) and its BMC address in the out-of-band VLAN.
+#
+# A VM guest's disk_gib is the virtual size of its root disk (VM_DISK_GIB): a thin qcow2 overlay
+# of the baked base disk, grown to that size and never shrunk. state_gib is preflight's budget
+# for it, the expected growth of state/nodes/<n> (FRAMEWORK.md 3.1). Its basis, read on the lab
+# host on 2026-10-20:
+# - M1's two guests held 148 MiB and 175 MiB in state/nodes/<n> after all of M1's runs (du -sh:
+#   the overlay, the seed, the console logs), with no image pulled;
+# - the 22 images the registry holds for the cluster (control plane, kube-vip, Cilium,
+#   cert-manager, democratic-csi, the test backend, helm) are 0.97 GiB as pulled and 2.75 GiB
+#   unpacked for linux/amd64, summed from the seeded blobs; the budget counts each node holding
+#   every one of them in both forms, 3.7 GiB;
+# - a control node: 0.2 + 3.7 = 3.9 GiB, budgeted at 6 GiB; the other 2.1 GiB is headroom for
+#   etcd's data and the journal, which M2's deploy measures;
+# - a GPU node: the same 3.9 GiB, plus 8 GiB held for the serving image it holds from chapter 6
+#   on, budgeted at 12 GiB. The image holds no model since revision 2 (the weights come from the
+#   models share, read-only, never written to the node's disk); the budget stays at 12 GiB until
+#   chapter 6's deploy records what a GPU node's disk holds.
+# - a GPU node's memory (revision 2, measured on the lab host on 2026-10-28 with llama.cpp b11382,
+#   the node's pods each in a container on 12 pinned CPUs, the server arguments below): the
+#   workers holding a whole copy read 14.3 GB resident for chat and 16.7 GB for staff, a worker
+#   holding half of chat's spanning copy c 7.3 GB, the servers 0.3 GB to 0.9 GB: 37 GiB of serving
+#   pods on k8s-gpu1 (36.5 on k8s-gpu2), plus the node's own 2 to 3 GiB: 42 GiB. A server maps its
+#   whole file while it loads (its high-water mark read 14.5 GB) and keeps none of it: those pages
+#   are the page cache's, which the kernel reclaims.
+#   Three workers of 4 threads and the servers' 2 each: 12 vCPUs. serving: {mem_gib, vcpus} sizes the
+#   node so in a lab whose features turn serving on; every other lab keeps its 16 GiB and 8 vCPUs.
+hosts:
+  k8s-cp1:
+    kind: vm-node
+    group: ctrl
+    mgmt: 101
+    octet: 11
+    mem_gib: 8
+    vcpus: 4
+    disk_gib: 40
+    state_gib: 6
+    k8s: init
+    bond: {pc: 11, eth: 4}
+    oob_eth: 4
+    since: 3
+  k8s-cp2:
+    kind: vm-node
+    group: ctrl
+    mgmt: 102
+    octet: 12
+    mem_gib: 8
+    vcpus: 4
+    disk_gib: 40
+    state_gib: 6
+    k8s: join-control
+    bond: {pc: 12, eth: 5}
+    oob_eth: 5
+    since: 3
+  k8s-cp3:
+    kind: vm-node
+    group: ctrl
+    mgmt: 103
+    octet: 13
+    mem_gib: 8
+    vcpus: 4
+    disk_gib: 40
+    state_gib: 6
+    k8s: join-control
+    bond: {pc: 13, eth: 6}
+    oob_eth: 6
+    since: 3
+  k8s-gpu1:
+    kind: vm-node
+    group: gpu
+    index: 1
+    mgmt: 111
+    octet: 21
+    mem_gib: 16
+    vcpus: 8
+    serving: {mem_gib: 42, vcpus: 12}
+    disk_gib: 80
+    state_gib: 12
+    k8s: join-worker
+    bond: {pc: 21, eth: 7, tagged: [{vlan: 120}]}
+    oob_eth: 1
+    rails: {switch_eth: 1}
+    relay: true
+    since: 3
+  k8s-gpu2:
+    kind: vm-node
+    group: gpu
+    index: 2
+    mgmt: 112
+    octet: 22
+    mem_gib: 16
+    vcpus: 8
+    serving: {mem_gib: 42, vcpus: 12}
+    disk_gib: 80
+    state_gib: 12
+    k8s: join-worker
+    bond: {pc: 22, eth: 8, tagged: [{vlan: 120}]}
+    oob_eth: 2
+    rails: {switch_eth: 5}
+    relay: true
+    since: 3
+  # The ingress nodes (build A revision 2): Kubernetes workers that hold the Gateway VIPs' L2
+  # announcement leases and nothing else a user reaches, tainted so only what tolerates the taint
+  # runs there. Each has its node address in VLAN 100 and a tagged unit in VLAN 110, where the VIPs
+  # live; a policy rule sends traffic sourced from VLAN 110 out of that unit by table 110, so a
+  # Gateway's replies leave the way the request came in.
+  k8s-ingress1:
+    kind: vm-node
+    group: ingress
+    mgmt: 104
+    octet: 31
+    mem_gib: 6
+    vcpus: 4
+    disk_gib: 40
+    state_gib: 6
+    k8s: join-worker
+    bond: {pc: 14, eth: 14, tagged: [{vlan: 110, octet: 11, table: 110}]}
+    oob_eth: 7
+    since: 3
+  k8s-ingress2:
+    kind: vm-node
+    group: ingress
+    mgmt: 105
+    octet: 32
+    mem_gib: 6
+    vcpus: 4
+    disk_gib: 40
+    state_gib: 6
+    k8s: join-worker
+    bond: {pc: 15, eth: 15, tagged: [{vlan: 110, octet: 12, table: 110}]}
+    oob_eth: 8
+    since: 3
+  # The bastion is a jump host and nothing else: one leg, in its
+  # own VLAN, which the firewall's administrative interface answers from. It serves no DNS, no time
+  # and no CA, has no leg in the BMC VLAN and holds no standing cluster-admin credential: an
+  # operator's kubeconfig there is a client certificate valid for operator_kubeconfig_h hours,
+  # issued on the init node, and the harness's own kubectl runs on the init node (k8s.admin_node).
+  bastion:
+    kind: bastion
+    group: bastion
+    mgmt: 50
+    vlan: 300
+    octet: 10
+    bond: {pc: 30, eth: 9, ip_mtu: 1500}
+    resolver: [dns-res1, dns-res2]
+    requires: [fw, dns-res1, dns-res2]
+    since: 4
+
+  # The services: two authoritative servers for the platform's zone on different
+  # segments, recursion off (dns-auth1 the primary, dns-auth2 its secondary by zone transfer, each view's
+  # transfer keyed by its own TSIG key), and two recursive resolvers that every inside client asks,
+  # which also serve time (chrony, from inet-ntp upstream). Each is a container on the pair with an
+  # LACP bond, one leg a switch, in VLAN 130 or 131 (IP MTU 1500). The resolvers forward nothing
+  # outside the lab: the platform's zone and its reverse zones go to the authoritative pair, and
+  # every other name is answered NXDOMAIN at once (they are authoritative for an empty root).
+  dns-auth1:
+    kind: resolver
+    role: dns-auth
+    group: services
+    mgmt: 56
+    vlan: 130
+    octet: 11
+    bond: {pc: 41, eth: 16, ip_mtu: 1500}
+    dns_role: bind-auth
+    resolver: [dns-res1, dns-res2]
+    requires: [fw]
+    since: 1
+  dns-res1:
+    kind: resolver
+    role: dns-res
+    group: services
+    mgmt: 57
+    vlan: 130
+    octet: 21
+    bond: {pc: 42, eth: 17, ip_mtu: 1500}
+    dns_role: bind-recursive
+    resolver: [dns-res1, dns-res2]
+    requires: [fw, dns-auth1, dns-auth2, inet-ntp]
+    since: 1
+  dns-auth2:
+    kind: resolver
+    role: dns-auth
+    group: services
+    mgmt: 58
+    vlan: 131
+    octet: 11
+    bond: {pc: 43, eth: 18, ip_mtu: 1500}
+    dns_role: bind-auth
+    resolver: [dns-res1, dns-res2]
+    requires: [fw, dns-auth1]
+    since: 1
+  dns-res2:
+    kind: resolver
+    role: dns-res
+    group: services
+    mgmt: 59
+    vlan: 131
+    octet: 21
+    bond: {pc: 44, eth: 19, ip_mtu: 1500}
+    dns_role: bind-recursive
+    resolver: [dns-res1, dns-res2]
+    requires: [fw, dns-auth1, dns-auth2, inet-ntp]
+    since: 1
+
+  # The uplink side, prebuilt since chapter 1: one /30 per router port on the operator segment.
+  #
+  # The uplink router routes build A's inside prefixes to the firewall's public address (from
+  # the chapter 4 lab on), so an operator request to any inside address reaches
+  # the firewall and leaves a deny-all-log line there, where chapter 2's matrix reads its refusal;
+  # without the route it would die here unseen. dest seg:<segment> is that segment's prefix, via
+  # public the firewall's public address. render/frr.py routes a segment only while the firewall
+  # gateways it in the lab: a prefix the firewall does not hold would come back on its default route.
+  uplink-rtr:
+    kind: frr
+    group: uplink
+    mgmt: 61
+    ifaces:
+      eth1: {address: 198.51.100.1/29}
+      eth3: {address: 192.0.2.5/30}
+      eth4: {address: 192.0.2.9/30}
+      eth5: {address: 192.0.2.13/30}
+      eth6: {address: 192.0.2.17/30}
+      eth7: {address: 192.0.2.21/30}
+    routes:
+      # the operator's site LAN sits behind its VPN router
+      - {id: operator-site,     dest: "seg:operator-site", via: 192.0.2.22, since: 4}
+      - {id: inside-nodes,      dest: "seg:nodes",      via: public, decision: dec-route-inside-via-fw, since: 4}
+      - {id: inside-ingress,    dest: "seg:ingress",    via: public, decision: dec-route-inside-via-fw, since: 4}
+      - {id: inside-stor-mgmt,  dest: "seg:stor-mgmt",  via: public, decision: dec-route-inside-via-fw, since: 4}
+      - {id: inside-bastion,    dest: "seg:bastion",    via: public, decision: dec-route-inside-via-fw, since: 4}
+      - {id: inside-services-a, dest: "seg:services-a", via: public, decision: dec-route-inside-via-fw, since: 4}
+      - {id: inside-services-b, dest: "seg:services-b", via: public, decision: dec-route-inside-via-fw, since: 4}
+      - {id: inside-oob,        dest: "seg:oob",        via: public, decision: dec-route-inside-via-fw, since: 4}
+      - {id: inside-enterprise, dest: "seg:enterprise", via: public, decision: dec-route-inside-via-fw, since: 4}
+    requires: [fw]
+    since: 4
+  # The operator's site (build A revision 2): its VPN router holds an IPsec site-to-site tunnel to the
+  # firewall's public address (strongSwan, IKEv2, a pre-shared key made per lab), protecting the
+  # site LAN to the platform's prefixes; the operator's client sits behind it. The firewall
+  # terminates the tunnel in its own zone, operator-vpn, and publishes nothing on the internet.
+  ops-gw:
+    kind: vpngw
+    group: uplink
+    mgmt: 64
+    ifaces:
+      eth1: {address: 192.0.2.22/30, gw: 192.0.2.21}
+      eth2: {address: 192.0.2.1/30}
+    attach:
+      - {id: uplink, to: uplink-rtr, nic: eth1, peer_nic: eth7}
+    # the firewall's tunnel this router is the far end of: its traffic selectors mirror that
+    # tunnel's proxy IDs (render/host.py writes swanctl.conf from them)
+    vpn: {firewall_vpn: ops-gw}
+    requires: [uplink-rtr, fw]
+    since: 4
+  ops-client:
+    kind: client
+    group: uplink
+    mgmt: 81
+    ifaces:
+      eth1: {address: 192.0.2.2/30, gw: 192.0.2.1}
+    attach:
+      - {id: site, to: ops-gw, nic: eth1, peer_nic: eth2}
+    resolver: ops-dns
+    requires: [ops-gw]
+    since: 4
+  # An internet host that is not the operator: the matrix's proof that the operator's path is
+  # refused to everyone else. It listens on 443, so an inside population's egress to an arbitrary
+  # internet host has something to reach.
+  web-client:
+    kind: client
+    group: uplink
+    mgmt: 84
+    ifaces:
+      eth1: {address: 192.0.2.18/30, gw: 192.0.2.17}
+    attach:
+      - {id: uplink, to: uplink-rtr, nic: eth1, peer_nic: eth6}
+    listen: [443]
+    resolver: ops-dns
+    requires: [uplink-rtr]
+    since: 4
+  inet-registry:
+    kind: registry
+    group: uplink
+    mgmt: 70
+    ifaces:
+      eth1: {address: 192.0.2.6/30, gw: 192.0.2.5}
+    attach:
+      - {id: uplink, to: uplink-rtr, nic: eth1, peer_nic: eth3}
+    requires: [uplink-rtr]
+    since: 4
+  # The upstream time reference, a stand-in for an internet NTP service: chrony serving the lab
+  # host's clock (a container shares the host kernel's clock; chronyd runs with -x and never adjusts
+  # it), with NTS, its certificate signed by the lab's internet intermediate. dns-res1 and dns-res2 follow it.
+  inet-ntp:
+    kind: resolver
+    role: inet-ntp
+    group: uplink
+    mgmt: 63
+    ifaces:
+      eth1: {address: 192.0.2.14/30, gw: 192.0.2.13}
+    attach:
+      - {id: uplink, to: uplink-rtr, nic: eth1, peer_nic: eth5}
+    requires: [uplink-rtr]
+    since: 1
+  ops-dns:
+    kind: resolver
+    group: uplink
+    mgmt: 53
+    ifaces:
+      eth1: {address: 192.0.2.10/30, gw: 192.0.2.9}
+    attach:
+      - {id: uplink, to: uplink-rtr, nic: eth1, peer_nic: eth4}
+    dns_role: bind-auth
+    requires: [uplink-rtr]
+    since: 7
+
+  # The enterprise LAN: one client on the firewall's ethernet1/4 in state one. Chapter 9 adds
+  # the LAN resolver and settles the LAN's layout (FRAMEWORK 1.5, segments with more than one host).
+  ent-client:
+    kind: client
+    group: enterprise
+    mgmt: 82
+    ifaces:
+      eth1: {address: 10.24.10.10/30, gw: 10.24.10.9}
+    resolver: [ent-dns]
+    # A lookup must outlast an LACP failover on the pair (about 3 s), or a client running through a
+    # drill fails on its name before the path recovers (chapter 3's drills run from this client).
+    resolv_options: "timeout:10 attempts:4"
+    requires: [fw, ent-dns]
+    since: 1
+  # The enterprise's own corporate resolver (a stand-in): dnsmasq, recursion on for staff. It answers
+  # the corporate names itself and forwards the platform's zone, and only that, to the platform's
+  # authoritative pair; the enterprise keeps its resolver and the platform owns only its subdomain.
+  ent-dns:
+    kind: resolver
+    role: dns-corporate
+    group: enterprise
+    mgmt: 55
+    ifaces:
+      eth1: {address: 10.24.10.53/30, gw: 10.24.10.54}
+    dns_role: dnsmasq
+    requires: [fw]
+    since: 1
+
+  # The internet side (state many, from chapter 9).
+  isp-rtr:
+    kind: frr
+    group: internet
+    mgmt: 62
+    ifaces:
+      eth1: {address: 198.51.100.9/30}
+      eth2: {address: 203.0.113.1/30}
+      eth3: {address: 203.0.113.5/30}
+    # The ISP routes only the public address inward (chapter 11's first layer).
+    routes:
+      - {id: public-address, dest: 198.51.100.2/32, via: 198.51.100.10}
+    requires: [fw]
+    when: "many>=9"
+    since: 9
+  inet-client:
+    kind: client
+    group: internet
+    mgmt: 83
+    ifaces:
+      eth1: {address: 203.0.113.2/30, gw: 203.0.113.1}
+    attach:
+      - {id: isp, to: isp-rtr, nic: eth1, peer_nic: eth2}
+    resolver: inet-dns
+    requires: [isp-rtr]
+    when: "many>=9"
+    since: 9
+  inet-dns:
+    kind: resolver
+    group: internet
+    mgmt: 54
+    ifaces:
+      eth1: {address: 203.0.113.6/30, gw: 203.0.113.5}
+    attach:
+      - {id: isp, to: isp-rtr, nic: eth1, peer_nic: eth3}
+    dns_role: bind-auth
+    requires: [isp-rtr]
+    when: "many>=9"
+    since: 9
+
+# The in-lab registry (FRAMEWORK.md section 5), the upstream registry's stand-in on the uplink side
+# so a node's pull crosses the firewall's source NAT. It serves HTTPS with a
+# certificate the lab's internet intermediate signs (ca.leaves: inet-registry): containerd's hosts.toml
+# names it with https:// and the lab root as its CA, and helm reaches its OCI charts with
+# --ca-file. An image a pod names as <upstream>/<repo>:<tag> is served from
+# <mirror>/<upstream>/<repo>:<tag>, and every node gets one hosts.toml per upstream
+# (override_path = true, one config_path directory). Helm charts are OCI artifacts under
+# <mirror>/<charts>/<chart>.
+registry:
+  node: inet-registry
+  port: 5000
+  name: registry
+  scheme: https
+  upstreams: [docker.io, ghcr.io, quay.io, registry.k8s.io]
+  charts: charts
+
+# Time (chapter 4). The two resolvers serve time to every inside segment (chrony): each follows the
+# upstream reference over NTS (RFC 8915, the reference's certificate from the lab's internet
+# intermediate), and falls back to its own clock at local_stratum when the reference is out of
+# reach. Every client names both servers. The reference serves the lab host's clock (a container
+# shares the host kernel's clock, whose tick preflight reads) at reference_stratum. No chronyd in
+# the lab adjusts the clock (-x). The VM guests and TrueNAS take their time from the two resolvers,
+# and so does the firewall's own NTP, out of its services interface (firewall.system).
+ntp:
+  servers: [dns-res1, dns-res2]
+  upstream: inet-ntp
+  nts: true
+  allow: [nodes, ingress, stor-mgmt, bastion, oob, services-a, services-b]
+  local_stratum: 10
+  reference_stratum: 2
+
+# ---------------------------------------------------------------------------------------------
+# The firewall (chapter 4): one routing instance, a zone per interface, route then translation
+# then rule. Address references: any, public (the public address /32), vip:<gateway>,
+# seg:<segment>, node:<host> (its primary address /32), mgmt:<storage> (its management address),
+# fw:<interface> (the firewall's own address on that interface), addr:<name> and group:<name> (the address objects and groups below), or a literal prefix.
+#
+# Every allow rule names its App-IDs with service application-default (an explicit service only
+# where a non-default port forces it: the API server's 6443, the registry's 5000, NTS-KE's 4460),
+# carries the profile group, and logs at session end; deny-all-log closes the rulebase, and the
+# predefined intrazone and interzone rules are set to deny and log, so nothing passes unlisted in
+# either direction. Egress is allowlisted: the nodes reach the registry, the resolvers reach the
+# time reference, and nothing else leaves. The lab's PA-VM is unlicensed: App-ID runs on the factory
+# content 9010-9583, and the profiles attach but hold no signatures (threat and antivirus content
+# version 0); Zone Protection needs no licence.
+firewall:
+  node: fw
+  hostname: fw
+  vr: core
+  public: ethernet1/5
+  interfaces:
+    - {name: ae1, kind: aggregate, members: [ethernet1/1, ethernet1/2], lacp: {mode: active, rate: fast}, mtu: 9216}
+    - {name: ae1.100, kind: subinterface, parent: ae1, tag: 100, address: 10.20.1.1/24, zone: k8s-nodes, mtu: 9000}
+    # mss_adjust: the SYNs through the ingress unit carry MSS 1500 - 140 = 1360, so a Gateway's
+    # full-size segment to the operator still fits the IPsec tunnel (tunnel.1, MTU 1400) with its
+    # ESP overhead: without it the Gateway's 1448-byte segments to ops-client were lost in the
+    # tunnel and every answer larger than one segment hung (build 4)
+    - {name: ae1.110, kind: subinterface, parent: ae1, tag: 110, address: 10.20.11.1/24, zone: ingress, mtu: 1500, mss_adjust: 140}
+    - {name: ae1.200, kind: subinterface, parent: ae1, tag: 200, address: 10.20.2.1/24, zone: stor-mgmt, mtu: 1500}
+    - {name: ae1.300, kind: subinterface, parent: ae1, tag: 300, address: 10.20.3.1/24, zone: bastion, mtu: 1500}
+    - {name: ae1.130, kind: subinterface, parent: ae1, tag: 130, address: 10.20.13.1/24, zone: services, mtu: 1500}
+    - {name: ae1.131, kind: subinterface, parent: ae1, tag: 131, address: 10.20.14.1/24, zone: services, mtu: 1500}
+    - {name: ethernet1/3, kind: layer3, address: 10.20.9.254/24, zone: oob}
+    - {name: ethernet1/4, kind: layer3, address: 10.24.10.9/30, zone: enterprise}
+    - {name: ethernet1/7, kind: layer3, address: 10.24.10.54/30, zone: enterprise}
+    - {name: ethernet1/5, kind: layer3, address: 198.51.100.2/29, zone: uplink}
+    - {name: ethernet1/6, kind: layer3, address: 198.51.100.10/30, zone: isp, when: "many>=9", since: 9}
+    # the operator's IPsec tunnel ends here, in its own zone
+    - {name: tunnel.1, kind: tunnel, zone: operator-vpn, mtu: 1400, since: 4}
+  zones:
+    - {name: k8s-nodes}
+    - {name: ingress}
+    - {name: stor-mgmt}
+    - {name: bastion}
+    - {name: services}
+    - {name: oob}
+    - {name: enterprise}
+    - {name: uplink, zone_protection: zp-internet}
+    - {name: operator-vpn, since: 4}
+    - {name: isp, zone_protection: zp-internet, when: "many>=9", since: 9}
+  routes:
+    - {name: default-uplink, dest: 0.0.0.0/0, nexthop: 198.51.100.1, interface: ethernet1/5}
+    - {name: operator-site, dest: "seg:operator-site", interface: tunnel.1, since: 4}
+    - {name: isp-customers, dest: 203.0.113.0/26, nexthop: 198.51.100.9, interface: ethernet1/6, when: "many>=10", since: 10}
+    # RFC 1918 space the firewall holds no connected route for is discarded, never sent to the uplink
+    - {name: discard-10, dest: 10.0.0.0/8, discard: true, since: 4}
+    - {name: discard-172-16, dest: 172.16.0.0/12, discard: true, since: 4}
+    - {name: discard-192-168, dest: 192.168.0.0/16, discard: true, since: 4}
+  services:
+    - {name: tcp-443, protocol: tcp, port: "443"}
+    - {name: tcp-5000, protocol: tcp, port: "5000"}
+    - {name: tcp-6443, protocol: tcp, port: "6443"}
+    - {name: tcp-4460, protocol: tcp, port: "4460"}
+  # Named sources: the administrators (the staff client stands in for the admins' desks, the
+  # operator's site prefix arrives through the tunnel) and the monitoring collector, a reserved
+  # address in the bastion's VLAN that no host holds until chapter 20 adds it.
+  addresses:
+    - {name: ent-client, ref: "node:ent-client", desc: "the staff client, standing in for the administrators' desks"}
+    - {name: operator-site, ref: "seg:operator-site", desc: "the operator's site LAN, through the tunnel"}
+    - {name: collector, prefix: 10.20.3.20/32, desc: "the monitoring collector's reserved address, no host until chapter 20"}
+  groups:
+    - {name: admins, members: [ent-client, operator-site], desc: "where administrators reach the bastion from"}
+  profiles:
+    group: bp-default
+    virus: default
+    spyware: default
+    vulnerability: default
+    file_blocking: basic file blocking
+    zone_protection:
+      name: zp-internet
+      flood:
+        tcp-syn: {action: syn-cookies, alarm: 10000, activate: 10000, maximal: 40000}
+        udp: {alarm: 10000, activate: 10000, maximal: 40000}
+        icmp: {alarm: 10000, activate: 10000, maximal: 40000}
+        icmpv6: {alarm: 10000, activate: 10000, maximal: 40000}
+        other-ip: {alarm: 10000, activate: 10000, maximal: 40000}
+      discard: [ip-spoof, malformed-option, strict-ip-check]
+  default_rules:
+    intrazone-default: {action: deny, log_end: true}
+    interzone-default: {action: deny, log_end: true}
+  # The operator's tunnel: IKEv2 with a pre-shared key (made per lab under state/secrets/ipsec, set
+  # on the firewall by boot through the API and never rendered), AES-256 and SHA-256 with DH group
+  # 14, one proxy ID per protected pair.
+  crypto:
+    - {name: op-ike, kind: ike, encryption: [aes-256-cbc], hash: [sha256], dh: group14, lifetime_h: 8}
+    - {name: op-esp, kind: ipsec, encryption: [aes-256-cbc], hash: [sha256], dh: group14, lifetime_h: 1}
+  vpns:
+    - name: ops-gw
+      interface: ethernet1/5
+      peer: "node:ops-gw"
+      tunnel_interface: tunnel.1
+      ike_crypto: op-ike
+      ipsec_crypto: op-esp
+      psk: ops-gw
+      proxy_ids:
+        - {name: ingress, local: "seg:ingress", remote: "seg:operator-site"}
+        - {name: bastion, local: "seg:bastion", remote: "seg:operator-site"}
+      since: 4
+  # The firewall's own DNS and NTP go to the two resolvers (primary and secondary) out of its
+  # services interface, which carries no management profile (chapter 4).
+  system:
+    dns: [node:dns-res1, node:dns-res2]
+    ntp: [node:dns-res1, node:dns-res2]
+    service_route: ae1.130
+  # Administrative access (chapter 4): the firewall answers SSH and HTTPS on the bastion's VLAN
+  # interface only, and there only to the jump host itself (VLAN 300 holds nothing else, so it is the
+  # dedicated admin VLAN); nothing administrative is published on the uplink, and every other
+  # interface answers ping only. The PA-VM's own management port stays on containerlab's
+  # management network, where vrnetlab's launcher and the harness reach it (ch04/README.md).
+  admin: {interface: ae1.300, profile: bastion-admin, allow: [https, ssh, ping], permitted: ["node:bastion"], since: 4}
+  # Security rules, in order. Every rule logs at session end. deny-all-log is always last.
+  rules:
+    - {name: staff-to-users-gateway, from: [enterprise], to: [ingress], src: [seg:enterprise], dst: [vip:gw-users], application: [ssl], decision: dec-policy-enterprise-users, since: 4}
+    - {name: ent-dns-to-platform-dns, from: [enterprise], to: [services], src: [node:ent-dns], dst: [node:dns-auth1, node:dns-auth2], application: [dns], since: 4}
+    # The enterprise's own resolver sits on its own firewall port in the same zone as the staff
+    # client: with intrazone-default overridden to deny, the client's queries to it need a rule.
+    - {name: staff-to-enterprise-dns, from: [enterprise], to: [enterprise], src: [seg:enterprise], dst: [node:ent-dns], application: [dns], since: 4}
+    - {name: admins-to-bastion, from: [enterprise, operator-vpn], to: [bastion], src: [group:admins], dst: [node:bastion], application: [ssh], since: 4}
+    # The firewall's own administrative interface on ae1.300 (fw.admin): with the predefined
+    # intrazone-default overridden to deny, traffic from the bastion to the firewall's address in the
+    # bastion's own zone needs its rule, as the gateway pings do; the profile still permits the
+    # bastion alone. App-ID sees the web interface's HTTPS as ssl (no decryption), never as
+    # panos-web-interface (the traffic log of the first try: ssl, deny-all-log).
+    - {name: bastion-to-firewall-admin, from: [bastion], to: [bastion], src: [node:bastion], dst: ["fw:ae1.300"], application: [ssl, ssh], since: 4}
+    - {name: bastion-to-nodes, from: [bastion], to: [k8s-nodes], src: [node:bastion], dst: [seg:nodes], application: [ssh], since: 4}
+    - {name: bastion-to-api, from: [bastion], to: [k8s-nodes], src: [node:bastion], dst: [seg:nodes], application: [ssl], service: [tcp-6443], since: 4}
+    - {name: bastion-to-internal-gateway, from: [bastion], to: [ingress], src: [node:bastion], dst: [vip:gw-internal], application: [ssl], since: 4}
+    - {name: bastion-to-stor-mgmt, from: [bastion], to: [stor-mgmt], src: [node:bastion], dst: [mgmt:truenas1], application: [ssl], since: 4}
+    - {name: bastion-to-bmc, from: [bastion], to: [oob], src: [node:bastion, addr:collector], dst: [seg:oob], application: [ssh, ssl], since: 4}
+    - {name: bastion-to-services-admin, from: [bastion], to: [services], src: [node:bastion], dst: [node:dns-auth1, node:dns-res1, node:dns-auth2, node:dns-res2], application: [ssh], since: 4}
+    # Each segment's hosts ping their own gateway, the firewall's interface on it: traffic to the
+    # firewall's own address is intrazone, and intrazone-default is overridden to deny.
+    - {name: inside-to-gateway-ping, from: [k8s-nodes, ingress, stor-mgmt, services, bastion, oob, enterprise], to: [k8s-nodes, ingress, stor-mgmt, services, bastion, oob, enterprise], src: [seg:nodes, seg:ingress, seg:stor-mgmt, seg:services-a, seg:services-b, seg:bastion, seg:oob, seg:enterprise], dst: [fw:ae1.100, fw:ae1.110, fw:ae1.130, fw:ae1.131, fw:ae1.200, fw:ae1.300, fw:ethernet1/3, fw:ethernet1/4, fw:ethernet1/7], application: [ping], since: 4}
+    # A node's ping to the public address, the probe chapter 4's LAND check and land drill send
+    # through no-nat-public (deleted, internet-snat rewrites the source to that same address and the
+    # firewall discards it as a LAND attack, which it can do only once a rule has allowed the session).
+    # Rendered only in a lab whose drills plan runs the land drill (drill: land), so no other lab's
+    # rulebase changes: nothing else reaches the public address from inside.
+    - {name: nodes-to-public-ping, from: [k8s-nodes], to: [uplink], src: [seg:nodes], dst: [public], application: [ping], drill: land, since: 4}
+    - {name: inside-to-resolvers, from: [k8s-nodes, ingress, stor-mgmt, bastion, oob, services], to: [services], src: [seg:nodes, seg:ingress, seg:stor-mgmt, seg:bastion, seg:oob, seg:services-a, seg:services-b], dst: [node:dns-res1, node:dns-res2], application: [dns], since: 4}
+    - {name: inside-to-ntp, from: [k8s-nodes, ingress, stor-mgmt, bastion, oob, services], to: [services], src: [seg:nodes, seg:ingress, seg:stor-mgmt, seg:bastion, seg:oob, seg:services-a, seg:services-b], dst: [node:dns-res1, node:dns-res2], application: [ntp], since: 4}
+    - {name: resolvers-to-auth, from: [services], to: [services], src: [node:dns-res1, node:dns-res2], dst: [node:dns-auth1, node:dns-auth2], application: [dns], since: 4}
+    - {name: auth-zone-transfer, from: [services], to: [services], src: [node:dns-auth1, node:dns-auth2], dst: [node:dns-auth1, node:dns-auth2], application: [dns], since: 4}
+    - {name: ntp-upstream, from: [services], to: [uplink], src: [node:dns-res1, node:dns-res2], dst: [node:inet-ntp], application: [ntp], since: 4}
+    - {name: nts-ke-upstream, from: [services], to: [uplink], src: [node:dns-res1, node:dns-res2], dst: [node:inet-ntp], application: [ssl], service: [tcp-4460], since: 4}
+    - {name: nodes-to-registry, from: [k8s-nodes], to: [uplink], src: [seg:nodes], dst: [node:inet-registry], application: [ssl], service: [tcp-5000], since: 4}
+    - {name: nodes-to-internal-gateway, from: [k8s-nodes], to: [ingress], src: [seg:nodes], dst: [vip:gw-internal], application: [ssl], since: 4}
+    - {name: csi-to-storage-api, from: [k8s-nodes], to: [stor-mgmt], src: [seg:nodes], dst: [mgmt:truenas1], application: [ssl], since: 4}
+    - {name: operator-ike, from: [uplink], to: [uplink], src: [node:ops-gw], dst: [public], application: [ike, ipsec-esp, ipsec-esp-udp], since: 4}
+    - {name: operator-to-internal-gateway, from: [operator-vpn], to: [ingress], src: [seg:operator-site], dst: [vip:gw-internal], application: [ssl], decision: dec-policy-operator-vpn, since: 4}
+    - {name: isp-to-internet-gateway, from: [isp], to: [ingress], src: [any], dst: [public], application: [ssl], when: "many>=10", decision: dec-nat-internet, since: 10}
+    - {name: deny-all-log, from: [any], to: [any], src: [any], dst: [any], service: [any], action: deny, decision: dec-policy-deny-all-log, since: 2}
+  # NAT rules, in order: zones are the pre-NAT zones; a DNAT on the public address is written
+  # with the public address's own zone as its destination zone. Nothing is published on the uplink:
+  # the operator arrives through the tunnel, untranslated.
+  nat:
+    - {name: dnat-internet-gateway, from: [isp], to: [uplink], src: [any], dst: [public], service: tcp-443, dnat: vip:gw-inet, when: "many>=10", decision: dec-nat-internet, since: 10}
+    - {name: no-nat-public, from: [k8s-nodes, services], to: [uplink], src: [any], dst: [public], service: any, decision: dec-nat-no-land, since: 4}
+    - {name: internet-snat, from: [k8s-nodes, services], to: [uplink], src: [any], dst: [any], service: any, snat: {type: dynamic-ip-and-port, interface: ethernet1/5}, since: 4}
+
+# ---------------------------------------------------------------------------------------------
+# Kubernetes, Gateways, audiences and populations (chapters 6 to 11).
+k8s:
+  api_vip: 10
+  api_name: k8s
+  pod_segment: pods
+  service_segment: services
+  gateway_class: cilium
+  # Label keys under the label domain (FRAMEWORK 1.2): <prefix>.<label_domain>/<name>, or
+  # <label_domain>/<name> with no prefix. control is node-role.tarnwick.example/control.
+  labels:
+    control:  {prefix: node-role, name: control}
+    gpu:      {prefix: node-role, name: gpu}
+    ingress:  {prefix: node-role, name: ingress}
+    pool:     {name: lb-pool}
+    audience: {name: audience}
+    decision: {prefix: decision, name: id}
+  # The nodes' segment (VLAN 100): the API VIP lives there.
+  node_segment: nodes
+  # The Gateway VIPs are announced from the ingress nodes only, on their VLAN 110 unit (build A
+  # revision 2). Cilium 1.19's L2 announcements are beta: one node answers ARP for a VIP, so nothing balances
+  # before the cluster, and failover takes the lease timers (Cilium's default 10 to 20 s).
+  l2_announce: {interfaces: ["^bond0\\.110$"], nodes: ingress}
+  # The ingress nodes carry a NoSchedule taint keyed on their role label, so only what tolerates it
+  # runs there (Cilium's agent and Envoy tolerate every taint).
+  taints:
+    ingress: {effect: NoSchedule}
+  # Pod addresses on each rail, clear of the nodes' .11 to .18: each placement row's address is
+  # fixed from this range (serving: below) and set by the CNI static IPAM plugin.
+  rail_pod_range: [100, 199]
+  # The devices Cilium's datapath attaches to. The agents read cilium-config only at start, so
+  # finish compares this set with the running cilium-config and every agent's age (FRAMEWORK 3.4).
+  cilium_devices: [bond0, bond0.110]
+  # Cilium drops VLAN-tagged frames on the devices it attaches to unless the VLAN is listed: the
+  # ingress units (110) and the GPU nodes' storage units (120) ride on bond0.
+  cilium_vlan_bypass: [110, 120]
+  # Where the Gateways live, and their one HTTPS listener each: the wildcard name under the org
+  # domain, so a hostname a Gateway has no route for reaches the Gateway and is answered 404 there
+  # (chapter 7), rather than refused in TLS. Each Gateway has a certificate and a key of its own
+  # (ca.certificates, the entry whose gateway: names it), so the key a compromised
+  # users' proxy holds is not the internal Gateway's.
+  gateway_namespace: gateways
+  listener: {port: 443, hostname: wildcard, certificate: gateway}
+  # Secrets at rest: the API servers encrypt Secret objects in etcd with the secretbox provider
+  # (build A revision 2). The key is made on the init node at its first init and shared with the
+  # other control nodes as the cluster's other shared keys are (state/shared/cluster/pki, until the
+  # retract); it lives on the control nodes, where production uses KMS v2 with an external KMS.
+  secrets_encryption: {provider: secretbox, resources: [secrets]}
+  # Pod traffic between nodes is encrypted by Cilium's WireGuard. Traffic between
+  # two pods on one node, and the rails (macvlan, outside Cilium), are not.
+  pod_encryption: wireguard
+  # The ingress nodes run what users reach: the API gateway, the router and the identity provider
+  # carry the ingress nodes' selector and tolerate their taint.
+  edge: {nodes: ingress}
+  # Network policy (build A revision 2): every namespace the render puts workloads in gets a
+  # CiliumNetworkPolicy that denies all ingress and egress, and then one allow per path the request
+  # needs: the Gateways' Envoy (Cilium's ingress entity) to the API gateway, the test backend and
+  # the identity provider; the API gateway to the router and to the identity provider's keys; the
+  # router to the model Services; the key Jobs and the key probe to the API server or the API
+  # gateway; DNS to the cluster's DNS. The rails are macvlan attachments, outside Cilium's policy.
+  network_policy: {default: deny}
+  # Which namespaces may attach routes to a Gateway (chapter 7), in a lab whose features turn
+  # serving on: each Gateway's listener admits HTTPRoutes only from the namespaces labelled
+  # <label_prefix>.<label domain>/<gateway id>: "true", and the render labels exactly the
+  # namespaces whose routes it attaches there (the test backend's, the API gateway's and, for the
+  # recipe's route, the serving namespace). A lab without serving keeps from: All, as the labs of
+  # chapters 3 and 4 and milestone M2 were recorded with.
+  allowed_routes: {label_prefix: routes}
+  # Operators: the bastion holds no standing cluster-admin
+  # kubeconfig. Each operator user gets a kubeconfig there whose client certificate kubeadm issues on
+  # the init node (kubeadm kubeconfig user) for validity_h hours, in group, bound to cluster_role by
+  # one ClusterRoleBinding; finish issues it again at every run. The harness's own kubectl runs on the
+  # init node with the admin kubeconfig kubeadm wrote there, which never leaves it.
+  operators: {users: [admin], group: operators, cluster_role: view, validity_h: 8}
+
+# The test backend (M2, kept for chapter 7's timeout drill): an HTTP server behind both Gateways,
+# so the Gateway path is proven before any model is served. It runs agnhost netexec, whose
+# /echo?msg=<text> answers <text>. One HTTPRoute per Gateway in gateways: lists that Gateway's own
+# hostnames (its listener names: the users' hostname on both, the admin names on the internal one)
+# under path, so an admin name sent to the users' VIP matches no route and gets the Gateway's 404.
+test_backend:
+  name: echo
+  namespace: echo
+  image: test_backend
+  args: [netexec, --http-port=8080]
+  port: 8080
+  replicas: 2
+  path: /echo
+  gateways: [gw-internal, gw-users]
+  since: 7
+
+# VIP and pool octets in the ingress VLAN (110).
+gateways:
+  - {id: gw-internal, vip: 200, pool: [200, 209], segment: ingress, audience: internal, decision: dec-routeset-internal, since: 7}
+  - {id: gw-users,    vip: 210, pool: [210, 214], segment: ingress, audience: enterprise, decision: dec-routeset-enterprise, since: 7}
+  - {id: gw-inet,     vip: 220, pool: [220, 224], segment: ingress, audience: internet, when: "many>=8", decision: dec-routeset-internet, since: 8}
+
+audiences:
+  - {id: internal,   gateway: gw-internal, models: all, admin: true, since: 7}
+  - {id: enterprise, gateway: gw-users, models: [chat, staff], since: 7}
+  - {id: internet,   gateway: gw-inet, models: [chat], when: "many>=8", since: 8}
+
+# Where users come from (chapter 2). zones are the firewall zones they arrive in; answer is what
+# their resolver returns for the users' hostname.
+populations:
+  # The operator arrives through the IPsec tunnel into zone operator-vpn, untranslated, and asks
+  # the internal Gateway's VIP; the public resolver holds no name for it, so the
+  # operator's tools name the VIP directly.
+  - id: operator
+    segments: [operator-site]
+    zones: [operator-vpn]
+    audience: internal
+    clients: [ops-client]
+    resolver: ops-dns
+    answer: vip:gw-internal
+    translated: false
+    since: 4
+  # An internet host that is not the operator: nothing on the public address answers it.
+  - id: web
+    segments: [web]
+    zones: [uplink]
+    audience: none
+    clients: [web-client]
+    resolver: ops-dns
+    answer: public
+    translated: false
+    since: 4
+  - id: nodes
+    segments: [nodes, bastion]
+    zones: [k8s-nodes, bastion]
+    audience: internal
+    resolver: [dns-res1, dns-res2]
+    answer: vip:gw-internal
+    translated: false
+    since: 7
+  - id: enterprise
+    segments: [enterprise]
+    zones: [enterprise]
+    audience: enterprise
+    clients: [ent-client]
+    resolver: ent-dns
+    answer: vip:gw-users
+    translated: false
+    since: 1
+  - id: internet
+    segments: [internet]
+    zones: [isp]
+    audience: internet
+    clients: [inet-client]
+    resolver: inet-dns
+    answer: public
+    translated: true
+    when: "many>=9"
+    since: 9
+
+# Two models (build A revision 2, and the author's sizing of 2026-10-27). Each node-local copy
+# sits wholly inside one GPU node, its server and its worker on one rail, so the copy's RPC runs
+# through the rail NIC's macvlan bridge and never reaches a rail switch: a production copy of
+# either model fits one GPU (TP=1). A model's node-local copies sit on different nodes and on rails
+# of different parity, so the loss of one node, one rail switch or one pair member leaves a copy of
+# each model. chat's copy c spans both nodes on rail 7 (spans: true), labeled as the stand-in for a
+# model too large for one node: its worker on the other node is the one RPC that crosses a rail
+# switch, so chapters 5 and 6 still capture rail traffic. weights names the model's pin under
+# serving.models in spec/versions.yaml. The first model is the one the internet audience may call
+# in state many; the second stays with the staff.
+models:
+  - id: chat
+    weights: chat
+    since: 6
+    copies:
+      - {id: a, rail: 3, server: k8s-gpu1, workers: [k8s-gpu1], decision: dec-place-chat}
+      - {id: b, rail: 6, server: k8s-gpu2, workers: [k8s-gpu2], decision: dec-place-chat}
+      - {id: c, rail: 7, server: k8s-gpu1, workers: [k8s-gpu2, k8s-gpu1], spans: true, decision: dec-place-chat}
+  - id: staff
+    weights: staff
+    since: 6
+    copies:
+      - {id: a, rail: 4, server: k8s-gpu1, workers: [k8s-gpu1], decision: dec-place-staff}
+      - {id: b, rail: 5, server: k8s-gpu2, workers: [k8s-gpu2], decision: dec-place-staff}
+
+# The model-serving recipe (serving-layer/, chapters 6 and 7). In a lab whose features turn serving
+# on, render/k8s.py writes bootstrap/k8s/serving.env from the models: table above and this block,
+# and finish runs `make -C serving-layer serve` with it. Each placement row is one StatefulSet of
+# one pod (<row>-0): a model copy's llama-server or one of its ggml-rpc-server workers, every pod
+# of a copy on the copy's rail through a macvlan attachment on that rail's NIC. Each pod's rail address is fixed: the rail's pod
+# range (k8s.rail_pod_range) from its first address, in placement order, set by the CNI static
+# IPAM plugin, so a server's --rpc list never changes when a worker is re-created.
+#   image, keys_image  images.<key> in spec/versions.yaml (mirror: local): the nodes pull each from
+#                      the in-lab registry as <mirror>/<repository>:<tag>
+#   key                the Secret the servers read their bearer key from; the key tool generates
+#                      it inside the cluster (sk-<org short>-<prefix>-<32 hex>) and never prints it
+#   weights            the models directory: dir in the checkout (git ignores it; make -C images
+#                      models-link points it at a larger disk), bound read-only into each GPU node's container, exported to the guest
+#                      over virtio-9p under tag and mounted at guest; each server mounts it at
+#                      /models through a local PersistentVolume of its node
+#   server_args        llama-server's arguments beyond the model, the bind address and the RPC list:
+#                      every layer on the workers (-ngl 99), 4096 tokens of context in 8 slots of
+#                      512 (a slot bounds the longest answer the timeouts in inference: must cover),
+#                      256 tokens an answer when a request names no max_tokens (-n is a default, not
+#                      a cap: a request's max_tokens wins), no reasoning (--reasoning-budget 0), and
+#                      no prompt cache or context checkpoints in the server's memory (--cache-ram 0,
+#                      --ctx-checkpoints 0: with them a server grew from 0.9 GB to 2.6 GB on 8 slots)
+#   worker_args        ggml-rpc-server's threads; a GPU node's 12 vCPUs hold three workers
+#   ports              llama-server's HTTP port, ggml-rpc-server's port, and the closed port the
+#                      server's readiness probe connects to over the rail (the worker's kernel
+#                      refusing it proves the rail, and the probe opens no RPC session that could
+#                      compete with the server's own)
+#   readiness          the server's probe timers: a dead rail takes the replica out of its
+#                      Services about period_s x failure_threshold seconds after it fails, plus
+#                      the time the removal takes to propagate
+#   route              the recipe's own HTTPRoute, on that Gateway only: the operator's direct path
+#                      for tests, hostname <hostname>.<org domain>, one rule per model and per copy
+#   load               make load's client container; its hostname is pinned to the answer of the
+#                      client's population (the public address for the operator)
+serving:
+  namespace: serving
+  image: serving
+  keys_image: keys
+  key: {secret: llm-api-key, field: key, prefix: serving}
+  ports: {http: 8080, rpc: 50052, rail_probe: 50053}
+  weights: {dir: images/models, tag: models, guest: /srv/models}
+  server_args: ["-ngl", "99", "-c", "4096", "-np", "8", "-n", "256", "-t", "2", "--reasoning-budget", "0", "--cache-ram", "0", "--ctx-checkpoints", "0"]
+  worker_args: ["-t", "4"]
+  readiness: {period_s: 2, failure_threshold: 2, timeout_s: 2}
+  route: {gateway: gw-internal, hostname: serve, request_s: 900, backend_request_s: 900}
+  load: {client: ops-client}
+  since: 6
+
+# The API gateway and the model router (chapters 6 and 7), in a lab whose features turn serving on.
+# render/k8s.py writes bootstrap/k8s/60-inference-base.yaml, 61-inference-keys.yaml and
+# 62-inference.yaml from this block, and finish applies them after the serving recipe (the router
+# reads the recipe's key). A request reaches a model through a Gateway's model route, the API
+# gateway, the router and the model's Service:
+#   path        the prefix under which every model has its route: <path>/<route id>, the uuid5 of
+#               the model's name (FRAMEWORK.md 1.2). The users' Gateway carries one rule per model
+#               its audience may call; the internal Gateway the bare prefix
+#   gateway     APISIX in standalone mode, its routes from a ConfigMap: per model, key
+#               authentication on the Authorization header, consumer restriction to the model's
+#               consumer group (a key for another model answered 401, not the default 403), and a
+#               rewrite to the router's path for that model (/engines/<model>/chat/completions,
+#               so the model is the route's whatever the body names) with the router's master key
+#               set in place of the caller's; its upstream read timeout
+#   router      LiteLLM: one deployment per model, on the model's Service (both copies' servers,
+#               whose readiness keeps a dead copy out of it), with the serving recipe's key; its
+#               per-attempt timeout and how many times it tries again
+#   keys        one key per model in Secret models.secret (sk-<org short>-<model>-<32 hex>, the
+#               first made once, by the keys Job); the router's master key; the backend key, the
+#               recipe's key copied into this namespace for the router. Each is made or copied
+#               inside the cluster and never printed
+#   route       the model routes' request and backend timeouts: router attempts inside the API
+#               gateway's read, inside backendRequest, inside request. The numbers come from the
+#               speeds measured on the lab host on 2026-10-28: a server slot
+#               holds 512 tokens (-c 4096, 8 slots), and staff, the slower model, filled one in 101 s
+#               alone (452 tokens) and answered 64 tokens in 57 s with four requests at once on the
+#               GPU node's CPUs, so a non-streamed attempt may take 280 s, below Envoy's 300 s stream
+#               idle timeout; a stream may stay silent 60 s (four 106-token prompts at once took 12 s);
+#               one retry; the API gateway's read 600 s, and the routes' whole-request cap 620 s,
+#               above two attempts, so nothing on the path cuts an answer the slot can hold at the
+#               lab's load
+#   probe       the per-pod key probe (chapter 7): a pod of the key tool whose own service account
+#               may list the API gateway's pods; it sends one request with a key to every API
+#               gateway pod by the pod's address and prints each pod's status
+#   callers     who may call (build A revision 2): each caller is one consumer group of the API
+#               gateway, with the models it may call (models:, or its audience's), one request
+#               limit for the whole group (limit-count, counted in each API gateway pod), and how
+#               its members prove who they are:
+#                 application  one consumer per key, each key a field <caller>.<id> of the key
+#                              Secret (sk-<org short>-<caller>-<32 hex>, the first made by the key
+#                              Job), with an owner and an expiry date in the key table
+#                 people       one consumer per person of identity.people, matched on the verified
+#                              email of an OpenID Connect token from the identity provider whose
+#                              audience names the API gateway (identity.audience)
+#               A model's route admits the groups that may call it; any other credential, a key or
+#               a token, is refused 401 with the one message authentication gives an unknown one
+inference:
+  namespace: inference
+  path: /models
+  gateway: {name: api-gateway, image: apisix, replicas: 2, port: 9080, uid: 636, upstream_timeout_s: 600}
+  router: {name: router, image: litellm, replicas: 2, port: 4000, attempt_timeout_s: 280, stream_timeout_s: 60, retries: 1}
+  keys:
+    models: {secret: api-keys}
+    master: {secret: router-master-key, field: key, prefix: router}
+    backend: {secret: backend-key}
+  route: {request_s: 620, backend_request_s: 620}
+  probe: {name: key-probe}
+  callers:
+    - {id: batch, kind: application, models: [chat], owner: data-platform, expires: "2027-04-30", limit: {count: 3000, window_s: 60}}
+    - {id: helpdesk, kind: application, models: [staff], owner: service-desk, expires: "2027-04-30", limit: {count: 3000, window_s: 60}}
+    - {id: staff, kind: people, audience: enterprise, people: [ent-client], limit: {count: 600, window_s: 60}}
+  since: 6
+
+# The identity provider (chapter 7), in a lab whose features turn serving on. Dex
+# stands in for the enterprise's own IdP: it runs in the platform's cluster (production keeps the
+# IdP the enterprise's, outside the platform) and is published on both Gateways as
+# <hostname>.<org zone>, which the views answer with each Gateway's VIP. render/identity.py writes
+# bootstrap/k8s/57-identity.yaml (its namespace's objects: the config as a ConfigMap, the
+# Deployment on the ingress nodes, its Service and one HTTPRoute per Gateway). Its credentials, each
+# client's secret and each person's password hash, are made on the lab host (state/secrets.env:
+# SFAB_IDP_*) and written by finish as one Secret through a pipe, never printed.
+#   audience    the API gateway's client id. A person signs in through one of clients (the resource
+#               owner password grant, labeled: production uses the authorization code flow with
+#               PKCE in the person's browser) and asks for audience:server:client_id:<audience>;
+#               Dex writes the API gateway into the token's aud only for a client the API gateway's
+#               client trusts (trustedPeers), and the API gateway refuses any token without it
+#   people      the enterprise's staff with a Dex account (static passwords, a lab stand-in for the
+#               corporate directory), each matched by its email in inference.callers; node is the
+#               client the person signs in from (the audit's and the trace's sign-in runs there)
+#   storage     memory: the signing keys are made at start and rotate every keys_h hours, and the
+#               API gateway reads the key set again when a token names a key it has not seen
+identity:
+  provider: dex
+  namespace: identity
+  name: idp
+  image: dex
+  port: 5556
+  hostname: id
+  gateways: [gw-internal, gw-users]
+  replicas: 1
+  audience: ai-gateway
+  clients:
+    - {id: staff-cli, name: Tarnwick staff tools}
+  people:
+    - {id: ent-client, email: ent-client@tarnwick.example, name: Staff member at ent-client, node: ent-client}
+  token_ttl_m: 60
+  keys_h: 6
+  since: 7
+
+# ---------------------------------------------------------------------------------------------
+# DNS (chapters 1, 7 and 9), in the platform's zone (org.zone) and nowhere else: no record at the
+# corporate apex and no wildcard. The names users type, the admin names and the
+# internal-only names (the serving recipe's own route) are explicit records.
+#
+# views are the authoritative pair's (servers: the primary first, then its secondaries, which take
+# each view's zones from the primary by a transfer keyed with that view's own TSIG key, so a
+# secondary's copy of a view is the primary's copy of the same view) and the public servers'. A view
+# matches the resolvers that ask it, not the end clients: the authoritative pair answers only the
+# platform's resolvers (internal: the nodes' answer, with the infrastructure records and reverse
+# zones) and the enterprise's corporate resolver (enterprise: the users' names only). answer is what
+# a view returns for the names users type (and, in the internal view, the admin and internal names).
+#
+# resolvers are what clients ask: dns-res1 and dns-res2 recurse for every inside segment (BIND, recursion on
+# for those clients only), sending the platform's zone and its reverse zones to the authoritative
+# pair (static-stub) and answering every other name NXDOMAIN at once (an empty root: the lab has no
+# way out); ent-dns, the enterprise's resolver, answers the corporate names itself and forwards only
+# the platform's zone to the pair.
+dns:
+  users: [llm]
+  admin: [admin, grafana]
+  internal: [serve]
+  # the identity provider's name (identity.hostname): answered by both views, each with its own
+  # Gateway, so staff sign in through the users' Gateway and the inside through the internal one
+  identity: [id]
+  wildcard: false
+  views:
+    - {id: internal, server: [dns-auth1, dns-auth2], kind: bind-auth, match: ["node:dns-res1", "node:dns-res2"], answer: vip:gw-internal, names: [users, admin, internal, identity], infra: true, decision: dec-view-internal, since: 7}
+    - {id: enterprise, server: [dns-auth1, dns-auth2], kind: bind-auth, match: ["node:ent-dns"], answer: vip:gw-users, names: [users, identity], decision: dec-view-enterprise, since: 7}
+    # The uplink side's public server publishes no platform name in state one: the operator comes in
+    # through the tunnel, and no admin name, no wildcard and no internal Gateway is ever public.
+    - {id: public-operator, server: [ops-dns], kind: bind-auth, match: [operator], answer: public, names: [], when: "one | many<=8", decision: dec-view-public, since: 7}
+    - {id: public-operator, server: [ops-dns], kind: bind-auth, match: [operator], answer: public, names: [users], when: "many>=9", decision: dec-view-public, since: 9}
+    - {id: public-internet, server: [inet-dns], kind: bind-auth, match: [internet], answer: public, names: [users], when: "many>=9", decision: dec-view-public, since: 9}
+  resolvers:
+    - {id: inside, servers: [dns-res1, dns-res2], kind: bind-recursive, clients: [nodes, ingress, stor-mgmt, bastion, oob, services-a, services-b], to: [dns-auth1, dns-auth2], since: 1}
+    - {id: corporate, servers: [ent-dns], kind: dnsmasq, clients: [enterprise], to: [dns-auth1, dns-auth2], local: [ent-client, ent-dns], since: 1}
+
+# The lab CA (chapter 7): the root is made on the lab host by make ca (sfab-ca,
+# common/ca/), its key kept under the lab's state/ca at mode 0600 and bound into no node; it signs
+# the intermediates once. Each intermediate's name constraints are its names and prefixes:
+#   platform    the platform's zone and the build's prefixes; cert-manager's CA issuer signs the
+#               Gateway certificates with it (its key pair a Secret in cert-manager's namespace)
+#   kubernetes  kubeadm signs the cluster with it on the control nodes (published for them in
+#               state/shared/cluster/ca until every control node has joined). kubeadm always
+#               writes the node's own name into each control node's API server certificate, and a
+#               client that checks constraints refuses a name outside them, so it also permits the
+#               control nodes' bare names
+#   internet    the uplink side's names and the operator segment: it signs the leaves of the
+#               upstream stand-ins (the registry, the time reference); its key stays on the lab host
+# leaves are the certificates sfab-ca signs on the lab host for a node of the lab: the key and the
+# chain go to state/tls/<node>/, bound read-only into that node only.
+ca:
+  root: {cn: Tarnwick Lab Root CA}
+  intermediates:
+    - {id: platform, cn: Tarnwick Platform CA, key: ec-p256, dns: [ai.tarnwick.example], ip: [10.20.0.0/14, 10.24.10.0/24]}
+    - {id: kubernetes, cn: Tarnwick Kubernetes CA, key: rsa-2048, dns: [ai.tarnwick.example, kubernetes, kubernetes.default, kubernetes.default.svc, cluster.local, k8s-cp1, k8s-cp2, k8s-cp3], ip: [10.20.1.0/24, 10.23.0.0/16]}
+    - {id: internet, cn: Tarnwick Lab Internet CA, key: ec-p256, dns: [upstream.example], ip: [192.0.2.0/24], proof: {inside: [registry.upstream.example], outside: [llm.ai.tarnwick.example, 10.20.11.200]}}
+  leaves:
+    - {id: inet-registry, ca: internet, node: inet-registry, dns: [registry.upstream.example], ip: ["node:inet-registry"]}
+    - {id: inet-ntp, ca: internet, node: inet-ntp, dns: [ntp.upstream.example], ip: ["node:inet-ntp"]}
+  proof:
+    inside: [llm.ai.tarnwick.example]
+    outside: [llm.corvane.example]
+  # What cert-manager issues in the cluster (M2): its CA ClusterIssuer signs with the platform
+  # intermediate, one listener certificate per Gateway (gateway:, each with its own key; a Gateway
+  # the state does not hold has none issued), each covering the zone's wildcard name (wildcard:
+  # *.ai.tarnwick.example, a certificate name only: the zone publishes no wildcard record).
+  issuer: {name: lab-ca, intermediate: platform}
+  certificates:
+    - {id: gw-internal, gateway: gw-internal, secret: gw-internal-tls, dns: [wildcard], duration_h: 2160, renew_before_h: 360}
+    - {id: gw-users, gateway: gw-users, secret: gw-users-tls, dns: [wildcard], duration_h: 2160, renew_before_h: 360}
+    - {id: gw-inet, gateway: gw-inet, secret: gw-inet-tls, dns: [wildcard], duration_h: 2160, renew_before_h: 360}
+
+# ---------------------------------------------------------------------------------------------
+# The decision table and the matrix (chapter 2). A lab whose chapter.yaml says decisions: true
+# renders both (render/decisions.py): gen/decisions.yaml and gen/matrix.yaml, with their runtime
+# forms gen/decisions.json and gen/matrix.json, which label.sh and matrix.sh read. Such a lab also
+# labels every object of every row with its decision id: the element's own decision:, else
+# dec-<prefix>-<the object's name>, and every switch with the forwarding decision below. A lab
+# without it renders neither and stamps only the ids the elements carry.
+#
+# rows are the layers a request meets, in that order (Table 2-1): layer, owner (the device that
+# owns it), object, decision, evidence and refusal are the table's columns as the chapter states
+# them; prefix names the row in a derived id. The objects of each row are found in the model:
+# the DNS views, the firewall's routes and the routers' static routes, the NAT rules, the security
+# rules, the Gateways' HTTPRoutes, the API gateway's consumer groups (one per caller) and the
+# placement table with the rail attachments.
+decisions:
+  rows:
+    - id: view
+      prefix: view
+      layer: Resolver view
+      owner: resolver
+      object: "The platform's authoritative pair, with an internal view for the platform's resolvers and an enterprise view for the corporate resolver; a public server on the uplink side that publishes no platform name in state one"
+      decision: Which address a population gets for a name
+      evidence: "The answer dig returns on the population's own client"
+      refusal: none
+      note: "a wrong answer moves the request to another layer's refusal"
+    - id: routing
+      prefix: route
+      layer: Routing
+      owner: firewall, and the routers in front of it
+      object: "The firewall's one routing instance, which holds its gateway subnets as connected routes, the operator's site through the tunnel, a default route toward the uplink and discard routes for the rest of RFC 1918; the uplink router, which holds a static route to each of the firewall's gateway subnets via the public address"
+      decision: Whether a route to the destination exists, looked up on ingress
+      evidence: "The route table of each device on the path; for silence, the table of the device without the route, beside a capture at that hop"
+      refusal: silence
+    - id: nat
+      prefix: nat
+      layer: NAT
+      owner: firewall
+      object: "The NAT rulebase: the no-translation rule for the public address and source NAT for the allowlisted egress; nothing is published on the uplink"
+      decision: Which address a request leaves or lands with, keyed on the pre-NAT zone
+      evidence: "The session's NAT rule and translated address"
+      refusal: none
+      note: an untranslated request goes on to policy
+    - id: policy
+      prefix: policy
+      layer: Security policy
+      owner: firewall
+      object: "The security rulebase of App-ID rules, each with the profile group, closing with deny-all-log, the predefined intrazone and interzone rules set to deny"
+      decision: Allow or deny, and log, on the original addresses and the post-NAT zone
+      evidence: The traffic log line naming the rule
+      refusal: log-line
+    - id: routeset
+      prefix: routeset
+      layer: Route set
+      owner: Gateway
+      object: "Each Gateway's HTTPRoutes: the internal Gateway's /models/ prefix and admin hostnames, the users' Gateway's one path per model"
+      decision: Whether a hostname and path exist for the audience behind that Gateway
+      evidence: "The HTTP status the Gateway returns, and for a refusal, no line in the API gateway's log"
+      refusal: "404"
+    - id: key
+      prefix: key
+      layer: Caller
+      owner: API gateway
+      object: "One route per model, admitting the consumer groups of the callers that may call it; one group per caller, its consumers an application's keys or the people its identity provider signs in"
+      decision: Whether the caller may use the model
+      evidence: "The API gateway's 401 with the message it gives an unknown credential, the same for a credential of a caller the model's route does not admit; it names neither the credential nor its consumer"
+      refusal: "401"
+    - id: placement
+      prefix: place
+      layer: Placement
+      owner: cluster
+      object: "The placement table, and each replica's Multus attachment, one per rail"
+      decision: "Which rail a replica's workers answer from"
+      evidence: "Each pod's network-status annotation read against the table, and the worker's rail port counter"
+      refusal: none
+      note: a dead rail removes a copy, not the model
+  # The switches implement no row: each is labeled forwarding only, and the audit's forwarding-only
+  # reads prove it (no address on any served VLAN, PortChannel or host port, no routing protocol, an
+  # empty default table; an MCLAG member holds exactly its two keepalive /31s, in the keepalive VRF,
+  # whose table holds only those two connected routes).
+  forwarding:
+    decision: dec-forwarding-only
+    what: forwards frames and decides nothing, with no routing protocol and no address on any served VLAN, PortChannel or host port; an MCLAG member's only addresses are its two keepalive /31s, in a VRF nothing routes
+  # Decision ids that label objects of no row, each with why.
+  other:
+    - {decision: dec-storage-data-address, why: "the storage classes carry NFS and NVMe/TCP to the storage system's data address on its own Layer 2 VLAN, and the CSI driver's API calls go to its management address: an addressing choice no layer refuses on"}
+
+# The population and endpoint matrix (Table 2-2): each population against each endpoint, every
+# cell's mode computed from the spec as the request meets the layers above (render/decisions.py),
+# and tried by matrix.sh by TCP connect and HTTP request, never by ping. A row is a population and
+# the client it tries from; a column is either
+#   connect: an address reference and port (vip:<gateway>, api, node:<host>, oob:<host> its BMC
+#            address, data:<storage>, mgmt:<storage>), tried by one TCP connect; a cell whose
+#            population's resolver answer lands on that same Gateway after the firewall's
+#            translation is tried at that answer (the operator's internal Gateway cell, at the
+#            public address);
+#   model:   a model's route, asked by name at the address the population's resolver returns,
+#            once with the model's own key and once with another model's;
+#   name:    a hostname (an admin name) asked at the address the resolver returns, with path.
+# silence holds the cells whose mode is silence, which Part II has none of (chapter 11 fills it).
+matrix:
+  rows:
+    - {population: enterprise, label: Staff, client: ent-client}
+    - {population: operator, label: Operator, client: ops-client}
+    - {population: nodes, label: Nodes, client: k8s-cp2}
+    - {population: web, label: Internet host, client: web-client}
+  columns:
+    - {id: gw-internal, label: Internal Gateway, connect: "vip:gw-internal", port: 443}
+    - {id: gw-users, label: "Users' Gateway", connect: "vip:gw-users", port: 443}
+    - {id: chat, label: Route to chat, model: chat}
+    - {id: staff, label: Route to staff, model: staff}
+    - {id: admin, label: Admin hostnames, name: admin, path: /echo}
+    - {id: api-server, label: API server, connect: api, port: 6443}
+    - {id: node, label: "A node, k8s-gpu1", connect: "node:k8s-gpu1", port: 22}
+    - {id: bmc, label: "A BMC, k8s-gpu1's", connect: "oob:k8s-gpu1", port: 443}
+    - {id: stor-data, label: Storage data, connect: "data:truenas1", port: 2049}
+    - {id: stor-mgmt, label: Storage management, connect: "mgmt:truenas1", port: 443}
+    - {id: egress, label: "An internet host, web-client", connect: "node:web-client", port: 443}
+  # each request of the run takes its own source port from here, in cell order
+  sport: 43000
+  timeout_s: 4

@@ -1,0 +1,271 @@
+start 2026-10-14T15:58:59Z
++ docker rm -f sfab-m1-gpu1
+sfab-m1-gpu1
+Started sfab-m1-recover.service - /usr/bin/make recover.
+/root/sfab/labs/common/stages/run.sh recover
+== stage boot 2026-10-14T15:58:59Z (log state/logs/boot-20261014T155859Z.log)
+boot: containers missing or links lost: redeploying (down fast, then up)
+down: containerlab destroy sfab-m1
+15:58:59 INFO Parsing & checking topology file=topo.clab.yml
+15:58:59 INFO Parsing & checking topology file=topo.clab.yml
+15:58:59 INFO Destroying lab name=sfab-m1
+15:59:01 INFO Removed container name=sfab-m1-oob-sw
+15:59:01 INFO Removed container name=sfab-m1-fw
+15:59:01 INFO Removed container name=sfab-m1-fe-sw1
+15:59:01 INFO Removed container name=sfab-m1-gpu2
+15:59:01 INFO Removed container name=sfab-m1-fe-sw2
+15:59:02 INFO Removed container name=sfab-m1-rail-sw1
+15:59:02 INFO Removed container name=sfab-m1-rail-sw2
+15:59:02 INFO Removing host entries path=/etc/hosts
+15:59:02 INFO Removing SSH config path=/etc/ssh/ssh_config.d/clab-sfab-m1.conf
+down: removed clab-sfab-m1/
+== teardown sfab-m1 (fast)
+  PASS  no sfab-m1-* container remains
+  PASS  no clab-sfab-m1/ remains
+  PASS  state/ disks kept until wipe (243M)
+== RESULT: 3 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+up: state/ prepared from gen/clab-state.json
+up: guests held (state/shared/hold-guests) until boot releases them
+sfab: warning: /root/sfab/labs/common/host/mem-watchdog.sh is not present: the memory watchdog is not running
+up: containerlab deploy sfab-m1, 8 nodes, 8 workers (2026-10-14T15:59:03Z)
+15:59:03 INFO Containerlab started version=0.81.0
+15:59:03 INFO Parsing & checking topology file=topo.clab.yml
+15:59:03 INFO Removing directory path=/root/sfab/labs/dev/m1/clab-sfab-m1
+15:59:03 INFO Creating docker network name=sfab-a-mgmt IPv4 subnet=172.21.40.0/24 IPv6 subnet="" MTU=0
+15:59:03 INFO Creating lab directory path=/root/sfab/labs/dev/m1/clab-sfab-m1
+15:59:03 INFO Creating container name=gpu2
+15:59:03 INFO Creating container name=oob-sw
+15:59:03 INFO Creating container name=gpu1
+15:59:03 INFO Creating container name=fw
+15:59:03 INFO Creating container name=rail-sw2
+15:59:03 INFO Creating container name=rail-sw1
+15:59:03 INFO Creating container name=fe-sw2
+15:59:03 INFO Creating container name=fe-sw1
+15:59:07 INFO Adding host entries path=/etc/hosts
+15:59:07 INFO Adding SSH config for nodes path=/etc/ssh/ssh_config.d/clab-sfab-m1.conf
+up: all 8 containers running (2026-10-14T15:59:07Z)
+  step    up.deploy done in 6s
+== switches up
+  PASS  fe-sw1: healthy, KLISH startup config applied, show version over SSH
+  PASS  fe-sw2: healthy, KLISH startup config applied, show version over SSH
+  PASS  oob-sw: healthy, KLISH startup config applied, show version over SSH
+  PASS  rail-sw1: healthy, KLISH startup config applied, show version over SSH
+  PASS  rail-sw2: healthy, KLISH startup config applied, show version over SSH
+  step    boot.switches done in 241s
+== parity
+  PASS  fe-sw1: parity, 0 missing lines
+  PASS  fe-sw2: parity, 0 missing lines
+  PASS  oob-sw: parity, 0 missing lines
+  PASS  rail-sw1: parity, 0 missing lines
+  PASS  rail-sw2: parity, 0 missing lines
+  step    boot.parity done in 9s
+== GRO off
+  PASS  fe-sw1: GRO, rx-gro-hw and LRO off on all 8 data NICs
+  PASS  fe-sw2: GRO, rx-gro-hw and LRO off on all 8 data NICs
+  PASS  oob-sw: GRO, rx-gro-hw and LRO off on all 3 data NICs
+  PASS  rail-sw1: GRO, rx-gro-hw and LRO off on all 8 data NICs
+  PASS  rail-sw2: GRO, rx-gro-hw and LRO off on all 8 data NICs
+  step    boot.gro done in 1s
+== firewall fw
+  PASS  fw: healthy
+  PASS  fw: delivered /config/startup-config.cfg matches the render byte for byte
+  PASS  fw: startup configuration committed (marker present)
+  PASS  fw: every enforced.txt line in the set-format running configuration (try 1)
+  step    boot.fw done in 368s
+== fabric
+  PASS  pair session, roles, peer link and PortChannels as rendered, the PortChannels facing the held guests set aside until their release in 2 consecutive polls 15s apart (poll 2)
+  step    boot.fabric done in 21s
+== guests
+  PASS  guests released (state/shared/hold-guests removed)
+  PASS  gpu1: SSH answers and sfab-netsetup.service ran in this boot
+  PASS  gpu2: SSH answers and sfab-netsetup.service ran in this boot
+  step    boot.guests done in 70s
+== guest bonds
+  PASS  pair session, roles and every PortChannel as rendered, the guest bonds included in 2 consecutive polls 15s apart (poll 2)
+  step    boot.bonds done in 21s
+== node sync
+  SKIP  node-sync (common/host/node-sync.sh is not present)
+  step    boot.node-sync ran without a verdict; no marker written
+== RESULT: 24 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+== stage boot done in 740s
+== stage finish 2026-10-14T16:11:19Z (log state/logs/finish-20261014T161119Z.log)
+finish: k8s is off for sfab-m1: no cluster, charts or sweeps
+== RESULT: 0 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+finish: audit.sh --quick
+== collect (2026-10-14T16:11:20Z, 6 nodes, quick)
+  PASS  collect rail-sw2: 14 of 14 commands saved
+  PASS  collect oob-sw: 14 of 14 commands saved
+  PASS  collect rail-sw1: 14 of 14 commands saved
+  PASS  collect fe-sw1: 16 of 16 commands saved
+  PASS  collect fe-sw2: 16 of 16 commands saved
+  PASS  collect fw: 9 of 9 commands saved
+  PASS  collect fe-sw1: 16 of 16 commands saved
+  PASS  collect fe-sw2: 16 of 16 commands saved
+  PASS  collect oob-sw: 14 of 14 commands saved
+  PASS  collect rail-sw1: 14 of 14 commands saved
+  PASS  collect rail-sw2: 14 of 14 commands saved
+  PASS  collect fw: 9 of 9 commands saved
+== fe-sw1: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 8
+  PASS  CLAB_MGMT_PASSTHROUGH is true
+  PASS  data NICs inside the switch VM: 8
+  PASS  GRO, rx-gro-hw and LRO off on all 8 data NICs
+  PASS  IPv6 off on the container's 5 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (55 of 55 rendered lines present)
+== fe-sw2: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 8
+  PASS  CLAB_MGMT_PASSTHROUGH is true
+  PASS  data NICs inside the switch VM: 8
+  PASS  GRO, rx-gro-hw and LRO off on all 8 data NICs
+  PASS  IPv6 off on the container's 5 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (55 of 55 rendered lines present)
+== oob-sw: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 3
+  PASS  data NICs inside the switch VM: 3
+  PASS  GRO, rx-gro-hw and LRO off on all 3 data NICs
+  PASS  IPv6 off on the container's 3 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (14 of 14 rendered lines present)
+== rail-sw1: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 8
+  PASS  data NICs inside the switch VM: 8
+  PASS  GRO, rx-gro-hw and LRO off on all 8 data NICs
+  PASS  IPv6 off on the container's 8 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (37 of 37 rendered lines present)
+== rail-sw2: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 8
+  PASS  data NICs inside the switch VM: 8
+  PASS  GRO, rx-gro-hw and LRO off on all 8 data NICs
+  PASS  IPv6 off on the container's 8 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (37 of 37 rendered lines present)
+== fe-sw1: VLAN membership
+  PASS  Vlan100: PortChannel1(T),PortChannel10(T),PortChannel21(A),PortChannel22(A)
+  PASS  Vlan200: PortChannel1(T),PortChannel10(T)
+  PASS  Vlan300: PortChannel1(T),PortChannel10(T)
+  PASS  no VLAN outside the render
+== fe-sw2: VLAN membership
+  PASS  Vlan100: PortChannel1(T),PortChannel10(T),PortChannel21(A),PortChannel22(A)
+  PASS  Vlan200: PortChannel1(T),PortChannel10(T)
+  PASS  Vlan300: PortChannel1(T),PortChannel10(T)
+  PASS  no VLAN outside the render
+== oob-sw: VLAN membership
+  PASS  Vlan90: Ethernet0(A),Ethernet1(A),Ethernet2(A)
+  PASS  no VLAN outside the render
+== rail-sw1: VLAN membership
+  PASS  Vlan101: Ethernet0(A),Ethernet4(A)
+  PASS  Vlan103: Ethernet1(A),Ethernet5(A)
+  PASS  Vlan105: Ethernet2(A),Ethernet6(A)
+  PASS  Vlan107: Ethernet3(A),Ethernet7(A)
+  PASS  no VLAN outside the render
+== rail-sw2: VLAN membership
+  PASS  Vlan102: Ethernet0(A),Ethernet4(A)
+  PASS  Vlan104: Ethernet1(A),Ethernet5(A)
+  PASS  Vlan106: Ethernet2(A),Ethernet6(A)
+  PASS  Vlan108: Ethernet3(A),Ethernet7(A)
+  PASS  no VLAN outside the render
+== fe-sw1: MAC table
+  PASS  MAC table holds host MACs only (7 entries; 1 VLAN 1 or container veth entries set aside)
+== fe-sw2: MAC table
+  PASS  MAC table holds host MACs only (7 entries; 4 VLAN 1 or container veth entries set aside)
+== oob-sw: MAC table
+  PASS  MAC table holds host MACs only (2 entries; 4 VLAN 1 or container veth entries set aside)
+== rail-sw1: MAC table
+  PASS  MAC table holds host MACs only (8 entries; 8 VLAN 1 or container veth entries set aside)
+== rail-sw2: MAC table
+  PASS  MAC table holds host MACs only (8 entries; 8 VLAN 1 or container veth entries set aside)
+== fw: firewall
+  PASS  commit marker present
+  PASS  delivered /config/startup-config.cfg matches the render byte for byte
+  PASS  enforced.txt present (73 lines)
+  PASS  all 73 enforced lines in the set-format running configuration
+  PASS  ethernet1/1 and ethernet1/2 in the aggregate (bundled, current, selected)
+  PASS  LACP partner is the pair's mclag-system-mac 02:5a:00:00:00:01
+  PASS  ae1.100 up: tag 100, 10.20.1.1/24, zone data, on ae1 which is up
+  PASS  ae1.200 up: tag 200, 10.20.2.1/24, zone stor-mgmt, on ae1 which is up
+  PASS  ae1.300 up: tag 300, 10.20.3.1/24, zone bastion, on ae1 which is up
+== fe-sw1: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any interface Vlan block
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== fe-sw2: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any interface Vlan block
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== rail-sw1: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any interface Vlan block
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== rail-sw2: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any interface Vlan block
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== oob-sw: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any interface Vlan block
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== pair fe-sw1 fe-sw2
+  PASS  fe-sw1: MCLAG domain
+  PASS  fe-sw1: session up
+  PASS  fe-sw1: peer link up
+  PASS  fe-sw1: peer link PortChannel1
+  PASS  fe-sw1: keepalive in VRF mgmt
+  PASS  fe-sw1: keepalive source is the passthrough address 172.21.40.11
+  PASS  fe-sw1: keepalive peer is 172.21.40.12
+  PASS  fe-sw1: mclag-system-mac 02:5a:00:00:00:01
+  PASS  fe-sw1: MLAG interface PortChannel10 up/up
+  PASS  fe-sw1: MLAG interface PortChannel21 up/up
+  PASS  fe-sw1: MLAG interface PortChannel22 up/up
+  PASS  fe-sw1: PortChannel1 up with Ethernet0,Ethernet1
+  PASS  fe-sw1: PortChannel10 up with Ethernet2
+  PASS  fe-sw1: PortChannel21 up with Ethernet6
+  PASS  fe-sw1: PortChannel22 up with Ethernet7
+  PASS  fe-sw2: MCLAG domain
+  PASS  fe-sw2: session up
+  PASS  fe-sw2: peer link up
+  PASS  fe-sw2: peer link PortChannel1
+  PASS  fe-sw2: keepalive in VRF mgmt
+  PASS  fe-sw2: keepalive source is the passthrough address 172.21.40.12
+  PASS  fe-sw2: keepalive peer is 172.21.40.11
+  PASS  fe-sw2: mclag-system-mac 02:5a:00:00:00:01
+  PASS  fe-sw2: MLAG interface PortChannel10 up/up
+  PASS  fe-sw2: MLAG interface PortChannel21 up/up
+  PASS  fe-sw2: MLAG interface PortChannel22 up/up
+  PASS  fe-sw2: PortChannel1 up with Ethernet0,Ethernet1
+  PASS  fe-sw2: PortChannel10 up with Ethernet2
+  PASS  fe-sw2: PortChannel21 up with Ethernet6
+  PASS  fe-sw2: PortChannel22 up with Ethernet7
+  PASS  roles: one active, one standby
+== RESULT: 143 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+== result set: dev/m1/state/run/sets/sfab-m1_audit_20261014T161119Z
+== stage finish done in 13s
+sfab-m1-recover.service: Deactivated successfully.
+sfab-m1-recover.service: Consumed 17.496s CPU time.

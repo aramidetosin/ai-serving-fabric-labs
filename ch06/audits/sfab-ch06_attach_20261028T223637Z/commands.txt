@@ -1,0 +1,99 @@
+### 2026-10-28T22:36:39Z k8s-cp1 kubectl
++ kubectl -n serving get pod chat-c-server-0 -o wide
+NAME              READY   STATUS    RESTARTS   AGE    IP            NODE       NOMINATED NODE   READINESS GATES
+chat-c-server-0   1/1     Running   0          111m   10.22.1.122   k8s-gpu1   <none>           <none>
+
+### 2026-10-28T22:36:39Z k8s-cp1 kubectl
++ kubectl -n serving get pod chat-c-server-0 -o jsonpath={.metadata.annotations.k8s\.v1\.cni\.cncf\.io/network-status}
+[{
+    "name": "cilium",
+    "interface": "eth0",
+    "ips": [
+        "10.22.1.122"
+    ],
+    "mac": "0a:f5:b3:d4:b0:4a",
+    "default": true,
+    "dns": {},
+    "gateway": [
+        "10.22.1.227"
+    ]
+},{
+    "name": "serving/rail7",
+    "interface": "rail7",
+    "ips": [
+        "10.21.7.100"
+    ],
+    "mac": "02:5a:fe:07:00:64",
+    "dns": {}
+}]
+
+### 2026-10-28T22:36:41Z k8s-gpu1 guest
++ for n in $(ip netns list | awk '{print $1}'); do ip -n $n -4 -o addr show dev eth0 2>/dev/null | grep -q ' 10.22.1.122/' && echo $n; done
+cni-4eeb716b-9eb9-1496-73ca-4e54c5956347
+
+### 2026-10-28T22:36:42Z k8s-gpu1 guest
++ ip -n cni-4eeb716b-9eb9-1496-73ca-4e54c5956347 -br address
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+rail7@if12       UP             10.21.7.100/24 fe80::5a:feff:fe07:64/64 
+eth0@if50        UP             10.22.1.122/32 fe80::8f5:b3ff:fed4:b04a/64 
+
+### 2026-10-28T22:36:42Z k8s-gpu1 guest
++ ip -n cni-4eeb716b-9eb9-1496-73ca-4e54c5956347 route
+default via 10.22.1.227 dev eth0 mtu 8855 
+10.21.7.0/24 dev rail7 proto kernel scope link src 10.21.7.100 
+10.22.1.227 dev eth0 scope link 
+
+### 2026-10-28T22:36:43Z k8s-cp1 kubectl
++ kubectl -n serving get endpointslices -o wide
+NAME            ADDRESSTYPE   PORTS   ENDPOINTS                            AGE
+chat-a-h4wl2    IPv4          8080    10.22.1.33                           108m
+chat-b-6hkjn    IPv4          8080    10.22.2.174                          108m
+chat-c-b75b4    IPv4          8080    10.22.1.122                          108m
+chat-ljc9n      IPv4          8080    10.22.1.33,10.22.1.122,10.22.2.174   108m
+staff-a-rn9v8   IPv4          8080    10.22.1.1                            108m
+staff-b-5wbht   IPv4          8080    10.22.2.81                           108m
+staff-pklsm     IPv4          8080    10.22.1.1,10.22.2.81                 108m
+
+### 2026-10-28T22:36:44Z k8s-cp1 kubectl
++ kubectl -n serving get endpointslice chat-c-b75b4 -o wide
+NAME           ADDRESSTYPE   PORTS   ENDPOINTS     AGE
+chat-c-b75b4   IPv4          8080    10.22.1.122   108m
+
+### 2026-10-28T22:36:45Z k8s-cp1 kubectl
++ kubectl -n serving get endpointslice chat-ljc9n -o wide
+NAME         ADDRESSTYPE   PORTS   ENDPOINTS                            AGE
+chat-ljc9n   IPv4          8080    10.22.1.33,10.22.1.122,10.22.2.174   108m
+
+### 2026-10-28T22:36:46Z k8s-cp1 kubectl
++ kubectl -n serving get service chat-c -o wide
+NAME     TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE    SELECTOR
+chat-c   ClusterIP   10.23.39.253   <none>        8080/TCP   108m   tarnwick.example/copy=c,tarnwick.example/model=chat,tarnwick.example/role=server
+
+### 2026-10-28T22:36:47Z k8s-cp1 kubectl
++ kubectl -n inference exec router-76cf778fb6-gwr7f -- python3 -c import socket, sys; print(socket.gethostbyname(sys.argv[1])) chat-c.serving.svc.cluster.local.
+10.23.39.253
+
+### 2026-10-28T22:36:50Z rail-sw1 klish
+terminal length 0
+show mac address-table
+exit
+terminal length 0
+show mac address-table
+exit
+rail-sw1# terminal length 0
+rail-sw1# show mac address-table
+-----------------------------------------------------------
+VLAN         MAC-ADDRESS         TYPE         INTERFACE           
+-----------------------------------------------------------
+101         02:5a:6f:00:00:04   DYNAMIC       Ethernet0           
+101         02:5a:70:00:00:04   DYNAMIC       Ethernet4           
+103         02:5a:6f:00:00:06   DYNAMIC       Ethernet1           
+103         02:5a:70:00:00:06   DYNAMIC       Ethernet5           
+105         02:5a:6f:00:00:08   DYNAMIC       Ethernet2           
+105         02:5a:70:00:00:08   DYNAMIC       Ethernet6           
+107         02:5a:6f:00:00:0a   DYNAMIC       Ethernet3           
+107         02:5a:fe:07:00:64   DYNAMIC       Ethernet3           
+107         02:5a:70:00:00:0a   DYNAMIC       Ethernet7           
+107         02:5a:fe:07:00:65   DYNAMIC       Ethernet7           
+rail-sw1# exit
+

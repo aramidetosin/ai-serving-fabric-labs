@@ -1,0 +1,6 @@
+# The enterprise's corporate resolver (dnsmasq): SLUG SURFACE COMMAND. judge.py's services group
+# judges these files: the users' name from the platform's enterprise view, an admin name not
+# published to staff (NXDOMAIN), and a corporate name answered locally.
++corp_users          exec        dig +time=3 +tries=2 +short @127.0.0.1 {users_fqdn}
+corp_admin           exec        dig +time=3 +tries=2 @127.0.0.1 {admin_name} A | grep -E 'status:' || echo 'no answer'
+corp_local           exec        dig +time=3 +tries=2 +short @127.0.0.1 {corporate_fqdn}

@@ -1,0 +1,42 @@
+# break-6b (Chapter 6): a route in a rail attachment.
+#
+# chat-c's server sits on k8s-gpu1 on rail 7 at 10.21.7.100, attached through rail7, a macvlan with the
+# static IPAM plugin and no routes; copy c spans the nodes (the stand-in for a model larger than one
+# node), so its worker0 is on k8s-gpu2 at 10.21.7.101, across rail-sw1. The break makes the server
+# again through its StatefulSet at the same address and MAC, but through rail7-route, a copy of rail7
+# whose IPAM adds one route (cni.dev static IPAM: routes, each a dst and an optional gw): the
+# cluster's pod network, 10.22.0.0/16, via 10.21.7.101, chat-c's worker0. Requests from the router
+# still arrive on the server's eth0, but its replies to any pod address now leave on the rail, toward
+# a worker that is no router.
+#
+# record: the namespace's pods, endpoints, network-status annotations and Warning events; the
+# server's route table, read on k8s-gpu1, and k8s-gpu1's rail7 NIC captured while a router pod
+# connects to it (the network policy admits only the router and the Gateways' Envoy to a server);
+# then 20 requests to chat and 2 to staff (on every 15th interval) through the users' Gateway. The
+# server's readiness probe runs inside the pod and reaches its workers over the rail, so it stays
+# Ready and keeps chat-c in its Services while requests sent to it fail or time out, unless the
+# router's retries land them on another copy: how many of the 22 fail depends on where the router sends them, so the share is recorded, not judged. The
+# heal runs make serve after removing chat-c's server, which its StatefulSet makes again through
+# rail7 as the table renders it, and serve removes rail7-route, the attachment the table does not use.
+title: chat-c's server attached through a copy of rail7 that routes the pod network over the rail
+since: 6
+break:
+  - pod_route: {pod: chat-c-server-0, via: 10.21.7.101}
+record:
+  - k8s_show: {}
+  - pod_net: {pod: chat-c-server-0, from: router}
+  - probe_gateway: {id: users, from: ent-client, gateway: gw-users, models: [chat, staff], every: {staff: 15}, count: 20, interval_s: 2, timeout_s: 400, passes: 1}
+expect_broken:
+  - reply_path: {pod: chat-c-server-0, leaves: rail}
+  - endpoints: {service: chat-c, ready: 1}
+  - endpoints: {service: chat, ready: 3}
+  - endpoints: {service: staff, ready: 2}
+heal:
+  - serve: {replace: [chat-c-server-0]}
+expect_healed:
+  - placement: {pod: chat-c-server-0, rail: 7}
+  - reply_path: {pod: chat-c-server-0, leaves: eth0}
+  - endpoints: {service: chat-c, ready: 1}
+  - endpoints: {service: chat, ready: 3}
+  - endpoints: {service: staff, ready: 2}
+  - probe_share: {probe: users, failing: none}

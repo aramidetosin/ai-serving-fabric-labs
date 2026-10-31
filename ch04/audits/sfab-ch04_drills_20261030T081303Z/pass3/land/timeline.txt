@@ -1,0 +1,12 @@
+1793349201.974845605 START pass 3 land
+1793349215.061363408 PROBE baseline k8s-cp2 ping -c 5 -i 0.5 -W 1 198.51.100.2
+1793349218.220866902 PROBED baseline 5 packets transmitted, 5 received, 0% packet loss, time 2004ms
+1793349230.349481031 INJECT delete no-nat-public
+1793349281.864735063 INJECTED
+1793349334.990166319 PROBE broken k8s-cp2 ping -c 5 -i 0.5 -W 1 198.51.100.2
+1793349339.082269472 PROBED broken 5 packets transmitted, 0 received, 100% packet loss, time 2018ms
+1793349410.310412856 RESTORE no-nat-public
+1793349464.556117435 RESTORED no-nat-public
+1793349483.183565867 PROBE restored k8s-cp2 ping -c 5 -i 0.5 -W 1 198.51.100.2
+1793349486.389583114 PROBED restored 5 packets transmitted, 5 received, 0% packet loss, time 2004ms
+1793349499.206813156 END

@@ -1,0 +1,5 @@
+idle-timeout, pass 1: the test backend silent past Envoy's stream idle timeout through the users' Gateway, then the corrected chain
+  halves: {"corrected": {"backend_bytes_before_continue": 1, "closed_by": null, "idle": "600s", "server": "envoy", "status": 200, "total_s": 330.948217, "upstream_closed_s": null}, "rendered": {"backend_bytes_before_continue": 0, "closed_by": "10.22.0.47:34147", "idle": "300s", "server": "envoy", "status": 504, "total_s": 300.015558, "upstream_closed_s": 300.0}}
+  helm: {"corrected": {"cilium-envoy_s": 35.0, "cilium-operator_s": 5.7, "cilium_s": 49.9, "upgrade_s": 3.0}, "rendered": {"cilium-envoy_s": 35.4, "cilium-operator_s": 4.4, "cilium_s": 51.9, "upgrade_s": 31.1}}
+  leases: {"after-corrected": {"gw-internal": "k8s-ingress2, 1 transitions", "gw-users": "k8s-ingress2, 1 transitions"}, "after-rendered": {"gw-internal": "k8s-ingress2, 3 transitions", "gw-users": "k8s-ingress2, 3 transitions"}, "before-corrected": {"gw-internal": "k8s-ingress1, 0 transitions", "gw-users": "k8s-ingress1, 0 transitions"}, "before-rendered": {"gw-internal": "k8s-ingress2, 1 transitions", "gw-users": "k8s-ingress2, 1 transitions"}}
+  silent_s: 330

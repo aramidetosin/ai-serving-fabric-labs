@@ -1,0 +1,155 @@
+# sfab-m1 fw: set-format lines the running configuration must hold after the startup commit.
+# Rendered from spec/profile-a.yaml beside bootstrap/fw/startup-config.xml; edit the spec and run make render.
+# Compare each line after removing trailing spaces and folding runs of spaces into one;
+# lines starting with # and blank lines are comments. Rule order is not checked here.
+# Not in this lab:
+#   vpn ops-gw: interface ethernet1/5 is not in this lab
+#   interface ethernet1/4: its wire is not in this lab
+#   interface ethernet1/7: its wire is not in this lab
+#   interface ethernet1/5: its wire is not in this lab
+#   interface tunnel.1: no tunnel of it is in this lab
+#   zone enterprise: no interface of it is in this lab
+#   zone uplink: no interface of it is in this lab
+#   zone operator-vpn: no interface of it is in this lab
+#   route default-uplink: interface ethernet1/5 is not in this lab
+#   route operator-site: interface tunnel.1 is not in this lab
+#   rule staff-to-users-gateway: zone enterprise is not in this lab
+#   rule ent-dns-to-platform-dns: zone enterprise is not in this lab
+#   rule staff-to-enterprise-dns: zone enterprise is not in this lab
+#   rule admins-to-bastion: zone enterprise, operator-vpn is not in this lab
+#   rule bastion-to-firewall-admin: node bastion is not in this lab
+#   rule bastion-to-nodes: node bastion is not in this lab
+#   rule bastion-to-api: node bastion is not in this lab
+#   rule bastion-to-internal-gateway: node bastion is not in this lab
+#   rule bastion-to-stor-mgmt: node bastion is not in this lab
+#   rule bastion-to-services-admin: node bastion, dns-auth1, dns-auth2, dns-res1, dns-res2 is not in this lab
+#   rule inside-to-resolvers: node dns-res1, dns-res2 is not in this lab
+#   rule inside-to-ntp: node dns-res1, dns-res2 is not in this lab
+#   rule resolvers-to-auth: node dns-auth1, dns-auth2, dns-res1, dns-res2 is not in this lab
+#   rule auth-zone-transfer: node dns-auth1, dns-auth2 is not in this lab
+#   rule ntp-upstream: zone uplink is not in this lab
+#   rule nts-ke-upstream: zone uplink is not in this lab
+#   rule nodes-to-registry: zone uplink is not in this lab
+#   rule operator-ike: zone uplink is not in this lab
+#   rule operator-to-internal-gateway: zone operator-vpn is not in this lab
+#   nat no-nat-public: zone uplink is not in this lab
+#   nat internet-snat: zone uplink is not in this lab
+#   dns server 10.20.13.21: no node in this lab holds that address
+#   dns server 10.20.14.21: no node in this lab holds that address
+#   ntp server 10.20.13.21: no node in this lab holds that address
+#   ntp server 10.20.14.21: no node in this lab holds that address
+set deviceconfig system hostname fw
+set deviceconfig system timezone UTC
+set deviceconfig setting management idle-timeout 0
+set deviceconfig setting auto-mac-detect yes
+set deviceconfig setting jumbo-frame mtu 9216
+set network profiles interface-management-profile ping-only ping yes
+set network profiles interface-management-profile bastion-admin https yes
+set network profiles interface-management-profile bastion-admin ssh yes
+set network profiles interface-management-profile bastion-admin ping yes
+set network profiles interface-management-profile bastion-admin permitted-ip 10.20.3.10/32
+set network interface ethernet ethernet1/1 aggregate-group ae1
+set network interface ethernet ethernet1/2 aggregate-group ae1
+set network interface ethernet ethernet1/3 layer3 ip 10.20.9.254/24
+set network interface ethernet ethernet1/3 layer3 interface-management-profile ping-only
+set network interface aggregate-ethernet ae1 layer3 mtu 9216
+set network interface aggregate-ethernet ae1 layer3 lacp enable yes
+set network interface aggregate-ethernet ae1 layer3 lacp mode active
+set network interface aggregate-ethernet ae1 layer3 lacp transmission-rate fast
+set network interface aggregate-ethernet ae1 layer3 units ae1.100 tag 100
+set network interface aggregate-ethernet ae1 layer3 units ae1.100 ip 10.20.1.1/24
+set network interface aggregate-ethernet ae1 layer3 units ae1.100 mtu 9000
+set network interface aggregate-ethernet ae1 layer3 units ae1.100 interface-management-profile ping-only
+set network interface aggregate-ethernet ae1 layer3 units ae1.110 tag 110
+set network interface aggregate-ethernet ae1 layer3 units ae1.110 ip 10.20.11.1/24
+set network interface aggregate-ethernet ae1 layer3 units ae1.110 mtu 1500
+set network interface aggregate-ethernet ae1 layer3 units ae1.110 interface-management-profile ping-only
+set network interface aggregate-ethernet ae1 layer3 units ae1.110 adjust-tcp-mss enable yes
+set network interface aggregate-ethernet ae1 layer3 units ae1.110 adjust-tcp-mss ipv4-mss-adjustment 140
+set network interface aggregate-ethernet ae1 layer3 units ae1.200 tag 200
+set network interface aggregate-ethernet ae1 layer3 units ae1.200 ip 10.20.2.1/24
+set network interface aggregate-ethernet ae1 layer3 units ae1.200 mtu 1500
+set network interface aggregate-ethernet ae1 layer3 units ae1.200 interface-management-profile ping-only
+set network interface aggregate-ethernet ae1 layer3 units ae1.300 tag 300
+set network interface aggregate-ethernet ae1 layer3 units ae1.300 ip 10.20.3.1/24
+set network interface aggregate-ethernet ae1 layer3 units ae1.300 mtu 1500
+set network interface aggregate-ethernet ae1 layer3 units ae1.300 interface-management-profile bastion-admin
+set network interface aggregate-ethernet ae1 layer3 units ae1.130 tag 130
+set network interface aggregate-ethernet ae1 layer3 units ae1.130 ip 10.20.13.1/24
+set network interface aggregate-ethernet ae1 layer3 units ae1.130 mtu 1500
+set network interface aggregate-ethernet ae1 layer3 units ae1.130 interface-management-profile ping-only
+set network interface aggregate-ethernet ae1 layer3 units ae1.131 tag 131
+set network interface aggregate-ethernet ae1 layer3 units ae1.131 ip 10.20.14.1/24
+set network interface aggregate-ethernet ae1 layer3 units ae1.131 mtu 1500
+set network interface aggregate-ethernet ae1 layer3 units ae1.131 interface-management-profile ping-only
+set network virtual-router core interface [ ae1.100 ae1.110 ae1.200 ae1.300 ae1.130 ae1.131 ethernet1/3 ]
+set network virtual-router core routing-table ip static-route discard-10 destination 10.0.0.0/8
+set network virtual-router core routing-table ip static-route discard-10 nexthop discard
+set network virtual-router core routing-table ip static-route discard-172-16 destination 172.16.0.0/12
+set network virtual-router core routing-table ip static-route discard-172-16 nexthop discard
+set network virtual-router core routing-table ip static-route discard-192-168 destination 192.168.0.0/16
+set network virtual-router core routing-table ip static-route discard-192-168 nexthop discard
+set zone k8s-nodes network layer3 ae1.100
+set zone ingress network layer3 ae1.110
+set zone stor-mgmt network layer3 ae1.200
+set zone bastion network layer3 ae1.300
+set zone services network layer3 [ ae1.130 ae1.131 ]
+set zone oob network layer3 ethernet1/3
+set address collector ip-netmask 10.20.3.20/32
+set address collector description "the monitoring collector's reserved address, no host until chapter 20"
+set profile-group bp-default virus default
+set profile-group bp-default spyware default
+set profile-group bp-default vulnerability default
+set profile-group bp-default file-blocking "basic file blocking"
+set rulebase security rules bastion-to-bmc from bastion
+set rulebase security rules bastion-to-bmc to oob
+set rulebase security rules bastion-to-bmc source collector
+set rulebase security rules bastion-to-bmc destination 10.20.9.0/24
+set rulebase security rules bastion-to-bmc application [ ssh ssl ]
+set rulebase security rules bastion-to-bmc service application-default
+set rulebase security rules bastion-to-bmc action allow
+set rulebase security rules bastion-to-bmc log-end yes
+set rulebase security rules bastion-to-bmc profile-setting group bp-default
+set rulebase security rules inside-to-gateway-ping from [ k8s-nodes ingress stor-mgmt services bastion oob ]
+set rulebase security rules inside-to-gateway-ping to [ k8s-nodes ingress stor-mgmt services bastion oob ]
+set rulebase security rules inside-to-gateway-ping source [ 10.20.1.0/24 10.20.11.0/24 10.20.2.0/24 10.20.13.0/24 10.20.14.0/24 10.20.3.0/24 10.20.9.0/24 10.24.10.0/24 ]
+set rulebase security rules inside-to-gateway-ping destination [ 10.20.1.1 10.20.11.1 10.20.13.1 10.20.14.1 10.20.2.1 10.20.3.1 10.20.9.254 10.24.10.9 10.24.10.54 ]
+set rulebase security rules inside-to-gateway-ping application ping
+set rulebase security rules inside-to-gateway-ping service application-default
+set rulebase security rules inside-to-gateway-ping action allow
+set rulebase security rules inside-to-gateway-ping log-end yes
+set rulebase security rules inside-to-gateway-ping profile-setting group bp-default
+set rulebase security rules nodes-to-internal-gateway from k8s-nodes
+set rulebase security rules nodes-to-internal-gateway to ingress
+set rulebase security rules nodes-to-internal-gateway source 10.20.1.0/24
+set rulebase security rules nodes-to-internal-gateway destination 10.20.11.200
+set rulebase security rules nodes-to-internal-gateway application ssl
+set rulebase security rules nodes-to-internal-gateway service application-default
+set rulebase security rules nodes-to-internal-gateway action allow
+set rulebase security rules nodes-to-internal-gateway log-end yes
+set rulebase security rules nodes-to-internal-gateway profile-setting group bp-default
+set rulebase security rules csi-to-storage-api from k8s-nodes
+set rulebase security rules csi-to-storage-api to stor-mgmt
+set rulebase security rules csi-to-storage-api source 10.20.1.0/24
+set rulebase security rules csi-to-storage-api destination 10.20.2.31
+set rulebase security rules csi-to-storage-api application ssl
+set rulebase security rules csi-to-storage-api service application-default
+set rulebase security rules csi-to-storage-api action allow
+set rulebase security rules csi-to-storage-api log-end yes
+set rulebase security rules csi-to-storage-api profile-setting group bp-default
+set rulebase security rules deny-all-log from any
+set rulebase security rules deny-all-log to any
+set rulebase security rules deny-all-log source any
+set rulebase security rules deny-all-log destination any
+set rulebase security rules deny-all-log application any
+set rulebase security rules deny-all-log service any
+set rulebase security rules deny-all-log action deny
+set rulebase security rules deny-all-log log-end yes
+set rulebase security rules deny-all-log description dec-policy-deny-all-log
+set rulebase default-security-rules rules intrazone-default action deny
+set rulebase default-security-rules rules intrazone-default log-start no
+set rulebase default-security-rules rules intrazone-default log-end yes
+set rulebase default-security-rules rules interzone-default action deny
+set rulebase default-security-rules rules interzone-default log-start no
+set rulebase default-security-rules rules interzone-default log-end yes
+set import network interface [ ae1.100 ae1.110 ae1.200 ae1.300 ae1.130 ae1.131 ethernet1/3 ]

@@ -1,0 +1,321 @@
+{
+  "access": {
+    "Ethernet0": {
+      "desc": "k8s-gpu1-rail1",
+      "eth": "eth1",
+      "kind": "rail",
+      "peer": "k8s-gpu1:eth4",
+      "rail": 1,
+      "vlan": 101
+    },
+    "Ethernet1": {
+      "desc": "k8s-gpu1-rail3",
+      "eth": "eth2",
+      "kind": "rail",
+      "peer": "k8s-gpu1:eth6",
+      "rail": 3,
+      "vlan": 103
+    },
+    "Ethernet2": {
+      "desc": "k8s-gpu1-rail5",
+      "eth": "eth3",
+      "kind": "rail",
+      "peer": "k8s-gpu1:eth8",
+      "rail": 5,
+      "vlan": 105
+    },
+    "Ethernet3": {
+      "desc": "k8s-gpu1-rail7",
+      "eth": "eth4",
+      "kind": "rail",
+      "peer": "k8s-gpu1:eth10",
+      "rail": 7,
+      "vlan": 107
+    },
+    "Ethernet4": {
+      "desc": "k8s-gpu2-rail1",
+      "eth": "eth5",
+      "kind": "rail",
+      "peer": "k8s-gpu2:eth4",
+      "rail": 1,
+      "vlan": 101
+    },
+    "Ethernet5": {
+      "desc": "k8s-gpu2-rail3",
+      "eth": "eth6",
+      "kind": "rail",
+      "peer": "k8s-gpu2:eth6",
+      "rail": 3,
+      "vlan": 103
+    },
+    "Ethernet6": {
+      "desc": "k8s-gpu2-rail5",
+      "eth": "eth7",
+      "kind": "rail",
+      "peer": "k8s-gpu2:eth8",
+      "rail": 5,
+      "vlan": 105
+    },
+    "Ethernet7": {
+      "desc": "k8s-gpu2-rail7",
+      "eth": "eth8",
+      "kind": "rail",
+      "peer": "k8s-gpu2:eth10",
+      "rail": 7,
+      "vlan": 107
+    }
+  },
+  "addresses": {
+    "data": [],
+    "ip_interfaces": [
+      {
+        "address": "10.0.0.15/24",
+        "gateway": "10.0.0.2",
+        "interface": "Management0",
+        "source": "slirp",
+        "vrf": "mgmt"
+      }
+    ]
+  },
+  "bgp": null,
+  "container": "sfab-ch04-rail-sw1",
+  "es": null,
+  "evpn": null,
+  "keepalive": null,
+  "known_macs": {
+    "02:5a:6f:00:00:04": {
+      "node": "k8s-gpu1",
+      "source": "nic",
+      "via": "Ethernet0",
+      "vlan": 101
+    },
+    "02:5a:6f:00:00:06": {
+      "node": "k8s-gpu1",
+      "source": "nic",
+      "via": "Ethernet1",
+      "vlan": 103
+    },
+    "02:5a:6f:00:00:08": {
+      "node": "k8s-gpu1",
+      "source": "nic",
+      "via": "Ethernet2",
+      "vlan": 105
+    },
+    "02:5a:6f:00:00:0a": {
+      "node": "k8s-gpu1",
+      "source": "nic",
+      "via": "Ethernet3",
+      "vlan": 107
+    },
+    "02:5a:6f:01:00:04": {
+      "node": "k8s-gpu1",
+      "source": "relay-macvlan",
+      "via": "Ethernet0",
+      "vlan": 101
+    },
+    "02:5a:6f:01:00:06": {
+      "node": "k8s-gpu1",
+      "source": "relay-macvlan",
+      "via": "Ethernet1",
+      "vlan": 103
+    },
+    "02:5a:6f:01:00:08": {
+      "node": "k8s-gpu1",
+      "source": "relay-macvlan",
+      "via": "Ethernet2",
+      "vlan": 105
+    },
+    "02:5a:6f:01:00:0a": {
+      "node": "k8s-gpu1",
+      "source": "relay-macvlan",
+      "via": "Ethernet3",
+      "vlan": 107
+    },
+    "02:5a:70:00:00:04": {
+      "node": "k8s-gpu2",
+      "source": "nic",
+      "via": "Ethernet4",
+      "vlan": 101
+    },
+    "02:5a:70:00:00:06": {
+      "node": "k8s-gpu2",
+      "source": "nic",
+      "via": "Ethernet5",
+      "vlan": 103
+    },
+    "02:5a:70:00:00:08": {
+      "node": "k8s-gpu2",
+      "source": "nic",
+      "via": "Ethernet6",
+      "vlan": 105
+    },
+    "02:5a:70:00:00:0a": {
+      "node": "k8s-gpu2",
+      "source": "nic",
+      "via": "Ethernet7",
+      "vlan": 107
+    },
+    "02:5a:70:01:00:04": {
+      "node": "k8s-gpu2",
+      "source": "relay-macvlan",
+      "via": "Ethernet4",
+      "vlan": 101
+    },
+    "02:5a:70:01:00:06": {
+      "node": "k8s-gpu2",
+      "source": "relay-macvlan",
+      "via": "Ethernet5",
+      "vlan": 103
+    },
+    "02:5a:70:01:00:08": {
+      "node": "k8s-gpu2",
+      "source": "relay-macvlan",
+      "via": "Ethernet6",
+      "vlan": 105
+    },
+    "02:5a:70:01:00:0a": {
+      "node": "k8s-gpu2",
+      "source": "relay-macvlan",
+      "via": "Ethernet7",
+      "vlan": 107
+    }
+  },
+  "lab": "sfab-ch04",
+  "mclag": null,
+  "mgmt": "172.21.40.21",
+  "mgmt_vrf": "mgmt",
+  "num_nics": 8,
+  "passthrough": false,
+  "portchannels": {},
+  "ports": {
+    "Ethernet0": {
+      "admin": "up",
+      "desc": "k8s-gpu1-rail1",
+      "eth": "eth1",
+      "mtu": 9100,
+      "peer": "k8s-gpu1:eth4",
+      "portchannel": null,
+      "role": "rail"
+    },
+    "Ethernet1": {
+      "admin": "up",
+      "desc": "k8s-gpu1-rail3",
+      "eth": "eth2",
+      "mtu": 9100,
+      "peer": "k8s-gpu1:eth6",
+      "portchannel": null,
+      "role": "rail"
+    },
+    "Ethernet2": {
+      "admin": "up",
+      "desc": "k8s-gpu1-rail5",
+      "eth": "eth3",
+      "mtu": 9100,
+      "peer": "k8s-gpu1:eth8",
+      "portchannel": null,
+      "role": "rail"
+    },
+    "Ethernet3": {
+      "admin": "up",
+      "desc": "k8s-gpu1-rail7",
+      "eth": "eth4",
+      "mtu": 9100,
+      "peer": "k8s-gpu1:eth10",
+      "portchannel": null,
+      "role": "rail"
+    },
+    "Ethernet4": {
+      "admin": "up",
+      "desc": "k8s-gpu2-rail1",
+      "eth": "eth5",
+      "mtu": 9100,
+      "peer": "k8s-gpu2:eth4",
+      "portchannel": null,
+      "role": "rail"
+    },
+    "Ethernet5": {
+      "admin": "up",
+      "desc": "k8s-gpu2-rail3",
+      "eth": "eth6",
+      "mtu": 9100,
+      "peer": "k8s-gpu2:eth6",
+      "portchannel": null,
+      "role": "rail"
+    },
+    "Ethernet6": {
+      "admin": "up",
+      "desc": "k8s-gpu2-rail5",
+      "eth": "eth7",
+      "mtu": 9100,
+      "peer": "k8s-gpu2:eth8",
+      "portchannel": null,
+      "role": "rail"
+    },
+    "Ethernet7": {
+      "admin": "up",
+      "desc": "k8s-gpu2-rail7",
+      "eth": "eth8",
+      "mtu": 9100,
+      "peer": "k8s-gpu2:eth10",
+      "portchannel": null,
+      "role": "rail"
+    }
+  },
+  "role": "rail_vlan",
+  "router": false,
+  "routes": {
+    "default": []
+  },
+  "schema": 1,
+  "switch": "rail-sw1",
+  "used_ports": [
+    "Ethernet0",
+    "Ethernet1",
+    "Ethernet2",
+    "Ethernet3",
+    "Ethernet4",
+    "Ethernet5",
+    "Ethernet6",
+    "Ethernet7"
+  ],
+  "vlans": {
+    "101": {
+      "tagged": [],
+      "untagged": [
+        "Ethernet0",
+        "Ethernet4"
+      ]
+    },
+    "103": {
+      "tagged": [],
+      "untagged": [
+        "Ethernet1",
+        "Ethernet5"
+      ]
+    },
+    "105": {
+      "tagged": [],
+      "untagged": [
+        "Ethernet2",
+        "Ethernet6"
+      ]
+    },
+    "107": {
+      "tagged": [],
+      "untagged": [
+        "Ethernet3",
+        "Ethernet7"
+      ]
+    }
+  },
+  "vm_data_nics": [
+    "eth1",
+    "eth2",
+    "eth3",
+    "eth4",
+    "eth5",
+    "eth6",
+    "eth7",
+    "eth8"
+  ]
+}

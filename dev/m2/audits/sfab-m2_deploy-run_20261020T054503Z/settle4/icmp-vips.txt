@@ -1,0 +1,43 @@
+NS                NAME                                                    HOLDER
+kube-system       cilium-l2announce-gateways-cilium-gateway-gw-internal   ctrl2
+kube-system       cilium-l2announce-gateways-cilium-gateway-gw-users      ctrl2
+kube-system       plndr-cp-lock                                           ctrl1
+NAMESPACE   NAME          CLASS    ADDRESS       PROGRAMMED   AGE
+gateways    gw-internal   cilium   10.20.1.200   True         24m
+gateways    gw-users      cilium   10.20.1.210   True         24m
+== ctrl1 ping 10.20.1.200
+3 packets transmitted, 0 received, 100% packet loss, time 2030ms
+
+10.20.1.200 dev bond0 lladdr 02:5a:66:00:00:01 DELAY 
+== ctrl1 tcp 10.20.1.200:443/6443
+open 443
+== ctrl1 ping 10.20.1.210
+3 packets transmitted, 0 received, +1 errors, 100% packet loss, time 2040ms
+pipe 3
+10.20.1.210 dev bond0 lladdr 02:5a:66:00:00:01 REACHABLE 
+== ctrl1 tcp 10.20.1.210:443/6443
+open 443
+== ctrl1 ping 10.20.1.10
+3 packets transmitted, 3 received, 0% packet loss, time 2010ms
+rtt min/avg/max/mdev = 0.029/0.043/0.068/0.017 ms
+10.20.1.10 dev bond0 lladdr 02:5a:65:00:00:01 STALE 
+== ctrl1 tcp 10.20.1.10:443/6443
+open 6443
+== gpu1 ping 10.20.1.200
+3 packets transmitted, 0 received, +1 errors, 100% packet loss, time 2036ms
+pipe 3
+10.20.1.200 dev bond0 lladdr 02:5a:66:00:00:01 DELAY 
+== gpu1 tcp 10.20.1.200:443/6443
+open 443
+== gpu1 ping 10.20.1.210
+3 packets transmitted, 0 received, +1 errors, 100% packet loss, time 2029ms
+pipe 3
+10.20.1.210 dev bond0 lladdr 02:5a:66:00:00:01 REACHABLE 
+== gpu1 tcp 10.20.1.210:443/6443
+open 443
+== gpu1 ping 10.20.1.10
+3 packets transmitted, 3 received, 0% packet loss, time 2024ms
+rtt min/avg/max/mdev = 0.318/0.411/0.481/0.068 ms
+10.20.1.10 dev bond0 lladdr 02:5a:65:00:00:01 REACHABLE 
+== gpu1 tcp 10.20.1.10:443/6443
+open 6443

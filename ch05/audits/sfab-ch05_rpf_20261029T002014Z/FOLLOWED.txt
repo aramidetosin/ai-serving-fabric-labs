@@ -1,0 +1,5 @@
+from: k8s-gpu1 namespace gpu1 (10.21.1.11)
+to: 10.21.2.12 on rail 2 (k8s-gpu2 namespace gpu2, rail2)
+relay: relay
+count: 3
+label: the IP relay between rails is the lab's stand-in that lets captures show PXN's path: production GPU hosts do not IP-forward between rails (NCCL moves cross-rail collective data over NVLink with PXN, and its IP control traffic uses the frontend), and rp_filter 2 belongs to the relay; production keeps 1 with per-rail policy routing

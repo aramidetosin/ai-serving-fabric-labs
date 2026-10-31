@@ -1,0 +1,38 @@
+# sfab/registry: the lab's registry (FRAMEWORK.md section 5), the upstream registry's stand-in on the
+# uplink side. It serves the images and charts `make -C images registry-seed` stored, from
+# images/registry/data bound read-only at /var/lib/registry (render/clab.py). Read-only mode refuses
+# every push and turns the upload purge off, so the registry never writes to its data; delete is
+# off. HTTPS on port 5000, with the leaf of the lab's internet intermediate that sfab-ca signs on the
+# lab host (state/tls/registry, bound read-only at /sfab/tls: chain.crt is the leaf then the
+# intermediate): containerd names it with https:// and the lab root in hosts.toml, and helm reaches
+# its OCI charts with --ca-file.
+version: 0.1
+log:
+  level: info
+  fields:
+    service: registry
+storage:
+  cache:
+    blobdescriptor: inmemory
+  filesystem:
+    rootdirectory: /var/lib/registry
+  delete:
+    enabled: false
+  maintenance:
+    uploadpurging:
+      enabled: false
+    readonly:
+      enabled: true
+http:
+  addr: :5000
+  tls:
+    certificate: /sfab/tls/chain.crt
+    key: /sfab/tls/tls.key
+    minimumtls: tls1.2
+  headers:
+    X-Content-Type-Options: [nosniff]
+health:
+  storagedriver:
+    enabled: true
+    interval: 10s
+    threshold: 3

@@ -1,0 +1,102 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "addressType": "IPv4",
+            "apiVersion": "discovery.k8s.io/v1",
+            "endpoints": [
+                {
+                    "addresses": [
+                        "10.22.1.33"
+                    ],
+                    "conditions": {
+                        "ready": true,
+                        "serving": true,
+                        "terminating": false
+                    },
+                    "nodeName": "k8s-gpu1",
+                    "targetRef": {
+                        "kind": "Pod",
+                        "name": "chat-a-server-0",
+                        "namespace": "serving",
+                        "uid": "92279575-4219-472f-90b7-90d8a1c2f5fd"
+                    }
+                },
+                {
+                    "addresses": [
+                        "10.22.2.174"
+                    ],
+                    "conditions": {
+                        "ready": true,
+                        "serving": true,
+                        "terminating": false
+                    },
+                    "nodeName": "k8s-gpu2",
+                    "targetRef": {
+                        "kind": "Pod",
+                        "name": "chat-b-server-0",
+                        "namespace": "serving",
+                        "uid": "5580d070-2ca0-4d4e-bf54-0d0905a27886"
+                    }
+                },
+                {
+                    "addresses": [
+                        "10.22.1.35"
+                    ],
+                    "conditions": {
+                        "ready": true,
+                        "serving": true,
+                        "terminating": false
+                    },
+                    "nodeName": "k8s-gpu1",
+                    "targetRef": {
+                        "kind": "Pod",
+                        "name": "chat-c-server-0",
+                        "namespace": "serving",
+                        "uid": "8ddf57d6-5459-4068-a25b-c67f5d42d0b5"
+                    }
+                }
+            ],
+            "kind": "EndpointSlice",
+            "metadata": {
+                "annotations": {
+                    "endpoints.kubernetes.io/last-change-trigger-time": "2026-10-28T22:47:48Z"
+                },
+                "creationTimestamp": "2026-10-28T20:48:09Z",
+                "generateName": "chat-",
+                "generation": 26,
+                "labels": {
+                    "app.kubernetes.io/name": "serving",
+                    "endpointslice.kubernetes.io/managed-by": "endpointslice-controller.k8s.io",
+                    "kubernetes.io/service-name": "chat",
+                    "tarnwick.example/model": "chat"
+                },
+                "name": "chat-ljc9n",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Service",
+                        "name": "chat",
+                        "uid": "c4ceaf80-0b56-468e-959c-e0a6f9d1169e"
+                    }
+                ],
+                "resourceVersion": "40003",
+                "uid": "9b33755d-5ec8-473e-904b-6bf5279fdf26"
+            },
+            "ports": [
+                {
+                    "name": "http",
+                    "port": 8080,
+                    "protocol": "TCP"
+                }
+            ]
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

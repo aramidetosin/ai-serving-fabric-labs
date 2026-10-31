@@ -1,0 +1,30 @@
+== preflight sfab-m2 (2026-10-20T05:45:17Z)
+  PASS  identity: lab sfab-m2 in m2, prefix sfab-m2-, network sfab-a-mgmt
+  PASS  topo.clab.yml present
+  PASS  docker 29.5.2 answers
+  PASS  containerlab at the pinned 0.81.1
+  PASS  python3 3.12 (3.10 or later)
+  PASS  tools: sshpass tcpdump nsenter ethtool openssl and the rest present
+  PASS  /dev/kvm read-write
+  PASS  host tick 10000
+  PASS  no other sfab lab's container running
+  PASS  containerlab knows no other sfab lab
+  PASS  no containerlab deploy in progress
+  PASS  subnet 172.21.40.0/24 held by no docker network or host interface (sfab-a-mgmt not created yet)
+  PASS  image sfab/bastion:1 present (28c7a0655bf7)
+  PASS  image sfab/client:1 present (65f9d5060772)
+  PASS  image sfab/frr:10.5.4-1 present (b8cd88419a8a)
+  PASS  image sfab/registry:1 present (ee8b09575ec0)
+  PASS  image sfab/vm-node:1-k8s1.35.8 present (7fcaedda1055)
+  PASS  image vrnetlab/dell_sonic:4.6.0 present (c0214f532277)
+  PASS  image vrnetlab/paloalto_pa-vm:12.1.2 present (d1ca9a0f1687)
+  PASS  image vrnetlab/truenas_truenas:27.0.0-RC.1 present (d0b0a42ff2d3)
+  PASS  registry data seeded: images/registry/data holds SEED.json (a link to the image store)
+  PASS  free memory: MemAvailable 131.6 GiB covers 112.75 GiB for the nodes not yet running plus the 16.0 GiB floor
+  PASS  vCPUs: 54.0 for the lab within 2 x 128 host CPUs
+  PASS  disk: 285.1 GiB free covers 83.0 GiB under state/ (budget 83.0 GiB, 0.0 GiB of it already there) and 56.0 GiB of container layers under /var/lib/docker for the nodes not yet running, one filesystem (139.0 GiB)
+  PASS  module bonding loaded
+  PASS  module vrf loaded
+  PASS  state/secrets.env (0600) and the lab SSH key present
+  PASS  render: sfab check clean
+== RESULT: 28 passed, 0 failed, 0 known platform limitation(s), 0 skipped

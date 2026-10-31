@@ -1,0 +1,10 @@
+  PASS  pass 2 key-lifecycle: the key Job minted batch.fd000002 into the key Secret (sha256:ec8f5df23969), on the host clock at 1793368592.7735677
+  PASS  pass 2 key-lifecycle: every API gateway pod accepted it, each on its own schedule: api-gateway-64bc7b94df-7b74q 32.4 s, api-gateway-64bc7b94df-hm4sq 71.7 s after the Secret's write; the last pod's acceptance 71.7 s
+  PASS  pass 2 key-lifecycle: the first 200 through llm.ai.tarnwick.example came 34.2 s after the write, once a pod held the key (the first pod 32.4 s), and 9 of the VIP's requests were refused 401 between it and the last pod's acceptance: a first 200 shows one pod holds a key, the last pod's acceptance that all do
+  PASS  pass 2 key-lifecycle: the new chat key on staff's route: 401 at every API gateway pod (api-gateway-64bc7b94df-7b74q 401, api-gateway-64bc7b94df-hm4sq 401) and through the VIP (HTTP 401)
+  PASS  pass 2 key-lifecycle: the key Job revoked batch.fd000002 (sha256:ec8f5df23969), on the host clock at 1793368689.9912577
+  PASS  pass 2 key-lifecycle: after the revoke every API gateway pod refused it: api-gateway-64bc7b94df-7b74q 78.9 s, api-gateway-64bc7b94df-hm4sq 65.3 s; the last pod's refusal 78.9 s after the revoke
+  PASS  pass 2 key-lifecycle: through the VIP the last 200 with it came 75.5 s after the revoke, and every request after the last pod's refusal was refused (7 requests)
+  PASS  pass 2 key-lifecycle: chat through gw-users: 0 of 101 requests failed
+  PASS  pass 2 key-lifecycle: staff through gw-users: 0 of 7 requests failed
+  PASS  pass 2 key-lifecycle: the key Secret holds the same fields and fingerprints after the drill as before (2 fields)

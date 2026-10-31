@@ -1,0 +1,28 @@
+
+Nat policy configured on vsys1:
+"no-nat-public; index: 1" {
+        nat-type ipv4;
+        from [ k8s-nodes services ];
+        source any;
+        source-region none;
+        to uplink;
+        to-interface  ;
+        destination 198.51.100.2;
+        destination-region none;
+        service 0:any/any/any;
+        terminal no;
+}
+
+"internet-snat; index: 2" {
+        nat-type ipv4;
+        from [ k8s-nodes services ];
+        source any;
+        source-region none;
+        to uplink;
+        to-interface  ;
+        destination any;
+        destination-region none;
+        service 0:any/any/any;
+        translate-to "src: ethernet1/5 198.51.100.2 (dynamic-ip-and-port) (pool idx: 1)";
+        terminal no;
+}

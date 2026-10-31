@@ -1,0 +1,17 @@
+== heal-6b: chat-c's server attached through a copy of rail7 that routes the pod network over the rail
+  PASS  make serve: every pod where the table places it, chat-c-server-0 removed first and made again (RESULT: 26 passed, 0 failed, 0 known platform limitation(s), 0 skipped)
+== heal-6b: recorded
+  PASS  chat-c-server-0 (10.22.1.35, on k8s-gpu1): route table read, and rail7 captured while the router pod router-76cf778fb6-gwr7f (10.22.4.84) connected to port 8080: connected, 0 packet(s) from 10.22.1.35 on rail7 (recorded)
+  PASS  users, heal, pass 1: 0 of 22 requests through gw-users to chat, staff failed (recorded)
+== heal-6b: healed
+  PASS  chat-c-server-0's network-status names rail 7, as the table places it (serving/rail7 rail7 10.21.7.100)
+  PASS  chat-c-server-0's route table holds no route to 10.22.0.0/16 via 10.21.7.101: the cluster network is on eth0 again
+  PASS  no packet from chat-c-server-0's eth0 address 10.22.1.35 on rail7 while its peer connected
+  PASS  the attachment rail7-route is gone
+  PASS  Service chat-c holds 1 ready endpoint(s) (10.22.1.35) of its servers chat-c-server-0
+  PASS  Service chat holds 3 ready endpoint(s) (10.22.1.33 10.22.1.35 10.22.2.174) of its servers chat-a-server-0,chat-b-server-0,chat-c-server-0
+  PASS  Service staff holds 2 ready endpoint(s) (10.22.1.1 10.22.2.81) of its servers staff-a-server-0,staff-b-server-0
+  PASS  users: every request succeeds (22 of 22)
+== the chapter audit after the heal
+  PASS  audit.sh after the heal: RESULT: 916 passed, 0 failed, 0 known platform limitation(s), 2 skipped (ch06/audits/sfab-ch06_audit_20261028T224944Z)
+== RESULT: 12 passed, 0 failed, 0 known platform limitation(s), 0 skipped

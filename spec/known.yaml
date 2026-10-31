@@ -1,0 +1,97 @@
+# Known platform limitations (FRAMEWORK.md section 4.2).
+#
+# A KNOWN line in an audit, trace or drill must name one of these ids. KNOWN is never counted
+# as a pass and is never printed in a chapter. Each entry says what the limit is (statement),
+# what it rules out of the book (out), and what every lab does about it (lab). source says how
+# it was found: L1 to L10 by testing SONiC 4.6.0 under vrnetlab before the first lab was built,
+# a test whose records are not in this repository. Where a recorded set holds a KNOWN line for
+# the limit, source names that set too, by the short name its lab's audits/INDEX.md gives it,
+# or by the page that lists it.
+
+known:
+  - id: L1
+    title: peer-link isolation is not enforced
+    statement: >-
+      MCLAG peer-link isolation is configured and shown as enabled, but the virtual bridge does
+      not isolate, so broadcast that crosses the peer link comes back out the MCLAG bonds.
+    out: any broadcast-over-peer-link figure, and any duplicate-free ping or ARP across the peer link
+    lab: a duplicate reply in a pair transcript is this artifact; warm ARP and MAC tables before recording
+    source: the switch image, tested before the first lab; recorded in chapter 3's drills (R in ch03/audits/INDEX.md) and in one milestone M1 audit (dev/m1/RESULTS.md)
+  - id: L2
+    title: delay-restore is not enforced
+    statement: >-
+      delay-restore 300 is written by default and displayed, and nothing is held down; a rejoin
+      is boot plus LACP.
+    out: any hold-down figure or story
+    lab: record the standby's return as an event, never the departure-to-return span
+    source: the switch image, tested before the first lab; recorded in chapter 3's drills (R in ch03/audits/INDEX.md)
+  - id: L3
+    title: PFC and ECN are configuration only
+    statement: >-
+      Maps, PFC priorities, the watchdog and the RoCE defaults are accepted, and no buffer limits
+      exist in the switch's state database.
+    out: lossless behavior, pause frames or counters, ECN marking, watchdog action, queue occupancy
+    lab: no QoS configuration in any lab
+    source: the switch image, tested before the first lab
+  - id: L4
+    title: custom WRED is rejected
+    statement: >-
+      Only the RoCE force-defaults command installs the RoCE policy, and it restarts the switch.
+    out: any WRED profile
+    lab: none
+    source: the switch image, tested before the first lab
+  - id: L5
+    title: no BMP
+    statement: >-
+      There is no KLISH command for BMP, and bgpd starts without the BMP module.
+    out: any BMP feed
+    lab: the route view is a REST or gNMI Get poll, or a gNMI SAMPLE subscription at 20 s or more
+    source: the switch image, tested before the first lab
+  - id: L6
+    title: sFlow crash-loops swss on a switch missing NICs
+    statement: >-
+      Global sFlow samples all 56 ports; ports without a VM NIC make syncd throw and swss restart
+      about every 2.5 minutes until sFlow is disabled.
+    out: sFlow on any switch with fewer than 56 NICs
+    lab: a switch that exports sFlow runs NUM_NICS 56 with eth56 connected
+    source: the switch image, tested before the first lab
+  - id: L7
+    title: LLDP stops after a swss restart
+    statement: >-
+      LLDP stays dead after a swss restart until the switch VM reboots, and during swss loops the
+      hosts cache a 1500-byte path MTU.
+    out: LLDP output read after a swss restart without a reboot
+    lab: reboot before reading LLDP after any swss restart; flush the hosts' route cache after an MTU event
+    source: the switch image, tested before the first lab
+  - id: L8
+    title: ECMP hashes on IP addresses only
+    statement: >-
+      The virtual data plane hashes ECMP on source and destination addresses; the KLISH load-share
+      hash lines do not reach it.
+    out: per-flow layer 4 spreading, hash seeds or fields, hash polarization
+    lab: drills place flows by source or destination address and locate each flow before a cut
+    source: the switch image, tested before the first lab
+  - id: L9
+    title: a shut port drops no carrier at the far end
+    statement: >-
+      A KLISH shutdown inside the switch VM does not drop carrier on the neighbor, and a
+      container-side link down is invisible to the VM, so no cable pull can be emulated.
+    out: carrier-loss detection, hardware failover times, any claim that a neighbor sees a shut at once
+    lab: every failover figure is an LACP-timeout or BFD figure, labeled so
+    source: the switch image, tested before the first lab; recorded in chapter 3's and chapter 5's drills (R in each lab's audits/INDEX.md)
+  - id: L10
+    title: docker pause holds packets
+    statement: >-
+      A paused switch container holds packets and delivers them about 31 s later, and BGP
+      neighbors reset their sessions on resume.
+    out: a whole-switch-dead loss figure from plain ping counts
+    lab: drills never use docker pause; late replies (RTT over 1 s) count as lost
+    source: the switch image, tested before the first lab
+  - id: L11
+    title: the lab host's clock
+    statement: >-
+      Until 2026-10-14 the lab host's kernel tick was 9258 us, so its monotonic clock ran at
+      0.9258 of real time and the wall clock stepped about every 35 s. The tick was set to 10000.
+    out: any duration measured while the host tick is not 10000
+    lab: preflight refuses to record unless the tick reads 10000; cross-switch timing still needs a measured offset
+    source: the lab host's tick, read with adjtimex(2) before and after it was set on 2026-10-14

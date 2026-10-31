@@ -1,0 +1,11 @@
+== break-3a: VLAN 200 allowed on the firewall PortChannel on fe-sw1 only
+  PASS  fe-sw2: interface PortChannel 10: switchport trunk allowed Vlan remove 200 accepted
+== break-3a: recorded
+  PASS  bastion-stor-mgmt, break, pass 1: 31 of 60 connects from bastion to 10.20.2.31:443 failed (recorded; the exercise names no share)
+  PASS  bastion-stor-mgmt, break, pass 2: 31 of 60 connects from bastion to 10.20.2.31:443 failed (recorded; the exercise names no share)
+  PASS  bastion-stor-mgmt, break, pass 3: 29 of 60 connects from bastion to 10.20.2.31:443 failed (recorded; the exercise names no share)
+== break-3a: broken as designed
+  PASS  fe-sw2: show vlan has PortChannel10 not in Vlan200: Vlan200: PortChannel1(T),PortChannel32(A)
+  PASS  fe-sw1: show vlan has PortChannel10 in Vlan200 (T): Vlan200: PortChannel1(T),PortChannel10(T),PortChannel32(A)
+  PASS  bastion-stor-mgmt: some connects fail and some succeed, by hash (91 of 180 across the passes)
+== RESULT: 7 passed, 0 failed, 0 known platform limitation(s), 0 skipped

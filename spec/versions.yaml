@@ -1,0 +1,421 @@
+# Every pin the labs use (FRAMEWORK.md sections 2.4, 3.1 and 5).
+#
+# images: ref is what the topology names. vrnetlab images are built on the lab host from the
+# reader's own vendor image and never pulled; their digest is local to each host, so it stays
+# null here and preflight (pf_images) records it in every result set. images/VENDOR-IMAGES.md
+# says where each vendor image comes from and how to build it. sfab/* images are built from this
+# repo by `make -C images`. status: candidate marks a pin that becomes final in the commit that
+# lands its first chapter; from that commit on it reads status: final.
+
+images:
+  dell_sonic:
+    ref: vrnetlab/dell_sonic:4.6.0
+    source: platform/dell-sonic-4.6.0
+    # vrnetlab (MIT; platform/dell-sonic-4.6.0/LICENSE.vrnetlab) at one commit for every file the
+    # build takes from it: dell/dell_sonic, common/ and the top-level makefiles. Each blob is what
+    # `git rev-parse <commit>:<path>` prints in a checkout; the launcher's is vrnetlab's own file,
+    # which launch.py.upstream-plus-numnics extends (platform/dell-sonic-4.6.0/README.md).
+    vrnetlab:
+      repository: https://github.com/srl-labs/vrnetlab
+      commit: 3a34fa63d73843c871f248e2df2ffa5c038183ce
+      blobs:
+        dell/dell_sonic/docker/launch.py: 055afa9f5a2cd5336395abc2774ad549b3c3ad6e
+        common/vrnetlab.py: 0b6bbf45df659e2785659708a78a6ef090e13887
+        common/healthcheck.py: 49053b63729fe3c67113b8c5649e96a4097bfa4e
+    pulled: false
+    digest: null
+  pa_vm:
+    ref: vrnetlab/paloalto_pa-vm:12.1.2
+    source: platform/paloalto-pa-vm-12.1.2
+    # vrnetlab at the commit the recorded image names in its vrnetlab-version label, for every file
+    # the build takes from it: paloalto/pan, common/ and the top-level makefiles. The launcher's
+    # blob is vrnetlab's own file, which launch.py.patched replaces whole
+    # (platform/paloalto-pa-vm-12.1.2/README.md).
+    vrnetlab:
+      repository: https://github.com/srl-labs/vrnetlab
+      commit: fd759f10587de4dd131815c8b7066ce3f957c749
+      blobs:
+        paloalto/pan/docker/launch.py: 817ca9f79ba29cd71275796cde006c67671c7e02
+        common/vrnetlab.py: 7eab1072d3183cefa00ed2a97aa547883e4af9f0
+        common/healthcheck.py: 49053b63729fe3c67113b8c5649e96a4097bfa4e
+    pulled: false
+    digest: null
+  # TrueNAS and ONTAP: vrnetlab's truenas/truenas and netapp/ontap at commit, the first that holds
+  # both, with common/ taken from common_commit, the parent of ddaac458 (which moved
+  # common/test_vrnetlab.py out of common/); d142be03 later changed common/vrnetlab.py. Each blob
+  # is a file the build copies into the image; the TrueNAS image the recordings ran on holds
+  # exactly these (images/VENDOR-IMAGES.md).
+  truenas:
+    ref: vrnetlab/truenas_truenas:27.0.0-RC.1
+    source: vrnetlab truenas/truenas
+    vrnetlab:
+      repository: https://github.com/srl-labs/vrnetlab
+      commit: c89aa5e8cdb3805fbc94b04f120d68847e2d377b
+      common_commit: da55d7cf48c1674422100a3bec2612f375dc1f4f
+      blobs:
+        truenas/truenas/docker/launch.py: 31c976daca8d56431c861e90c0cbed666a57c356
+        truenas/truenas/docker/tnrpc.py: 2c299a20e77f689aaf48343810eb70972ca3f56a
+        common/vrnetlab.py: 73aeb0be3d694ed08bd7011566ed0c545dc5f16d
+        common/healthcheck.py: 49053b63729fe3c67113b8c5649e96a4097bfa4e
+        common/test_vrnetlab.py: 173f903e2f19ee76edd25a590ed8f82a42de68a4
+    pulled: false
+    digest: null
+  ontap:
+    ref: vrnetlab/netapp_ontap:9.17.1
+    source: vrnetlab netapp/ontap
+    vrnetlab:
+      repository: https://github.com/srl-labs/vrnetlab
+      commit: c89aa5e8cdb3805fbc94b04f120d68847e2d377b
+      common_commit: da55d7cf48c1674422100a3bec2612f375dc1f4f
+      blobs:
+        netapp/ontap/docker/launch.py: 769d8180820c2fc040fa8d7bd9604c4eef1db319
+        common/vrnetlab.py: 73aeb0be3d694ed08bd7011566ed0c545dc5f16d
+        common/healthcheck.py: 49053b63729fe3c67113b8c5649e96a4097bfa4e
+        common/test_vrnetlab.py: 173f903e2f19ee76edd25a590ed8f82a42de68a4
+    pulled: false
+    digest: null
+    status: candidate
+  frr_upstream:
+    ref: quay.io/frrouting/frr:10.5.4
+    digest: sha256:17a66aa754b4f60d58fae6cf3c357b62cfb574beb2a4cacd26d50e3df8440b78
+    pulled: true
+  ubuntu_base:
+    ref: ubuntu:24.04
+    digest: sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3
+    pulled: true
+  alpine_base:
+    ref: alpine:3.20
+    digest: sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+    pulled: true
+  # registry:2 is distribution 2.8.3, the index Docker Hub named for both tags on 2026-10-20.
+  registry_upstream:
+    ref: registry:2
+    digest: sha256:a3d8aaa63ed8681a604f1dea0aa03f100d5895b6a58ace528858a7b332415373
+    pulled: true
+  # The copier `make -C images registry-seed` runs (images/registry/seed.py). The project
+  # rebuilds its plain tags daily; the -immutable tag is the fixed build of v1.22.3.
+  skopeo:
+    ref: quay.io/skopeo/stable:v1.22.3-immutable
+    digest: sha256:c0ee1f4edca5c01cb8d5611124f92f3cc47196ecab68aee5d0f90834e00574d5
+    pulled: true
+  # From vm-node 4 on, netsetup.sh builds the bond's tagged units (the GPU nodes' storage VLAN, the
+  # ingress nodes' VLAN with its own routing table) and moves the BMC NIC into its own namespace.
+  # From vm-node 5 on, cluster-bootstrap.sh writes the API server's EncryptionConfiguration (Secrets
+  # at rest) on the init node and shares it with the other control nodes. From vm-node 6 on, a GPU
+  # node whose container binds the models directory at /models exports it to the guest read-only
+  # (virtio-9p, mount tag models), and the guest mounts it at /srv/models before kubelet starts.
+  vm_node:
+    ref: sfab/vm-node:6-k8s1.35.8
+    source: images/vm-node
+    pulled: false
+  # From bastion 4 on, the bastion is a jump host only: no BIND, no chrony and no CA in the image.
+  bastion:
+    ref: sfab/bastion:4
+    source: images/bastion
+    base: ubuntu_base
+    pulled: false
+  resolver:
+    ref: sfab/resolver:3
+    source: images/resolver
+    base: alpine_base
+    # Alpine 3.20's own builds, installed as apk add <name>=<version> (images/resolver/image.mk);
+    # bind-tools, at bind's version, holds named-checkzone and rndc-confgen. Chapter 9 records
+    # dnsmasq's AAAA answers on exactly this release. chrony (from resolver 3 on)
+    # serves time on the resolvers and the time reference, with NTS (built with GnuTLS).
+    packages: {bind: 9.18.49-r0, dnsmasq: 2.90-r3, chrony: 4.5-r0}
+    pulled: false
+  # From bastion 2, client 2, frr 10.5.4-2, registry 2 and resolver 2 on, the init scripts write
+  # resolv.conf's search line as the lab's domain, never the one Docker copies from the lab
+  # host's own file. From bastion 3, frr 10.5.4-3 and vm-node 2 on, the login user is admin.
+  client:
+    ref: sfab/client:2
+    source: images/client
+    pulled: false
+  # The operator site's VPN router (chapter 4): strongSwan from Alpine 3.20's own
+  # mirror on sfab/client, the two packages the client lacks checked by sha256 before they install
+  # (fetched and verified on 2026-10-27).
+  # From vpngw 2 on, vpngw-run.sh finds charon by its process name, not its pid file (a second
+  # charon started beside a starting one deleted the live one's control socket).
+  # From vpngw 3 on, the router takes the admin SSH login like the FRR routers (key only, on its
+  # management address only), so openssh-server, its common files and sudo join the pins (fetched
+  # and verified with apk verify on 2026-10-28).
+  vpngw:
+    ref: sfab/vpngw:3
+    source: images/vpngw
+    base: client
+    packages: {strongswan: 5.9.13-r2, gmp: 6.3.0-r1, openssh_server: 9.7_p1-r5, sudo: 1.9.15_p5-r0}
+    sha256:
+      strongswan: 36a5e5284ba652f57d3f2a88323ecad536014d96600717aa9d6e546f960b3f47
+      gmp: dfc94acb8d7e33d3505b583b010932a3a49ea0388c2ba145ff6edafa7bf1104f
+      openssh_server: 6642fe02ce9fadc27477c2e3472acc9dbbad64a62592ac451a0e505e13837250
+      openssh_server_common: c7755d7534b95fbdeb5b0800dc4932d9fa37c4309dd0aec261f53413395d7269
+      sudo: eb1748b6bec6f198b6add1a7bdabe4e72eebcefbffa5c3580858f0f48d5c8b66
+    pulled: false
+  frr:
+    ref: sfab/frr:10.5.4-3
+    source: images/frr
+    base: frr_upstream
+    pulled: false
+  # From registry 3 on, the lab's registry serves HTTPS with its leaf of the
+  # lab's internet intermediate (state/tls/inet-registry, bound at /sfab/tls).
+  registry:
+    ref: sfab/registry:3
+    source: images/registry
+    base: registry_upstream
+    pulled: false
+  # The serving image's base (serving-layer/image): Debian 12 slim, the index Docker Hub named for
+  # the tag on 2026-10-21. The build pulls it by this digest.
+  debian_base:
+    ref: debian:12-slim
+    digest: sha256:7ff6ba31527b9e336162fa061746c366c4b2032f4d2cff2078bea43f78efe3f8
+    pulled: true
+  # The two images the cluster pulls that this repository builds (mirror: local): the model server
+  # and its RPC workers (serving-layer/image, its inputs pinned under serving: below) and the API
+  # key tool (images/keys, built on sfab/client, its one library pinned under keys: below).
+  # `make -C images registry-seed` pushes each from the lab host's Docker into the in-lab registry
+  # as <mirror>/<repository>:<tag>, and the nodes pull it from there by that name.
+  serving:
+    ref: sfab/serving:b11382-2
+    source: serving-layer/image
+    base: debian_base
+    mirror: local
+    pulled: false
+  keys:
+    ref: sfab/keys:3
+    source: images/keys
+    base: client
+    mirror: local
+    pulled: false
+
+tools:
+  # The release preflight (pf_tools) wants exactly, always the latest release (the author's rule,
+  # 2026-10-27): 0.81.0, then 0.81.1 on 2026-10-20, then 0.82.0 on 2026-10-27. Each lab's RESULTS.md
+  # names the release it was recorded on; M1's facts were on 0.81.0 (dev/m1/RESULTS.md), M2's on
+  # 0.81.1 (dev/m2/RESULTS.md, settle item 5).
+  containerlab: 0.82.0
+  python: "3.10"
+
+kubernetes:
+  version: v1.35.8
+  # The Debian packages the vm-node bake installs from pkgs.k8s.io (core:/stable:/v1.35) and holds;
+  # kubelet and kubectl take the kubeadm version.
+  packages: {kubeadm: 1.35.8-1.1, kubernetes_cni: 1.8.0-1.1, cri_tools: 1.35.0-1.1}
+  # The control plane kubeadm v1.35.8 starts (kubeadm's own image constants for 1.35), pulled
+  # through the in-lab registry. No kube-proxy: Cilium replaces it. pause is also containerd 2.2's
+  # own sandbox image, so the two agree.
+  control_plane:
+    images:
+      kube_apiserver: {ref: "registry.k8s.io/kube-apiserver:v1.35.8", digest: "sha256:6a7b73e718540d2c097cbcdc84c0f2cffad7a51ebccaf7f0b8cceb464715e1d9"}
+      kube_controller_manager: {ref: "registry.k8s.io/kube-controller-manager:v1.35.8", digest: "sha256:b27c0bf88a81437747b257a1e6d019a921ec3a97b724e67dfc180efe3125998b"}
+      kube_scheduler: {ref: "registry.k8s.io/kube-scheduler:v1.35.8", digest: "sha256:f4334826c53876b700f73cd06a69c405c6f882a4116c5813786e046ee6eca1ac"}
+      etcd: {ref: "registry.k8s.io/etcd:3.6.6-0", digest: "sha256:60a30b5d81b2217555e2cfb9537f655b7ba97220b99c39ee2e162a7127225890"}
+      coredns: {ref: "registry.k8s.io/coredns/coredns:v1.13.1", digest: "sha256:9b9128672209474da07c91439bf15ed704ae05ad918dd6454e5b6ae14e35fee6"}
+      pause: {ref: "registry.k8s.io/pause:3.10.1", digest: "sha256:278fb9dbcca9518083ad1e11276933a2e96f23de604a3a08cc3c80002767d24c"}
+    status: final
+  # Cilium (render/k8s.py): the 1.19 release M2, chapter 3 and chapter 4 ran and recorded with this
+  # kubeadm and Gateway API v1.4.1 (1.19.9 and 1.20.3 are current on 2026-10-20). The sha256 is the
+  # chart repository index's digest of cilium-1.19.7.tgz. Each image digest is the one the chart's
+  # own values name, set again as an override in the values file, so the registry holds what runs.
+  cilium:
+    version: 1.19.7
+    chart: {name: cilium, repo: "https://helm.cilium.io", version: "1.19.7", sha256: af6aeba999b438b897e71452051aab2c014bb89369ab34ca46a33003eb0d017e}
+    images:
+      agent: {ref: "quay.io/cilium/cilium:v1.19.7", digest: "sha256:1b58bcb81c723cf130a0dd2fb2e1132c57f8fbc2ef7bdb85519cfcc36111c77e"}
+      operator: {ref: "quay.io/cilium/operator-generic:v1.19.7", digest: "sha256:61e773bfc25a448f1ad3ead605af94b3ef176ba2925cf4bd1b11e09794b72bed"}
+      envoy: {ref: "quay.io/cilium/cilium-envoy:v1.36.9-1786864149-07e8503ff34b9190d7bbe4e57d4e185c4ef8b1de", digest: "sha256:beccdf3c119f299cf696885188584bbd0531d74bca08096113207999aff95e87"}
+    status: final
+  # The Gateway API CRDs, standard channel: the release's standard-install.yaml, kept in the repo at
+  # file (the labs run offline) and checked against this sha256 at every render. v1.4.1 is what
+  # Cilium 1.19 supports (v1.6.3 is current). The CRDs go in before Cilium, whose operator turns
+  # its Gateway controller on only when they exist as it starts. Licence: LICENSE.gateway-api.
+  gateway_api:
+    version: v1.4.1
+    channel: standard
+    manifest: {url: "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.1/standard-install.yaml", sha256: 73b91b77f6be023a8c92c969fc664e5bd3b1a28aea59eac9ebc904607354dad2, file: common/sfab/render/upstream/gateway-api-v1.4.1-standard-install.yaml}
+    status: final
+  # Multus, the thick plugin (render/k8s.py, in every lab whose features turn serving on, from
+  # chapter 6's). The manifest is the release tag's deployments/multus-daemonset-thick.yml, kept in
+  # the repo at file and checked against this sha256 at every render. The seed copies one platform
+  # (platforms: one), so the render names the image by the linux/amd64 manifest the pinned index
+  # lists (platform_digest), never by the index.
+  multus:
+    version: v4.3.0
+    image: {ref: "ghcr.io/k8snetworkplumbingwg/multus-cni:v4.3.0-thick", digest: "sha256:2b9671447f3ea4e7e56730843dbf59445b9307246f393b61386b896d56ae51c9", platform_digest: "sha256:84873accf7adac86589558e97038b846f6a748e82dc163620cc4fe63fd175a8c", platforms: one}
+    manifest: {url: "https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/v4.3.0/deployments/multus-daemonset-thick.yml", sha256: 2d622f697809644a12704497bbf5c3256adc1e7f5b5504655e4993743651b585, file: common/sfab/render/upstream/multus-v4.3.0-daemonset-thick.yml}
+    status: final
+  # Not used: each pod's rail address comes from the placement (render/k8s.py, serving.env) and is
+  # set by the CNI static IPAM plugin, which the node disk holds with macvlan (kubernetes-cni).
+  whereabouts: {version: null, status: not used}
+  # The API gateway and the model router (chapter 7), pulled by the nodes through the in-lab
+  # registry. One platform each (platforms: one): the seed copies the linux/amd64 manifest the
+  # pinned index names, and a pod names the image by that manifest's digest (platform_digest).
+  apisix:
+    version: 3.9.1
+    image: {ref: "docker.io/apache/apisix:3.9.1-debian", digest: "sha256:48ce16399e68a5f31c8b49d802f1e71ec93aea44d8c8ae311dc170e8564d5c4e", platform_digest: "sha256:57a4001b6fb865d844c5f099069423c98b469f876bfba7ae88bbafc6ddd3748b", platforms: one}
+    status: final
+  litellm:
+    version: v1.104.0
+    image: {ref: "ghcr.io/berriai/litellm:v1.104.0", digest: "sha256:625981c83410a3ea68eb0697590a57ec1d764d634514d54fa5db0591077ee839", platform_digest: "sha256:5ce1ebf7f26ed82501b598e0ebecd4fe63d0e61817178427d4df86f2a16729ec", platforms: one}
+    status: final
+  # Dex, the OpenID Connect provider that stands in for the enterprise's identity provider (approved
+  # by the author at this version on 2026-10-27). The index digest is the one Docker
+  # Hub named for the tag on 2026-10-28; its linux/amd64 manifest's layers add up to 50,554,278
+  # bytes, the size the approval named. One platform (Docker Hub).
+  dex:
+    version: v2.46.0
+    image: {ref: "docker.io/dexidp/dex:v2.46.0", digest: "sha256:933fcd3f523338c847b88ef84a7145fb2fcb7b9917f08418612afeaaa2001777", platform_digest: "sha256:fd4ab5d117005b927433133f1d7db7cc30fbb537c377912b75b349edff47df01", platforms: one}
+    status: final
+  # cert-manager: the current release on 2026-10-20. The chart sha256 is the jetstack repository
+  # index's. The ACME solver is named in the controller's arguments only and never pulled
+  # (used: false).
+  cert_manager:
+    version: v1.21.2
+    chart: {name: cert-manager, repo: "https://charts.jetstack.io", version: v1.21.2, sha256: 73a56e1728edd6c99f1f31082618c3259d279a76b7ebd3d4bdc5475c2442d34a}
+    images:
+      controller: {ref: "quay.io/jetstack/cert-manager-controller:v1.21.2", digest: "sha256:70f532fd9cfde0b09d55687200942399d89838bc2d5d5b45152eb799a15912b8"}
+      webhook: {ref: "quay.io/jetstack/cert-manager-webhook:v1.21.2", digest: "sha256:a60e2dac46dbb8a7f3df95c54ce941012f54c2fe022f0ee55aaa1ab40ed957ae"}
+      cainjector: {ref: "quay.io/jetstack/cert-manager-cainjector:v1.21.2", digest: "sha256:c85268c64f2e0e76684bf5fe8906caff34b82523561c6affe0fae3546bd87562"}
+      startupapicheck: {ref: "quay.io/jetstack/cert-manager-startupapicheck:v1.21.2", digest: "sha256:46e75b6866359ffb5d82624f41e3ed1c70b2994982702ced547ce5edb418a8f5"}
+      acmesolver: {ref: "quay.io/jetstack/cert-manager-acmesolver:v1.21.2", digest: "sha256:699b40d622211ab7accad8a21b04c5fbaa1841ef7a12621e8de492dbe27b2503", used: false}
+    status: final
+  # kube-vip for the API VIP: the release M2, chapter 3 and chapter 4 ran and recorded with kubeadm
+  # 1.35 and the super-admin.conf start (v1.2.4 and v1.3.1 are current on 2026-10-20).
+  kube_vip:
+    version: v1.1.2
+    image: {ref: "ghcr.io/kube-vip/kube-vip:v1.1.2", digest: "sha256:840305b94ef2a89abb3b7fd2b09edfbde690d90052020da4dff90679fe892da2"}
+    status: final
+  # The test backend behind both Gateways (spec test_backend): agnhost at the tag Kubernetes 1.35's
+  # own end-to-end tests use.
+  test_backend:
+    image: {ref: "registry.k8s.io/e2e-test-images/agnhost:2.59", digest: "sha256:10ed98804c877e505e17bced991682b6fd50ab1da9cddcd19935b48d645da40a"}
+    status: final
+  # helm on the init node, which installs Cilium before any node is Ready. The base disk carries no
+  # helm, so cluster-bootstrap.sh copies the binary out of this image, pulled through the in-lab
+  # registry. The helm project publishes no image of its own; this one carries the upstream release
+  # binary at the bastion's helm version below, which upgrades the same release. It comes from
+  # Docker Hub, so the seed copies its linux/amd64 manifest only, and the node pulls it by that
+  # manifest's digest (platform_digest, the pinned index's linux/amd64 entry), never by the index.
+  node_helm:
+    version: v3.22.0
+    image: {ref: "docker.io/alpine/helm:3.22.0", digest: "sha256:70ed3f7b02ab2eee12aa520ad6870305db8a82516b07aff62f5656c657a26e2a", platform_digest: "sha256:e29ba4b553fa9648d0a35a9e29c8744c597a3e400d5574daf0f20a4c3854b852"}
+    status: final
+  # democratic-csi (build A's CSI driver for TrueNAS, render/storage.py). The chart comes from the
+  # project's Helm repository; its sha256 is the repository index's digest of the .tgz. The driver
+  # runs the project's `next` line, which adds a websocket client for TrueNAS's JSON-RPC API that
+  # the last tagged release (v1.9.5) lacks, pinned by the digest `next` named on 2026-10-14 (and
+  # still named on 2026-10-20). Every image the chart starts is pinned by digest, so the in-lab
+  # registry holds exactly what the nodes pull. The snapshotter stays off until the cluster
+  # carries the snapshot CRDs. The node's cleanup sidecar runs the driver image (render/storage.py),
+  # so the chart's busybox default stays here as a record only (used: false): it would be the one
+  # image of the stack from Docker Hub, which the registry seed copies for one platform only.
+  democratic_csi:
+    chart: {name: democratic-csi, repo: "https://democratic-csi.github.io/charts", version: "0.15.1", sha256: 3d87e129cea46d49d810e9e5085b61d06c01a313bcf92160e3d106adc30426ed}
+    images:
+      driver: {ref: "ghcr.io/democratic-csi/democratic-csi:next", digest: "sha256:c6d74146e10b8ea2e0efd1f688779b6db529a71b83887ca3de953e5226d374b7"}
+      csi_proxy: {ref: "ghcr.io/democratic-csi/csi-grpc-proxy:v0.5.7", digest: "sha256:0240d0fba3cedd598036766b1865e88aa2eac9c16822df03d5d912a81128ebb6"}
+      provisioner: {ref: "registry.k8s.io/sig-storage/csi-provisioner:v3.6.0", digest: "sha256:6de50bacfd72627ffe4209e3db8ad7391d04ea6fb741bf51feab6c5dcfd80002"}
+      attacher: {ref: "registry.k8s.io/sig-storage/csi-attacher:v4.4.0", digest: "sha256:dbded4ebe299973e31d0ef55815eb07a990fc67872b14900a8e69232acae4f2d"}
+      resizer: {ref: "registry.k8s.io/sig-storage/csi-resizer:v1.9.0", digest: "sha256:f1f352df97874442624fcef23eab04aa038f66cb0e361212f6ec09e92998184d"}
+      snapshotter: {ref: "registry.k8s.io/sig-storage/csi-snapshotter:v8.2.1", digest: "sha256:5f4bb469fec51147ce157329dab598c758da1b018bad6dad26f0ff469326d769", used: false}
+      node_driver_registrar: {ref: "registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.9.0", digest: "sha256:cd21e19cd8bbd5bc56f1b4f1398a436e7897da2995d6d036c9729be3f4e456e6"}
+      cleanup: {ref: "docker.io/library/busybox:1.37.0", digest: "sha256:bdf57e528e45e4433820e045b29b4597825a1c9e38353532d90a01445013f82e", used: false}
+    status: final
+  trident: {version: null, status: open}
+  # The operator's tools in sfab/bastion (images/bastion/image.mk). Each sha256 is the one the
+  # publisher lists for the linux-amd64 download (kubectl's binary from dl.k8s.io; the helm and
+  # cilium-cli tarballs), and the build refuses a download that differs. helm stays on the 3 line,
+  # which the stage scripts' flags are written for.
+  kubectl: {version: v1.35.8, sha256: 874d5e72dbb819f43cff16bcd1e4f8bac5b7f2361fe1e55049b0a6c676fb0cbf}
+  helm: {version: v3.22.0, sha256: 1e4ab49e429626cf6c6958d914248b78c9730803c2751b87627e171dc800e7bb, status: final}
+  cilium_cli: {version: v0.19.7, sha256: cd15e0983bf0acc7946cd05d453d1e58376ea92dec2642e745212df2b07d8852, status: final}
+
+guest:
+  # The pinned Ubuntu 24.04 cloud image that `make -C images vm-node-base` bakes: the sha256 is
+  # release-20260826's own SHA256SUMS line for ubuntu-24.04-server-cloudimg-amd64.img (qcow2,
+  # 624829952 bytes, kernel 6.8.0-138-generic).
+  ubuntu_cloud_image: {release: "24.04", serial: "20260826", sha256: d0fe84bb5f80853425fa6be28e2c106f30104c3cfe8611933f2e65c9b63f0e30, status: final}
+
+ubuntu_archive:
+  # The Ubuntu archive as snapshot.ubuntu.com serves it at this moment. The vm-node runtime image
+  # and the bake install every Ubuntu package from it, so the same pins always give the same
+  # packages. It must not be older than the ubuntu_base image (built 2026-09-11).
+  snapshot: 20260912T000000Z
+
+# The serving image's inputs (serving-layer/image). `make -C images serving-fetch` puts each in the
+# vendor directory (VENDOR_DIR, default vendor/serving/ in the checkout), using a copy already there
+# when its sha256 matches and downloading it from url otherwise, and refuses a file whose sha256
+# differs; the build reads only those files.
+# - llama.cpp: the upstream release b11382's x64 Ubuntu build (MIT), whose llama-server and
+#   ggml-rpc-server need libgomp.so.1, libssl.so.3 and libcrypto.so.3 beyond Debian 12 slim
+#   (ldd in the pinned base, 2026-10-21).
+# The models are not in the image (build A revision 2: weights from a host directory). Each is
+# pinned under serving.models: the Hugging Face repository and revision, the file, its sha256 and
+# size; `make -C images models-fetch` puts both in images/models (git ignores it; with
+# SFAB_MODELS_STORE=<dir> they live in <dir> and images/models is a link to it, which
+# `make -C images models-link` puts back after a sync), each checked against its sha256, and a lab
+# with serving on binds that directory read-only into its GPU nodes' containers, whose guests mount
+# it at /srv/models (vm-init.sh, the models share).
+# - The two Debian 12 packages that hold those libraries, as the pinned base's apt sources named
+#   them on 2026-10-21 (libssl3 from bookworm-security); each sha256 is the archive's own
+#   Packages entry, which the downloaded file matched.
+serving:
+  llama_cpp:
+    release: b11382
+    license: MIT
+    asset: llama-b11382-bin-ubuntu-x64.tar.gz
+    url: "https://github.com/ggml-org/llama.cpp/releases/download/b11382/llama-b11382-bin-ubuntu-x64.tar.gz"
+    sha256: 34407d59947ed4ab35fe4ab2db5f61bb4d5aedfe25e6a72f702f3ae9758a396d
+    size: 17669957
+  # The two models (the author's choice, 2026-10-27): chat is Liquid AI's LFM2.5-24B-A2B (a
+  # mixture of experts, GGUF architecture lfm2moe; LFM Open License v1.0), staff is Qwen3.8-27B
+  # (dense, GGUF architecture qwen35; Apache-2.0) as Unsloth's GGUF, since Qwen publishes none. Both
+  # load in llama.cpp b11382 (checked on the lab host, 2026-10-28, through ggml-rpc-server too).
+  models:
+    chat:
+      name: LFM2.5-24B-A2B
+      format: gguf
+      quant: q4_k_m
+      license: LFM Open License v1.0
+      repository: LiquidAI/LFM2.5-24B-A2B-GGUF
+      revision: 0912d33141f77e10705345a6732bfd83f0252fdc
+      file: LFM2.5-24B-A2B-Q4_K_M.gguf
+      url: "https://huggingface.co/LiquidAI/LFM2.5-24B-A2B-GGUF/resolve/0912d33141f77e10705345a6732bfd83f0252fdc/LFM2.5-24B-A2B-Q4_K_M.gguf"
+      sha256: d3334405b96228eb9908cdebb5c6194908f2da64282bda852afc3a3910c64e7d
+      size: 14526258464
+    staff:
+      name: Qwen3.8-27B
+      format: gguf
+      quant: ud-q4_k_m
+      license: Apache-2.0
+      repository: unsloth/Qwen3.8-27B-GGUF
+      revision: 4ca720788d1e01f1bff70c033e0d0028fd02e502
+      file: Qwen3.8-27B-UD-Q4_K_M.gguf
+      url: "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/4ca720788d1e01f1bff70c033e0d0028fd02e502/Qwen3.8-27B-UD-Q4_K_M.gguf"
+      sha256: 322e194ff79741c7baa497c240f677f54b201b0efab44ca8e50f122b39123482
+      size: 16464440224
+  debs:
+    libgomp1:
+      version: "12.2.0-14+deb12u1"
+      file: "libgomp1_12.2.0-14+deb12u1_amd64.deb"
+      url: "http://deb.debian.org/debian/pool/main/g/gcc-12/libgomp1_12.2.0-14%2bdeb12u1_amd64.deb"
+      sha256: 48fec46bda7f5b1638b9e959889bfbc20491247d402d120bb152687eb48143d7
+      size: 115772
+    libssl3:
+      version: "3.0.22-1~deb12u1"
+      file: "libssl3_3.0.22-1~deb12u1_amd64.deb"
+      url: "http://deb.debian.org/debian-security/pool/updates/main/o/openssl/libssl3_3.0.22-1%7edeb12u1_amd64.deb"
+      sha256: f0a8aa8429209e556c278a9936bbd5f7d2cdb9f7e4e23b1e43ed399217ba80c1
+      size: 2039240
+
+# The API key tool's one library beyond Python's standard library (images/keys): PyYAML's wheel for
+# CPython 3.12 on musl (sfab/client's Alpine 3.20 Python), installed with no index and no
+# dependencies. `make -C images keys-fetch` puts it in VENDOR_DIR/keys/ the way serving-fetch does;
+# the sha256 is PyPI's own for the file.
+keys:
+  pyyaml:
+    version: 6.0.3
+    license: MIT
+    file: pyyaml-6.0.3-cp312-cp312-musllinux_1_2_x86_64.whl
+    url: "https://files.pythonhosted.org/packages/be/8e/98435a21d1d4b46590d5459a22d88128103f8da4c2d4cb8f14f2a96504e1/pyyaml-6.0.3-cp312-cp312-musllinux_1_2_x86_64.whl"
+    sha256: 41715c910c881bc081f1e8872880d3c650acf13dfa8214bad49ed4cede7c34ea
+    size: 790181

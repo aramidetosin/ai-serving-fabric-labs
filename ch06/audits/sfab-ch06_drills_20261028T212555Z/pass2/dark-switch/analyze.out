@@ -1,0 +1,15 @@
+  PASS  pass 2 dark-switch: Service chat: chat-c-server-0 left it 6.2 to 7.2 s after the shut session began (the readiness bound: a probe every 2 s, out after 2 failures, each up to 2 s, then the removal's propagation)
+  PASS  pass 2 dark-switch: ... and came back 7.7 to 8.8 s after the restore session began
+  PASS  pass 2 dark-switch: Service chat: chat-a-server-0, chat-b-server-0 stayed in it throughout (123 reads, one every 1 s)
+  PASS  pass 2 dark-switch: Service chat-a: chat-a-server-0 stayed in it throughout (123 reads, one every 1 s)
+  PASS  pass 2 dark-switch: Service chat-b: chat-b-server-0 stayed in it throughout (123 reads, one every 1 s)
+  PASS  pass 2 dark-switch: Service chat-c: chat-c-server-0 left it 6.2 to 7.2 s after the shut session began (the readiness bound: a probe every 2 s, out after 2 failures, each up to 2 s, then the removal's propagation)
+  PASS  pass 2 dark-switch: ... and came back 7.7 to 8.8 s after the restore session began
+  PASS  pass 2 dark-switch: Service staff: staff-a-server-0, staff-b-server-0 stayed in it throughout (123 reads, one every 1 s)
+  PASS  pass 2 dark-switch: Service staff-a: staff-a-server-0 stayed in it throughout (123 reads, one every 1 s)
+  PASS  pass 2 dark-switch: Service staff-b: staff-b-server-0 stayed in it throughout (123 reads, one every 1 s)
+  KNOWN pass 2 dark-switch: chat-a, staff-b on rail-sw1's rails stayed in their Services: each copy's RPC runs inside its node through the rail NIC's macvlan bridge, and a KLISH shutdown drops no carrier at the rail NICs (on hardware the NICs would lose carrier and these copies would leave too; each model's copies on the other rail switch's rails would answer): L9
+  PASS  pass 2 dark-switch: chat through gw-users: 0 of 54 requests failed (54 answered; 19 of 19 sent while rail-sw1 dark answered)
+  PASS  pass 2 dark-switch: ... none needed a router retry (the slowest answer took 4.128 s)
+  PASS  pass 2 dark-switch: staff through gw-users: 0 of 4 requests failed (4 answered; 2 of 2 sent while rail-sw1 dark answered)
+  PASS  pass 2 dark-switch: ... none needed a router retry (the slowest answer took 31.666 s)

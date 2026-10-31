@@ -1,0 +1,5 @@
++ docker inspect -f '{{json .HostConfig.Devices}}' sfab-m1-gpu1
+[{"PathOnHost":"/dev/kvm","PathInContainer":"/dev/kvm","CgroupPermissions":"rwm"},{"PathOnHost":"/dev/net/tun","PathInContainer":"/dev/net/tun","CgroupPermissions":"rwm"}]
++ docker exec sfab-m1-gpu1 ls -l /dev/kvm /dev/net/tun
+crw-rw---- 1 root  108 10, 232 Oct 14 15:05 /dev/kvm
+crw-rw-rw- 1 root root 10, 200 Oct 14 15:05 /dev/net/tun

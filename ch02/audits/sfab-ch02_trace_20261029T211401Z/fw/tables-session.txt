@@ -1,0 +1,591 @@
+Last login: Thu Oct 29 21:13:47 2026 from 172.21.40.1
+set cli pager off
+show routing route
+show running security-policy
+show running nat-policy
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show routing 
+admin@fw> show routing route
+
+flags: A:active, ?:loose, C:connect, H:host, S:static, ~:internal, R:rip, O:ospf, B:bgp, 
+       Oi:ospf intra-area, Oo:ospf inter-area, O1:ospf ext-type-1, O2:ospf ext-type-2, E:ecmp, M:multicast
+
+  
+VIRTUAL ROUTER: core (id 2)
+  ==========
+destination                                 nexthop                                 metric flags      age   interface          next-AS    
+0.0.0.0/0                                   198.51.100.1                            10     A S              ethernet1/5                   
+10.0.0.0/8                                  discard                                 10     A S                                            
+10.20.1.0/24                                10.20.1.1                               0      A C              ae1.100                       
+10.20.1.1/32                                0.0.0.0                                 0      A H                                            
+10.20.2.0/24                                10.20.2.1                               0      A C              ae1.200                       
+10.20.2.1/32                                0.0.0.0                                 0      A H                                            
+10.20.3.0/24                                10.20.3.1                               0      A C              ae1.300                       
+10.20.3.1/32                                0.0.0.0                                 0      A H                                            
+10.20.9.0/24                                10.20.9.254                             0      A C              ethernet1/3                   
+10.20.9.254/32                              0.0.0.0                                 0      A H                                            
+10.20.11.0/24                               10.20.11.1                              0      A C              ae1.110                       
+10.20.11.1/32                               0.0.0.0                                 0      A H                                            
+10.20.13.0/24                               10.20.13.1                              0      A C              ae1.130                       
+10.20.13.1/32                               0.0.0.0                                 0      A H                                            
+10.20.14.0/24                               10.20.14.1                              0      A C              ae1.131                       
+10.20.14.1/32                               0.0.0.0                                 0      A H                                            
+10.24.10.8/30                               10.24.10.9                              0      A C              ethernet1/4                   
+10.24.10.9/32                               0.0.0.0                                 0      A H                                            
+10.24.10.52/30                              10.24.10.54                             0      A C              ethernet1/7                   
+10.24.10.54/32                              0.0.0.0                                 0      A H                                            
+172.16.0.0/12                               discard                                 10     A S                                            
+192.0.2.0/30                                0.0.0.0                                 10     A S              tunnel.1                      
+192.168.0.0/16                              discard                                 10     A S                                            
+198.51.100.0/29                             198.51.100.2                            0      A C              ethernet1/5                   
+198.51.100.2/32                             0.0.0.0                                 0      A H                                            
+total routes shown: 25
+
+admin@fw> show 
+admin@fw> show running 
+admin@fw> show running security-policy
+
+"staff-to-users-gateway; index: 1" {
+        from enterprise;
+        source 10.24.10.0/24;
+        source-region none;
+        to ingress;
+        destination 10.20.11.210;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"ent-dns-to-platform-dns; index: 2" {
+        from enterprise;
+        source 10.24.10.53;
+        source-region none;
+        to services;
+        destination [ 10.20.14.11 10.20.13.11 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"staff-to-enterprise-dns; index: 3" {
+        from enterprise;
+        source 10.24.10.0/24;
+        source-region none;
+        to enterprise;
+        destination 10.24.10.53;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"admins-to-bastion; index: 4" {
+        from [ enterprise operator-vpn ];
+        source [ 192.0.2.0/30 10.24.10.10 ];
+        source-region none;
+        to bastion;
+        destination 10.20.3.10;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssh/tcp/any/22;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-firewall-admin; index: 5" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to bastion;
+        destination 10.20.3.1;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ssl/tcp/any/443 1:ssh/tcp/any/22 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-nodes; index: 6" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to k8s-nodes;
+        destination 10.20.1.0/24;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssh/tcp/any/22;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-api; index: 7" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to k8s-nodes;
+        destination 10.20.1.0/24;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/6443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-internal-gateway; index: 8" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to ingress;
+        destination 10.20.11.200;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-stor-mgmt; index: 9" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to stor-mgmt;
+        destination 10.20.2.31;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-bmc; index: 10" {
+        from bastion;
+        source [ 10.20.3.10 10.20.3.20 ];
+        source-region none;
+        to oob;
+        destination 10.20.9.0/24;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ssl/tcp/any/443 1:ssh/tcp/any/22 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-services-admin; index: 11" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to services;
+        destination [ 10.20.13.21 10.20.14.11 10.20.13.11 10.20.14.21 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssh/tcp/any/22;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"inside-to-gateway-ping; index: 12" {
+        from [ k8s-nodes ingress stor-mgmt bastion services oob enterprise ];
+        source [ 10.20.11.0/24 10.20.2.0/24 10.24.10.0/24 10.20.1.0/24 10.20.3.0/24 10.20.14.0/24 10.20.13.0/24 10.20.9.0/24 ];
+        source-region none;
+        to [ k8s-nodes ingress stor-mgmt bastion services oob enterprise ];
+        destination [ 10.24.10.9 10.24.10.54 10.20.9.254 10.20.13.1 10.20.2.1 10.20.14.1 10.20.3.1 10.20.11.1 10.20.1.1 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ping/icmp/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"inside-to-resolvers; index: 13" {
+        from [ k8s-nodes ingress stor-mgmt bastion services oob ];
+        source [ 10.20.11.0/24 10.20.2.0/24 10.20.1.0/24 10.20.3.0/24 10.20.14.0/24 10.20.13.0/24 10.20.9.0/24 ];
+        source-region none;
+        to services;
+        destination [ 10.20.13.21 10.20.14.21 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"inside-to-ntp; index: 14" {
+        from [ k8s-nodes ingress stor-mgmt bastion services oob ];
+        source [ 10.20.11.0/24 10.20.2.0/24 10.20.1.0/24 10.20.3.0/24 10.20.14.0/24 10.20.13.0/24 10.20.9.0/24 ];
+        source-region none;
+        to services;
+        destination [ 10.20.13.21 10.20.14.21 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ntp-base/tcp/any/123 1:ntp-base/udp/any/123 2:ntp-non-rfc/tcp/any/123 3:ntp-non-rfc/udp/any/123 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"resolvers-to-auth; index: 15" {
+        from services;
+        source [ 10.20.13.21 10.20.14.21 ];
+        source-region none;
+        to services;
+        destination [ 10.20.14.11 10.20.13.11 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"auth-zone-transfer; index: 16" {
+        from services;
+        source [ 10.20.14.11 10.20.13.11 ];
+        source-region none;
+        to services;
+        destination [ 10.20.14.11 10.20.13.11 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"ntp-upstream; index: 17" {
+        from services;
+        source [ 10.20.13.21 10.20.14.21 ];
+        source-region none;
+        to uplink;
+        destination 192.0.2.14;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ntp-base/tcp/any/123 1:ntp-base/udp/any/123 2:ntp-non-rfc/tcp/any/123 3:ntp-non-rfc/udp/any/123 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"nts-ke-upstream; index: 18" {
+        from services;
+        source [ 10.20.13.21 10.20.14.21 ];
+        source-region none;
+        to uplink;
+        destination 192.0.2.14;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/4460;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"nodes-to-registry; index: 19" {
+        from k8s-nodes;
+        source 10.20.1.0/24;
+        source-region none;
+        to uplink;
+        destination 192.0.2.6;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/5000;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"nodes-to-internal-gateway; index: 20" {
+        from k8s-nodes;
+        source 10.20.1.0/24;
+        source-region none;
+        to ingress;
+        destination 10.20.11.200;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"csi-to-storage-api; index: 21" {
+        from k8s-nodes;
+        source 10.20.1.0/24;
+        source-region none;
+        to stor-mgmt;
+        destination 10.20.2.31;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"operator-ike; index: 22" {
+        from uplink;
+        source 192.0.2.22;
+        source-region none;
+        to uplink;
+        destination 198.51.100.2;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ike/tcp/any/500 1:ike/udp/any/500 2:ipsec-esp/50/any/any 3:ipsec-esp-udp/udp/any/4500 4:ipsec-esp-udp/udp/any/4501 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"operator-to-internal-gateway; index: 23" {
+        from operator-vpn;
+        source 192.0.2.0/30;
+        source-region none;
+        to ingress;
+        destination 10.20.11.200;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"deny-all-log; index: 24" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal no;
+}
+
+"vsys1+intrazone-default; index: 25" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal yes;
+        type intrazone;
+}
+
+"vsys1+interzone-default; index: 26" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal yes;
+        type interzone;
+}
+
+dynamic url: no
+
+
+admin@fw> show 
+admin@fw> show running 
+admin@fw> show running nat-policy
+
+Nat policy configured on vsys1:
+"no-nat-public; index: 1" {
+        nat-type ipv4;
+        from [ k8s-nodes services ];
+        source any;
+        source-region none;
+        to uplink;
+        to-interface  ;
+        destination 198.51.100.2;
+        destination-region none;
+        service 0:any/any/any;
+        terminal no;
+}
+
+"internet-snat; index: 2" {
+        nat-type ipv4;
+        from [ k8s-nodes services ];
+        source any;
+        source-region none;
+        to uplink;
+        to-interface  ;
+        destination any;
+        destination-region none;
+        service 0:any/any/any;
+        translate-to "src: ethernet1/5 198.51.100.2 (dynamic-ip-and-port) (pool idx: 1)";
+        terminal no;
+}
+
+
+
+admin@fw> exit

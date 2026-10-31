@@ -1,0 +1,26 @@
+# KLISH parity normalization (FRAMEWORK.md section 3.3, switch_parity).
+#
+# common/klish/parity.py matches each rendered startup-config line, within its context, against
+# `show running-configuration`. Where the switch writes a line differently from how it was typed,
+# a row here says how to compare them. The table starts empty: the M1 milestone adds the first
+# rows, and every row cites the result set that shows the difference.
+#
+# Row format (all strings are Python regular expressions, matched against the whole line after
+# leading and trailing whitespace is stripped):
+#
+#   - id: n1                       unique id, n followed by a number
+#     context: '^interface PortChannel[0-9]+$'
+#                                  optional: the enclosing block header the row applies in;
+#                                  omitted means any context, including the top level
+#     rendered: '^fast_rate$'      the line as rendered and typed
+#     running: '^lacp fast-rate$'  the line as the running configuration prints it, with
+#                                  \1, \2 ... referring to groups of rendered:
+#     action: rewrite              rewrite: compare the rendered line as running:
+#                                  absent:  the switch accepts the line and never prints it
+#                                  default: the switch prints it only when it differs from a default
+#     evidence: dev/m1/audits/<result set>/fe-sw1/<file>.txt:<line>
+#     note: one plain sentence on why
+#
+# Lines the launcher skips (blank lines and lines starting with "!") never reach parity.
+
+normalize: []

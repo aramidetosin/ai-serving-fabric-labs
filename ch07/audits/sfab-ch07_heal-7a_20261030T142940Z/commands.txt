@@ -1,0 +1,60 @@
+### 2026-10-30T14:29:52Z k8s-cp1 kubectl
++ kubectl -n inference delete pod api-gateway-64bc7b94df-hm4sq --wait=true
+pod "api-gateway-64bc7b94df-hm4sq" deleted from inference namespace
+
+### 2026-10-30T14:29:53Z k8s-cp1 kubectl
++ kubectl -n inference rollout status deployment/api-gateway --timeout=300s
+deployment "api-gateway" successfully rolled out
+
+### 2026-10-30T14:30:01Z k8s-cp1 kubectl
++ kubectl create -f - (a manifest, no secret)
+pod/key-probe-break-pods created
+
+### 2026-10-30T14:30:07Z k8s-cp1 kubectl
++ kubectl -n inference logs key-probe-break-pods
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 1, "status": 200, "t": 1793370602.048}
+{"ip": "10.22.0.123", "label": "pods", "pod": "api-gateway-64bc7b94df-kjsww", "round": 1, "status": 200, "t": 1793370602.048}
+{"label": "pods", "summary": {"all": true, "answered": 2, "expect": 200, "pods": 2, "rounds": 1, "s": 1.569}}
+
+### 2026-10-30T14:30:31Z ent-client container
++ sh -c rm -f /tmp/sfab-break-probe/records-*.jsonl; python3 /tmp/sfab-break-probe/probe_gateway.py --dir /tmp/sfab-break-probe --target chat https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions  --interval 1 --timeout 400 --max-tokens 8 --count 20 
+chat: sent 20, answered 20, failed 0
+
+### 2026-10-30T14:30:33Z k8s-cp1 kubectl
++ kubectl -n inference get pods -l app.kubernetes.io/name=api-gateway -o wide
+NAME                           READY   STATUS    RESTARTS   AGE    IP            NODE           NOMINATED NODE   READINESS GATES
+api-gateway-64bc7b94df-7b74q   2/2     Running   0          110m   10.22.1.137   k8s-ingress2   <none>           <none>
+api-gateway-64bc7b94df-kjsww   2/2     Running   0          52s    10.22.0.123   k8s-ingress1   <none>           <none>
+
+### 2026-10-30T14:30:34Z k8s-cp1 kubectl
++ kubectl -n inference logs api-gateway-64bc7b94df-7b74q -c keys --tail=20
+composed /standalone/apisix.yaml: 3 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 batch.fd000001 sha256:06cc6f9a0318 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 3 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 batch.fd000002 sha256:ec8f5df23969 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 3 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 batch.fd000003 sha256:ce91c8b1eda2 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 3 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 batch.fa000001 sha256:6b38bbf9af91 helpdesk.132a48fc sha256:3e3f7b85c2e5
+
+### 2026-10-30T14:30:35Z k8s-cp1 kubectl
++ kubectl -n inference logs api-gateway-64bc7b94df-kjsww -c keys --tail=20
+
+
+### 2026-10-30T14:30:37Z k8s-cp1 kubectl
++ kubectl create -f - (a manifest, no secret)
+job.batch/key-probe-cleanup-revoke created
+
+### 2026-10-30T14:30:41Z k8s-cp1 kubectl
++ kubectl -n inference wait --for=condition=complete job/key-probe-cleanup-revoke --timeout=180s
+job.batch/key-probe-cleanup-revoke condition met
+
+### 2026-10-30T14:30:42Z k8s-cp1 kubectl
++ kubectl -n inference logs job/key-probe-cleanup-revoke
+revoked batch.fa000001 from Secret inference/api-keys: sha256:6b38bbf9af91
+

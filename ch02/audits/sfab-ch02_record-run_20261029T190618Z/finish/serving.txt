@@ -1,0 +1,33 @@
+make[1]: Entering directory '/root/sfab/labs/ai-serving-fabric-labs/serving-layer'
+PYTHONDONTWRITEBYTECODE=1 python3 /root/sfab/labs/ai-serving-fabric-labs/serving-layer/serving.py serve --env /root/sfab/labs/ai-serving-fabric-labs/ch02/bootstrap/k8s/serving.env
+== serving: 11 pods of 5 copies of 2 models, namespace serving
+  PASS  daemonset kube-system/kube-multus-ds rolled out
+  PASS  namespace serving, 5 rail attachment(s), the key tool's role and the models volume of 2 node(s) applied
+  key tool: Secret serving/llm-api-key: created, key sha256:53bfe9f97ec5
+  PASS  key Secret serving/llm-api-key generated in the cluster by the key tool (its value never printed)
+  PASS  0 pod(s) replaced or removed, 0 kept as rendered
+  PASS  6 worker pod(s) Ready
+  PASS  5 server pod(s) Ready
+  PASS  7 Services and HTTPRoute serving/serving on gateways/gw-internal applied
+== placement read back
+  PASS  chat-a-server-0 of StatefulSet chat-a-server on k8s-gpu1, rail3 10.21.3.100, Ready
+  PASS  chat-a-worker0-0 of StatefulSet chat-a-worker0 on k8s-gpu1, rail3 10.21.3.101, Ready
+  PASS  chat-b-server-0 of StatefulSet chat-b-server on k8s-gpu2, rail6 10.21.6.100, Ready
+  PASS  chat-b-worker0-0 of StatefulSet chat-b-worker0 on k8s-gpu2, rail6 10.21.6.101, Ready
+  PASS  chat-c-server-0 of StatefulSet chat-c-server on k8s-gpu1, rail7 10.21.7.100, Ready
+  PASS  chat-c-worker0-0 of StatefulSet chat-c-worker0 on k8s-gpu2, rail7 10.21.7.101, Ready
+  PASS  chat-c-worker1-0 of StatefulSet chat-c-worker1 on k8s-gpu1, rail7 10.21.7.102, Ready
+  PASS  staff-a-server-0 of StatefulSet staff-a-server on k8s-gpu1, rail4 10.21.4.100, Ready
+  PASS  staff-a-worker0-0 of StatefulSet staff-a-worker0 on k8s-gpu1, rail4 10.21.4.101, Ready
+  PASS  staff-b-server-0 of StatefulSet staff-b-server on k8s-gpu2, rail5 10.21.5.100, Ready
+  PASS  staff-b-worker0-0 of StatefulSet staff-b-worker0 on k8s-gpu2, rail5 10.21.5.101, Ready
+== Services
+  PASS  Service chat: 3 ready endpoint(s), its servers (10.22.0.168 10.22.0.250 10.22.4.244)
+  PASS  Service staff: 2 ready endpoint(s), its servers (10.22.0.98 10.22.4.234)
+  PASS  Service chat-a: 1 ready endpoint(s), its servers (10.22.0.250)
+  PASS  Service chat-b: 1 ready endpoint(s), its servers (10.22.4.244)
+  PASS  Service chat-c: 1 ready endpoint(s), its servers (10.22.0.168)
+  PASS  Service staff-a: 1 ready endpoint(s), its servers (10.22.0.98)
+  PASS  Service staff-b: 1 ready endpoint(s), its servers (10.22.4.234)
+== RESULT: 25 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+make[1]: Leaving directory '/root/sfab/labs/ai-serving-fabric-labs/serving-layer'

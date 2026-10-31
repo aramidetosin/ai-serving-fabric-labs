@@ -1,0 +1,70 @@
+# Chapter 5, "Rail-Only Backend with VLANs" (FRAMEWORK.md 6.3, fourth row), lab sfab-ch05.
+#
+# Build A's one-tenant state, sliced to the backend: both rail switches and both GPU nodes. The
+# slice's closure (FRAMEWORK.md 1.4, step 4) adds the switches the nodes' other links land on: the
+# pair, which carries their bonds, and the out-of-band switch. Nothing else deploys. The firewall
+# is not in this lab, so the nodes get no gateway (a VLAN's gateway is rendered only while the
+# node that holds it is in the lab), and the cluster, serving and storage stay off. The chapter
+# prints both rail switches, so both deploy whole (FRAMEWORK.md 1.4, step 7). The lab extends no
+# other lab.
+lab: sfab-ch05
+profile: a
+state: one
+slice:
+  nodes: [rail, k8s-gpu1, k8s-gpu2]
+features: {k8s: false, serving: false, storage_setup: false}
+prints: [rail-sw1, rail-sw2]
+extends: null
+variants: {}
+
+# The rail trace (trace.sh, common/trace/lib-railtrace.sh; rendered to gen/trace.json). First a
+# same-rail health check on every rail: one ping from each of k8s-gpu1's GPU namespaces to k8s-gpu2's
+# address on the same rail. Then two flows from k8s-gpu1's namespace gpu1 (10.21.1.11), each a ping of
+# count requests under one ICMP id, captured at every point below:
+#
+#   same-rail   to k8s-gpu2 on rail 1 (10.21.1.12): request and reply cross rail-sw1 only
+#   cross-rail  to k8s-gpu2 on rail 2 (10.21.2.12): the request goes through k8s-gpu1's relay to its
+#               namespace gpu2, which forwards it onto rail 2 (rail-sw2); k8s-gpu2 answers through its
+#               own relay, whose namespace gpu1 forwards the reply onto rail 1 (rail-sw1)
+#
+# A point is <depth>-<name>: the node-local bridge on each node (captured in the guest, decoded
+# there) and the switch ports facing each node on rails 1 and 2 (captured on the lab host in the
+# switch container). Then traceroute for each flow from the same namespace, and the DF probe
+# matrix: each flow in both directions at every size in df_sizes (IP bytes; the payload is 28
+# less), with the don't-fragment bit set, captured again at the same points.
+trace:
+  rails:
+    from: k8s-gpu1
+    to: k8s-gpu2
+    flows:
+      - {id: same-rail, rail: 1}
+      - {id: cross-rail, rail: 1, to_rail: 2}
+    count: 3
+    interval_s: 0.5
+    df_sizes: [9000, 9001]
+    points:
+      - {id: 1-k8s-gpu1-relay0, node: k8s-gpu1, iface: relay0}
+      - {id: 2-rail-sw1-Ethernet0, node: rail-sw1, eth: eth1}
+      - {id: 2-rail-sw2-Ethernet0, node: rail-sw2, eth: eth1}
+      - {id: 3-rail-sw1-Ethernet4, node: rail-sw1, eth: eth5}
+      - {id: 3-rail-sw2-Ethernet4, node: rail-sw2, eth: eth5}
+      - {id: 4-k8s-gpu2-relay0, node: k8s-gpu2, iface: relay0}
+
+# The dark-switch drill (drills.sh, common/drill/lib-raildrill.sh; rendered to gen/drills.json).
+# Every port of rail-sw1 is shut in one KLISH session (interface range), held hold_s, then given
+# no shutdown. The rails probe runs throughout: from k8s-gpu1, one ping per row, each under its own
+# ICMP id, at interval_s: the same rail on all eight rails (to k8s-gpu2's address on that rail), and
+# the cross-rail rows listed (from rail a's namespace to k8s-gpu2's address on rail b). tcpdump on the
+# lab host, in both nodes' container ports on every rail, records each request and reply on the
+# host's clock; the guest's own ping log is the second witness. The plan marks each row dark or
+# answered while the switch is shut: a row is dark when its request or its reply rides one of the
+# shut switch's rails, since nothing routes around it.
+drills:
+  probes:
+    rails: {from: k8s-gpu1, to: k8s-gpu2, id_base: 5500, interval_s: 0.2, cross: [[2, 1], [1, 2], [2, 4]]}
+  timing: {lead_s: 10, hold_s: 30, tail_s: 20, whole_polls: 12}
+  list:
+    - id: dark-switch
+      title: every port of rail-sw1 shut with interface range, held, then no shutdown
+      dark: {switch: rail-sw1}
+      probes: [rails]

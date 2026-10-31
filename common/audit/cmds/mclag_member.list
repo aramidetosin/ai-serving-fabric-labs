@@ -1,0 +1,14 @@
+# An MCLAG pair member, after dell_sonic.list.
++mclag_brief         klish       show mclag brief
++portchannel_summary klish       show PortChannel summary
+running_mclag        klish       show running-configuration mclag
+# Chapter 3's pair checks (judge.py pair-roles): the ICCP socket on TCP 8888 and iccpd's own view
+# of the keepalive, both read on the switch's Linux side.
++iccp_session        shell       sudo ss -tanp | grep 8888
++iccp_state          shell       docker exec iccpd mclagdctl -i {mclag.domain} dump state
+# The keepalive VRF's table (forwarding-only: only the two keepalive /31s, connected) and the pair's
+# loop protection and storm control (judge.py l2-hygiene).
++ip_route_ka         klish       show ip route vrf {keepalive.vrf}
+running_stp          klish       show running-configuration spanning-tree
++bpdu_guard          klish       show spanning-tree bpdu-guard
+storm_control        klish       show storm-control

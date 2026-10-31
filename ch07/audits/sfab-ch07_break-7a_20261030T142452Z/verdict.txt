@@ -1,0 +1,10 @@
+== break-7a: a new key for chat loaded by every API gateway pod but one
+  PASS  api-gateway-64bc7b94df-hm4sq, the API gateway pod at place 1 of 2 by name, held: its sidecar keeps the apisix.yaml it has (hold file /standalone/hold)
+  PASS  the key Job minted batch.fa000001 in Secret inference/api-keys (sha256:6b38bbf9af91)
+== break-7a: recorded
+  PASS  pods, break: the per-pod probe of batch.fa000001 on chat's route: api-gateway-64bc7b94df-7b74q 401,200; api-gateway-64bc7b94df-hm4sq 401 (recorded)
+  PASS  users, break, pass 1: 10 of 20 requests through gw-users to chat failed (recorded)
+== break-7a: broken as designed
+  PASS  pods: only api-gateway-64bc7b94df-hm4sq, the held pod, never accepted the key (401); api-gateway-64bc7b94df-7b74q accepted it
+  PASS  users: some requests fail and some succeed (10 of 20 across the passes)
+== RESULT: 6 passed, 0 failed, 0 known platform limitation(s), 0 skipped

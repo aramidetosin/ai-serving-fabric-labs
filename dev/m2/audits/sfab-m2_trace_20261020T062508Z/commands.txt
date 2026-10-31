@@ -1,0 +1,630 @@
+### 2026-10-20T06:25:08Z bastion kubectl
++ kubectl get leases -A -o json
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T06:04:31Z",
+                "name": "external-attacher-leader-org-democratic-csi-nfs",
+                "namespace": "democratic-csi",
+                "resourceVersion": "10513",
+                "uid": "594b82e6-d2c7-40f8-8e50-f69ec22a2b17"
+            },
+            "spec": {
+                "acquireTime": "2026-10-20T06:04:31.466560Z",
+                "holderIdentity": "truenas-nfs-democratic-csi-controller-5fd44d79cc-qnqgk",
+                "leaseDurationSeconds": 15,
+                "leaseTransitions": 0,
+                "renewTime": "2026-10-20T06:25:03.549546Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T06:04:28Z",
+                "name": "external-attacher-leader-org-democratic-csi-nvmeof",
+                "namespace": "democratic-csi",
+                "resourceVersion": "10528",
+                "uid": "d17c333d-596e-4083-b1a6-78030de691b5"
+            },
+            "spec": {
+                "acquireTime": "2026-10-20T06:04:28.632985Z",
+                "holderIdentity": "truenas-nvmeof-democratic-csi-controller-78cd99c49d-cqbb7",
+                "leaseDurationSeconds": 15,
+                "leaseTransitions": 0,
+                "renewTime": "2026-10-20T06:25:06.088044Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T06:04:31Z",
+                "name": "external-resizer-org-democratic-csi-nfs",
+                "namespace": "democratic-csi",
+                "resourceVersion": "10514",
+                "uid": "48617461-bc08-42bc-9dcf-a87f20aeb096"
+            },
+            "spec": {
+                "acquireTime": "2026-10-20T06:04:31.468469Z",
+                "holderIdentity": "truenas-nfs-democratic-csi-controller-5fd44d79cc-qnqgk",
+                "leaseDurationSeconds": 15,
+                "leaseTransitions": 0,
+                "renewTime": "2026-10-20T06:25:03.555214Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T06:04:28Z",
+                "name": "external-resizer-org-democratic-csi-nvmeof",
+                "namespace": "democratic-csi",
+                "resourceVersion": "10527",
+                "uid": "d1fddbdb-f8cd-4c8c-967e-564005ebd691"
+            },
+            "spec": {
+                "acquireTime": "2026-10-20T06:04:28.635845Z",
+                "holderIdentity": "truenas-nvmeof-democratic-csi-controller-78cd99c49d-cqbb7",
+                "leaseDurationSeconds": 15,
+                "leaseTransitions": 0,
+                "renewTime": "2026-10-20T06:25:05.699007Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T06:04:31Z",
+                "name": "org-democratic-csi-nfs",
+                "namespace": "democratic-csi",
+                "resourceVersion": "10512",
+                "uid": "808494c7-338b-4160-a2ec-101163e56932"
+            },
+            "spec": {
+                "acquireTime": "2026-10-20T06:04:31.470567Z",
+                "holderIdentity": "1792476271466-946-org-democratic-csi-nfs",
+                "leaseDurationSeconds": 15,
+                "leaseTransitions": 0,
+                "renewTime": "2026-10-20T06:25:03.545207Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T06:04:28Z",
+                "name": "org-democratic-csi-nvmeof",
+                "namespace": "democratic-csi",
+                "resourceVersion": "10526",
+                "uid": "ed4ed3ec-714f-4333-b6da-b608744fb926"
+            },
+            "spec": {
+                "acquireTime": "2026-10-20T06:04:28.635152Z",
+                "holderIdentity": "1792476268634-4119-org-democratic-csi-nvmeof",
+                "leaseDurationSeconds": 15,
+                "leaseTransitions": 0,
+                "renewTime": "2026-10-20T06:25:05.698395Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T05:58:02Z",
+                "name": "ctrl1",
+                "namespace": "kube-node-lease",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "v1",
+                        "kind": "Node",
+                        "name": "ctrl1",
+                        "uid": "bfb3483f-90dd-4bc8-bcf3-df6ca529977b"
+                    }
+                ],
+                "resourceVersion": "10509",
+                "uid": "e87440b4-10a7-4002-940e-cc323bb6278d"
+            },
+            "spec": {
+                "holderIdentity": "ctrl1",
+                "leaseDurationSeconds": 40,
+                "renewTime": "2026-10-20T06:25:02.990274Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T05:58:38Z",
+                "name": "ctrl2",
+                "namespace": "kube-node-lease",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "v1",
+                        "kind": "Node",
+                        "name": "ctrl2",
+                        "uid": "d57c5175-c560-4bbf-b3f9-8c2b09ddb970"
+                    }
+                ],
+                "resourceVersion": "10489",
+                "uid": "bbbf9fea-7e3e-42e7-9667-b85e801fd424"
+            },
+            "spec": {
+                "holderIdentity": "ctrl2",
+                "leaseDurationSeconds": 40,
+                "renewTime": "2026-10-20T06:24:59.294857Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T05:58:46Z",
+                "name": "ctrl3",
+                "namespace": "kube-node-lease",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "v1",
+                        "kind": "Node",
+                        "name": "ctrl3",
+                        "uid": "3b4c319c-9360-4426-8c66-7eb1e252880a"
+                    }
+                ],
+                "resourceVersion": "10536",
+                "uid": "90f4e500-90fc-44c7-a2c0-9feb7193ca34"
+            },
+            "spec": {
+                "holderIdentity": "ctrl3",
+                "leaseDurationSeconds": 40,
+                "renewTime": "2026-10-20T06:25:07.265106Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T05:58:19Z",
+                "name": "gpu1",
+                "namespace": "kube-node-lease",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "v1",
+                        "kind": "Node",
+                        "name": "gpu1",
+                        "uid": "c9819c3e-4221-429a-a5f4-f9a8cc89f517"
+                    }
+                ],
+                "resourceVersion": "10539",
+                "uid": "943e4c16-e6c1-469f-8079-3b99c5dec595"
+            },
+            "spec": {
+                "holderIdentity": "gpu1",
+                "leaseDurationSeconds": 40,
+                "renewTime": "2026-10-20T06:25:08.159279Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T05:58:23Z",
+                "name": "gpu2",
+                "namespace": "kube-node-lease",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "v1",
+                        "kind": "Node",
+                        "name": "gpu2",
+                        "uid": "ace72624-d66e-4ae0-91f2-61d3f99234e6"
+                    }
+                ],
+                "resourceVersion": "10501",
+                "uid": "66b3ed1a-bd42-4852-ae43-9f21058a6e12"
+            },
+            "spec": {
+                "holderIdentity": "gpu2",
+                "leaseDurationSeconds": 40,
+                "renewTime": "2026-10-20T06:25:01.904360Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T05:58:22Z",
+                "labels": {
+                    "apiserver.kubernetes.io/identity": "kube-apiserver",
+                    "kubernetes.io/hostname": "ctrl2"
+                },
+                "name": "apiserver-qef2aymilqugv47vhlspm7vneu",
+                "namespace": "kube-system",
+                "resourceVersion": "10517",
+                "uid": "58ba758f-f1e2-40ac-bb15-6ea5031aa799"
+            },
+            "spec": {
+                "holderIdentity": "apiserver-qef2aymilqugv47vhlspm7vneu_e10740df-fcfb-4e05-b79f-9d7369be4fc7",
+                "leaseDurationSeconds": 3600,
+                "renewTime": "2026-10-20T06:25:04.032558Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T05:58:00Z",
+                "labels": {
+                    "apiserver.kubernetes.io/identity": "kube-apiserver",
+                    "kubernetes.io/hostname": "ctrl1"
+                },
+                "name": "apiserver-zth2mytviyq2c5jkfag3mfrgia",
+                "namespace": "kube-system",
+                "resourceVersion": "10516",
+                "uid": "a3560483-96a3-40ee-8569-7cfee28c9cd7"
+            },
+            "spec": {
+                "holderIdentity": "apiserver-zth2mytviyq2c5jkfag3mfrgia_38d49c16-c53d-4d16-8a56-2af49ce39023",
+                "leaseDurationSeconds": 3600,
+                "renewTime": "2026-10-20T06:25:03.885005Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T05:58:31Z",
+                "labels": {
+                    "apiserver.kubernetes.io/identity": "kube-apiserver",
+                    "kubernetes.io/hostname": "ctrl3"
+                },
+                "name": "apiserver-ztyi5t7w7c3bfcn3qhdm3n2qf4",
+                "namespace": "kube-system",
+                "resourceVersion": "10515",
+                "uid": "6882777f-576f-44f5-9ebe-34404c21b994"
+            },
+            "spec": {
+                "holderIdentity": "apiserver-ztyi5t7w7c3bfcn3qhdm3n2qf4_ecca97fe-2c8f-419d-a5a8-2f6609f7a37c",
+                "leaseDurationSeconds": 3600,
+                "renewTime": "2026-10-20T06:25:03.672630Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T06:03:21Z",
+                "labels": {
+                    "app.kubernetes.io/managed-by": "cert-manager-cainjector"
+                },
+                "name": "cert-manager-cainjector-leader-election",
+                "namespace": "kube-system",
+                "resourceVersion": "10535",
+                "uid": "4a575487-16e6-429d-9b90-a19a8e889d13"
+            },
+            "spec": {
+                "acquireTime": "2026-10-20T06:03:21.448389Z",
+                "holderIdentity": "cert-manager-cainjector-54b9c9cd8d-pbxpd_d13d6c06-5458-45ca-9590-7b15f8f9e871",
+                "leaseDurationSeconds": 60,
+                "leaseTransitions": 0,
+                "renewTime": "2026-10-20T06:25:06.982099Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T06:03:21Z",
+                "labels": {
+                    "app.kubernetes.io/managed-by": "cert-manager"
+                },
+                "name": "cert-manager-controller",
+                "namespace": "kube-system",
+                "resourceVersion": "10537",
+                "uid": "46f6543a-ac4a-4829-9e46-04d9cad1710e"
+            },
+            "spec": {
+                "acquireTime": "2026-10-20T06:03:21.724771Z",
+                "holderIdentity": "cert-manager-5748c9d4f5-bzdfj-external-cert-manager-controller",
+                "leaseDurationSeconds": 60,
+                "leaseTransitions": 0,
+                "renewTime": "2026-10-20T06:25:07.285407Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T06:03:38Z",
+                "name": "cilium-l2announce-gateways-cilium-gateway-gw-internal",
+                "namespace": "kube-system",
+                "resourceVersion": "10542",
+                "uid": "f4127c48-dd96-4802-8328-b29084d43ecc"
+            },
+            "spec": {
+                "acquireTime": "2026-10-20T06:03:38.039850Z",
+                "holderIdentity": "ctrl2",
+                "leaseDurationSeconds": 15,
+                "leaseTransitions": 0,
+                "renewTime": "2026-10-20T06:25:08.404973Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T06:03:38Z",
+                "name": "cilium-l2announce-gateways-cilium-gateway-gw-users",
+                "namespace": "kube-system",
+                "resourceVersion": "10541",
+                "uid": "cd0dc028-3b3b-4bc6-9a68-62fb3287bcfc"
+            },
+            "spec": {
+                "acquireTime": "2026-10-20T06:03:38.039903Z",
+                "holderIdentity": "ctrl2",
+                "leaseDurationSeconds": 15,
+                "leaseTransitions": 0,
+                "renewTime": "2026-10-20T06:25:08.404973Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T06:02:26Z",
+                "name": "cilium-operator-resource-lock",
+                "namespace": "kube-system",
+                "resourceVersion": "10532",
+                "uid": "0f3b644e-28dc-4894-91a4-965ace8ff4f6"
+            },
+            "spec": {
+                "acquireTime": "2026-10-20T06:02:26.953292Z",
+                "holderIdentity": "gpu2-qb7hq647sv",
+                "leaseDurationSeconds": 15,
+                "leaseTransitions": 0,
+                "renewTime": "2026-10-20T06:25:06.591956Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T05:58:02Z",
+                "name": "kube-controller-manager",
+                "namespace": "kube-system",
+                "resourceVersion": "10533",
+                "uid": "248e4632-326d-45c8-9db0-fa5663ab6629"
+            },
+            "spec": {
+                "acquireTime": "2026-10-20T05:58:02.804873Z",
+                "holderIdentity": "ctrl1_24fb13d2-d931-4894-bbb6-6f906604c5a8",
+                "leaseDurationSeconds": 15,
+                "leaseTransitions": 0,
+                "renewTime": "2026-10-20T06:25:06.922786Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T05:58:04Z",
+                "name": "kube-scheduler",
+                "namespace": "kube-system",
+                "resourceVersion": "10534",
+                "uid": "3e1f9ea9-bb2a-4607-8631-d2839b8e4d76"
+            },
+            "spec": {
+                "acquireTime": "2026-10-20T05:58:04.556601Z",
+                "holderIdentity": "ctrl1_5356b12c-9af8-4815-bcd5-9656998a30c5",
+                "leaseDurationSeconds": 15,
+                "leaseTransitions": 0,
+                "renewTime": "2026-10-20T06:25:06.923343Z"
+            }
+        },
+        {
+            "apiVersion": "coordination.k8s.io/v1",
+            "kind": "Lease",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T05:58:02Z",
+                "name": "plndr-cp-lock",
+                "namespace": "kube-system",
+                "resourceVersion": "10540",
+                "uid": "df068c7f-9613-45c5-bece-858ea23fbd73"
+            },
+            "spec": {
+                "acquireTime": "2026-10-20T06:00:21.490536Z",
+                "holderIdentity": "ctrl1",
+                "leaseDurationSeconds": 5,
+                "leaseTransitions": 1,
+                "renewTime": "2026-10-20T06:25:08.382731Z"
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
+
+### 2026-10-20T06:25:08Z ent-client capture
++ nsenter -t 1756658 -n timeout 300 tcpdump -i eth1 -nn -s 256 -U -w captures/1-ent-client-eth1.pcap '(tcp port 443) or (vlan and (tcp port 443))'
+
+### 2026-10-20T06:25:08Z fw capture
++ nsenter -t 1756589 -n timeout 300 tcpdump -i eth4 -nn -s 256 -U -w captures/2-fw-ethernet1-4.pcap '(tcp port 443) or (vlan and (tcp port 443))'
+
+### 2026-10-20T06:25:08Z fw capture
++ nsenter -t 1756589 -n timeout 300 tcpdump -i eth1 -nn -s 256 -U -w captures/3-fw-ae1-leg1.pcap '(tcp port 443) or (vlan and (tcp port 443))'
+
+### 2026-10-20T06:25:08Z fw capture
++ nsenter -t 1756589 -n timeout 300 tcpdump -i eth2 -nn -s 256 -U -w captures/3-fw-ae1-leg2.pcap '(tcp port 443) or (vlan and (tcp port 443))'
+
+### 2026-10-20T06:25:08Z fe-sw1 capture
++ nsenter -t 1756622 -n timeout 300 tcpdump -i eth3 -nn -s 256 -U -w captures/4-fe-sw1-Ethernet2.pcap '(tcp port 443) or (vlan and (tcp port 443))'
+
+### 2026-10-20T06:25:08Z fe-sw2 capture
++ nsenter -t 1756597 -n timeout 300 tcpdump -i eth3 -nn -s 256 -U -w captures/4-fe-sw2-Ethernet2.pcap '(tcp port 443) or (vlan and (tcp port 443))'
+
+### 2026-10-20T06:25:08Z fe-sw1 capture
++ nsenter -t 1756622 -n timeout 300 tcpdump -i eth5 -nn -s 256 -U -w captures/5-fe-sw1-Ethernet4.pcap '(tcp port 443) or (vlan and (tcp port 443))'
+
+### 2026-10-20T06:25:08Z fe-sw2 capture
++ nsenter -t 1756597 -n timeout 300 tcpdump -i eth5 -nn -s 256 -U -w captures/5-fe-sw2-Ethernet4.pcap '(tcp port 443) or (vlan and (tcp port 443))'
+
+### 2026-10-20T06:25:09Z ctrl2 guest
++ setsid rm -f /tmp/sfab-trace-6-ctrl2-bond0.pcap /tmp/sfab-trace-6-ctrl2-bond0.txt; exec timeout 300 tcpdump -i bond0 -nn -s 256 -U -w /tmp/sfab-trace-6-ctrl2-bond0.pcap '(tcp port 443) or (vlan and (tcp port 443))' &
+
+
+### 2026-10-20T06:25:12Z ent-client container
++ dig +time=5 +tries=2 +short llm.tarnwick.example
+10.20.1.210
+
+### 2026-10-20T06:25:12Z ent-client container
++ curl -sS -i --max-time 20 --local-port 41442 https://llm.tarnwick.example/echo?msg=sfab-m2-trace
+HTTP/1.1 200 OK
+date: Tue, 20 Oct 2026 06:25:12 GMT
+content-length: 13
+content-type: text/plain; charset=utf-8
+x-envoy-upstream-service-time: 1
+server: envoy
+
+sfab-m2-trace
+
+### 2026-10-20T06:25:15Z ent-client container
++ curl -sS -i --max-time 20 --local-port 41443 https://llm.tarnwick.example/echo?msg=sfab-m2-trace
+HTTP/1.1 200 OK
+date: Tue, 20 Oct 2026 06:25:15 GMT
+content-length: 13
+content-type: text/plain; charset=utf-8
+x-envoy-upstream-service-time: 1
+server: envoy
+
+sfab-m2-trace
+
+### 2026-10-20T06:25:17Z ctrl2 guest
++ pkill -INT -f '[s]fab-trace-6-ctrl2-bond0.pcap' || true
+
+
+### 2026-10-20T06:25:18Z ctrl2 guest
++ tcpdump -nn -e -tttt -v -S -r /tmp/sfab-trace-6-ctrl2-bond0.pcap > /tmp/sfab-trace-6-ctrl2-bond0.txt 2>&1; wc -l < /tmp/sfab-trace-6-ctrl2-bond0.txt
+69
+
+### 2026-10-20T06:25:23Z fw panos-cli
+Last login: Tue Oct 20 06:19:02 2026 from 172.21.40.1
+set cli pager off
+show log traffic direction equal backward receive_time in last-15-minutes dport equal 443
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show log 
+admin@fw> show log traffic 
+admin@fw> show log traffic direction 
+admin@fw> show log traffic direction equal 
+admin@fw> show log traffic direction equal backward 
+admin@fw> show log traffic direction equal backward receive_time 
+admin@fw> show log traffic direction equal backward receive_time in 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 443
+Time                App             From                            Src Port          Source
+Rule                Action          To                              Dst Port          Destination
+Src User        Dst User                        End Reason
+Rule_UUid
+====================================================================================================
+2026/10/20 06:13:57 ssl             enterprise                      55494             10.24.10.10
+enterprise-to-users allow           data                            443               10.20.1.210
+                                                tcp-rst-from-client
+cc4218e8-7413-4c2f-9b18-1fa3e97ad97c
+2026/10/20 06:13:57 ssl             enterprise                      55482             10.24.10.10
+enterprise-to-users allow           data                            443               10.20.1.210
+                                                tcp-rst-from-client
+cc4218e8-7413-4c2f-9b18-1fa3e97ad97c
+2026/10/20 06:13:56 ssl             uplink                          45072             192.0.2.2
+uplink-to-internal- allow           data                            443               198.51.100.2
+                                                tcp-rst-from-client
+daa3afe4-bfbf-4a1f-b099-10baf4b106d8
+2026/10/20 06:13:56 ssl             uplink                          45076             192.0.2.2
+uplink-to-internal- allow           data                            443               198.51.100.2
+                                                tcp-rst-from-client
+daa3afe4-bfbf-4a1f-b099-10baf4b106d8
+2026/10/20 06:13:54 ssl             bastion                         46436             10.20.3.10
+bastion-to-stor-mgm allow           stor-mgmt                       443               10.20.2.31
+                                                tcp-fin
+ca9a9f16-b698-4a2b-99e3-f6c9b1a10c55
+admin@fw> exit
+
+### 2026-10-20T06:25:38Z fw panos-cli
+Last login: Tue Oct 20 06:25:19 2026 from 172.21.40.1
+set cli pager off
+show log traffic direction equal backward receive_time in last-15-minutes dport equal 443
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show log 
+admin@fw> show log traffic 
+admin@fw> show log traffic direction 
+admin@fw> show log traffic direction equal 
+admin@fw> show log traffic direction equal backward 
+admin@fw> show log traffic direction equal backward receive_time 
+admin@fw> show log traffic direction equal backward receive_time in 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 443
+Time                App             From                            Src Port          Source
+Rule                Action          To                              Dst Port          Destination
+Src User        Dst User                        End Reason
+Rule_UUid
+====================================================================================================
+2026/10/20 06:25:30 ssl             enterprise                      41443             10.24.10.10
+enterprise-to-users allow           data                            443               10.20.1.210
+                                                tcp-rst-from-client
+cc4218e8-7413-4c2f-9b18-1fa3e97ad97c
+2026/10/20 06:25:27 ssl             enterprise                      41442             10.24.10.10
+enterprise-to-users allow           data                            443               10.20.1.210
+                                                tcp-rst-from-client
+cc4218e8-7413-4c2f-9b18-1fa3e97ad97c
+2026/10/20 06:13:57 ssl             enterprise                      55494             10.24.10.10
+enterprise-to-users allow           data                            443               10.20.1.210
+                                                tcp-rst-from-client
+cc4218e8-7413-4c2f-9b18-1fa3e97ad97c
+2026/10/20 06:13:57 ssl             enterprise                      55482             10.24.10.10
+enterprise-to-users allow           data                            443               10.20.1.210
+                                                tcp-rst-from-client
+cc4218e8-7413-4c2f-9b18-1fa3e97ad97c
+2026/10/20 06:13:56 ssl             uplink                          45072             192.0.2.2
+uplink-to-internal- allow           data                            443               198.51.100.2
+                                                tcp-rst-from-client
+daa3afe4-bfbf-4a1f-b099-10baf4b106d8
+2026/10/20 06:13:56 ssl             uplink                          45076             192.0.2.2
+uplink-to-internal- allow           data                            443               198.51.100.2
+                                                tcp-rst-from-client
+daa3afe4-bfbf-4a1f-b099-10baf4b106d8
+2026/10/20 06:13:54 ssl             bastion                         46436             10.20.3.10
+bastion-to-stor-mgm allow           stor-mgmt                       443               10.20.2.31
+                                                tcp-fin
+ca9a9f16-b698-4a2b-99e3-f6c9b1a10c55
+admin@fw> exit
+

@@ -1,0 +1,68 @@
+# sfab-ch03 Gateways: rendered from spec/profile-a.yaml by render/k8s.py; edit the spec and run make render
+# One Gateway per spec Gateway, class cilium, its VIP as its address. The one HTTPS listener
+# answers *.ai.tarnwick.example with the Gateway's certificate (gw-internal gw-internal-tls, gw-users gw-users-tls), so a hostname a Gateway has no route for
+# reaches the Gateway and is answered 404 there, rather than refused in TLS.
+# Each Gateway's certificate has a key of its own: the users' Gateway's proxy holds no key the internal Gateway uses.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gw-internal
+  namespace: gateways
+  labels:
+    tarnwick.example/audience: internal
+    decision.tarnwick.example/id: dec-routeset-internal
+spec:
+  gatewayClassName: cilium
+  addresses:
+  - type: IPAddress
+    value: "10.20.11.200"
+  infrastructure:
+    labels:
+      tarnwick.example/lb-pool: gw-internal
+      tarnwick.example/audience: internal
+  listeners:
+  - name: https
+    protocol: HTTPS
+    port: 443
+    hostname: "*.ai.tarnwick.example"
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - group: ""
+        kind: Secret
+        name: gw-internal-tls
+    allowedRoutes:
+      namespaces:
+        from: All
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gw-users
+  namespace: gateways
+  labels:
+    tarnwick.example/audience: enterprise
+    decision.tarnwick.example/id: dec-routeset-enterprise
+spec:
+  gatewayClassName: cilium
+  addresses:
+  - type: IPAddress
+    value: "10.20.11.210"
+  infrastructure:
+    labels:
+      tarnwick.example/lb-pool: gw-users
+      tarnwick.example/audience: enterprise
+  listeners:
+  - name: https
+    protocol: HTTPS
+    port: 443
+    hostname: "*.ai.tarnwick.example"
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - group: ""
+        kind: Secret
+        name: gw-users-tls
+    allowedRoutes:
+      namespaces:
+        from: All

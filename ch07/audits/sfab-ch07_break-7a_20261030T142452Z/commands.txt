@@ -1,0 +1,548 @@
+### 2026-10-30T14:24:54Z k8s-cp1 kubectl
++ kubectl -n inference exec api-gateway-64bc7b94df-hm4sq -c keys -- touch /standalone/hold
+
+
+### 2026-10-30T14:24:56Z k8s-cp1 kubectl
++ kubectl create -f - (a manifest, no secret)
+job.batch/key-probe-break-mint created
+
+### 2026-10-30T14:25:00Z k8s-cp1 kubectl
++ kubectl -n inference wait --for=condition=complete job/key-probe-break-mint --timeout=180s
+job.batch/key-probe-break-mint condition met
+
+### 2026-10-30T14:25:00Z k8s-cp1 kubectl
++ kubectl -n inference logs job/key-probe-break-mint
+minted batch.fa000001 in Secret inference/api-keys: sha256:6b38bbf9af91
+
+### 2026-10-30T14:25:08Z k8s-cp1 kubectl
++ kubectl create -f - (a manifest, no secret)
+pod/key-probe-break-pods created
+
+### 2026-10-30T14:29:13Z k8s-cp1 kubectl
++ kubectl -n inference logs key-probe-break-pods
+{"ip": "10.22.1.137", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-7b74q", "round": 1, "status": 401, "t": 1793370309.223}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 1, "status": 401, "t": 1793370309.223}
+{"ip": "10.22.1.137", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-7b74q", "round": 2, "status": 401, "t": 1793370310.223}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 2, "status": 401, "t": 1793370310.223}
+{"ip": "10.22.1.137", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-7b74q", "round": 3, "status": 401, "t": 1793370311.223}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 3, "status": 401, "t": 1793370311.223}
+{"ip": "10.22.1.137", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-7b74q", "round": 4, "status": 401, "t": 1793370312.224}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 4, "status": 401, "t": 1793370312.224}
+{"ip": "10.22.1.137", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-7b74q", "round": 5, "status": 401, "t": 1793370313.224}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 5, "status": 401, "t": 1793370313.224}
+{"ip": "10.22.1.137", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-7b74q", "round": 6, "status": 401, "t": 1793370314.224}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 6, "status": 401, "t": 1793370314.224}
+{"ip": "10.22.1.137", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-7b74q", "round": 7, "status": 401, "t": 1793370315.224}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 7, "status": 401, "t": 1793370315.224}
+{"ip": "10.22.1.137", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-7b74q", "round": 8, "status": 401, "t": 1793370316.224}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 8, "status": 401, "t": 1793370316.224}
+{"ip": "10.22.1.137", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-7b74q", "round": 9, "status": 401, "t": 1793370317.224}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 9, "status": 401, "t": 1793370317.224}
+{"ip": "10.22.1.137", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-7b74q", "round": 10, "status": 401, "t": 1793370318.224}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 10, "status": 401, "t": 1793370318.224}
+{"ip": "10.22.1.137", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-7b74q", "round": 11, "status": 401, "t": 1793370319.225}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 11, "status": 401, "t": 1793370319.225}
+{"ip": "10.22.1.137", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-7b74q", "round": 12, "status": 401, "t": 1793370320.225}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 12, "status": 401, "t": 1793370320.225}
+{"ip": "10.22.1.137", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-7b74q", "round": 13, "status": 401, "t": 1793370321.225}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 13, "status": 401, "t": 1793370321.225}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 14, "status": 200, "t": 1793370322.225}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 14, "status": 401, "t": 1793370322.225}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 15, "status": 200, "t": 1793370323.225}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 15, "status": 401, "t": 1793370323.225}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 16, "status": 200, "t": 1793370324.226}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 16, "status": 401, "t": 1793370324.226}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 17, "status": 200, "t": 1793370325.226}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 17, "status": 401, "t": 1793370325.226}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 18, "status": 200, "t": 1793370326.226}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 18, "status": 401, "t": 1793370326.226}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 19, "status": 200, "t": 1793370327.226}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 19, "status": 401, "t": 1793370327.226}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 20, "status": 200, "t": 1793370328.226}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 20, "status": 401, "t": 1793370328.226}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 21, "status": 200, "t": 1793370329.226}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 21, "status": 401, "t": 1793370329.226}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 22, "status": 200, "t": 1793370330.227}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 22, "status": 401, "t": 1793370330.227}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 23, "status": 200, "t": 1793370331.227}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 23, "status": 401, "t": 1793370331.227}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 24, "status": 200, "t": 1793370332.227}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 24, "status": 401, "t": 1793370332.227}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 25, "status": 200, "t": 1793370333.227}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 25, "status": 401, "t": 1793370333.227}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 26, "status": 200, "t": 1793370334.227}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 26, "status": 401, "t": 1793370334.227}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 27, "status": 200, "t": 1793370335.227}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 27, "status": 401, "t": 1793370335.227}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 28, "status": 200, "t": 1793370336.227}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 28, "status": 401, "t": 1793370336.227}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 29, "status": 200, "t": 1793370337.227}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 29, "status": 401, "t": 1793370337.227}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 30, "status": 200, "t": 1793370338.228}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 30, "status": 401, "t": 1793370338.228}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 31, "status": 200, "t": 1793370339.228}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 31, "status": 401, "t": 1793370339.228}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 32, "status": 200, "t": 1793370340.228}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 32, "status": 401, "t": 1793370340.228}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 33, "status": 200, "t": 1793370341.228}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 33, "status": 401, "t": 1793370341.228}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 34, "status": 200, "t": 1793370342.228}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 34, "status": 401, "t": 1793370342.228}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 35, "status": 200, "t": 1793370343.228}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 35, "status": 401, "t": 1793370343.228}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 36, "status": 200, "t": 1793370344.229}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 36, "status": 401, "t": 1793370344.229}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 37, "status": 200, "t": 1793370345.229}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 37, "status": 401, "t": 1793370345.229}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 38, "status": 200, "t": 1793370346.229}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 38, "status": 401, "t": 1793370346.229}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 39, "status": 200, "t": 1793370347.229}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 39, "status": 401, "t": 1793370347.229}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 40, "status": 200, "t": 1793370348.229}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 40, "status": 401, "t": 1793370348.229}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 41, "status": 200, "t": 1793370349.229}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 41, "status": 401, "t": 1793370349.229}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 42, "status": 200, "t": 1793370350.229}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 42, "status": 401, "t": 1793370350.229}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 43, "status": 200, "t": 1793370351.23}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 43, "status": 401, "t": 1793370351.23}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 44, "status": 200, "t": 1793370352.23}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 44, "status": 401, "t": 1793370352.23}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 45, "status": 200, "t": 1793370353.23}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 45, "status": 401, "t": 1793370353.23}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 46, "status": 200, "t": 1793370354.23}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 46, "status": 401, "t": 1793370354.23}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 47, "status": 200, "t": 1793370355.23}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 47, "status": 401, "t": 1793370355.23}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 48, "status": 200, "t": 1793370356.23}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 48, "status": 401, "t": 1793370356.23}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 49, "status": 200, "t": 1793370357.23}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 49, "status": 401, "t": 1793370357.23}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 50, "status": 200, "t": 1793370358.23}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 50, "status": 401, "t": 1793370358.23}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 51, "status": 200, "t": 1793370359.231}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 51, "status": 401, "t": 1793370359.231}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 52, "status": 200, "t": 1793370360.231}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 52, "status": 401, "t": 1793370360.231}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 53, "status": 200, "t": 1793370361.231}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 53, "status": 401, "t": 1793370361.231}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 54, "status": 200, "t": 1793370362.231}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 54, "status": 401, "t": 1793370362.231}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 55, "status": 200, "t": 1793370363.231}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 55, "status": 401, "t": 1793370363.231}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 56, "status": 200, "t": 1793370364.231}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 56, "status": 401, "t": 1793370364.231}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 57, "status": 200, "t": 1793370365.231}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 57, "status": 401, "t": 1793370365.231}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 58, "status": 200, "t": 1793370366.232}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 58, "status": 401, "t": 1793370366.232}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 59, "status": 200, "t": 1793370367.232}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 59, "status": 401, "t": 1793370367.232}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 60, "status": 200, "t": 1793370368.232}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 60, "status": 401, "t": 1793370368.232}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 61, "status": 200, "t": 1793370369.232}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 61, "status": 401, "t": 1793370369.232}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 62, "status": 200, "t": 1793370370.232}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 62, "status": 401, "t": 1793370370.232}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 63, "status": 200, "t": 1793370371.232}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 63, "status": 401, "t": 1793370371.232}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 64, "status": 200, "t": 1793370372.232}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 64, "status": 401, "t": 1793370372.232}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 65, "status": 200, "t": 1793370373.232}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 65, "status": 401, "t": 1793370373.232}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 66, "status": 200, "t": 1793370374.233}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 66, "status": 401, "t": 1793370374.233}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 67, "status": 200, "t": 1793370375.233}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 67, "status": 401, "t": 1793370375.233}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 68, "status": 200, "t": 1793370376.233}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 68, "status": 401, "t": 1793370376.233}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 69, "status": 200, "t": 1793370377.233}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 69, "status": 401, "t": 1793370377.233}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 70, "status": 200, "t": 1793370378.233}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 70, "status": 401, "t": 1793370378.233}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 71, "status": 200, "t": 1793370379.233}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 71, "status": 401, "t": 1793370379.233}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 72, "status": 200, "t": 1793370380.233}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 72, "status": 401, "t": 1793370380.233}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 73, "status": 200, "t": 1793370381.233}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 73, "status": 401, "t": 1793370381.233}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 74, "status": 200, "t": 1793370382.234}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 74, "status": 401, "t": 1793370382.234}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 75, "status": 200, "t": 1793370383.236}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 75, "status": 401, "t": 1793370383.236}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 76, "status": 200, "t": 1793370384.236}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 76, "status": 401, "t": 1793370384.236}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 77, "status": 200, "t": 1793370385.236}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 77, "status": 401, "t": 1793370385.236}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 78, "status": 200, "t": 1793370386.237}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 78, "status": 401, "t": 1793370386.237}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 79, "status": 200, "t": 1793370387.237}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 79, "status": 401, "t": 1793370387.237}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 80, "status": 200, "t": 1793370388.237}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 80, "status": 401, "t": 1793370388.237}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 81, "status": 200, "t": 1793370389.237}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 81, "status": 401, "t": 1793370389.237}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 82, "status": 200, "t": 1793370390.237}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 82, "status": 401, "t": 1793370390.237}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 83, "status": 200, "t": 1793370391.237}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 83, "status": 401, "t": 1793370391.237}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 84, "status": 200, "t": 1793370392.238}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 84, "status": 401, "t": 1793370392.238}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 85, "status": 200, "t": 1793370393.238}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 85, "status": 401, "t": 1793370393.238}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 86, "status": 200, "t": 1793370394.238}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 86, "status": 401, "t": 1793370394.238}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 87, "status": 200, "t": 1793370395.238}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 87, "status": 401, "t": 1793370395.238}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 88, "status": 200, "t": 1793370396.238}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 88, "status": 401, "t": 1793370396.238}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 89, "status": 200, "t": 1793370397.238}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 89, "status": 401, "t": 1793370397.238}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 90, "status": 200, "t": 1793370398.238}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 90, "status": 401, "t": 1793370398.238}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 91, "status": 200, "t": 1793370399.239}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 91, "status": 401, "t": 1793370399.239}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 92, "status": 200, "t": 1793370400.239}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 92, "status": 401, "t": 1793370400.239}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 93, "status": 200, "t": 1793370401.239}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 93, "status": 401, "t": 1793370401.239}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 94, "status": 200, "t": 1793370402.239}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 94, "status": 401, "t": 1793370402.239}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 95, "status": 200, "t": 1793370403.239}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 95, "status": 401, "t": 1793370403.239}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 96, "status": 200, "t": 1793370404.239}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 96, "status": 401, "t": 1793370404.239}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 97, "status": 200, "t": 1793370405.239}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 97, "status": 401, "t": 1793370405.239}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 98, "status": 200, "t": 1793370406.24}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 98, "status": 401, "t": 1793370406.24}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 99, "status": 200, "t": 1793370407.24}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 99, "status": 401, "t": 1793370407.24}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 100, "status": 200, "t": 1793370408.24}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 100, "status": 401, "t": 1793370408.24}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 101, "status": 200, "t": 1793370409.24}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 101, "status": 401, "t": 1793370409.24}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 102, "status": 200, "t": 1793370410.24}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 102, "status": 401, "t": 1793370410.24}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 103, "status": 200, "t": 1793370411.24}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 103, "status": 401, "t": 1793370411.24}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 104, "status": 200, "t": 1793370412.24}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 104, "status": 401, "t": 1793370412.24}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 105, "status": 200, "t": 1793370413.24}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 105, "status": 401, "t": 1793370413.24}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 106, "status": 200, "t": 1793370414.24}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 106, "status": 401, "t": 1793370414.24}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 107, "status": 200, "t": 1793370415.241}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 107, "status": 401, "t": 1793370415.241}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 108, "status": 200, "t": 1793370416.241}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 108, "status": 401, "t": 1793370416.241}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 109, "status": 200, "t": 1793370417.241}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 109, "status": 401, "t": 1793370417.241}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 110, "status": 200, "t": 1793370418.241}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 110, "status": 401, "t": 1793370418.241}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 111, "status": 200, "t": 1793370419.241}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 111, "status": 401, "t": 1793370419.241}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 112, "status": 200, "t": 1793370420.241}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 112, "status": 401, "t": 1793370420.241}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 113, "status": 200, "t": 1793370421.241}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 113, "status": 401, "t": 1793370421.241}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 114, "status": 200, "t": 1793370422.241}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 114, "status": 401, "t": 1793370422.241}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 115, "status": 200, "t": 1793370423.242}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 115, "status": 401, "t": 1793370423.242}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 116, "status": 200, "t": 1793370424.242}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 116, "status": 401, "t": 1793370424.242}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 117, "status": 200, "t": 1793370425.242}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 117, "status": 401, "t": 1793370425.242}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 118, "status": 200, "t": 1793370426.242}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 118, "status": 401, "t": 1793370426.242}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 119, "status": 200, "t": 1793370427.242}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 119, "status": 401, "t": 1793370427.242}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 120, "status": 200, "t": 1793370428.242}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 120, "status": 401, "t": 1793370428.242}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 121, "status": 200, "t": 1793370429.242}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 121, "status": 401, "t": 1793370429.242}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 122, "status": 200, "t": 1793370430.242}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 122, "status": 401, "t": 1793370430.242}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 123, "status": 200, "t": 1793370431.242}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 123, "status": 401, "t": 1793370431.242}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 124, "status": 200, "t": 1793370432.243}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 124, "status": 401, "t": 1793370432.243}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 125, "status": 200, "t": 1793370433.243}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 125, "status": 401, "t": 1793370433.243}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 126, "status": 200, "t": 1793370434.243}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 126, "status": 401, "t": 1793370434.243}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 127, "status": 200, "t": 1793370435.243}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 127, "status": 401, "t": 1793370435.243}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 128, "status": 200, "t": 1793370436.243}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 128, "status": 401, "t": 1793370436.243}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 129, "status": 200, "t": 1793370437.243}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 129, "status": 401, "t": 1793370437.243}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 130, "status": 200, "t": 1793370438.243}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 130, "status": 401, "t": 1793370438.243}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 131, "status": 200, "t": 1793370439.243}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 131, "status": 401, "t": 1793370439.243}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 132, "status": 200, "t": 1793370440.244}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 132, "status": 401, "t": 1793370440.244}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 133, "status": 200, "t": 1793370441.244}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 133, "status": 401, "t": 1793370441.244}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 134, "status": 200, "t": 1793370442.244}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 134, "status": 401, "t": 1793370442.244}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 135, "status": 200, "t": 1793370443.244}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 135, "status": 401, "t": 1793370443.244}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 136, "status": 200, "t": 1793370444.244}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 136, "status": 401, "t": 1793370444.244}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 137, "status": 200, "t": 1793370445.244}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 137, "status": 401, "t": 1793370445.244}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 138, "status": 200, "t": 1793370446.244}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 138, "status": 401, "t": 1793370446.244}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 139, "status": 200, "t": 1793370447.244}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 139, "status": 401, "t": 1793370447.244}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 140, "status": 200, "t": 1793370448.245}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 140, "status": 401, "t": 1793370448.245}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 141, "status": 200, "t": 1793370449.245}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 141, "status": 401, "t": 1793370449.245}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 142, "status": 200, "t": 1793370450.245}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 142, "status": 401, "t": 1793370450.245}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 143, "status": 200, "t": 1793370451.245}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 143, "status": 401, "t": 1793370451.245}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 144, "status": 200, "t": 1793370452.245}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 144, "status": 401, "t": 1793370452.245}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 145, "status": 200, "t": 1793370453.245}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 145, "status": 401, "t": 1793370453.245}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 146, "status": 200, "t": 1793370454.245}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 146, "status": 401, "t": 1793370454.245}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 147, "status": 200, "t": 1793370455.245}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 147, "status": 401, "t": 1793370455.245}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 148, "status": 200, "t": 1793370456.245}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 148, "status": 401, "t": 1793370456.245}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 149, "status": 200, "t": 1793370457.246}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 149, "status": 401, "t": 1793370457.246}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 150, "status": 200, "t": 1793370458.246}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 150, "status": 401, "t": 1793370458.246}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 151, "status": 200, "t": 1793370459.246}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 151, "status": 401, "t": 1793370459.246}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 152, "status": 200, "t": 1793370460.246}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 152, "status": 401, "t": 1793370460.246}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 153, "status": 200, "t": 1793370461.246}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 153, "status": 401, "t": 1793370461.246}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 154, "status": 200, "t": 1793370462.246}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 154, "status": 401, "t": 1793370462.246}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 155, "status": 200, "t": 1793370463.247}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 155, "status": 401, "t": 1793370463.247}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 156, "status": 200, "t": 1793370464.247}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 156, "status": 401, "t": 1793370464.247}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 157, "status": 200, "t": 1793370465.247}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 157, "status": 401, "t": 1793370465.247}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 158, "status": 200, "t": 1793370466.247}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 158, "status": 401, "t": 1793370466.247}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 159, "status": 200, "t": 1793370467.247}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 159, "status": 401, "t": 1793370467.247}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 160, "status": 200, "t": 1793370468.247}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 160, "status": 401, "t": 1793370468.247}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 161, "status": 200, "t": 1793370469.247}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 161, "status": 401, "t": 1793370469.247}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 162, "status": 200, "t": 1793370470.247}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 162, "status": 401, "t": 1793370470.247}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 163, "status": 200, "t": 1793370471.248}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 163, "status": 401, "t": 1793370471.248}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 164, "status": 200, "t": 1793370472.248}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 164, "status": 401, "t": 1793370472.248}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 165, "status": 200, "t": 1793370473.248}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 165, "status": 401, "t": 1793370473.248}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 166, "status": 200, "t": 1793370474.248}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 166, "status": 401, "t": 1793370474.248}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 167, "status": 200, "t": 1793370475.248}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 167, "status": 401, "t": 1793370475.248}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 168, "status": 200, "t": 1793370476.248}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 168, "status": 401, "t": 1793370476.248}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 169, "status": 200, "t": 1793370477.248}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 169, "status": 401, "t": 1793370477.248}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 170, "status": 200, "t": 1793370478.248}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 170, "status": 401, "t": 1793370478.248}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 171, "status": 200, "t": 1793370479.248}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 171, "status": 401, "t": 1793370479.248}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 172, "status": 200, "t": 1793370480.249}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 172, "status": 401, "t": 1793370480.249}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 173, "status": 200, "t": 1793370481.249}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 173, "status": 401, "t": 1793370481.249}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 174, "status": 200, "t": 1793370482.249}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 174, "status": 401, "t": 1793370482.249}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 175, "status": 200, "t": 1793370483.249}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 175, "status": 401, "t": 1793370483.249}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 176, "status": 200, "t": 1793370484.249}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 176, "status": 401, "t": 1793370484.249}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 177, "status": 200, "t": 1793370485.249}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 177, "status": 401, "t": 1793370485.249}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 178, "status": 200, "t": 1793370486.249}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 178, "status": 401, "t": 1793370486.249}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 179, "status": 200, "t": 1793370487.25}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 179, "status": 401, "t": 1793370487.25}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 180, "status": 200, "t": 1793370488.25}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 180, "status": 401, "t": 1793370488.25}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 181, "status": 200, "t": 1793370489.25}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 181, "status": 401, "t": 1793370489.25}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 182, "status": 200, "t": 1793370490.25}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 182, "status": 401, "t": 1793370490.25}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 183, "status": 200, "t": 1793370491.25}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 183, "status": 401, "t": 1793370491.25}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 184, "status": 200, "t": 1793370492.25}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 184, "status": 401, "t": 1793370492.25}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 185, "status": 200, "t": 1793370493.25}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 185, "status": 401, "t": 1793370493.25}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 186, "status": 200, "t": 1793370494.25}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 186, "status": 401, "t": 1793370494.25}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 187, "status": 200, "t": 1793370495.25}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 187, "status": 401, "t": 1793370495.25}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 188, "status": 200, "t": 1793370496.251}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 188, "status": 401, "t": 1793370496.251}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 189, "status": 200, "t": 1793370497.251}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 189, "status": 401, "t": 1793370497.251}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 190, "status": 200, "t": 1793370498.251}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 190, "status": 401, "t": 1793370498.251}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 191, "status": 200, "t": 1793370499.251}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 191, "status": 401, "t": 1793370499.251}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 192, "status": 200, "t": 1793370500.251}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 192, "status": 401, "t": 1793370500.251}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 193, "status": 200, "t": 1793370501.251}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 193, "status": 401, "t": 1793370501.251}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 194, "status": 200, "t": 1793370502.251}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 194, "status": 401, "t": 1793370502.251}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 195, "status": 200, "t": 1793370503.251}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 195, "status": 401, "t": 1793370503.251}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 196, "status": 200, "t": 1793370504.252}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 196, "status": 401, "t": 1793370504.252}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 197, "status": 200, "t": 1793370505.252}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 197, "status": 401, "t": 1793370505.252}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 198, "status": 200, "t": 1793370506.252}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 198, "status": 401, "t": 1793370506.252}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 199, "status": 200, "t": 1793370507.252}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 199, "status": 401, "t": 1793370507.252}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 200, "status": 200, "t": 1793370508.252}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 200, "status": 401, "t": 1793370508.252}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 201, "status": 200, "t": 1793370509.252}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 201, "status": 401, "t": 1793370509.252}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 202, "status": 200, "t": 1793370510.252}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 202, "status": 401, "t": 1793370510.252}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 203, "status": 200, "t": 1793370511.252}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 203, "status": 401, "t": 1793370511.252}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 204, "status": 200, "t": 1793370512.253}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 204, "status": 401, "t": 1793370512.253}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 205, "status": 200, "t": 1793370513.253}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 205, "status": 401, "t": 1793370513.253}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 206, "status": 200, "t": 1793370514.253}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 206, "status": 401, "t": 1793370514.253}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 207, "status": 200, "t": 1793370515.253}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 207, "status": 401, "t": 1793370515.253}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 208, "status": 200, "t": 1793370516.253}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 208, "status": 401, "t": 1793370516.253}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 209, "status": 200, "t": 1793370517.253}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 209, "status": 401, "t": 1793370517.253}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 210, "status": 200, "t": 1793370518.253}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 210, "status": 401, "t": 1793370518.253}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 211, "status": 200, "t": 1793370519.253}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 211, "status": 401, "t": 1793370519.253}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 212, "status": 200, "t": 1793370520.253}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 212, "status": 401, "t": 1793370520.253}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 213, "status": 200, "t": 1793370521.254}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 213, "status": 401, "t": 1793370521.254}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 214, "status": 200, "t": 1793370522.254}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 214, "status": 401, "t": 1793370522.254}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 215, "status": 200, "t": 1793370523.254}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 215, "status": 401, "t": 1793370523.254}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 216, "status": 200, "t": 1793370524.254}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 216, "status": 401, "t": 1793370524.254}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 217, "status": 200, "t": 1793370525.254}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 217, "status": 401, "t": 1793370525.254}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 218, "status": 200, "t": 1793370526.254}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 218, "status": 401, "t": 1793370526.254}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 219, "status": 200, "t": 1793370527.254}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 219, "status": 401, "t": 1793370527.254}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 220, "status": 200, "t": 1793370528.254}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 220, "status": 401, "t": 1793370528.254}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 221, "status": 200, "t": 1793370529.255}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 221, "status": 401, "t": 1793370529.255}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 222, "status": 200, "t": 1793370530.255}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 222, "status": 401, "t": 1793370530.255}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 223, "status": 200, "t": 1793370531.255}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 223, "status": 401, "t": 1793370531.255}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 224, "status": 200, "t": 1793370532.255}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 224, "status": 401, "t": 1793370532.255}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 225, "status": 200, "t": 1793370533.255}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 225, "status": 401, "t": 1793370533.255}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 226, "status": 200, "t": 1793370534.255}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 226, "status": 401, "t": 1793370534.255}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 227, "status": 200, "t": 1793370535.255}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 227, "status": 401, "t": 1793370535.255}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 228, "status": 200, "t": 1793370536.255}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 228, "status": 401, "t": 1793370536.255}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 229, "status": 200, "t": 1793370537.256}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 229, "status": 401, "t": 1793370537.256}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 230, "status": 200, "t": 1793370538.256}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 230, "status": 401, "t": 1793370538.256}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 231, "status": 200, "t": 1793370539.256}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 231, "status": 401, "t": 1793370539.256}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 232, "status": 200, "t": 1793370540.256}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 232, "status": 401, "t": 1793370540.256}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 233, "status": 200, "t": 1793370541.256}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 233, "status": 401, "t": 1793370541.256}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 234, "status": 200, "t": 1793370542.256}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 234, "status": 401, "t": 1793370542.256}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 235, "status": 200, "t": 1793370543.256}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 235, "status": 401, "t": 1793370543.256}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 236, "status": 200, "t": 1793370544.256}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 236, "status": 401, "t": 1793370544.256}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 237, "status": 200, "t": 1793370545.257}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 237, "status": 401, "t": 1793370545.257}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 238, "status": 200, "t": 1793370546.257}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 238, "status": 401, "t": 1793370546.257}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 239, "status": 200, "t": 1793370547.257}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 239, "status": 401, "t": 1793370547.257}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 240, "status": 200, "t": 1793370548.257}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 240, "status": 401, "t": 1793370548.257}
+{"ip": "10.22.1.137", "label": "pods", "pod": "api-gateway-64bc7b94df-7b74q", "round": 241, "status": 200, "t": 1793370549.257}
+{"ip": "10.22.0.7", "label": "pods", "message": "Authorization Failed", "pod": "api-gateway-64bc7b94df-hm4sq", "round": 241, "status": 401, "t": 1793370549.257}
+{"label": "pods", "summary": {"all": false, "answered": 1, "expect": 200, "pods": 2, "rounds": 241, "s": 240.851}}
+
+### 2026-10-30T14:29:35Z ent-client container
++ sh -c rm -f /tmp/sfab-break-probe/records-*.jsonl; python3 /tmp/sfab-break-probe/probe_gateway.py --dir /tmp/sfab-break-probe --target chat https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions  --interval 1 --timeout 400 --max-tokens 8 --count 20 
+chat: sent 20, answered 10, failed 10
+
+### 2026-10-30T14:29:37Z k8s-cp1 kubectl
++ kubectl -n inference get pods -l app.kubernetes.io/name=api-gateway -o wide
+NAME                           READY   STATUS    RESTARTS   AGE    IP            NODE           NOMINATED NODE   READINESS GATES
+api-gateway-64bc7b94df-7b74q   2/2     Running   0          109m   10.22.1.137   k8s-ingress2   <none>           <none>
+api-gateway-64bc7b94df-hm4sq   2/2     Running   0          109m   10.22.0.7     k8s-ingress1   <none>           <none>
+
+### 2026-10-30T14:29:38Z k8s-cp1 kubectl
++ kubectl -n inference logs api-gateway-64bc7b94df-7b74q -c keys --tail=20
+composed /standalone/apisix.yaml: 3 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 batch.fd000001 sha256:06cc6f9a0318 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 3 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 batch.fd000002 sha256:ec8f5df23969 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 3 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 batch.fd000003 sha256:ce91c8b1eda2 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 3 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 batch.fa000001 sha256:6b38bbf9af91 helpdesk.132a48fc sha256:3e3f7b85c2e5
+
+### 2026-10-30T14:29:39Z k8s-cp1 kubectl
++ kubectl -n inference logs api-gateway-64bc7b94df-hm4sq -c keys --tail=20
+composed /standalone/apisix.yaml: 3 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 batch.fd000001 sha256:06cc6f9a0318 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 3 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 batch.fd000002 sha256:ec8f5df23969 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 3 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 batch.fd000003 sha256:ce91c8b1eda2 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+composed /standalone/apisix.yaml: 2 key(s) from /keys: batch.3915b3b1 sha256:afa4a482f152 helpdesk.132a48fc sha256:3e3f7b85c2e5
+held: /standalone/hold exists, so /standalone/apisix.yaml keeps what it holds
+

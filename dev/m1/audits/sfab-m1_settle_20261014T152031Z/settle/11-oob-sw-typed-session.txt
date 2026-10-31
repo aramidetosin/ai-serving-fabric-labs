@@ -1,0 +1,175 @@
+2026-10-14 15:08:29,120: launch     	INFO typing KLISH startup config /config/startup-config.cfg
+2026-10-14 15:08:29,120: vrnetlab   	DEBUG writing to serial console: ''
+2026-10-14 15:08:29,120: vrnetlab   	INFO waiting for 'login:' on serial console
+logout
+
+Debian GNU/Linux 12 oob-sw ttyS0
+
+oob-sw login: 2026-10-14 15:08:30,485: vrnetlab   	INFO read from serial console: 'logout
+
+Debian GNU/Linux 12 oob-sw ttyS0
+
+oob-sw login: '
+2026-10-14 15:08:30,485: vrnetlab   	DEBUG writing to serial console: 'admin'
+2026-10-14 15:08:30,485: vrnetlab   	INFO waiting for 'Password:' on serial console
+admin
+Password: 2026-10-14 15:08:30,527: vrnetlab   	INFO read from serial console: 'admin
+Password: '
+2026-10-14 15:08:30,527: vrnetlab   	DEBUG writing to serial console: 'admin'
+2026-10-14 15:08:30,527: vrnetlab   	INFO waiting for '$' on serial console
+
+Linux oob-sw 6.1.0-48-2-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.172-1 (2026-05-15) x86_64
+You are on
+  ____   ___  _   _ _  ____
+ / ___| / _ \| \ | (_)/ ___|
+ \___ \| | | |  \| | | |
+  ___) | |_| | |\  | | |___
+ |____/ \___/|_| \_|_|\____|
+
+-- Software for Open Networking in the Cloud --
+
+Unauthorized access and/or use are prohibited.
+All access and/or use are subject to monitoring.
+
+Help:   https://sonic-net.github.io/SONiC/
+
+Last login: Wed Oct 14 15:06:12 UTC 2026 on ttyS0
+admin@oob-sw:~$ 2026-10-14 15:08:30,785: vrnetlab   	INFO read from serial console: '
+Linux oob-sw 6.1.0-48-2-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.172-1 (2026-05-15) x86_64
+You are on
+  ____   ___  _   _ _  ____
+ / ___| / _ \| \ | (_)/ ___|
+ \___ \| | | |  \| | | |
+  ___) | |_| | |\  | | |___
+ |____/ \___/|_| \_|_|\____|
+
+-- Software for Open Networking in the Cloud --
+
+Unauthorized access and/or use are prohibited.
+All access and/or use are subject to monitoring.
+
+Help:   https://sonic-net.github.io/SONiC/
+
+Last login: Wed Oct 14 15:06:12 UTC 2026 on ttyS0
+admin@oob-sw:~$ '
+2026-10-14 15:08:30,785: vrnetlab   	DEBUG writing to serial console: 'sonic-cli'
+2026-10-14 15:08:30,785: vrnetlab   	INFO waiting for '#' on serial console
+sonic-cli
+oob-sw# 2026-10-14 15:08:32,060: vrnetlab   	INFO read from serial console: 'sonic-cli
+oob-sw# '
+2026-10-14 15:08:32,060: vrnetlab   	DEBUG writing to serial console: 'terminal length 0'
+2026-10-14 15:08:32,061: vrnetlab   	DEBUG writing to serial console: 'configure terminal'
+2026-10-14 15:08:32,361: vrnetlab   	DEBUG writing to serial console: 'ip vrf mgmt'
+2026-10-14 15:08:32,661: vrnetlab   	DEBUG writing to serial console: 'end'
+2026-10-14 15:08:32,961: vrnetlab   	DEBUG writing to serial console: 'configure terminal'
+2026-10-14 15:08:33,261: vrnetlab   	DEBUG writing to serial console: 'interface Vlan 90'
+2026-10-14 15:08:33,562: vrnetlab   	DEBUG writing to serial console: 'exit'
+2026-10-14 15:08:33,862: vrnetlab   	DEBUG writing to serial console: 'interface Ethernet0'
+2026-10-14 15:08:34,162: vrnetlab   	DEBUG writing to serial console: 'description gpu1-eth3'
+2026-10-14 15:08:34,462: vrnetlab   	DEBUG writing to serial console: 'switchport access Vlan 90'
+2026-10-14 15:08:34,763: vrnetlab   	DEBUG writing to serial console: 'no shutdown'
+2026-10-14 15:08:35,063: vrnetlab   	DEBUG writing to serial console: 'exit'
+2026-10-14 15:08:35,363: vrnetlab   	DEBUG writing to serial console: 'interface Ethernet1'
+2026-10-14 15:08:35,663: vrnetlab   	DEBUG writing to serial console: 'description gpu2-eth3'
+2026-10-14 15:08:35,964: vrnetlab   	DEBUG writing to serial console: 'switchport access Vlan 90'
+2026-10-14 15:08:36,264: vrnetlab   	DEBUG writing to serial console: 'no shutdown'
+2026-10-14 15:08:36,564: vrnetlab   	DEBUG writing to serial console: 'exit'
+2026-10-14 15:08:36,864: vrnetlab   	DEBUG writing to serial console: 'interface Ethernet2'
+2026-10-14 15:08:37,165: vrnetlab   	DEBUG writing to serial console: 'description fw-eth3'
+2026-10-14 15:08:37,465: vrnetlab   	DEBUG writing to serial console: 'switchport access Vlan 90'
+2026-10-14 15:08:37,765: vrnetlab   	DEBUG writing to serial console: 'no shutdown'
+2026-10-14 15:08:38,065: vrnetlab   	DEBUG writing to serial console: 'exit'
+2026-10-14 15:08:38,366: vrnetlab   	DEBUG writing to serial console: 'end'
+2026-10-14 15:08:38,666: vrnetlab   	DEBUG writing to serial console: 'end'
+2026-10-14 15:08:38,666: vrnetlab   	INFO waiting for '#' on serial console
+terminal length 0
+oob-sw# configure terminal
+oob-sw(config)# ip vrf mgmt
+end
+configure terminal
+interface Vlan 90
+exit
+interface Ethernet0
+description gpu1-eth3
+switchport access Vlan 90
+no shutdown
+oob-sw(config)# end
+oob-sw# configure terminal
+oob-sw(config)# interface Vlan 90
+exit
+oob-sw(config-if-Vlan90)# exit
+oob-sw(config)# interface Ethernet0
+oob-sw(config-if-Ethernet0)# description gpu1-eth3
+oob-sw(config-if-Ethernet0)# switchport access Vlan 90
+oob-sw(config-if-Ethernet0)# no shutdown
+oob-sw(config-if-Ethernet0)# exit
+oob-sw(config)# interface Ethernet1
+description gpu2-eth3
+oob-sw(config-if-Ethernet1)# description gpu2-eth3
+switchport access Vlan 90
+oob-sw(config-if-Ethernet1)# switchport access Vlan 90
+no shutdown
+oob-sw(config-if-Ethernet1)# no shutdown
+oob-sw(config-if-Ethernet1)# exit
+oob-sw(config)# interface Ethernet2
+oob-sw(config-if-Ethernet2)# description fw-eth3
+oob-sw(config-if-Ethernet2)# switchport access Vlan 90
+oob-sw(config-if-Ethernet2)# no shutdown
+oob-sw(config-if-Ethernet2)# exit
+oob-sw(config)# end
+oob-sw# 2026-10-14 15:08:38,667: vrnetlab   	INFO read from serial console: 'terminal length 0
+oob-sw# configure terminal
+oob-sw(config)# ip vrf mgmt
+end
+configure terminal
+interface Vlan 90
+exit
+interface Ethernet0
+description gpu1-eth3
+switchport access Vlan 90
+no shutdown
+oob-sw(config)# end
+oob-sw# configure terminal
+oob-sw(config)# interface Vlan 90
+exit
+oob-sw(config-if-Vlan90)# exit
+oob-sw(config)# interface Ethernet0
+oob-sw(config-if-Ethernet0)# description gpu1-eth3
+oob-sw(config-if-Ethernet0)# switchport access Vlan 90
+oob-sw(config-if-Ethernet0)# no shutdown
+oob-sw(config-if-Ethernet0)# exit
+oob-sw(config)# interface Ethernet1
+description gpu2-eth3
+oob-sw(config-if-Ethernet1)# description gpu2-eth3
+switchport access Vlan 90
+oob-sw(config-if-Ethernet1)# switchport access Vlan 90
+no shutdown
+oob-sw(config-if-Ethernet1)# no shutdown
+oob-sw(config-if-Ethernet1)# exit
+oob-sw(config)# interface Ethernet2
+oob-sw(config-if-Ethernet2)# description fw-eth3
+oob-sw(config-if-Ethernet2)# switchport access Vlan 90
+oob-sw(config-if-Ethernet2)# no shutdown
+oob-sw(config-if-Ethernet2)# exit
+oob-sw(config)# end
+oob-sw# '
+2026-10-14 15:08:38,667: vrnetlab   	DEBUG writing to serial console: 'write memory'
+2026-10-14 15:08:38,667: vrnetlab   	INFO waiting for '#' on serial console
+end
+         ^
+% Error: Invalid input detected at "^" marker.
+oob-sw# write memory
+2026-10-14 15:08:38,711: vrnetlab   	INFO read from serial console: 'end
+         ^
+% Error: Invalid input detected at "^" marker.
+oob-sw# write memory
+'
+2026-10-14 15:08:38,711: vrnetlab   	DEBUG writing to serial console: 'exit'
+2026-10-14 15:08:38,711: vrnetlab   	INFO waiting for '$' on serial console
+exit
+oob-sw# exit
+admin@oob-sw:~$ 2026-10-14 15:08:39,108: vrnetlab   	INFO read from serial console: 'exit
+oob-sw# exit
+admin@oob-sw:~$ '
+2026-10-14 15:08:39,108: vrnetlab   	DEBUG writing to serial console: 'logout'
+2026-10-14 15:08:39,108: launch     	INFO KLISH startup config applied

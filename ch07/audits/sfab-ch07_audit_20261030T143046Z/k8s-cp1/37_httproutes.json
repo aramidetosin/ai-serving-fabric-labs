@@ -1,0 +1,844 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "gateway.networking.k8s.io/v1",
+            "kind": "HTTPRoute",
+            "metadata": {
+                "creationTimestamp": "2026-10-30T12:34:07Z",
+                "generation": 1,
+                "labels": {
+                    "decision.tarnwick.example/id": "dec-routeset-internal",
+                    "tarnwick.example/audience": "internal"
+                },
+                "name": "echo-gw-internal",
+                "namespace": "echo",
+                "resourceVersion": "2718",
+                "uid": "54c90f04-1b46-4a7e-a9b9-a55228b0af79"
+            },
+            "spec": {
+                "hostnames": [
+                    "llm.ai.tarnwick.example",
+                    "admin.ai.tarnwick.example",
+                    "grafana.ai.tarnwick.example"
+                ],
+                "parentRefs": [
+                    {
+                        "group": "gateway.networking.k8s.io",
+                        "kind": "Gateway",
+                        "name": "gw-internal",
+                        "namespace": "gateways",
+                        "sectionName": "https"
+                    }
+                ],
+                "rules": [
+                    {
+                        "backendRefs": [
+                            {
+                                "group": "",
+                                "kind": "Service",
+                                "name": "echo",
+                                "port": 8080,
+                                "weight": 1
+                            }
+                        ],
+                        "matches": [
+                            {
+                                "path": {
+                                    "type": "PathPrefix",
+                                    "value": "/echo"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            "status": {
+                "parents": [
+                    {
+                        "conditions": [
+                            {
+                                "lastTransitionTime": "2026-10-30T12:34:07Z",
+                                "message": "Accepted HTTPRoute",
+                                "observedGeneration": 1,
+                                "reason": "Accepted",
+                                "status": "True",
+                                "type": "Accepted"
+                            },
+                            {
+                                "lastTransitionTime": "2026-10-30T12:34:07Z",
+                                "message": "Service reference is valid",
+                                "observedGeneration": 1,
+                                "reason": "ResolvedRefs",
+                                "status": "True",
+                                "type": "ResolvedRefs"
+                            }
+                        ],
+                        "controllerName": "io.cilium/gateway-controller",
+                        "parentRef": {
+                            "group": "gateway.networking.k8s.io",
+                            "kind": "Gateway",
+                            "name": "gw-internal",
+                            "namespace": "gateways",
+                            "sectionName": "https"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "gateway.networking.k8s.io/v1",
+            "kind": "HTTPRoute",
+            "metadata": {
+                "creationTimestamp": "2026-10-30T12:34:07Z",
+                "generation": 3,
+                "labels": {
+                    "decision.tarnwick.example/id": "dec-routeset-enterprise",
+                    "tarnwick.example/audience": "enterprise"
+                },
+                "name": "echo-gw-users",
+                "namespace": "echo",
+                "resourceVersion": "28638",
+                "uid": "9cd0a96b-00e7-4aa3-8865-d31d32bf9808"
+            },
+            "spec": {
+                "hostnames": [
+                    "llm.ai.tarnwick.example"
+                ],
+                "parentRefs": [
+                    {
+                        "group": "gateway.networking.k8s.io",
+                        "kind": "Gateway",
+                        "name": "gw-users",
+                        "namespace": "gateways",
+                        "sectionName": "https"
+                    }
+                ],
+                "rules": [
+                    {
+                        "backendRefs": [
+                            {
+                                "group": "",
+                                "kind": "Service",
+                                "name": "echo",
+                                "port": 8080,
+                                "weight": 1
+                            }
+                        ],
+                        "matches": [
+                            {
+                                "path": {
+                                    "type": "PathPrefix",
+                                    "value": "/echo"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            "status": {
+                "parents": [
+                    {
+                        "conditions": [
+                            {
+                                "lastTransitionTime": "2026-10-30T13:52:28Z",
+                                "message": "Accepted HTTPRoute",
+                                "observedGeneration": 3,
+                                "reason": "Accepted",
+                                "status": "True",
+                                "type": "Accepted"
+                            },
+                            {
+                                "lastTransitionTime": "2026-10-30T13:52:28Z",
+                                "message": "Service reference is valid",
+                                "observedGeneration": 3,
+                                "reason": "ResolvedRefs",
+                                "status": "True",
+                                "type": "ResolvedRefs"
+                            }
+                        ],
+                        "controllerName": "io.cilium/gateway-controller",
+                        "parentRef": {
+                            "group": "gateway.networking.k8s.io",
+                            "kind": "Gateway",
+                            "name": "gw-users",
+                            "namespace": "gateways",
+                            "sectionName": "https"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "gateway.networking.k8s.io/v1",
+            "kind": "HTTPRoute",
+            "metadata": {
+                "creationTimestamp": "2026-10-30T12:34:08Z",
+                "generation": 1,
+                "labels": {
+                    "decision.tarnwick.example/id": "dec-routeset-internal",
+                    "tarnwick.example/audience": "internal"
+                },
+                "name": "idp-gw-internal",
+                "namespace": "identity",
+                "resourceVersion": "2756",
+                "uid": "45cbfb88-b089-42a8-af95-b20da49838e8"
+            },
+            "spec": {
+                "hostnames": [
+                    "id.ai.tarnwick.example"
+                ],
+                "parentRefs": [
+                    {
+                        "group": "gateway.networking.k8s.io",
+                        "kind": "Gateway",
+                        "name": "gw-internal",
+                        "namespace": "gateways",
+                        "sectionName": "https"
+                    }
+                ],
+                "rules": [
+                    {
+                        "backendRefs": [
+                            {
+                                "group": "",
+                                "kind": "Service",
+                                "name": "idp",
+                                "port": 5556,
+                                "weight": 1
+                            }
+                        ],
+                        "matches": [
+                            {
+                                "path": {
+                                    "type": "PathPrefix",
+                                    "value": "/"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            "status": {
+                "parents": [
+                    {
+                        "conditions": [
+                            {
+                                "lastTransitionTime": "2026-10-30T12:34:08Z",
+                                "message": "Accepted HTTPRoute",
+                                "observedGeneration": 1,
+                                "reason": "Accepted",
+                                "status": "True",
+                                "type": "Accepted"
+                            },
+                            {
+                                "lastTransitionTime": "2026-10-30T12:34:08Z",
+                                "message": "Service reference is valid",
+                                "observedGeneration": 1,
+                                "reason": "ResolvedRefs",
+                                "status": "True",
+                                "type": "ResolvedRefs"
+                            }
+                        ],
+                        "controllerName": "io.cilium/gateway-controller",
+                        "parentRef": {
+                            "group": "gateway.networking.k8s.io",
+                            "kind": "Gateway",
+                            "name": "gw-internal",
+                            "namespace": "gateways",
+                            "sectionName": "https"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "gateway.networking.k8s.io/v1",
+            "kind": "HTTPRoute",
+            "metadata": {
+                "creationTimestamp": "2026-10-30T12:34:08Z",
+                "generation": 1,
+                "labels": {
+                    "decision.tarnwick.example/id": "dec-routeset-enterprise",
+                    "tarnwick.example/audience": "enterprise"
+                },
+                "name": "idp-gw-users",
+                "namespace": "identity",
+                "resourceVersion": "2762",
+                "uid": "fe27e3a1-e614-4945-b1b5-51df9c0a1895"
+            },
+            "spec": {
+                "hostnames": [
+                    "id.ai.tarnwick.example"
+                ],
+                "parentRefs": [
+                    {
+                        "group": "gateway.networking.k8s.io",
+                        "kind": "Gateway",
+                        "name": "gw-users",
+                        "namespace": "gateways",
+                        "sectionName": "https"
+                    }
+                ],
+                "rules": [
+                    {
+                        "backendRefs": [
+                            {
+                                "group": "",
+                                "kind": "Service",
+                                "name": "idp",
+                                "port": 5556,
+                                "weight": 1
+                            }
+                        ],
+                        "matches": [
+                            {
+                                "path": {
+                                    "type": "PathPrefix",
+                                    "value": "/"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            "status": {
+                "parents": [
+                    {
+                        "conditions": [
+                            {
+                                "lastTransitionTime": "2026-10-30T12:34:08Z",
+                                "message": "Accepted HTTPRoute",
+                                "observedGeneration": 1,
+                                "reason": "Accepted",
+                                "status": "True",
+                                "type": "Accepted"
+                            },
+                            {
+                                "lastTransitionTime": "2026-10-30T12:34:08Z",
+                                "message": "Service reference is valid",
+                                "observedGeneration": 1,
+                                "reason": "ResolvedRefs",
+                                "status": "True",
+                                "type": "ResolvedRefs"
+                            }
+                        ],
+                        "controllerName": "io.cilium/gateway-controller",
+                        "parentRef": {
+                            "group": "gateway.networking.k8s.io",
+                            "kind": "Gateway",
+                            "name": "gw-users",
+                            "namespace": "gateways",
+                            "sectionName": "https"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "gateway.networking.k8s.io/v1",
+            "kind": "HTTPRoute",
+            "metadata": {
+                "creationTimestamp": "2026-10-30T12:39:43Z",
+                "generation": 1,
+                "labels": {
+                    "decision.tarnwick.example/id": "dec-routeset-internal",
+                    "tarnwick.example/audience": "internal"
+                },
+                "name": "models-gw-internal",
+                "namespace": "inference",
+                "resourceVersion": "5265",
+                "uid": "374e3a6b-caba-4ad2-b09d-0792d4c7c090"
+            },
+            "spec": {
+                "hostnames": [
+                    "llm.ai.tarnwick.example"
+                ],
+                "parentRefs": [
+                    {
+                        "group": "gateway.networking.k8s.io",
+                        "kind": "Gateway",
+                        "name": "gw-internal",
+                        "namespace": "gateways",
+                        "sectionName": "https"
+                    }
+                ],
+                "rules": [
+                    {
+                        "backendRefs": [
+                            {
+                                "group": "",
+                                "kind": "Service",
+                                "name": "api-gateway",
+                                "port": 9080,
+                                "weight": 1
+                            }
+                        ],
+                        "matches": [
+                            {
+                                "path": {
+                                    "type": "PathPrefix",
+                                    "value": "/models"
+                                }
+                            }
+                        ],
+                        "timeouts": {
+                            "backendRequest": "620s",
+                            "request": "620s"
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "parents": [
+                    {
+                        "conditions": [
+                            {
+                                "lastTransitionTime": "2026-10-30T12:39:43Z",
+                                "message": "Accepted HTTPRoute",
+                                "observedGeneration": 1,
+                                "reason": "Accepted",
+                                "status": "True",
+                                "type": "Accepted"
+                            },
+                            {
+                                "lastTransitionTime": "2026-10-30T12:39:43Z",
+                                "message": "Service reference is valid",
+                                "observedGeneration": 1,
+                                "reason": "ResolvedRefs",
+                                "status": "True",
+                                "type": "ResolvedRefs"
+                            }
+                        ],
+                        "controllerName": "io.cilium/gateway-controller",
+                        "parentRef": {
+                            "group": "gateway.networking.k8s.io",
+                            "kind": "Gateway",
+                            "name": "gw-internal",
+                            "namespace": "gateways",
+                            "sectionName": "https"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "gateway.networking.k8s.io/v1",
+            "kind": "HTTPRoute",
+            "metadata": {
+                "creationTimestamp": "2026-10-30T12:39:43Z",
+                "generation": 1,
+                "labels": {
+                    "decision.tarnwick.example/id": "dec-routeset-enterprise",
+                    "tarnwick.example/audience": "enterprise"
+                },
+                "name": "models-gw-users",
+                "namespace": "inference",
+                "resourceVersion": "5272",
+                "uid": "368ab2b9-4878-41a0-92a7-e5994deb0ceb"
+            },
+            "spec": {
+                "hostnames": [
+                    "llm.ai.tarnwick.example"
+                ],
+                "parentRefs": [
+                    {
+                        "group": "gateway.networking.k8s.io",
+                        "kind": "Gateway",
+                        "name": "gw-users",
+                        "namespace": "gateways",
+                        "sectionName": "https"
+                    }
+                ],
+                "rules": [
+                    {
+                        "backendRefs": [
+                            {
+                                "group": "",
+                                "kind": "Service",
+                                "name": "api-gateway",
+                                "port": 9080,
+                                "weight": 1
+                            }
+                        ],
+                        "matches": [
+                            {
+                                "path": {
+                                    "type": "PathPrefix",
+                                    "value": "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7"
+                                }
+                            }
+                        ],
+                        "timeouts": {
+                            "backendRequest": "620s",
+                            "request": "620s"
+                        }
+                    },
+                    {
+                        "backendRefs": [
+                            {
+                                "group": "",
+                                "kind": "Service",
+                                "name": "api-gateway",
+                                "port": 9080,
+                                "weight": 1
+                            }
+                        ],
+                        "matches": [
+                            {
+                                "path": {
+                                    "type": "PathPrefix",
+                                    "value": "/models/8242d5c4-9bce-5497-8414-f5bad94fdd84"
+                                }
+                            }
+                        ],
+                        "timeouts": {
+                            "backendRequest": "620s",
+                            "request": "620s"
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "parents": [
+                    {
+                        "conditions": [
+                            {
+                                "lastTransitionTime": "2026-10-30T12:39:43Z",
+                                "message": "Accepted HTTPRoute",
+                                "observedGeneration": 1,
+                                "reason": "Accepted",
+                                "status": "True",
+                                "type": "Accepted"
+                            },
+                            {
+                                "lastTransitionTime": "2026-10-30T12:39:43Z",
+                                "message": "Service reference is valid",
+                                "observedGeneration": 1,
+                                "reason": "ResolvedRefs",
+                                "status": "True",
+                                "type": "ResolvedRefs"
+                            }
+                        ],
+                        "controllerName": "io.cilium/gateway-controller",
+                        "parentRef": {
+                            "group": "gateway.networking.k8s.io",
+                            "kind": "Gateway",
+                            "name": "gw-users",
+                            "namespace": "gateways",
+                            "sectionName": "https"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "gateway.networking.k8s.io/v1",
+            "kind": "HTTPRoute",
+            "metadata": {
+                "annotations": {
+                    "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"gateway.networking.k8s.io/v1\",\"kind\":\"HTTPRoute\",\"metadata\":{\"annotations\":{},\"labels\":{\"app.kubernetes.io/name\":\"serving\"},\"name\":\"serving\",\"namespace\":\"serving\"},\"spec\":{\"hostnames\":[\"serve.ai.tarnwick.example\"],\"parentRefs\":[{\"group\":\"gateway.networking.k8s.io\",\"kind\":\"Gateway\",\"name\":\"gw-internal\",\"namespace\":\"gateways\",\"sectionName\":\"https\"}],\"rules\":[{\"backendRefs\":[{\"name\":\"chat\",\"port\":8080}],\"filters\":[{\"type\":\"URLRewrite\",\"urlRewrite\":{\"path\":{\"replacePrefixMatch\":\"/\",\"type\":\"ReplacePrefixMatch\"}}}],\"matches\":[{\"path\":{\"type\":\"PathPrefix\",\"value\":\"/chat\"}}],\"timeouts\":{\"backendRequest\":\"900s\",\"request\":\"900s\"}},{\"backendRefs\":[{\"name\":\"staff\",\"port\":8080}],\"filters\":[{\"type\":\"URLRewrite\",\"urlRewrite\":{\"path\":{\"replacePrefixMatch\":\"/\",\"type\":\"ReplacePrefixMatch\"}}}],\"matches\":[{\"path\":{\"type\":\"PathPrefix\",\"value\":\"/staff\"}}],\"timeouts\":{\"backendRequest\":\"900s\",\"request\":\"900s\"}},{\"backendRefs\":[{\"name\":\"chat-a\",\"port\":8080}],\"filters\":[{\"type\":\"URLRewrite\",\"urlRewrite\":{\"path\":{\"replacePrefixMatch\":\"/\",\"type\":\"ReplacePrefixMatch\"}}}],\"matches\":[{\"path\":{\"type\":\"PathPrefix\",\"value\":\"/chat-a\"}}],\"timeouts\":{\"backendRequest\":\"900s\",\"request\":\"900s\"}},{\"backendRefs\":[{\"name\":\"chat-b\",\"port\":8080}],\"filters\":[{\"type\":\"URLRewrite\",\"urlRewrite\":{\"path\":{\"replacePrefixMatch\":\"/\",\"type\":\"ReplacePrefixMatch\"}}}],\"matches\":[{\"path\":{\"type\":\"PathPrefix\",\"value\":\"/chat-b\"}}],\"timeouts\":{\"backendRequest\":\"900s\",\"request\":\"900s\"}},{\"backendRefs\":[{\"name\":\"chat-c\",\"port\":8080}],\"filters\":[{\"type\":\"URLRewrite\",\"urlRewrite\":{\"path\":{\"replacePrefixMatch\":\"/\",\"type\":\"ReplacePrefixMatch\"}}}],\"matches\":[{\"path\":{\"type\":\"PathPrefix\",\"value\":\"/chat-c\"}}],\"timeouts\":{\"backendRequest\":\"900s\",\"request\":\"900s\"}},{\"backendRefs\":[{\"name\":\"staff-a\",\"port\":8080}],\"filters\":[{\"type\":\"URLRewrite\",\"urlRewrite\":{\"path\":{\"replacePrefixMatch\":\"/\",\"type\":\"ReplacePrefixMatch\"}}}],\"matches\":[{\"path\":{\"type\":\"PathPrefix\",\"value\":\"/staff-a\"}}],\"timeouts\":{\"backendRequest\":\"900s\",\"request\":\"900s\"}},{\"backendRefs\":[{\"name\":\"staff-b\",\"port\":8080}],\"filters\":[{\"type\":\"URLRewrite\",\"urlRewrite\":{\"path\":{\"replacePrefixMatch\":\"/\",\"type\":\"ReplacePrefixMatch\"}}}],\"matches\":[{\"path\":{\"type\":\"PathPrefix\",\"value\":\"/staff-b\"}}],\"timeouts\":{\"backendRequest\":\"900s\",\"request\":\"900s\"}}]}}\n"
+                },
+                "creationTimestamp": "2026-10-30T12:39:22Z",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/name": "serving"
+                },
+                "name": "serving",
+                "namespace": "serving",
+                "resourceVersion": "5068",
+                "uid": "d221a76c-37d2-4e26-89f4-a96167b37653"
+            },
+            "spec": {
+                "hostnames": [
+                    "serve.ai.tarnwick.example"
+                ],
+                "parentRefs": [
+                    {
+                        "group": "gateway.networking.k8s.io",
+                        "kind": "Gateway",
+                        "name": "gw-internal",
+                        "namespace": "gateways",
+                        "sectionName": "https"
+                    }
+                ],
+                "rules": [
+                    {
+                        "backendRefs": [
+                            {
+                                "group": "",
+                                "kind": "Service",
+                                "name": "chat",
+                                "port": 8080,
+                                "weight": 1
+                            }
+                        ],
+                        "filters": [
+                            {
+                                "type": "URLRewrite",
+                                "urlRewrite": {
+                                    "path": {
+                                        "replacePrefixMatch": "/",
+                                        "type": "ReplacePrefixMatch"
+                                    }
+                                }
+                            }
+                        ],
+                        "matches": [
+                            {
+                                "path": {
+                                    "type": "PathPrefix",
+                                    "value": "/chat"
+                                }
+                            }
+                        ],
+                        "timeouts": {
+                            "backendRequest": "900s",
+                            "request": "900s"
+                        }
+                    },
+                    {
+                        "backendRefs": [
+                            {
+                                "group": "",
+                                "kind": "Service",
+                                "name": "staff",
+                                "port": 8080,
+                                "weight": 1
+                            }
+                        ],
+                        "filters": [
+                            {
+                                "type": "URLRewrite",
+                                "urlRewrite": {
+                                    "path": {
+                                        "replacePrefixMatch": "/",
+                                        "type": "ReplacePrefixMatch"
+                                    }
+                                }
+                            }
+                        ],
+                        "matches": [
+                            {
+                                "path": {
+                                    "type": "PathPrefix",
+                                    "value": "/staff"
+                                }
+                            }
+                        ],
+                        "timeouts": {
+                            "backendRequest": "900s",
+                            "request": "900s"
+                        }
+                    },
+                    {
+                        "backendRefs": [
+                            {
+                                "group": "",
+                                "kind": "Service",
+                                "name": "chat-a",
+                                "port": 8080,
+                                "weight": 1
+                            }
+                        ],
+                        "filters": [
+                            {
+                                "type": "URLRewrite",
+                                "urlRewrite": {
+                                    "path": {
+                                        "replacePrefixMatch": "/",
+                                        "type": "ReplacePrefixMatch"
+                                    }
+                                }
+                            }
+                        ],
+                        "matches": [
+                            {
+                                "path": {
+                                    "type": "PathPrefix",
+                                    "value": "/chat-a"
+                                }
+                            }
+                        ],
+                        "timeouts": {
+                            "backendRequest": "900s",
+                            "request": "900s"
+                        }
+                    },
+                    {
+                        "backendRefs": [
+                            {
+                                "group": "",
+                                "kind": "Service",
+                                "name": "chat-b",
+                                "port": 8080,
+                                "weight": 1
+                            }
+                        ],
+                        "filters": [
+                            {
+                                "type": "URLRewrite",
+                                "urlRewrite": {
+                                    "path": {
+                                        "replacePrefixMatch": "/",
+                                        "type": "ReplacePrefixMatch"
+                                    }
+                                }
+                            }
+                        ],
+                        "matches": [
+                            {
+                                "path": {
+                                    "type": "PathPrefix",
+                                    "value": "/chat-b"
+                                }
+                            }
+                        ],
+                        "timeouts": {
+                            "backendRequest": "900s",
+                            "request": "900s"
+                        }
+                    },
+                    {
+                        "backendRefs": [
+                            {
+                                "group": "",
+                                "kind": "Service",
+                                "name": "chat-c",
+                                "port": 8080,
+                                "weight": 1
+                            }
+                        ],
+                        "filters": [
+                            {
+                                "type": "URLRewrite",
+                                "urlRewrite": {
+                                    "path": {
+                                        "replacePrefixMatch": "/",
+                                        "type": "ReplacePrefixMatch"
+                                    }
+                                }
+                            }
+                        ],
+                        "matches": [
+                            {
+                                "path": {
+                                    "type": "PathPrefix",
+                                    "value": "/chat-c"
+                                }
+                            }
+                        ],
+                        "timeouts": {
+                            "backendRequest": "900s",
+                            "request": "900s"
+                        }
+                    },
+                    {
+                        "backendRefs": [
+                            {
+                                "group": "",
+                                "kind": "Service",
+                                "name": "staff-a",
+                                "port": 8080,
+                                "weight": 1
+                            }
+                        ],
+                        "filters": [
+                            {
+                                "type": "URLRewrite",
+                                "urlRewrite": {
+                                    "path": {
+                                        "replacePrefixMatch": "/",
+                                        "type": "ReplacePrefixMatch"
+                                    }
+                                }
+                            }
+                        ],
+                        "matches": [
+                            {
+                                "path": {
+                                    "type": "PathPrefix",
+                                    "value": "/staff-a"
+                                }
+                            }
+                        ],
+                        "timeouts": {
+                            "backendRequest": "900s",
+                            "request": "900s"
+                        }
+                    },
+                    {
+                        "backendRefs": [
+                            {
+                                "group": "",
+                                "kind": "Service",
+                                "name": "staff-b",
+                                "port": 8080,
+                                "weight": 1
+                            }
+                        ],
+                        "filters": [
+                            {
+                                "type": "URLRewrite",
+                                "urlRewrite": {
+                                    "path": {
+                                        "replacePrefixMatch": "/",
+                                        "type": "ReplacePrefixMatch"
+                                    }
+                                }
+                            }
+                        ],
+                        "matches": [
+                            {
+                                "path": {
+                                    "type": "PathPrefix",
+                                    "value": "/staff-b"
+                                }
+                            }
+                        ],
+                        "timeouts": {
+                            "backendRequest": "900s",
+                            "request": "900s"
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "parents": [
+                    {
+                        "conditions": [
+                            {
+                                "lastTransitionTime": "2026-10-30T12:39:22Z",
+                                "message": "Accepted HTTPRoute",
+                                "observedGeneration": 1,
+                                "reason": "Accepted",
+                                "status": "True",
+                                "type": "Accepted"
+                            },
+                            {
+                                "lastTransitionTime": "2026-10-30T12:39:22Z",
+                                "message": "Service reference is valid",
+                                "observedGeneration": 1,
+                                "reason": "ResolvedRefs",
+                                "status": "True",
+                                "type": "ResolvedRefs"
+                            }
+                        ],
+                        "controllerName": "io.cilium/gateway-controller",
+                        "parentRef": {
+                            "group": "gateway.networking.k8s.io",
+                            "kind": "Gateway",
+                            "name": "gw-internal",
+                            "namespace": "gateways",
+                            "sectionName": "https"
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

@@ -1,0 +1,210 @@
+repostate: 1 of 1483 files differ from the stamp; the tree is not the stamped one
+== collect (2026-10-29T00:17:44Z, 5 nodes, quick)
+  PASS  collect rail-sw1: 17 of 17 commands saved
+  PASS  collect oob-sw: 16 of 16 commands saved
+  PASS  collect rail-sw2: 17 of 17 commands saved
+  PASS  collect fe-sw2: 22 of 22 commands saved
+  PASS  collect fe-sw1: 22 of 22 commands saved
+  PASS  collect fe-sw1: 22 of 22 commands saved
+  PASS  collect fe-sw2: 22 of 22 commands saved
+  PASS  collect oob-sw: 16 of 16 commands saved
+  PASS  collect rail-sw1: 17 of 17 commands saved
+  PASS  collect rail-sw2: 17 of 17 commands saved
+== fe-sw1: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 13
+  PASS  CLAB_MGMT_PASSTHROUGH is true
+  PASS  data NICs inside the switch VM: 13
+  PASS  GRO, rx-gro-hw and LRO off on all 13 data NICs
+  PASS  IPv6 off on the container's 5 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (84 of 84 rendered lines present)
+== fe-sw2: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 13
+  PASS  CLAB_MGMT_PASSTHROUGH is true
+  PASS  data NICs inside the switch VM: 13
+  PASS  GRO, rx-gro-hw and LRO off on all 13 data NICs
+  PASS  IPv6 off on the container's 5 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (84 of 84 rendered lines present)
+== oob-sw: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 2
+  PASS  data NICs inside the switch VM: 2
+  PASS  GRO, rx-gro-hw and LRO off on all 2 data NICs
+  PASS  IPv6 off on the container's 2 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (10 of 10 rendered lines present)
+== rail-sw1: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 8
+  PASS  data NICs inside the switch VM: 8
+  PASS  GRO, rx-gro-hw and LRO off on all 8 data NICs
+  PASS  IPv6 off on the container's 8 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (86 of 86 rendered lines present)
+== rail-sw2: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 8
+  PASS  data NICs inside the switch VM: 8
+  PASS  GRO, rx-gro-hw and LRO off on all 8 data NICs
+  PASS  IPv6 off on the container's 8 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (86 of 86 rendered lines present)
+== fe-sw1: VLAN membership
+  PASS  Vlan100: PortChannel1(T),PortChannel21(A),PortChannel22(A)
+  PASS  Vlan110: PortChannel1(T)
+  PASS  Vlan120: PortChannel1(T),PortChannel21(T),PortChannel22(T)
+  PASS  Vlan130: PortChannel1(T)
+  PASS  Vlan131: PortChannel1(T)
+  PASS  Vlan200: PortChannel1(T)
+  PASS  Vlan300: PortChannel1(T)
+  PASS  Vlan3966: PortChannel1(T)
+  PASS  no VLAN outside the render
+== fe-sw2: VLAN membership
+  PASS  Vlan100: PortChannel1(T),PortChannel21(A),PortChannel22(A)
+  PASS  Vlan110: PortChannel1(T)
+  PASS  Vlan120: PortChannel1(T),PortChannel21(T),PortChannel22(T)
+  PASS  Vlan130: PortChannel1(T)
+  PASS  Vlan131: PortChannel1(T)
+  PASS  Vlan200: PortChannel1(T)
+  PASS  Vlan300: PortChannel1(T)
+  PASS  Vlan3966: PortChannel1(T)
+  PASS  no VLAN outside the render
+== oob-sw: VLAN membership
+  PASS  Vlan90: Ethernet0(A),Ethernet1(A)
+  PASS  no VLAN outside the render
+== rail-sw1: VLAN membership
+  PASS  Vlan101: Ethernet0(A),Ethernet4(A)
+  PASS  Vlan103: Ethernet1(A),Ethernet5(A)
+  PASS  Vlan105: Ethernet2(A),Ethernet6(A)
+  PASS  Vlan107: Ethernet3(A),Ethernet7(A)
+  PASS  no VLAN outside the render
+== rail-sw2: VLAN membership
+  PASS  Vlan102: Ethernet0(A),Ethernet4(A)
+  PASS  Vlan104: Ethernet1(A),Ethernet5(A)
+  PASS  Vlan106: Ethernet2(A),Ethernet6(A)
+  PASS  Vlan108: Ethernet3(A),Ethernet7(A)
+  PASS  no VLAN outside the render
+== fe-sw1: MAC table
+  PASS  MAC table holds host MACs only (4 entries; 0 VLAN 1 or container veth entries set aside; 1 on PortChannel1 in Vlan3966, the partner's backup keepalive)
+== fe-sw2: MAC table
+  PASS  MAC table holds host MACs only (4 entries; 0 VLAN 1 or container veth entries set aside; 1 on PortChannel1 in Vlan3966, the partner's backup keepalive)
+== oob-sw: MAC table
+  PASS  MAC table holds host MACs only (0 entries; 0 VLAN 1 or container veth entries set aside)
+== rail-sw1: MAC table
+  PASS  MAC table holds host MACs only (16 entries; 8 VLAN 1 or container veth entries set aside)
+== rail-sw2: MAC table
+  PASS  MAC table holds host MACs only (16 entries; 0 VLAN 1 or container veth entries set aside)
+== fe-sw1: forwarding only
+  PASS  show ip interfaces lists only Management0 and the keepalive addresses (Ethernet12,Management0,Vlan3966)
+  PASS  Ethernet12 holds 10.20.255.0/31 in VRF VrfMclagKa
+  PASS  Vlan3966 holds 10.20.255.4/31 in VRF VrfMclagKa
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route (the default table) prints nothing
+  PASS  VRF VrfMclagKa holds only its connected keepalive /31s
+  PASS  no router line in the running configuration
+  PASS  no address on any served VLAN's interface Vlan block (only Vlan3966, the backup keepalive)
+  PASS  no address on any PortChannel or host port (only Ethernet12, the keepalive link)
+  PASS  Vlan3966 is in VRF VrfMclagKa
+  PASS  Ethernet12 is in VRF VrfMclagKa
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev but the keepalive addresses (Ethernet12 10.20.255.0/31, Vlan3966 10.20.255.4/31; lo-m, docker-mgmt, redirect, docker0 set aside)
+== fe-sw2: forwarding only
+  PASS  show ip interfaces lists only Management0 and the keepalive addresses (Ethernet12,Management0,Vlan3966)
+  PASS  Ethernet12 holds 10.20.255.1/31 in VRF VrfMclagKa
+  PASS  Vlan3966 holds 10.20.255.5/31 in VRF VrfMclagKa
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route (the default table) prints nothing
+  PASS  VRF VrfMclagKa holds only its connected keepalive /31s
+  PASS  no router line in the running configuration
+  PASS  no address on any served VLAN's interface Vlan block (only Vlan3966, the backup keepalive)
+  PASS  no address on any PortChannel or host port (only Ethernet12, the keepalive link)
+  PASS  Vlan3966 is in VRF VrfMclagKa
+  PASS  Ethernet12 is in VRF VrfMclagKa
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev but the keepalive addresses (Ethernet12 10.20.255.1/31, Vlan3966 10.20.255.5/31; lo-m, docker-mgmt, redirect, docker0 set aside)
+== rail-sw1: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route (the default table) prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any served VLAN's interface Vlan block
+  PASS  no address on any PortChannel or host port
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== rail-sw2: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route (the default table) prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any served VLAN's interface Vlan block
+  PASS  no address on any PortChannel or host port
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== oob-sw: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route (the default table) prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any served VLAN's interface Vlan block
+  PASS  no address on any PortChannel or host port
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== pair fe-sw1 fe-sw2
+  PASS  fe-sw1: MCLAG domain
+  PASS  fe-sw1: session up
+  PASS  fe-sw1: peer link up
+  PASS  fe-sw1: peer link PortChannel1
+  PASS  fe-sw1: keepalive in VRF VrfMclagKa
+  PASS  fe-sw1: keepalive source is its address on the keepalive link Ethernet12, 10.20.255.0
+  PASS  fe-sw1: keepalive peer is 10.20.255.1
+  PASS  fe-sw1: backup keepalive session up on Vlan3966, 10.20.255.4 to 10.20.255.5 in VRF VrfMclagKa
+  PASS  fe-sw1: mclag-system-mac 02:5a:00:00:00:01
+  PASS  fe-sw1: MLAG interface PortChannel21 up/up
+  PASS  fe-sw1: MLAG interface PortChannel22 up/up
+  PASS  fe-sw1: PortChannel1 up with Ethernet0,Ethernet1
+  PASS  fe-sw1: PortChannel21 up with Ethernet6
+  PASS  fe-sw1: PortChannel22 up with Ethernet7
+  PASS  fe-sw2: MCLAG domain
+  PASS  fe-sw2: session up
+  PASS  fe-sw2: peer link up
+  PASS  fe-sw2: peer link PortChannel1
+  PASS  fe-sw2: keepalive in VRF VrfMclagKa
+  PASS  fe-sw2: keepalive source is its address on the keepalive link Ethernet12, 10.20.255.1
+  PASS  fe-sw2: keepalive peer is 10.20.255.0
+  PASS  fe-sw2: backup keepalive session up on Vlan3966, 10.20.255.5 to 10.20.255.4 in VRF VrfMclagKa
+  PASS  fe-sw2: mclag-system-mac 02:5a:00:00:00:01
+  PASS  fe-sw2: MLAG interface PortChannel21 up/up
+  PASS  fe-sw2: MLAG interface PortChannel22 up/up
+  PASS  fe-sw2: PortChannel1 up with Ethernet0,Ethernet1
+  PASS  fe-sw2: PortChannel21 up with Ethernet6
+  PASS  fe-sw2: PortChannel22 up with Ethernet7
+  PASS  roles: one active, one standby
+== rail-sw1: the rail backend's absences (chapter 5)
+  PASS  rails 1, 3, 5, 7 are VLANs 101, 103, 105, 107, one interface Vlan block each
+  PASS  no VLAN interface address: none of the 4 interface Vlan blocks holds an ip, ipv6 or anycast address line
+  PASS  show ip interfaces lists no Vlan interface
+  PASS  no gateway: no static route in the running configuration, and show ip route (the default VRF) prints nothing
+  PASS  no router bgp: neither the KLISH running configuration nor FRR's own view holds a router bgp line
+  PASS  only Management0 in the mgmt VRF, and no interface in any other VRF
+  PASS  no inter-switch link: only the 8 rendered GPU access ports are up, and the other 48 ports are admin down
+  PASS  each up port's description names the GPU NIC the render cables there
+  PASS  the 8 rail ports at MTU 9216 as rendered (the l2 policy's port MTU), above the GPU NICs' 9000
+  PASS  every MAC learned on a rail port is a GPU NIC or relay macvlan the render cables to that port (16 entries)
+  PASS  every rail port runs no shutdown (the factory profile leaves all ports admin down), and each mtu line the render types is the rendered port MTU
+== rail-sw2: the rail backend's absences (chapter 5)
+  PASS  rails 2, 4, 6, 8 are VLANs 102, 104, 106, 108, one interface Vlan block each
+  PASS  no VLAN interface address: none of the 4 interface Vlan blocks holds an ip, ipv6 or anycast address line
+  PASS  show ip interfaces lists no Vlan interface
+  PASS  no gateway: no static route in the running configuration, and show ip route (the default VRF) prints nothing
+  PASS  no router bgp: neither the KLISH running configuration nor FRR's own view holds a router bgp line
+  PASS  only Management0 in the mgmt VRF, and no interface in any other VRF
+  PASS  no inter-switch link: only the 8 rendered GPU access ports are up, and the other 48 ports are admin down
+  PASS  each up port's description names the GPU NIC the render cables there
+  PASS  the 8 rail ports at MTU 9216 as rendered (the l2 policy's port MTU), above the GPU NICs' 9000
+  PASS  every MAC learned on a rail port is a GPU NIC or relay macvlan the render cables to that port (16 entries)
+  PASS  every rail port runs no shutdown (the factory profile leaves all ports admin down), and each mtu line the render types is the rendered port MTU
+== RESULT: 178 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+== result set: ch05/state/run/sets/sfab-ch05_audit_20261029T001744Z

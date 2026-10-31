@@ -1,0 +1,257 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "tarnwick.example/config": "ca85d1ed5b68a31f"
+                },
+                "creationTimestamp": "2026-10-29T19:34:30Z",
+                "generateName": "idp-dcb87bd58-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/name": "idp",
+                    "pod-template-hash": "dcb87bd58"
+                },
+                "name": "idp-dcb87bd58-6bdjd",
+                "namespace": "identity",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "ReplicaSet",
+                        "name": "idp-dcb87bd58",
+                        "uid": "47dbd38a-19cc-4fe8-a9fe-25ba57ec14ce"
+                    }
+                ],
+                "resourceVersion": "1956",
+                "uid": "bb06c737-e6e3-4803-b8dd-991d66fa82fd"
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "dex",
+                            "serve",
+                            "/etc/dex/config.yaml"
+                        ],
+                        "envFrom": [
+                            {
+                                "secretRef": {
+                                    "name": "idp-credentials"
+                                }
+                            }
+                        ],
+                        "image": "docker.io/dexidp/dex@sha256:fd4ab5d117005b927433133f1d7db7cc30fbb537c377912b75b349edff47df01",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "dex",
+                        "ports": [
+                            {
+                                "containerPort": 5556,
+                                "name": "http",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": "http",
+                                "scheme": "HTTP"
+                            },
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {
+                            "limits": {
+                                "memory": "192Mi"
+                            },
+                            "requests": {
+                                "cpu": "20m",
+                                "memory": "48Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "readOnlyRootFilesystem": true
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/etc/dex",
+                                "name": "config",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": false,
+                "nodeName": "k8s-ingress2",
+                "nodeSelector": {
+                    "node-role.tarnwick.example/ingress": ""
+                },
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "runAsGroup": 1001,
+                    "runAsNonRoot": true,
+                    "runAsUser": 1001,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoSchedule",
+                        "key": "node-role.tarnwick.example/ingress",
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "configMap": {
+                            "defaultMode": 420,
+                            "name": "idp-config"
+                        },
+                        "name": "config"
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-29T19:34:53Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-29T19:34:30Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-29T19:34:53Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-29T19:34:53Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-29T19:34:30Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "20m",
+                            "memory": "48Mi"
+                        },
+                        "containerID": "containerd://e99145b17ebdd19bac07db621c9ba01a9db35185fed4656edd9b72907345cf26",
+                        "image": "sha256:6cf078c8f1b771c0447a0c79bb9d4973908199eef37eb2ada921afbeae31a506",
+                        "imageID": "docker.io/dexidp/dex@sha256:fd4ab5d117005b927433133f1d7db7cc30fbb537c377912b75b349edff47df01",
+                        "lastState": {},
+                        "name": "dex",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "memory": "192Mi"
+                            },
+                            "requests": {
+                                "cpu": "20m",
+                                "memory": "48Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-29T19:34:53Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 1001,
+                                "supplementalGroups": [
+                                    1001
+                                ],
+                                "uid": 1001
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/etc/dex",
+                                "name": "config",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "10.20.1.32",
+                "hostIPs": [
+                    {
+                        "ip": "10.20.1.32"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.22.1.194",
+                "podIPs": [
+                    {
+                        "ip": "10.22.1.194"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-10-29T19:34:30Z"
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

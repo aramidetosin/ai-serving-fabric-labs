@@ -1,0 +1,13 @@
+; sfab-ch07 dns-res2, zone the root: rendered from spec/profile-a.yaml by render/dns.py; edit the spec and run make render
+; The lab has no way out: this resolver is authoritative for an empty root, so a name outside
+; the platform's zone gets NXDOMAIN at once and no query leaves the lab.
+$ORIGIN .
+$TTL 300
+@ IN SOA dns-res2.ai.tarnwick.example. hostmaster.ai.tarnwick.example. (
+    1918813926 ; serial, from the zone's data
+    3600 ; refresh
+    600 ; retry
+    86400 ; expire
+    60 ) ; negative answers
+@                             IN NS  dns-res2.ai.tarnwick.example.
+dns-res2.ai.tarnwick.example. IN A   10.20.14.21 ; name server

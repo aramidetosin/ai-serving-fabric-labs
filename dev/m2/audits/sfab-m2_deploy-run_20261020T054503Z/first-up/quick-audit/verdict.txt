@@ -1,0 +1,188 @@
+== collect (2026-10-20T06:08:32Z, 7 nodes, quick)
+  PASS  collect fe-sw1: 16 of 16 commands saved
+  PASS  collect fe-sw2: 16 of 16 commands saved
+  PASS  collect oob-sw: 14 of 14 commands saved
+  PASS  collect rail-sw1: 14 of 14 commands saved
+  PASS  collect rail-sw2: 14 of 14 commands saved
+  PASS  collect fw: 9 of 9 commands saved
+  PASS  collect bastion: 1 of 1 commands saved
+== fe-sw1: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 12
+  PASS  CLAB_MGMT_PASSTHROUGH is true
+  PASS  data NICs inside the switch VM: 12
+  PASS  GRO, rx-gro-hw and LRO off on all 12 data NICs
+  PASS  IPv6 off on the container's 12 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (113 of 113 rendered lines present)
+== fe-sw2: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 11
+  PASS  CLAB_MGMT_PASSTHROUGH is true
+  PASS  data NICs inside the switch VM: 11
+  PASS  GRO, rx-gro-hw and LRO off on all 11 data NICs
+  PASS  IPv6 off on the container's 11 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (109 of 109 rendered lines present)
+== oob-sw: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 7
+  PASS  data NICs inside the switch VM: 7
+  PASS  GRO, rx-gro-hw and LRO off on all 7 data NICs
+  PASS  IPv6 off on the container's 7 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (30 of 30 rendered lines present)
+== rail-sw1: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 8
+  PASS  data NICs inside the switch VM: 8
+  PASS  GRO, rx-gro-hw and LRO off on all 8 data NICs
+  PASS  IPv6 off on the container's 8 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (37 of 37 rendered lines present)
+== rail-sw2: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 8
+  PASS  data NICs inside the switch VM: 8
+  PASS  GRO, rx-gro-hw and LRO off on all 8 data NICs
+  PASS  IPv6 off on the container's 8 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (37 of 37 rendered lines present)
+== fe-sw1: VLAN membership
+  PASS  Vlan100: PortChannel1(T),PortChannel10(T),PortChannel11(A),PortChannel12(A),PortChannel13(A),PortChannel21(A),PortChannel22(A),PortChannel31(A)
+  PASS  Vlan200: Ethernet11(A),PortChannel1(T),PortChannel10(T)
+  PASS  Vlan300: PortChannel1(T),PortChannel10(T),PortChannel30(A)
+  PASS  no VLAN outside the render
+== fe-sw2: VLAN membership
+  PASS  Vlan100: PortChannel1(T),PortChannel10(T),PortChannel11(A),PortChannel12(A),PortChannel13(A),PortChannel21(A),PortChannel22(A),PortChannel31(A)
+  PASS  Vlan200: PortChannel1(T),PortChannel10(T)
+  PASS  Vlan300: PortChannel1(T),PortChannel10(T),PortChannel30(A)
+  PASS  no VLAN outside the render
+== oob-sw: VLAN membership
+  PASS  Vlan90: Ethernet0(A),Ethernet1(A),Ethernet2(A),Ethernet3(A),Ethernet4(A),Ethernet5(A),Ethernet6(A)
+  PASS  no VLAN outside the render
+== rail-sw1: VLAN membership
+  PASS  Vlan101: Ethernet0(A),Ethernet4(A)
+  PASS  Vlan103: Ethernet1(A),Ethernet5(A)
+  PASS  Vlan105: Ethernet2(A),Ethernet6(A)
+  PASS  Vlan107: Ethernet3(A),Ethernet7(A)
+  PASS  no VLAN outside the render
+== rail-sw2: VLAN membership
+  PASS  Vlan102: Ethernet0(A),Ethernet4(A)
+  PASS  Vlan104: Ethernet1(A),Ethernet5(A)
+  PASS  Vlan106: Ethernet2(A),Ethernet6(A)
+  PASS  Vlan108: Ethernet3(A),Ethernet7(A)
+  PASS  no VLAN outside the render
+== fe-sw1: MAC table
+  FAIL  MAC table holds host MACs only (21 entries; 2 VLAN 1 or container veth entries set aside) -> 00:60:08:69:97:ef on PortChannel12 (Vlan100); 00:60:08:69:97:ef on PortChannel30 (Vlan300); aa:c1:ab:4d:33:d2 on PortChannel30 (Vlan300)
+== fe-sw2: MAC table
+  FAIL  MAC table holds host MACs only (21 entries; 2 VLAN 1 or container veth entries set aside) -> 00:60:08:69:97:ef on PortChannel12 (Vlan100); aa:c1:ab:1a:16:f0 on PortChannel1 (Vlan200); 00:60:08:69:97:ef on PortChannel30 (Vlan300); aa:c1:ab:4d:33:d2 on PortChannel30 (Vlan300)
+== oob-sw: MAC table
+  PASS  MAC table holds host MACs only (5 entries; 2 VLAN 1 or container veth entries set aside)
+== rail-sw1: MAC table
+  PASS  MAC table holds host MACs only (16 entries; 0 VLAN 1 or container veth entries set aside)
+== rail-sw2: MAC table
+  PASS  MAC table holds host MACs only (16 entries; 0 VLAN 1 or container veth entries set aside)
+== fw: firewall
+  PASS  commit marker present
+  PASS  delivered /config/startup-config.cfg matches the render byte for byte
+  PASS  enforced.txt present (195 lines)
+  PASS  all 195 enforced lines in the set-format running configuration
+  PASS  ethernet1/1 and ethernet1/2 in the aggregate (bundled, current, selected)
+  PASS  LACP partner is the pair's mclag-system-mac 02:5a:00:00:00:01
+  PASS  ae1.100 up: tag 100, 10.20.1.1/24, zone data, on ae1 which is up
+  PASS  ae1.200 up: tag 200, 10.20.2.1/24, zone stor-mgmt, on ae1 which is up
+  PASS  ae1.300 up: tag 300, 10.20.3.1/24, zone bastion, on ae1 which is up
+== fe-sw1: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any interface Vlan block
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== fe-sw2: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any interface Vlan block
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== rail-sw1: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any interface Vlan block
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== rail-sw2: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any interface Vlan block
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== oob-sw: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any interface Vlan block
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== pair fe-sw1 fe-sw2
+  PASS  fe-sw1: MCLAG domain
+  PASS  fe-sw1: session up
+  PASS  fe-sw1: peer link up
+  PASS  fe-sw1: peer link PortChannel1
+  PASS  fe-sw1: keepalive in VRF mgmt
+  PASS  fe-sw1: keepalive source is the passthrough address 172.21.40.11
+  PASS  fe-sw1: keepalive peer is 172.21.40.12
+  PASS  fe-sw1: mclag-system-mac 02:5a:00:00:00:01
+  PASS  fe-sw1: MLAG interface PortChannel10 up/up
+  PASS  fe-sw1: MLAG interface PortChannel11 up/up
+  PASS  fe-sw1: MLAG interface PortChannel12 up/up
+  PASS  fe-sw1: MLAG interface PortChannel13 up/up
+  PASS  fe-sw1: MLAG interface PortChannel21 up/up
+  PASS  fe-sw1: MLAG interface PortChannel22 up/up
+  PASS  fe-sw1: MLAG interface PortChannel30 up/up
+  PASS  fe-sw1: MLAG interface PortChannel31 up/up
+  PASS  fe-sw1: PortChannel1 up with Ethernet0,Ethernet1
+  PASS  fe-sw1: PortChannel10 up with Ethernet2
+  PASS  fe-sw1: PortChannel11 up with Ethernet3
+  PASS  fe-sw1: PortChannel12 up with Ethernet4
+  PASS  fe-sw1: PortChannel13 up with Ethernet5
+  PASS  fe-sw1: PortChannel21 up with Ethernet6
+  PASS  fe-sw1: PortChannel22 up with Ethernet7
+  PASS  fe-sw1: PortChannel30 up with Ethernet8
+  PASS  fe-sw1: PortChannel31 up with Ethernet9,Ethernet10
+  PASS  fe-sw2: MCLAG domain
+  PASS  fe-sw2: session up
+  PASS  fe-sw2: peer link up
+  PASS  fe-sw2: peer link PortChannel1
+  PASS  fe-sw2: keepalive in VRF mgmt
+  PASS  fe-sw2: keepalive source is the passthrough address 172.21.40.12
+  PASS  fe-sw2: keepalive peer is 172.21.40.11
+  PASS  fe-sw2: mclag-system-mac 02:5a:00:00:00:01
+  PASS  fe-sw2: MLAG interface PortChannel10 up/up
+  PASS  fe-sw2: MLAG interface PortChannel11 up/up
+  PASS  fe-sw2: MLAG interface PortChannel12 up/up
+  PASS  fe-sw2: MLAG interface PortChannel13 up/up
+  PASS  fe-sw2: MLAG interface PortChannel21 up/up
+  PASS  fe-sw2: MLAG interface PortChannel22 up/up
+  PASS  fe-sw2: MLAG interface PortChannel30 up/up
+  PASS  fe-sw2: MLAG interface PortChannel31 up/up
+  PASS  fe-sw2: PortChannel1 up with Ethernet0,Ethernet1
+  PASS  fe-sw2: PortChannel10 up with Ethernet2
+  PASS  fe-sw2: PortChannel11 up with Ethernet3
+  PASS  fe-sw2: PortChannel12 up with Ethernet4
+  PASS  fe-sw2: PortChannel13 up with Ethernet5
+  PASS  fe-sw2: PortChannel21 up with Ethernet6
+  PASS  fe-sw2: PortChannel22 up with Ethernet7
+  PASS  fe-sw2: PortChannel30 up with Ethernet8
+  PASS  fe-sw2: PortChannel31 up with Ethernet9,Ethernet10
+  PASS  roles: one active, one standby
+== RESULT: 162 passed, 2 failed, 0 known platform limitation(s), 0 skipped

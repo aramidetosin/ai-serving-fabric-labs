@@ -1,0 +1,116 @@
+### 2026-10-29T00:20:14Z k8s-gpu2 guest
++ ip -n gpu2 route get 10.21.1.11 from 10.21.2.12
+10.21.1.11 from 10.21.2.12 via 10.21.250.1 dev relay uid 0 
+    cache 
+
+### 2026-10-29T00:20:15Z k8s-gpu2 guest
++ ip netns exec gpu2 sysctl net.ipv4.conf.all.rp_filter net.ipv4.conf.default.rp_filter net.ipv4.conf.rail2.rp_filter net.ipv4.conf.relay.rp_filter
+net.ipv4.conf.all.rp_filter = 2
+net.ipv4.conf.default.rp_filter = 2
+net.ipv4.conf.rail2.rp_filter = 2
+net.ipv4.conf.relay.rp_filter = 2
+
+### 2026-10-29T00:20:15Z k8s-gpu2 guest
++ ip netns exec gpu2 sysctl net.ipv4.conf.all.rp_filter net.ipv4.conf.default.rp_filter net.ipv4.conf.rail2.rp_filter net.ipv4.conf.relay.rp_filter
+net.ipv4.conf.all.rp_filter = 2
+net.ipv4.conf.default.rp_filter = 2
+net.ipv4.conf.rail2.rp_filter = 2
+net.ipv4.conf.relay.rp_filter = 2
+
+### 2026-10-29T00:20:15Z k8s-gpu2 guest
++ ip netns exec gpu2 nstat -asz TcpExtIPReversePathFilter
+#kernel
+TcpExtIPReversePathFilter       0                  0.0
+
+### 2026-10-29T00:20:16Z k8s-gpu1 guest
++ ip netns exec gpu1 ping -q -c 3 -i 0.2 -W 1 10.21.2.12
+PING 10.21.2.12 (10.21.2.12) 56(84) bytes of data.
+
+--- 10.21.2.12 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 409ms
+rtt min/avg/max/mdev = 0.609/0.629/0.666/0.025 ms
+
+### 2026-10-29T00:20:16Z k8s-gpu2 guest
++ ip netns exec gpu2 nstat -asz TcpExtIPReversePathFilter
+#kernel
+TcpExtIPReversePathFilter       0                  0.0
+
+### 2026-10-29T00:20:16Z k8s-gpu2 guest
++ ip netns exec gpu2 sysctl -w net.ipv4.conf.all.rp_filter=1 net.ipv4.conf.rail2.rp_filter=0
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.rail2.rp_filter = 0
+
+### 2026-10-29T00:20:16Z k8s-gpu2 guest
++ ip netns exec gpu2 sysctl net.ipv4.conf.all.rp_filter net.ipv4.conf.default.rp_filter net.ipv4.conf.rail2.rp_filter net.ipv4.conf.relay.rp_filter
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.default.rp_filter = 2
+net.ipv4.conf.rail2.rp_filter = 0
+net.ipv4.conf.relay.rp_filter = 2
+
+### 2026-10-29T00:20:17Z k8s-gpu2 guest
++ ip netns exec gpu2 nstat -asz TcpExtIPReversePathFilter
+#kernel
+TcpExtIPReversePathFilter       0                  0.0
+
+### 2026-10-29T00:20:18Z k8s-gpu1 guest
++ ip netns exec gpu1 ping -q -c 3 -i 0.2 -W 1 10.21.2.12
+PING 10.21.2.12 (10.21.2.12) 56(84) bytes of data.
+
+--- 10.21.2.12 ping statistics ---
+3 packets transmitted, 0 received, 100% packet loss, time 414ms
+
+### 2026-10-29T00:20:18Z k8s-gpu2 guest
++ ip netns exec gpu2 nstat -asz TcpExtIPReversePathFilter
+#kernel
+TcpExtIPReversePathFilter       3                  0.0
+
+### 2026-10-29T00:20:19Z k8s-gpu2 guest
++ ip netns exec gpu2 sysctl -w net.ipv4.conf.all.rp_filter=1 net.ipv4.conf.rail2.rp_filter=2
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.rail2.rp_filter = 2
+
+### 2026-10-29T00:20:19Z k8s-gpu2 guest
++ ip netns exec gpu2 sysctl net.ipv4.conf.all.rp_filter net.ipv4.conf.default.rp_filter net.ipv4.conf.rail2.rp_filter net.ipv4.conf.relay.rp_filter
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.default.rp_filter = 2
+net.ipv4.conf.rail2.rp_filter = 2
+net.ipv4.conf.relay.rp_filter = 2
+
+### 2026-10-29T00:20:19Z k8s-gpu2 guest
++ ip netns exec gpu2 nstat -asz TcpExtIPReversePathFilter
+#kernel
+TcpExtIPReversePathFilter       3                  0.0
+
+### 2026-10-29T00:20:20Z k8s-gpu1 guest
++ ip netns exec gpu1 ping -q -c 3 -i 0.2 -W 1 10.21.2.12
+PING 10.21.2.12 (10.21.2.12) 56(84) bytes of data.
+
+--- 10.21.2.12 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 414ms
+rtt min/avg/max/mdev = 0.615/0.726/0.858/0.100 ms
+
+### 2026-10-29T00:20:20Z k8s-gpu2 guest
++ ip netns exec gpu2 nstat -asz TcpExtIPReversePathFilter
+#kernel
+TcpExtIPReversePathFilter       3                  0.0
+
+### 2026-10-29T00:20:20Z k8s-gpu2 guest
++ ip netns exec gpu2 sysctl -w net.ipv4.conf.all.rp_filter=2 net.ipv4.conf.rail2.rp_filter=2
+net.ipv4.conf.all.rp_filter = 2
+net.ipv4.conf.rail2.rp_filter = 2
+
+### 2026-10-29T00:20:20Z k8s-gpu2 guest
++ ip netns exec gpu2 sysctl net.ipv4.conf.all.rp_filter net.ipv4.conf.default.rp_filter net.ipv4.conf.rail2.rp_filter net.ipv4.conf.relay.rp_filter
+net.ipv4.conf.all.rp_filter = 2
+net.ipv4.conf.default.rp_filter = 2
+net.ipv4.conf.rail2.rp_filter = 2
+net.ipv4.conf.relay.rp_filter = 2
+
+### 2026-10-29T00:20:21Z k8s-gpu1 guest
++ ip netns exec gpu1 ping -q -c 3 -i 0.2 -W 1 10.21.2.12
+PING 10.21.2.12 (10.21.2.12) 56(84) bytes of data.
+
+--- 10.21.2.12 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 409ms
+rtt min/avg/max/mdev = 0.710/0.741/0.782/0.030 ms
+

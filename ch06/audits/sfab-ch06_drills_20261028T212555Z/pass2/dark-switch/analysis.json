@@ -1,0 +1,265 @@
+{
+  "dead_copies": [
+    "chat-c"
+  ],
+  "drill": "dark-switch",
+  "in_node": [
+    "chat-a",
+    "staff-b"
+  ],
+  "kind": "serve-dark",
+  "live_copies": [
+    "chat-a",
+    "chat-b",
+    "staff-a",
+    "staff-b"
+  ],
+  "models": [
+    {
+      "answered": 54,
+      "by_phase": {
+        "after": {
+          "answered": 16,
+          "failed": 0,
+          "sent": 16
+        },
+        "at the cut": {
+          "answered": 1,
+          "failed": 0,
+          "sent": 1
+        },
+        "at the restore": {
+          "answered": 2,
+          "failed": 0,
+          "sent": 2
+        },
+        "before": {
+          "answered": 14,
+          "failed": 0,
+          "sent": 14
+        },
+        "down": {
+          "answered": 19,
+          "failed": 0,
+          "sent": 19
+        },
+        "returning": {
+          "answered": 2,
+          "failed": 0,
+          "sent": 2
+        }
+      },
+      "failed": 0,
+      "fails": [],
+      "model": "chat",
+      "retried": [],
+      "sent": 54,
+      "slowest": {
+        "n": 29,
+        "phase": "down",
+        "retries": 0,
+        "took_s": 4.128
+      }
+    },
+    {
+      "answered": 4,
+      "by_phase": {
+        "after": {
+          "answered": 1,
+          "failed": 0,
+          "sent": 1
+        },
+        "at the cut": {
+          "answered": 0,
+          "failed": 0,
+          "sent": 0
+        },
+        "at the restore": {
+          "answered": 0,
+          "failed": 0,
+          "sent": 0
+        },
+        "before": {
+          "answered": 1,
+          "failed": 0,
+          "sent": 1
+        },
+        "down": {
+          "answered": 2,
+          "failed": 0,
+          "sent": 2
+        },
+        "returning": {
+          "answered": 0,
+          "failed": 0,
+          "sent": 0
+        }
+      },
+      "failed": 0,
+      "fails": [],
+      "model": "staff",
+      "retried": [],
+      "sent": 4,
+      "slowest": {
+        "n": 3,
+        "phase": "down",
+        "retries": 0,
+        "took_s": 31.666
+      }
+    }
+  ],
+  "natives": [
+    "Ethernet0",
+    "Ethernet1",
+    "Ethernet2",
+    "Ethernet3",
+    "Ethernet4",
+    "Ethernet5",
+    "Ethernet6",
+    "Ethernet7"
+  ],
+  "pass": 2,
+  "readiness": {
+    "failure_threshold": 2,
+    "period_s": 2,
+    "timeout_s": 2
+  },
+  "restore_session_s": 3.921,
+  "services": [
+    {
+      "back": {
+        "chat-c-server-0": {
+          "after_restore_s": 8.756,
+          "prev_after_restore_s": 7.745,
+          "t": 1793223800.564936
+        }
+      },
+      "dead": [
+        "chat-c-server-0"
+      ],
+      "kind": "model",
+      "left": {
+        "chat-c-server-0": {
+          "after_cut_s": 7.189,
+          "prev_after_cut_s": 6.179,
+          "t": 1793223758.989201
+        }
+      },
+      "lost_live": [],
+      "reads": 123,
+      "servers": [
+        "chat-a-server-0",
+        "chat-b-server-0",
+        "chat-c-server-0"
+      ],
+      "service": "chat",
+      "whole_before": true
+    },
+    {
+      "back": {},
+      "dead": [],
+      "kind": "copy",
+      "left": {},
+      "lost_live": [],
+      "reads": 123,
+      "servers": [
+        "chat-a-server-0"
+      ],
+      "service": "chat-a",
+      "whole_before": true
+    },
+    {
+      "back": {},
+      "dead": [],
+      "kind": "copy",
+      "left": {},
+      "lost_live": [],
+      "reads": 123,
+      "servers": [
+        "chat-b-server-0"
+      ],
+      "service": "chat-b",
+      "whole_before": true
+    },
+    {
+      "back": {
+        "chat-c-server-0": {
+          "after_restore_s": 8.756,
+          "prev_after_restore_s": 7.745,
+          "t": 1793223800.564936
+        }
+      },
+      "dead": [
+        "chat-c-server-0"
+      ],
+      "kind": "copy",
+      "left": {
+        "chat-c-server-0": {
+          "after_cut_s": 7.189,
+          "prev_after_cut_s": 6.179,
+          "t": 1793223758.989201
+        }
+      },
+      "lost_live": [],
+      "reads": 123,
+      "servers": [
+        "chat-c-server-0"
+      ],
+      "service": "chat-c",
+      "whole_before": true
+    },
+    {
+      "back": {},
+      "dead": [],
+      "kind": "model",
+      "left": {},
+      "lost_live": [],
+      "reads": 123,
+      "servers": [
+        "staff-a-server-0",
+        "staff-b-server-0"
+      ],
+      "service": "staff",
+      "whole_before": true
+    },
+    {
+      "back": {},
+      "dead": [],
+      "kind": "copy",
+      "left": {},
+      "lost_live": [],
+      "reads": 123,
+      "servers": [
+        "staff-a-server-0"
+      ],
+      "service": "staff-a",
+      "whole_before": true
+    },
+    {
+      "back": {},
+      "dead": [],
+      "kind": "copy",
+      "left": {},
+      "lost_live": [],
+      "reads": 123,
+      "servers": [
+        "staff-b-server-0"
+      ],
+      "service": "staff-b",
+      "whole_before": true
+    }
+  ],
+  "shut_session_s": 3.493,
+  "switch": "rail-sw1",
+  "timeline": {
+    "INJECT": 1793223751.8004744,
+    "INJECTED": 1793223755.293003,
+    "PROBES": 1793223725.5696106,
+    "RESTORE": 1793223791.8093426,
+    "RESTORED": 1793223795.7307239,
+    "RETURNED": 1793223800.564936,
+    "STOP": 1793223848.261614,
+    "TARGET": 1793223722.4136112
+  },
+  "whole_after_restore_s": 8.756
+}

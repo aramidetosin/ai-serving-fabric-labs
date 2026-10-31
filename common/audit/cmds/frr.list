@@ -1,0 +1,21 @@
+# An FRR router (sfab/frr: the uplink router; the ISP router and the carrier later): SLUG SURFACE
+# COMMAND. frr lines run vtysh in the router's container, exec lines a shell there. {p2p} lines run
+# once per point-to-point peer in the lab: a host peer is pinged, the firewall is read by ARP (its
+# rulebase admits no ping from the uplink zone: deny-all-log drops it, M2's first deploy).
+# frr_route_text is the route table as the router prints it, for the book to quote (chapter 2's
+# routing row: the uplink router's routes to the inside prefixes); the
+# judge reads the JSON form. resolv_conf shows the search line is the lab's domain, not the one
+# Docker copies from the lab host.
+frr_version          frr         show version
+frr_routes           frr-json    show ip route json
+frr_route_text       frr         show ip route
+link_eth0            exec-json   ip -j -d link show eth0
+ip_addr              exec-json   ip -j addr show
+table_main           exec        ip route show
+table_vrf_mgmt       exec        ip route show vrf mgmt
+ip_forward           exec        sysctl net.ipv4.ip_forward
+tx_container         host        container_offloads
+container_links      host-json   container_links
+ping_{p2p}           exec        ping -c 3 -W 2 {p2p_host_addr}
+arp_{p2p}            exec        arping -c 3 -w 6 -I {p2p_iface} {p2p_appliance_addr}
+resolv_conf          exec        cat /etc/resolv.conf

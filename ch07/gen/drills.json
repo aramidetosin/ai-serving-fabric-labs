@@ -1,0 +1,664 @@
+{
+  "bonded": [
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet3",
+          "node": "k8s-cp1",
+          "switch": "fe-sw1",
+          "switch_eth": "eth4"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet3",
+          "node": "k8s-cp1",
+          "switch": "fe-sw2",
+          "switch_eth": "eth4"
+        }
+      ],
+      "node": "k8s-cp1"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet4",
+          "node": "k8s-cp2",
+          "switch": "fe-sw1",
+          "switch_eth": "eth5"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet4",
+          "node": "k8s-cp2",
+          "switch": "fe-sw2",
+          "switch_eth": "eth5"
+        }
+      ],
+      "node": "k8s-cp2"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet5",
+          "node": "k8s-cp3",
+          "switch": "fe-sw1",
+          "switch_eth": "eth6"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet5",
+          "node": "k8s-cp3",
+          "switch": "fe-sw2",
+          "switch_eth": "eth6"
+        }
+      ],
+      "node": "k8s-cp3"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet6",
+          "node": "k8s-gpu1",
+          "switch": "fe-sw1",
+          "switch_eth": "eth7"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet6",
+          "node": "k8s-gpu1",
+          "switch": "fe-sw2",
+          "switch_eth": "eth7"
+        }
+      ],
+      "node": "k8s-gpu1"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet7",
+          "node": "k8s-gpu2",
+          "switch": "fe-sw1",
+          "switch_eth": "eth8"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet7",
+          "node": "k8s-gpu2",
+          "switch": "fe-sw2",
+          "switch_eth": "eth8"
+        }
+      ],
+      "node": "k8s-gpu2"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet13",
+          "node": "k8s-ingress1",
+          "switch": "fe-sw1",
+          "switch_eth": "eth14"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet13",
+          "node": "k8s-ingress1",
+          "switch": "fe-sw2",
+          "switch_eth": "eth14"
+        }
+      ],
+      "node": "k8s-ingress1"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet14",
+          "node": "k8s-ingress2",
+          "switch": "fe-sw1",
+          "switch_eth": "eth15"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet14",
+          "node": "k8s-ingress2",
+          "switch": "fe-sw2",
+          "switch_eth": "eth15"
+        }
+      ],
+      "node": "k8s-ingress2"
+    },
+    {
+      "bond": "bond0",
+      "kind": "bastion",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet8",
+          "node": "bastion",
+          "switch": "fe-sw1",
+          "switch_eth": "eth9"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet8",
+          "node": "bastion",
+          "switch": "fe-sw2",
+          "switch_eth": "eth9"
+        }
+      ],
+      "node": "bastion"
+    }
+  ],
+  "gateway_layer": {
+    "api_gateway": {
+      "container": "apisix",
+      "hold": "/standalone/hold",
+      "name": "api-gateway",
+      "port": 9080,
+      "selector": "app.kubernetes.io/name=api-gateway",
+      "sidecar": "keys"
+    },
+    "gateways": [
+      "gw-internal",
+      "gw-users"
+    ],
+    "keys": {
+      "image": "192.0.2.6:5000/sfab/keys:3",
+      "prefix": "sk-tw",
+      "sa": "inference-keys",
+      "secret": "api-keys"
+    },
+    "models": [
+      {
+        "key_caller": "batch",
+        "name": "chat",
+        "path": "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions",
+        "route_id": "a48b3df9-3b7f-58f0-9c52-c6f3004f05f7"
+      },
+      {
+        "key_caller": "helpdesk",
+        "name": "staff",
+        "path": "/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions",
+        "route_id": "8242d5c4-9bce-5497-8414-f5bad94fdd84"
+      }
+    ],
+    "namespace": "inference",
+    "probe": {
+      "image": "192.0.2.6:5000/sfab/keys:3",
+      "name": "key-probe",
+      "sa": "key-probe"
+    },
+    "prompt": "Say yes.",
+    "rejected": {
+      "code": 401,
+      "message": "Authorization Failed"
+    },
+    "router": {
+      "name": "router",
+      "selector": "app.kubernetes.io/name=router"
+    },
+    "serving_namespace": "serving"
+  },
+  "lab": "sfab-ch07",
+  "list": [
+    {
+      "cross": "staff",
+      "cross_path": "/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions",
+      "cross_url": "https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions",
+      "id": "key-lifecycle",
+      "id_base": "fd000000",
+      "key_caller": "batch",
+      "kind": "key-lifecycle",
+      "max_passes": null,
+      "model": "chat",
+      "path": "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions",
+      "probes": [
+        "gateway"
+      ],
+      "title": "one key for chat from mint to revoke under the gateway probe, at every API gateway pod and through the users' VIP",
+      "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+    },
+    {
+      "configmap": {
+        "key": "apisix.yaml",
+        "name": "api-gateway-routes",
+        "namespace": "inference"
+      },
+      "configmap_default": {
+        "apiVersion": "v1",
+        "data": {
+          "apisix.yaml": "routes:\n- id: chat\n  name: chat\n  uris:\n  - /models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions\n  - /models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/completions\n  methods:\n  - POST\n  upstream_id: router\n  plugins:\n    multi-auth:\n      auth_plugins:\n      - key-auth:\n          header: Authorization\n          hide_credentials: true\n      - oidc-consumer:\n          issuer: https://id.ai.tarnwick.example\n          jwks_uri: http://idp.identity.svc.cluster.local:5556/keys\n          audience: ai-gateway\n          claim: email\n    consumer-restriction:\n      type: consumer_group_id\n      whitelist:\n      - batch\n      - staff\n      rejected_code: 401\n      rejected_msg: \"Authorization Failed\"\n    proxy-rewrite:\n      regex_uri:\n      - \"^/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/(chat/completions|completions)$\"\n      - \"/engines/chat/$1\"\n      headers:\n        set:\n          Authorization: \"Bearer ${{ROUTER_MASTER_KEY}}\"\n    response-rewrite:\n      headers:\n        set:\n          WWW-Authenticate: \"Bearer realm=\\\"llm.ai.tarnwick.example\\\"\"\n      vars:\n      - - status\n        - \"==\"\n        - 401\n    file-logger:\n      path: /dev/stdout\n      log_format:\n        time: \"$time_iso8601\"\n        client: \"$remote_addr\"\n        host: \"$host\"\n        route: \"$route_id\"\n        request: \"$request_method $uri\"\n        status: \"$status\"\n        consumer: \"$consumer_name\"\n        caller: \"$consumer_group_id\"\n        upstream_status: \"$upstream_status\"\n        request_time: \"$request_time\"\n- id: staff\n  name: staff\n  uris:\n  - /models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions\n  - /models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/completions\n  methods:\n  - POST\n  upstream_id: router\n  plugins:\n    multi-auth:\n      auth_plugins:\n      - key-auth:\n          header: Authorization\n          hide_credentials: true\n      - oidc-consumer:\n          issuer: https://id.ai.tarnwick.example\n          jwks_uri: http://idp.identity.svc.cluster.local:5556/keys\n          audience: ai-gateway\n          claim: email\n    consumer-restriction:\n      type: consumer_group_id\n      whitelist:\n      - helpdesk\n      - staff\n    proxy-rewrite:\n      regex_uri:\n      - \"^/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/(chat/completions|completions)$\"\n      - \"/engines/staff/$1\"\n      headers:\n        set:\n          Authorization: \"Bearer ${{ROUTER_MASTER_KEY}}\"\n    response-rewrite:\n      headers:\n        set:\n          WWW-Authenticate: \"Bearer realm=\\\"llm.ai.tarnwick.example\\\"\"\n      vars:\n      - - status\n        - \"==\"\n        - 401\n    file-logger:\n      path: /dev/stdout\n      log_format:\n        time: \"$time_iso8601\"\n        client: \"$remote_addr\"\n        host: \"$host\"\n        route: \"$route_id\"\n        request: \"$request_method $uri\"\n        status: \"$status\"\n        consumer: \"$consumer_name\"\n        caller: \"$consumer_group_id\"\n        upstream_status: \"$upstream_status\"\n        request_time: \"$request_time\"\nupstreams:\n- id: router\n  type: roundrobin\n  scheme: http\n  pass_host: pass\n  nodes:\n  - host: router.inference.svc.cluster.local\n    port: 4000\n    weight: 1\n  timeout:\n    connect: 5\n    send: 600\n    read: 600\nconsumer_groups:\n- id: batch\n  desc: \"application batch (owner data-platform, keys expire 2027-04-30); may call chat\"\n  plugins:\n    limit-count:\n      count: 3000\n      time_window: 60\n      key_type: var\n      key: consumer_group_id\n      rejected_code: 429\n      policy: local\n- id: helpdesk\n  desc: \"application helpdesk (owner service-desk, keys expire 2027-04-30); may call staff\"\n  plugins:\n    limit-count:\n      count: 3000\n      time_window: 60\n      key_type: var\n      key: consumer_group_id\n      rejected_code: 429\n      policy: local\n- id: staff\n  desc: \"people: ent-client; may call chat, staff\"\n  plugins:\n    limit-count:\n      count: 600\n      time_window: 60\n      key_type: var\n      key: consumer_group_id\n      rejected_code: 429\n      policy: local\nconsumers:\n- username: staff_ent_client\n  group_id: staff\n  plugins:\n    oidc-consumer:\n      subject: ent-client@tarnwick.example\n#END\n"
+        },
+        "kind": "ConfigMap",
+        "metadata": {
+          "labels": {
+            "app.kubernetes.io/component": "api-gateway",
+            "app.kubernetes.io/name": "api-gateway",
+            "app.kubernetes.io/part-of": "inference"
+          },
+          "name": "api-gateway-routes",
+          "namespace": "inference"
+        }
+      },
+      "configmap_rendered": {
+        "apiVersion": "v1",
+        "data": {
+          "apisix.yaml": "routes:\n- id: chat\n  name: chat\n  uris:\n  - /models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions\n  - /models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/completions\n  methods:\n  - POST\n  upstream_id: router\n  plugins:\n    multi-auth:\n      auth_plugins:\n      - key-auth:\n          header: Authorization\n          hide_credentials: true\n      - oidc-consumer:\n          issuer: https://id.ai.tarnwick.example\n          jwks_uri: http://idp.identity.svc.cluster.local:5556/keys\n          audience: ai-gateway\n          claim: email\n    consumer-restriction:\n      type: consumer_group_id\n      whitelist:\n      - batch\n      - staff\n      rejected_code: 401\n      rejected_msg: \"Authorization Failed\"\n    proxy-rewrite:\n      regex_uri:\n      - \"^/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/(chat/completions|completions)$\"\n      - \"/engines/chat/$1\"\n      headers:\n        set:\n          Authorization: \"Bearer ${{ROUTER_MASTER_KEY}}\"\n    response-rewrite:\n      headers:\n        set:\n          WWW-Authenticate: \"Bearer realm=\\\"llm.ai.tarnwick.example\\\"\"\n      vars:\n      - - status\n        - \"==\"\n        - 401\n    file-logger:\n      path: /dev/stdout\n      log_format:\n        time: \"$time_iso8601\"\n        client: \"$remote_addr\"\n        host: \"$host\"\n        route: \"$route_id\"\n        request: \"$request_method $uri\"\n        status: \"$status\"\n        consumer: \"$consumer_name\"\n        caller: \"$consumer_group_id\"\n        upstream_status: \"$upstream_status\"\n        request_time: \"$request_time\"\n- id: staff\n  name: staff\n  uris:\n  - /models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions\n  - /models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/completions\n  methods:\n  - POST\n  upstream_id: router\n  plugins:\n    multi-auth:\n      auth_plugins:\n      - key-auth:\n          header: Authorization\n          hide_credentials: true\n      - oidc-consumer:\n          issuer: https://id.ai.tarnwick.example\n          jwks_uri: http://idp.identity.svc.cluster.local:5556/keys\n          audience: ai-gateway\n          claim: email\n    consumer-restriction:\n      type: consumer_group_id\n      whitelist:\n      - helpdesk\n      - staff\n      rejected_code: 401\n      rejected_msg: \"Authorization Failed\"\n    proxy-rewrite:\n      regex_uri:\n      - \"^/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/(chat/completions|completions)$\"\n      - \"/engines/staff/$1\"\n      headers:\n        set:\n          Authorization: \"Bearer ${{ROUTER_MASTER_KEY}}\"\n    response-rewrite:\n      headers:\n        set:\n          WWW-Authenticate: \"Bearer realm=\\\"llm.ai.tarnwick.example\\\"\"\n      vars:\n      - - status\n        - \"==\"\n        - 401\n    file-logger:\n      path: /dev/stdout\n      log_format:\n        time: \"$time_iso8601\"\n        client: \"$remote_addr\"\n        host: \"$host\"\n        route: \"$route_id\"\n        request: \"$request_method $uri\"\n        status: \"$status\"\n        consumer: \"$consumer_name\"\n        caller: \"$consumer_group_id\"\n        upstream_status: \"$upstream_status\"\n        request_time: \"$request_time\"\nupstreams:\n- id: router\n  type: roundrobin\n  scheme: http\n  pass_host: pass\n  nodes:\n  - host: router.inference.svc.cluster.local\n    port: 4000\n    weight: 1\n  timeout:\n    connect: 5\n    send: 600\n    read: 600\nconsumer_groups:\n- id: batch\n  desc: \"application batch (owner data-platform, keys expire 2027-04-30); may call chat\"\n  plugins:\n    limit-count:\n      count: 3000\n      time_window: 60\n      key_type: var\n      key: consumer_group_id\n      rejected_code: 429\n      policy: local\n- id: helpdesk\n  desc: \"application helpdesk (owner service-desk, keys expire 2027-04-30); may call staff\"\n  plugins:\n    limit-count:\n      count: 3000\n      time_window: 60\n      key_type: var\n      key: consumer_group_id\n      rejected_code: 429\n      policy: local\n- id: staff\n  desc: \"people: ent-client; may call chat, staff\"\n  plugins:\n    limit-count:\n      count: 600\n      time_window: 60\n      key_type: var\n      key: consumer_group_id\n      rejected_code: 429\n      policy: local\nconsumers:\n- username: staff_ent_client\n  group_id: staff\n  plugins:\n    oidc-consumer:\n      subject: ent-client@tarnwick.example\n#END\n"
+        },
+        "kind": "ConfigMap",
+        "metadata": {
+          "labels": {
+            "app.kubernetes.io/component": "api-gateway",
+            "app.kubernetes.io/name": "api-gateway",
+            "app.kubernetes.io/part-of": "inference"
+          },
+          "name": "api-gateway-routes",
+          "namespace": "inference"
+        }
+      },
+      "expect": {
+        "default": 403,
+        "rendered": 401,
+        "rendered_message": "Authorization Failed"
+      },
+      "id": "rejected-code",
+      "key_model": "chat",
+      "kind": "rejected-code",
+      "max_passes": null,
+      "model": "staff",
+      "path": "/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions",
+      "probes": [
+        "gateway"
+      ],
+      "title": "staff's route without its rejected code, a chat key answered with the plugin's default, then the rendered 401",
+      "url": "https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions"
+    },
+    {
+      "cec": "gateways/cilium-gateway-gw-users",
+      "cilium": {
+        "agents": "daemonset/cilium",
+        "chart": "oci://192.0.2.6:5000/charts/cilium",
+        "config_keys": [
+          "http-stream-idle-timeout",
+          "proxy-stream-idle-timeout-seconds"
+        ],
+        "envoy": "daemonset/cilium-envoy",
+        "namespace": "kube-system",
+        "operator": "deployment/cilium-operator",
+        "plain_http": false,
+        "release": "cilium",
+        "values_corrected": {
+          "bpf": {
+            "hostLegacyRouting": true,
+            "masquerade": false,
+            "vlanBypass": [
+              110,
+              120
+            ]
+          },
+          "cni": {
+            "exclusive": false
+          },
+          "devices": [
+            "bond0",
+            "bond0.110"
+          ],
+          "encryption": {
+            "enabled": true,
+            "type": "wireguard"
+          },
+          "envoy": {
+            "enabled": true,
+            "image": {
+              "override": "quay.io/cilium/cilium-envoy:v1.36.9-1786864149-07e8503ff34b9190d7bbe4e57d4e185c4ef8b1de@sha256:beccdf3c119f299cf696885188584bbd0531d74bca08096113207999aff95e87"
+            },
+            "streamIdleTimeoutDurationSeconds": 600
+          },
+          "extraConfig": {
+            "proxy-stream-idle-timeout-seconds": "600"
+          },
+          "gatewayAPI": {
+            "enabled": true,
+            "gatewayClass": {
+              "create": "true"
+            }
+          },
+          "hubble": {
+            "enabled": true,
+            "relay": {
+              "enabled": false
+            },
+            "ui": {
+              "enabled": false
+            }
+          },
+          "image": {
+            "override": "quay.io/cilium/cilium:v1.19.7@sha256:1b58bcb81c723cf130a0dd2fb2e1132c57f8fbc2ef7bdb85519cfcc36111c77e"
+          },
+          "ipam": {
+            "mode": "cluster-pool",
+            "operator": {
+              "clusterPoolIPv4MaskSize": 24,
+              "clusterPoolIPv4PodCIDRList": [
+                "10.22.0.0/16"
+              ]
+            }
+          },
+          "k8sClientRateLimit": {
+            "burst": 100,
+            "qps": 50
+          },
+          "k8sServiceHost": "10.20.1.10",
+          "k8sServicePort": 6443,
+          "kubeProxyReplacement": true,
+          "l2announcements": {
+            "enabled": true
+          },
+          "operator": {
+            "image": {
+              "override": "quay.io/cilium/operator-generic:v1.19.7@sha256:61e773bfc25a448f1ad3ead605af94b3ef176ba2925cf4bd1b11e09794b72bed"
+            },
+            "replicas": 2
+          },
+          "routingMode": "tunnel",
+          "tunnelProtocol": "geneve"
+        },
+        "values_rendered": {
+          "bpf": {
+            "hostLegacyRouting": true,
+            "masquerade": false,
+            "vlanBypass": [
+              110,
+              120
+            ]
+          },
+          "cni": {
+            "exclusive": false
+          },
+          "devices": [
+            "bond0",
+            "bond0.110"
+          ],
+          "encryption": {
+            "enabled": true,
+            "type": "wireguard"
+          },
+          "envoy": {
+            "enabled": true,
+            "image": {
+              "override": "quay.io/cilium/cilium-envoy:v1.36.9-1786864149-07e8503ff34b9190d7bbe4e57d4e185c4ef8b1de@sha256:beccdf3c119f299cf696885188584bbd0531d74bca08096113207999aff95e87"
+            }
+          },
+          "gatewayAPI": {
+            "enabled": true,
+            "gatewayClass": {
+              "create": "true"
+            }
+          },
+          "hubble": {
+            "enabled": true,
+            "relay": {
+              "enabled": false
+            },
+            "ui": {
+              "enabled": false
+            }
+          },
+          "image": {
+            "override": "quay.io/cilium/cilium:v1.19.7@sha256:1b58bcb81c723cf130a0dd2fb2e1132c57f8fbc2ef7bdb85519cfcc36111c77e"
+          },
+          "ipam": {
+            "mode": "cluster-pool",
+            "operator": {
+              "clusterPoolIPv4MaskSize": 24,
+              "clusterPoolIPv4PodCIDRList": [
+                "10.22.0.0/16"
+              ]
+            }
+          },
+          "k8sClientRateLimit": {
+            "burst": 100,
+            "qps": 50
+          },
+          "k8sServiceHost": "10.20.1.10",
+          "k8sServicePort": 6443,
+          "kubeProxyReplacement": true,
+          "l2announcements": {
+            "enabled": true
+          },
+          "operator": {
+            "image": {
+              "override": "quay.io/cilium/operator-generic:v1.19.7@sha256:61e773bfc25a448f1ad3ead605af94b3ef176ba2925cf4bd1b11e09794b72bed"
+            },
+            "replicas": 2
+          },
+          "routingMode": "tunnel",
+          "tunnelProtocol": "geneve"
+        },
+        "version": "1.19.7"
+      },
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "corrected": {
+        "backend_request_s": 400,
+        "request_s": 420,
+        "stream_idle_s": 600
+      },
+      "default_idle_s": 300,
+      "gateway": "gw-users",
+      "gateways": {
+        "gw-internal": "10.20.11.200",
+        "gw-users": "10.20.11.210"
+      },
+      "hostname": "llm.ai.tarnwick.example",
+      "id": "idle-timeout",
+      "kind": "idle-timeout",
+      "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-users",
+      "max_passes": 1,
+      "probes": [],
+      "resolve": null,
+      "silent_s": 330,
+      "test_backend": {
+        "container": "echo",
+        "deployment": "echo",
+        "namespace": "echo",
+        "port": 8080,
+        "replicas": 2,
+        "route": "echo-gw-users",
+        "route_corrected": {
+          "apiVersion": "gateway.networking.k8s.io/v1",
+          "kind": "HTTPRoute",
+          "metadata": {
+            "labels": {
+              "decision.tarnwick.example/id": "dec-routeset-enterprise",
+              "tarnwick.example/audience": "enterprise"
+            },
+            "name": "echo-gw-users",
+            "namespace": "echo"
+          },
+          "spec": {
+            "hostnames": [
+              "llm.ai.tarnwick.example"
+            ],
+            "parentRefs": [
+              {
+                "group": "gateway.networking.k8s.io",
+                "kind": "Gateway",
+                "name": "gw-users",
+                "namespace": "gateways",
+                "sectionName": "https"
+              }
+            ],
+            "rules": [
+              {
+                "backendRefs": [
+                  {
+                    "name": "echo",
+                    "port": 8080
+                  }
+                ],
+                "matches": [
+                  {
+                    "path": {
+                      "type": "PathPrefix",
+                      "value": "/echo"
+                    }
+                  }
+                ],
+                "timeouts": {
+                  "backendRequest": "400s",
+                  "request": "420s"
+                }
+              }
+            ]
+          }
+        },
+        "route_rendered": {
+          "apiVersion": "gateway.networking.k8s.io/v1",
+          "kind": "HTTPRoute",
+          "metadata": {
+            "labels": {
+              "decision.tarnwick.example/id": "dec-routeset-enterprise",
+              "tarnwick.example/audience": "enterprise"
+            },
+            "name": "echo-gw-users",
+            "namespace": "echo"
+          },
+          "spec": {
+            "hostnames": [
+              "llm.ai.tarnwick.example"
+            ],
+            "parentRefs": [
+              {
+                "group": "gateway.networking.k8s.io",
+                "kind": "Gateway",
+                "name": "gw-users",
+                "namespace": "gateways",
+                "sectionName": "https"
+              }
+            ],
+            "rules": [
+              {
+                "backendRefs": [
+                  {
+                    "name": "echo",
+                    "port": 8080
+                  }
+                ],
+                "matches": [
+                  {
+                    "path": {
+                      "type": "PathPrefix",
+                      "value": "/echo"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "selector": "app.kubernetes.io/name=echo"
+      },
+      "title": "the test backend silent past Envoy's stream idle timeout through the users' Gateway, then the corrected chain",
+      "url": "https://llm.ai.tarnwick.example/echo?msg=sfab-drill-idle",
+      "vip": "10.20.11.210"
+    }
+  ],
+  "pair": {
+    "domain": 1,
+    "members": [
+      "fe-sw1",
+      "fe-sw2"
+    ],
+    "name": "fe",
+    "peer_link": {
+      "fe-sw1": {
+        "eths": [
+          "eth1",
+          "eth2"
+        ],
+        "members": [
+          "Ethernet0",
+          "Ethernet1"
+        ],
+        "portchannel": "PortChannel1"
+      },
+      "fe-sw2": {
+        "eths": [
+          "eth1",
+          "eth2"
+        ],
+        "members": [
+          "Ethernet0",
+          "Ethernet1"
+        ],
+        "portchannel": "PortChannel1"
+      }
+    },
+    "source_ip": {
+      "fe-sw1": "10.20.255.0",
+      "fe-sw2": "10.20.255.1"
+    },
+    "system_mac": "02:5a:00:00:00:01"
+  },
+  "probes": {
+    "gateway": {
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "gateway": "gw-users",
+      "hostname": "llm.ai.tarnwick.example",
+      "interval_s": 2,
+      "keys": {
+        "namespace": "inference",
+        "secret": "api-keys"
+      },
+      "max_tokens": 8,
+      "models": [
+        {
+          "model": "chat",
+          "model_name": "openai/chat",
+          "route_id": "a48b3df9-3b7f-58f0-9c52-c6f3004f05f7",
+          "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+        },
+        {
+          "every": 15,
+          "model": "staff",
+          "model_name": "openai/staff",
+          "route_id": "8242d5c4-9bce-5497-8414-f5bad94fdd84",
+          "url": "https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions"
+        }
+      ],
+      "resolve": null,
+      "timeout_s": 400,
+      "vip": "10.20.11.210"
+    }
+  },
+  "schema": 1,
+  "timing": {
+    "accept_max_s": 300,
+    "lead_s": 10,
+    "settle_max_s": 900,
+    "tail_s": 10,
+    "whole_polls": 30
+  }
+}

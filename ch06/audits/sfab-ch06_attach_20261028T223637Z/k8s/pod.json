@@ -1,0 +1,326 @@
+{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "annotations": {
+            "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"cilium\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"10.22.1.122\"\n    ],\n    \"mac\": \"0a:f5:b3:d4:b0:4a\",\n    \"default\": true,\n    \"dns\": {},\n    \"gateway\": [\n        \"10.22.1.227\"\n    ]\n},{\n    \"name\": \"serving/rail7\",\n    \"interface\": \"rail7\",\n    \"ips\": [\n        \"10.21.7.100\"\n    ],\n    \"mac\": \"02:5a:fe:07:00:64\",\n    \"dns\": {}\n}]",
+            "k8s.v1.cni.cncf.io/networks": "[{\"name\":\"rail7\",\"namespace\":\"serving\",\"interface\":\"rail7\",\"ips\":[\"10.21.7.100/24\"],\"mac\":\"02:5a:fe:07:00:64\"}]",
+            "tarnwick.example/spec": "90fdb7c9041e8ba3"
+        },
+        "creationTimestamp": "2026-10-28T20:45:11Z",
+        "generateName": "chat-c-server-",
+        "generation": 1,
+        "labels": {
+            "app.kubernetes.io/component": "server",
+            "app.kubernetes.io/name": "serving",
+            "apps.kubernetes.io/pod-index": "0",
+            "controller-revision-hash": "chat-c-server-656dd7cc69",
+            "decision.tarnwick.example/id": "dec-place-chat",
+            "statefulset.kubernetes.io/pod-name": "chat-c-server-0",
+            "tarnwick.example/copy": "c",
+            "tarnwick.example/model": "chat",
+            "tarnwick.example/pod": "chat-c-server-0",
+            "tarnwick.example/rail": "rail7",
+            "tarnwick.example/role": "server"
+        },
+        "name": "chat-c-server-0",
+        "namespace": "serving",
+        "ownerReferences": [
+            {
+                "apiVersion": "apps/v1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "StatefulSet",
+                "name": "chat-c-server",
+                "uid": "dea1ead6-5952-4608-9cac-638a35e09909"
+            }
+        ],
+        "resourceVersion": "26919",
+        "uid": "3130f0a7-fa4c-4a38-8385-bc1b433c2b0e"
+    },
+    "spec": {
+        "automountServiceAccountToken": false,
+        "containers": [
+            {
+                "command": [
+                    "llama-server",
+                    "-m",
+                    "/models/LFM2.5-24B-A2B-Q4_K_M.gguf",
+                    "--alias",
+                    "chat",
+                    "--host",
+                    "$(POD_IP)",
+                    "--port",
+                    "8080",
+                    "--rpc",
+                    "10.21.7.101:50052,10.21.7.102:50052",
+                    "--tensor-split",
+                    "1,1",
+                    "-ngl",
+                    "99",
+                    "-c",
+                    "4096",
+                    "-np",
+                    "8",
+                    "-n",
+                    "256",
+                    "-t",
+                    "2",
+                    "--reasoning-budget",
+                    "0",
+                    "--cache-ram",
+                    "0",
+                    "--ctx-checkpoints",
+                    "0",
+                    "--no-ui",
+                    "--api-key-file",
+                    "/secret/key"
+                ],
+                "env": [
+                    {
+                        "name": "POD_IP",
+                        "valueFrom": {
+                            "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "status.podIP"
+                            }
+                        }
+                    },
+                    {
+                        "name": "SFAB_READY_HOST",
+                        "value": "$(POD_IP)"
+                    }
+                ],
+                "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                "imagePullPolicy": "IfNotPresent",
+                "name": "server",
+                "ports": [
+                    {
+                        "containerPort": 8080,
+                        "name": "http",
+                        "protocol": "TCP"
+                    }
+                ],
+                "readinessProbe": {
+                    "exec": {
+                        "command": [
+                            "sfab-ready",
+                            "server",
+                            "--port",
+                            "8080",
+                            "--rpc-port",
+                            "50052",
+                            "--probe-port",
+                            "50053",
+                            "10.21.7.101",
+                            "10.21.7.102"
+                        ]
+                    },
+                    "failureThreshold": 2,
+                    "periodSeconds": 2,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 2
+                },
+                "resources": {
+                    "limits": {
+                        "memory": "4Gi"
+                    },
+                    "requests": {
+                        "cpu": "500m",
+                        "memory": "512Mi"
+                    }
+                },
+                "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                        "drop": [
+                            "ALL"
+                        ]
+                    }
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "volumeMounts": [
+                    {
+                        "mountPath": "/secret",
+                        "name": "key",
+                        "readOnly": true
+                    },
+                    {
+                        "mountPath": "/models",
+                        "name": "models",
+                        "readOnly": true
+                    }
+                ]
+            }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": false,
+        "hostname": "chat-c-server-0",
+        "nodeName": "k8s-gpu1",
+        "nodeSelector": {
+            "kubernetes.io/hostname": "k8s-gpu1"
+        },
+        "preemptionPolicy": "PreemptLowerPriority",
+        "priority": 0,
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {
+            "fsGroup": 65532,
+            "runAsGroup": 65532,
+            "runAsNonRoot": true,
+            "runAsUser": 65532,
+            "seccompProfile": {
+                "type": "RuntimeDefault"
+            }
+        },
+        "serviceAccount": "default",
+        "serviceAccountName": "default",
+        "subdomain": "chat-c-server",
+        "terminationGracePeriodSeconds": 2,
+        "tolerations": [
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            }
+        ],
+        "volumes": [
+            {
+                "name": "key",
+                "secret": {
+                    "defaultMode": 288,
+                    "items": [
+                        {
+                            "key": "key",
+                            "path": "key"
+                        }
+                    ],
+                    "secretName": "llm-api-key"
+                }
+            },
+            {
+                "name": "models",
+                "persistentVolumeClaim": {
+                    "claimName": "models-k8s-gpu1",
+                    "readOnly": true
+                }
+            }
+        ]
+    },
+    "status": {
+        "conditions": [
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-28T20:45:12Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodReadyToStartContainers"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-28T20:45:11Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Initialized"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-28T22:04:32Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Ready"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-28T22:04:32Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "ContainersReady"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-28T20:45:11Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodScheduled"
+            }
+        ],
+        "containerStatuses": [
+            {
+                "allocatedResources": {
+                    "cpu": "500m",
+                    "memory": "512Mi"
+                },
+                "containerID": "containerd://a309f1026c761b127c0bbfea2c1d2fd7b7b5d056bbc1426af6846874674cf272",
+                "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                "imageID": "192.0.2.6:5000/sfab/serving@sha256:61f913c060ffb84f1c724fe623cd1023cc91efa20592cd251d5dd3c00914d0e4",
+                "lastState": {},
+                "name": "server",
+                "ready": true,
+                "resources": {
+                    "limits": {
+                        "memory": "4Gi"
+                    },
+                    "requests": {
+                        "cpu": "500m",
+                        "memory": "512Mi"
+                    }
+                },
+                "restartCount": 0,
+                "started": true,
+                "state": {
+                    "running": {
+                        "startedAt": "2026-10-28T20:45:12Z"
+                    }
+                },
+                "user": {
+                    "linux": {
+                        "gid": 65532,
+                        "supplementalGroups": [
+                            65532
+                        ],
+                        "uid": 65532
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "mountPath": "/secret",
+                        "name": "key",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    },
+                    {
+                        "mountPath": "/models",
+                        "name": "models",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            }
+        ],
+        "hostIP": "10.20.1.21",
+        "hostIPs": [
+            {
+                "ip": "10.20.1.21"
+            }
+        ],
+        "observedGeneration": 1,
+        "phase": "Running",
+        "podIP": "10.22.1.122",
+        "podIPs": [
+            {
+                "ip": "10.22.1.122"
+            }
+        ],
+        "qosClass": "Burstable",
+        "startTime": "2026-10-28T20:45:11Z"
+    }
+}

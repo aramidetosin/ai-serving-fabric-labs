@@ -1,0 +1,226 @@
+2026-10-20T05:57:46+00:00 ctrl1 systemd[1]: Starting sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium...
+2026-10-20T05:57:46+00:00 ctrl1 cluster-bootstrap.sh[1613]: [cluster-bootstrap] ctrl1: init in sfab-m2, API k8s.tarnwick.example:6443 (VIP 10.20.1.10)
+2026-10-20T05:57:46+00:00 ctrl1 cluster-bootstrap.sh[1613]: [cluster-bootstrap] cluster CA: CN=Tarnwick Kubernetes CA,O=Tarnwick
+2026-10-20T05:57:46+00:00 ctrl1 cluster-bootstrap.sh[1613]: [cluster-bootstrap] kubeadm init on ctrl1 (10.20.1.11), control-plane endpoint k8s.tarnwick.example:6443
+2026-10-20T05:57:46+00:00 ctrl1 cluster-bootstrap.sh[1613]: [cluster-bootstrap] cluster CA: CN=Tarnwick Kubernetes CA,O=Tarnwick
+2026-10-20T05:57:46+00:00 ctrl1 cluster-bootstrap.sh[1613]: [cluster-bootstrap] kube-vip: kube-vip-init.yaml
+2026-10-20T05:57:46+00:00 ctrl1 cluster-bootstrap.sh[1683]: [certs] Generating "apiserver" certificate and key
+2026-10-20T05:57:46+00:00 ctrl1 cluster-bootstrap.sh[1683]: [certs] apiserver serving cert is signed for DNS names [ctrl1 k8s.tarnwick.example kubernetes kubernetes.default kubernetes.default.svc kubernetes.default.svc.cluster.local] and IPs [10.23.0.1 10.20.1.11 10.20.1.10]
+2026-10-20T05:57:46+00:00 ctrl1 cluster-bootstrap.sh[1613]: [cluster-bootstrap] the API server's certificate now carries its intermediate (CN=Tarnwick Kubernetes CA,O=Tarnwick)
+2026-10-20T05:57:46+00:00 ctrl1 cluster-bootstrap.sh[1705]: [init] Using Kubernetes version: v1.35.8
+2026-10-20T05:57:46+00:00 ctrl1 cluster-bootstrap.sh[1705]: [preflight] Running pre-flight checks
+2026-10-20T05:57:46+00:00 ctrl1 cluster-bootstrap.sh[1705]: [preflight] Pulling images required for setting up a Kubernetes cluster
+2026-10-20T05:57:46+00:00 ctrl1 cluster-bootstrap.sh[1705]: [preflight] This might take a minute or two, depending on the speed of your internet connection
+2026-10-20T05:57:46+00:00 ctrl1 cluster-bootstrap.sh[1705]: [preflight] You can also perform this action beforehand using 'kubeadm config images pull'
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [certs] Using certificateDir folder "/etc/kubernetes/pki"
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [certs] Using existing ca certificate authority
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [certs] Using existing apiserver certificate and key on disk
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [certs] Generating "apiserver-kubelet-client" certificate and key
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [certs] Generating "front-proxy-ca" certificate and key
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [certs] Generating "front-proxy-client" certificate and key
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [certs] Generating "etcd/ca" certificate and key
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [certs] Generating "etcd/server" certificate and key
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [certs] etcd/server serving cert is signed for DNS names [ctrl1 localhost] and IPs [10.20.1.11 127.0.0.1 ::1]
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [certs] Generating "etcd/peer" certificate and key
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [certs] etcd/peer serving cert is signed for DNS names [ctrl1 localhost] and IPs [10.20.1.11 127.0.0.1 ::1]
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [certs] Generating "etcd/healthcheck-client" certificate and key
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [certs] Generating "apiserver-etcd-client" certificate and key
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [certs] Generating "sa" key and public key
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [kubeconfig] Using kubeconfig folder "/etc/kubernetes"
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [kubeconfig] Writing "admin.conf" kubeconfig file
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [kubeconfig] Writing "super-admin.conf" kubeconfig file
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [kubeconfig] Writing "kubelet.conf" kubeconfig file
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [kubeconfig] Writing "controller-manager.conf" kubeconfig file
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [kubeconfig] Writing "scheduler.conf" kubeconfig file
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [etcd] Creating static Pod manifest for local etcd in "/etc/kubernetes/manifests"
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [control-plane] Using manifest folder "/etc/kubernetes/manifests"
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [control-plane] Creating static Pod manifest for "kube-apiserver"
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [control-plane] Creating static Pod manifest for "kube-controller-manager"
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [control-plane] Creating static Pod manifest for "kube-scheduler"
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [kubelet-start] Writing kubelet environment file with flags to file "/var/lib/kubelet/kubeadm-flags.env"
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [kubelet-start] Writing kubelet configuration to file "/var/lib/kubelet/instance-config.yaml"
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: W1020 05:57:57.632703    1705 utils.go:69] The recommended value for "resolvConf" in "KubeletConfiguration" is: /run/systemd/resolve/resolv.conf; the provided value is: /etc/resolv.conf
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [patches] Applied patch of type "application/strategic-merge-patch+json" to target "kubeletconfiguration"
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [kubelet-start] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"
+2026-10-20T05:57:57+00:00 ctrl1 cluster-bootstrap.sh[1705]: [kubelet-start] Starting the kubelet
+2026-10-20T05:58:00+00:00 ctrl1 cluster-bootstrap.sh[1705]: [wait-control-plane] Waiting for the kubelet to boot up the control plane as static Pods from directory "/etc/kubernetes/manifests"
+2026-10-20T05:58:00+00:00 ctrl1 cluster-bootstrap.sh[1705]: [kubelet-check] Waiting for a healthy kubelet at http://127.0.0.1:10248/healthz. This can take up to 10m0s
+2026-10-20T05:58:00+00:00 ctrl1 cluster-bootstrap.sh[1705]: [kubelet-check] The kubelet is healthy after 1.683698ms
+2026-10-20T05:58:00+00:00 ctrl1 cluster-bootstrap.sh[1705]: [control-plane-check] Waiting for healthy control plane components. This can take up to 10m0s
+2026-10-20T05:58:00+00:00 ctrl1 cluster-bootstrap.sh[1705]: [control-plane-check] Checking kube-apiserver at https://10.20.1.11:6443/livez
+2026-10-20T05:58:00+00:00 ctrl1 cluster-bootstrap.sh[1705]: [control-plane-check] Checking kube-controller-manager at https://127.0.0.1:10257/healthz
+2026-10-20T05:58:00+00:00 ctrl1 cluster-bootstrap.sh[1705]: [control-plane-check] Checking kube-scheduler at https://127.0.0.1:10259/livez
+2026-10-20T05:58:00+00:00 ctrl1 cluster-bootstrap.sh[1705]: [control-plane-check] kube-scheduler is healthy after 2.538982ms
+2026-10-20T05:58:00+00:00 ctrl1 cluster-bootstrap.sh[1705]: [control-plane-check] kube-controller-manager is healthy after 3.068455ms
+2026-10-20T05:58:02+00:00 ctrl1 cluster-bootstrap.sh[1705]: [control-plane-check] kube-apiserver is healthy after 1.50138748s
+2026-10-20T05:58:02+00:00 ctrl1 cluster-bootstrap.sh[1705]: [upload-config] Storing the configuration used in ConfigMap "kubeadm-config" in the "kube-system" Namespace
+2026-10-20T05:58:02+00:00 ctrl1 cluster-bootstrap.sh[1705]: [kubelet] Creating a ConfigMap "kubelet-config" in namespace kube-system with the configuration for the kubelets in the cluster
+2026-10-20T05:58:02+00:00 ctrl1 cluster-bootstrap.sh[1705]: [upload-certs] Skipping phase. Please see --upload-certs
+2026-10-20T05:58:02+00:00 ctrl1 cluster-bootstrap.sh[1705]: [mark-control-plane] Marking the node ctrl1 as control-plane by adding the labels: [node-role.kubernetes.io/control-plane node.kubernetes.io/exclude-from-external-load-balancers]
+2026-10-20T05:58:02+00:00 ctrl1 cluster-bootstrap.sh[1705]: [mark-control-plane] Marking the node ctrl1 as control-plane by adding the taints [node-role.kubernetes.io/control-plane:NoSchedule]
+2026-10-20T05:58:02+00:00 ctrl1 cluster-bootstrap.sh[1705]: [bootstrap-token] Configuring bootstrap tokens, cluster-info ConfigMap, RBAC Roles
+2026-10-20T05:58:02+00:00 ctrl1 cluster-bootstrap.sh[1705]: [bootstrap-token] Configured RBAC rules to allow Node Bootstrap tokens to get nodes
+2026-10-20T05:58:02+00:00 ctrl1 cluster-bootstrap.sh[1705]: [bootstrap-token] Configured RBAC rules to allow Node Bootstrap tokens to post CSRs in order for nodes to get long term certificate credentials
+2026-10-20T05:58:02+00:00 ctrl1 cluster-bootstrap.sh[1705]: [bootstrap-token] Configured RBAC rules to allow the csrapprover controller automatically approve CSRs from a Node Bootstrap Token
+2026-10-20T05:58:02+00:00 ctrl1 cluster-bootstrap.sh[1705]: [bootstrap-token] Configured RBAC rules to allow certificate rotation for all node client certificates in the cluster
+2026-10-20T05:58:02+00:00 ctrl1 cluster-bootstrap.sh[1705]: [bootstrap-token] Configured RBAC rules to allow the API server kubelet client certificate to access the kubelet API
+2026-10-20T05:58:02+00:00 ctrl1 cluster-bootstrap.sh[1705]: [bootstrap-token] Creating the "cluster-info" ConfigMap in the "kube-public" namespace
+2026-10-20T05:58:02+00:00 ctrl1 cluster-bootstrap.sh[1705]: [kubelet-finalize] Updating "/etc/kubernetes/kubelet.conf" to point to a rotatable kubelet client certificate and key
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1705]: [addons] Applied essential addon: CoreDNS
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1705]: Your Kubernetes control-plane has initialized successfully!
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1705]: To start using your cluster, you need to run the following as a regular user:
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1705]:   mkdir -p $HOME/.kube
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1705]:   sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1705]:   sudo chown $(id -u):$(id -g) $HOME/.kube/config
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1705]: Alternatively, if you are the root user, you can run:
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1705]:   export KUBECONFIG=/etc/kubernetes/admin.conf
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1705]: You should now deploy a pod network to the cluster.
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1705]: Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1705]:   https://kubernetes.io/docs/concepts/cluster-administration/addons/
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1705]: You can now join any number of control-plane nodes by copying certificate authorities
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1705]: and service account keys on each node and then running the following as root:
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1705]:   kubeadm join k8s.tarnwick.example:6443 --token <value withheld> \
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1705]:         --discovery-token-ca-cert-hash sha256:76aebb3a966d9ddcb03190fc263812d31c21f2347e9a421d40a6f1984b7a4a43 \
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1705]:         --control-plane --certificate-key <value withheld>
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1705]: Then you can join any number of worker nodes by running the following on each as root:
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1705]: kubeadm join k8s.tarnwick.example:6443 --token <value withheld> \
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1705]:         --discovery-token-ca-cert-hash sha256:76aebb3a966d9ddcb03190fc263812d31c21f2347e9a421d40a6f1984b7a4a43
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1613]: [cluster-bootstrap] kube-vip: kube-vip.yaml
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1613]: [cluster-bootstrap] the lab's join token is in place, with no expiry
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1613]: [cluster-bootstrap] the control nodes' shared keys published in /shared/cluster/pki
+2026-10-20T05:58:03+00:00 ctrl1 cluster-bootstrap.sh[1613]: [cluster-bootstrap] kubeconfig published for the bastion (/shared/cluster/kubeconfig, then /shared/cluster/ready): https://10.20.1.10:6443, the lab root
+2026-10-20T05:58:04+00:00 ctrl1 cluster-bootstrap.sh[1613]: [cluster-bootstrap] Gateway API v1.4.1 CRDs established
+2026-10-20T05:58:04+00:00 ctrl1 cluster-bootstrap.sh[1613]: [cluster-bootstrap] helm v3.22.0 from docker.io/alpine/helm@sha256:e29ba4b553fa9648d0a35a9e29c8744c597a3e400d5574daf0f20a4c3854b852
+2026-10-20T05:58:04+00:00 ctrl1 cluster-bootstrap.sh[2417]: time="2026-10-20T05:58:04Z" level=warning msg="Config \"/etc/crictl.yaml\" does not exist, trying next: \"/usr/bin/crictl.yaml\""
+2026-10-20T05:58:05+00:00 ctrl1 cluster-bootstrap.sh[2427]: ctr: failed to mount [{bind /run/containerd/io.containerd.mount-manager.v1.bolt/t/1/1  []}]: mount source: "/run/containerd/io.containerd.mount-manager.v1.bolt/t/1/1", target: "/run/sfab/helm-image.297p7F", fstype: bind, flags: 0, data: "", err: no such device
+2026-10-20T05:58:05+00:00 ctrl1 systemd[1]: sfab-cluster.service: Main process exited, code=exited, status=1/FAILURE
+2026-10-20T05:58:05+00:00 ctrl1 systemd[1]: sfab-cluster.service: Failed with result 'exit-code'.
+2026-10-20T05:58:05+00:00 ctrl1 systemd[1]: Failed to start sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium.
+2026-10-20T05:58:05+00:00 ctrl1 systemd[1]: sfab-cluster.service: Consumed 1.733s CPU time, 66.7M memory peak, 0B memory swap peak.
+2026-10-20T05:58:26+00:00 ctrl1 systemd[1]: sfab-cluster.service: Scheduled restart job, restart counter is at 1.
+2026-10-20T05:58:26+00:00 ctrl1 systemd[1]: Starting sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium...
+2026-10-20T05:58:26+00:00 ctrl1 cluster-bootstrap.sh[2437]: [cluster-bootstrap] ctrl1: init in sfab-m2, API k8s.tarnwick.example:6443 (VIP 10.20.1.10)
+2026-10-20T05:58:26+00:00 ctrl1 cluster-bootstrap.sh[2437]: [cluster-bootstrap] the cluster exists (kubeadm init ran before)
+2026-10-20T05:58:27+00:00 ctrl1 cluster-bootstrap.sh[2437]: [cluster-bootstrap] Gateway API v1.4.1 CRDs established
+2026-10-20T05:58:27+00:00 ctrl1 cluster-bootstrap.sh[2437]: [cluster-bootstrap] helm v3.22.0 from docker.io/alpine/helm@sha256:e29ba4b553fa9648d0a35a9e29c8744c597a3e400d5574daf0f20a4c3854b852
+2026-10-20T05:58:27+00:00 ctrl1 cluster-bootstrap.sh[2515]: time="2026-10-20T05:58:27Z" level=warning msg="Config \"/etc/crictl.yaml\" does not exist, trying next: \"/usr/bin/crictl.yaml\""
+2026-10-20T05:58:27+00:00 ctrl1 cluster-bootstrap.sh[2525]: ctr: failed to mount [{bind /run/containerd/io.containerd.mount-manager.v1.bolt/t/2/1  []}]: mount source: "/run/containerd/io.containerd.mount-manager.v1.bolt/t/2/1", target: "/run/sfab/helm-image.5aeq6W", fstype: bind, flags: 0, data: "", err: no such device
+2026-10-20T05:58:27+00:00 ctrl1 systemd[1]: sfab-cluster.service: Main process exited, code=exited, status=1/FAILURE
+2026-10-20T05:58:27+00:00 ctrl1 systemd[1]: sfab-cluster.service: Failed with result 'exit-code'.
+2026-10-20T05:58:27+00:00 ctrl1 systemd[1]: Failed to start sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium.
+2026-10-20T05:58:48+00:00 ctrl1 systemd[1]: sfab-cluster.service: Scheduled restart job, restart counter is at 2.
+2026-10-20T05:58:48+00:00 ctrl1 systemd[1]: Starting sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium...
+2026-10-20T05:58:48+00:00 ctrl1 cluster-bootstrap.sh[2696]: [cluster-bootstrap] ctrl1: init in sfab-m2, API k8s.tarnwick.example:6443 (VIP 10.20.1.10)
+2026-10-20T05:58:48+00:00 ctrl1 cluster-bootstrap.sh[2696]: [cluster-bootstrap] the cluster exists (kubeadm init ran before)
+2026-10-20T05:58:49+00:00 ctrl1 cluster-bootstrap.sh[2696]: [cluster-bootstrap] Gateway API v1.4.1 CRDs established
+2026-10-20T05:58:49+00:00 ctrl1 cluster-bootstrap.sh[2696]: [cluster-bootstrap] helm v3.22.0 from docker.io/alpine/helm@sha256:e29ba4b553fa9648d0a35a9e29c8744c597a3e400d5574daf0f20a4c3854b852
+2026-10-20T05:58:49+00:00 ctrl1 cluster-bootstrap.sh[2772]: time="2026-10-20T05:58:49Z" level=warning msg="Config \"/etc/crictl.yaml\" does not exist, trying next: \"/usr/bin/crictl.yaml\""
+2026-10-20T05:58:49+00:00 ctrl1 cluster-bootstrap.sh[2782]: ctr: failed to mount [{bind /run/containerd/io.containerd.mount-manager.v1.bolt/t/3/1  []}]: mount source: "/run/containerd/io.containerd.mount-manager.v1.bolt/t/3/1", target: "/run/sfab/helm-image.8ExQUw", fstype: bind, flags: 0, data: "", err: no such device
+2026-10-20T05:58:49+00:00 ctrl1 systemd[1]: sfab-cluster.service: Main process exited, code=exited, status=1/FAILURE
+2026-10-20T05:58:49+00:00 ctrl1 systemd[1]: sfab-cluster.service: Failed with result 'exit-code'.
+2026-10-20T05:58:49+00:00 ctrl1 systemd[1]: Failed to start sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium.
+2026-10-20T05:59:10+00:00 ctrl1 systemd[1]: sfab-cluster.service: Scheduled restart job, restart counter is at 3.
+2026-10-20T05:59:10+00:00 ctrl1 systemd[1]: Starting sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium...
+2026-10-20T05:59:10+00:00 ctrl1 cluster-bootstrap.sh[3059]: [cluster-bootstrap] ctrl1: init in sfab-m2, API k8s.tarnwick.example:6443 (VIP 10.20.1.10)
+2026-10-20T05:59:10+00:00 ctrl1 cluster-bootstrap.sh[3059]: [cluster-bootstrap] the cluster exists (kubeadm init ran before)
+2026-10-20T05:59:11+00:00 ctrl1 cluster-bootstrap.sh[3059]: [cluster-bootstrap] Gateway API v1.4.1 CRDs established
+2026-10-20T05:59:11+00:00 ctrl1 cluster-bootstrap.sh[3059]: [cluster-bootstrap] helm v3.22.0 from docker.io/alpine/helm@sha256:e29ba4b553fa9648d0a35a9e29c8744c597a3e400d5574daf0f20a4c3854b852
+2026-10-20T05:59:11+00:00 ctrl1 cluster-bootstrap.sh[3137]: time="2026-10-20T05:59:11Z" level=warning msg="Config \"/etc/crictl.yaml\" does not exist, trying next: \"/usr/bin/crictl.yaml\""
+2026-10-20T05:59:11+00:00 ctrl1 cluster-bootstrap.sh[3147]: ctr: failed to mount [{bind /run/containerd/io.containerd.mount-manager.v1.bolt/t/4/1  []}]: mount source: "/run/containerd/io.containerd.mount-manager.v1.bolt/t/4/1", target: "/run/sfab/helm-image.GubLi5", fstype: bind, flags: 0, data: "", err: no such device
+2026-10-20T05:59:11+00:00 ctrl1 systemd[1]: sfab-cluster.service: Main process exited, code=exited, status=1/FAILURE
+2026-10-20T05:59:11+00:00 ctrl1 systemd[1]: sfab-cluster.service: Failed with result 'exit-code'.
+2026-10-20T05:59:11+00:00 ctrl1 systemd[1]: Failed to start sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium.
+2026-10-20T05:59:31+00:00 ctrl1 systemd[1]: sfab-cluster.service: Scheduled restart job, restart counter is at 4.
+2026-10-20T05:59:31+00:00 ctrl1 systemd[1]: Starting sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium...
+2026-10-20T05:59:31+00:00 ctrl1 cluster-bootstrap.sh[3232]: [cluster-bootstrap] ctrl1: init in sfab-m2, API k8s.tarnwick.example:6443 (VIP 10.20.1.10)
+2026-10-20T05:59:31+00:00 ctrl1 cluster-bootstrap.sh[3232]: [cluster-bootstrap] the cluster exists (kubeadm init ran before)
+2026-10-20T05:59:32+00:00 ctrl1 cluster-bootstrap.sh[3232]: [cluster-bootstrap] Gateway API v1.4.1 CRDs established
+2026-10-20T05:59:32+00:00 ctrl1 cluster-bootstrap.sh[3232]: [cluster-bootstrap] helm v3.22.0 from docker.io/alpine/helm@sha256:e29ba4b553fa9648d0a35a9e29c8744c597a3e400d5574daf0f20a4c3854b852
+2026-10-20T05:59:32+00:00 ctrl1 cluster-bootstrap.sh[3310]: time="2026-10-20T05:59:32Z" level=warning msg="Config \"/etc/crictl.yaml\" does not exist, trying next: \"/usr/bin/crictl.yaml\""
+2026-10-20T05:59:32+00:00 ctrl1 cluster-bootstrap.sh[3321]: ctr: failed to mount [{bind /run/containerd/io.containerd.mount-manager.v1.bolt/t/5/1  []}]: mount source: "/run/containerd/io.containerd.mount-manager.v1.bolt/t/5/1", target: "/run/sfab/helm-image.M3KTqt", fstype: bind, flags: 0, data: "", err: no such device
+2026-10-20T05:59:32+00:00 ctrl1 systemd[1]: sfab-cluster.service: Main process exited, code=exited, status=1/FAILURE
+2026-10-20T05:59:32+00:00 ctrl1 systemd[1]: sfab-cluster.service: Failed with result 'exit-code'.
+2026-10-20T05:59:32+00:00 ctrl1 systemd[1]: Failed to start sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium.
+2026-10-20T05:59:52+00:00 ctrl1 systemd[1]: sfab-cluster.service: Scheduled restart job, restart counter is at 5.
+2026-10-20T05:59:52+00:00 ctrl1 systemd[1]: Starting sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium...
+2026-10-20T05:59:52+00:00 ctrl1 cluster-bootstrap.sh[3502]: [cluster-bootstrap] ctrl1: init in sfab-m2, API k8s.tarnwick.example:6443 (VIP 10.20.1.10)
+2026-10-20T05:59:52+00:00 ctrl1 cluster-bootstrap.sh[3502]: [cluster-bootstrap] the cluster exists (kubeadm init ran before)
+2026-10-20T05:59:53+00:00 ctrl1 cluster-bootstrap.sh[3502]: [cluster-bootstrap] Gateway API v1.4.1 CRDs established
+2026-10-20T05:59:53+00:00 ctrl1 cluster-bootstrap.sh[3502]: [cluster-bootstrap] helm v3.22.0 from docker.io/alpine/helm@sha256:e29ba4b553fa9648d0a35a9e29c8744c597a3e400d5574daf0f20a4c3854b852
+2026-10-20T05:59:53+00:00 ctrl1 cluster-bootstrap.sh[3579]: time="2026-10-20T05:59:53Z" level=warning msg="Config \"/etc/crictl.yaml\" does not exist, trying next: \"/usr/bin/crictl.yaml\""
+2026-10-20T05:59:53+00:00 ctrl1 cluster-bootstrap.sh[3589]: ctr: failed to mount [{bind /run/containerd/io.containerd.mount-manager.v1.bolt/t/6/1  []}]: mount source: "/run/containerd/io.containerd.mount-manager.v1.bolt/t/6/1", target: "/run/sfab/helm-image.VHIsqs", fstype: bind, flags: 0, data: "", err: no such device
+2026-10-20T05:59:53+00:00 ctrl1 systemd[1]: sfab-cluster.service: Main process exited, code=exited, status=1/FAILURE
+2026-10-20T05:59:53+00:00 ctrl1 systemd[1]: sfab-cluster.service: Failed with result 'exit-code'.
+2026-10-20T05:59:53+00:00 ctrl1 systemd[1]: Failed to start sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium.
+2026-10-20T06:00:13+00:00 ctrl1 systemd[1]: sfab-cluster.service: Scheduled restart job, restart counter is at 6.
+2026-10-20T06:00:13+00:00 ctrl1 systemd[1]: Starting sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium...
+2026-10-20T06:00:13+00:00 ctrl1 cluster-bootstrap.sh[3861]: [cluster-bootstrap] ctrl1: init in sfab-m2, API k8s.tarnwick.example:6443 (VIP 10.20.1.10)
+2026-10-20T06:00:13+00:00 ctrl1 cluster-bootstrap.sh[3861]: [cluster-bootstrap] the cluster exists (kubeadm init ran before)
+2026-10-20T06:00:16+00:00 ctrl1 cluster-bootstrap.sh[3861]: [cluster-bootstrap] waiting for the API through k8s.tarnwick.example:6443
+2026-10-20T06:00:28+00:00 ctrl1 cluster-bootstrap.sh[3861]: [cluster-bootstrap] Gateway API v1.4.1 CRDs established
+2026-10-20T06:00:28+00:00 ctrl1 cluster-bootstrap.sh[3861]: [cluster-bootstrap] helm v3.22.0 from docker.io/alpine/helm@sha256:e29ba4b553fa9648d0a35a9e29c8744c597a3e400d5574daf0f20a4c3854b852
+2026-10-20T06:00:28+00:00 ctrl1 cluster-bootstrap.sh[4031]: time="2026-10-20T06:00:28Z" level=warning msg="Config \"/etc/crictl.yaml\" does not exist, trying next: \"/usr/bin/crictl.yaml\""
+2026-10-20T06:00:28+00:00 ctrl1 cluster-bootstrap.sh[4041]: ctr: failed to mount [{bind /run/containerd/io.containerd.mount-manager.v1.bolt/t/7/1  []}]: mount source: "/run/containerd/io.containerd.mount-manager.v1.bolt/t/7/1", target: "/run/sfab/helm-image.XpWmc3", fstype: bind, flags: 0, data: "", err: no such device
+2026-10-20T06:00:28+00:00 ctrl1 systemd[1]: sfab-cluster.service: Main process exited, code=exited, status=1/FAILURE
+2026-10-20T06:00:28+00:00 ctrl1 systemd[1]: sfab-cluster.service: Failed with result 'exit-code'.
+2026-10-20T06:00:28+00:00 ctrl1 systemd[1]: Failed to start sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium.
+2026-10-20T06:00:48+00:00 ctrl1 systemd[1]: sfab-cluster.service: Scheduled restart job, restart counter is at 7.
+2026-10-20T06:00:48+00:00 ctrl1 systemd[1]: Starting sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium...
+2026-10-20T06:00:48+00:00 ctrl1 cluster-bootstrap.sh[4114]: [cluster-bootstrap] ctrl1: init in sfab-m2, API k8s.tarnwick.example:6443 (VIP 10.20.1.10)
+2026-10-20T06:00:48+00:00 ctrl1 cluster-bootstrap.sh[4114]: [cluster-bootstrap] the cluster exists (kubeadm init ran before)
+2026-10-20T06:00:49+00:00 ctrl1 cluster-bootstrap.sh[4114]: [cluster-bootstrap] Gateway API v1.4.1 CRDs established
+2026-10-20T06:00:49+00:00 ctrl1 cluster-bootstrap.sh[4114]: [cluster-bootstrap] helm v3.22.0 from docker.io/alpine/helm@sha256:e29ba4b553fa9648d0a35a9e29c8744c597a3e400d5574daf0f20a4c3854b852
+2026-10-20T06:00:49+00:00 ctrl1 cluster-bootstrap.sh[4192]: time="2026-10-20T06:00:49Z" level=warning msg="Config \"/etc/crictl.yaml\" does not exist, trying next: \"/usr/bin/crictl.yaml\""
+2026-10-20T06:00:49+00:00 ctrl1 cluster-bootstrap.sh[4203]: ctr: failed to mount [{bind /run/containerd/io.containerd.mount-manager.v1.bolt/t/8/1  []}]: mount source: "/run/containerd/io.containerd.mount-manager.v1.bolt/t/8/1", target: "/run/sfab/helm-image.yXDfYS", fstype: bind, flags: 0, data: "", err: no such device
+2026-10-20T06:00:49+00:00 ctrl1 systemd[1]: sfab-cluster.service: Main process exited, code=exited, status=1/FAILURE
+2026-10-20T06:00:49+00:00 ctrl1 systemd[1]: sfab-cluster.service: Failed with result 'exit-code'.
+2026-10-20T06:00:49+00:00 ctrl1 systemd[1]: Failed to start sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium.
+2026-10-20T06:01:09+00:00 ctrl1 systemd[1]: sfab-cluster.service: Scheduled restart job, restart counter is at 8.
+2026-10-20T06:01:09+00:00 ctrl1 systemd[1]: Starting sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium...
+2026-10-20T06:01:09+00:00 ctrl1 cluster-bootstrap.sh[4221]: [cluster-bootstrap] ctrl1: init in sfab-m2, API k8s.tarnwick.example:6443 (VIP 10.20.1.10)
+2026-10-20T06:01:09+00:00 ctrl1 cluster-bootstrap.sh[4221]: [cluster-bootstrap] the cluster exists (kubeadm init ran before)
+2026-10-20T06:01:10+00:00 ctrl1 cluster-bootstrap.sh[4221]: [cluster-bootstrap] Gateway API v1.4.1 CRDs established
+2026-10-20T06:01:10+00:00 ctrl1 cluster-bootstrap.sh[4221]: [cluster-bootstrap] helm v3.22.0 from docker.io/alpine/helm@sha256:e29ba4b553fa9648d0a35a9e29c8744c597a3e400d5574daf0f20a4c3854b852
+2026-10-20T06:01:10+00:00 ctrl1 cluster-bootstrap.sh[4299]: time="2026-10-20T06:01:10Z" level=warning msg="Config \"/etc/crictl.yaml\" does not exist, trying next: \"/usr/bin/crictl.yaml\""
+2026-10-20T06:01:10+00:00 ctrl1 cluster-bootstrap.sh[4310]: ctr: failed to mount [{bind /run/containerd/io.containerd.mount-manager.v1.bolt/t/9/1  []}]: mount source: "/run/containerd/io.containerd.mount-manager.v1.bolt/t/9/1", target: "/run/sfab/helm-image.pWkGvT", fstype: bind, flags: 0, data: "", err: no such device
+2026-10-20T06:01:10+00:00 ctrl1 systemd[1]: sfab-cluster.service: Main process exited, code=exited, status=1/FAILURE
+2026-10-20T06:01:10+00:00 ctrl1 systemd[1]: sfab-cluster.service: Failed with result 'exit-code'.
+2026-10-20T06:01:10+00:00 ctrl1 systemd[1]: Failed to start sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium.
+2026-10-20T06:01:30+00:00 ctrl1 systemd[1]: sfab-cluster.service: Scheduled restart job, restart counter is at 9.
+2026-10-20T06:01:30+00:00 ctrl1 systemd[1]: Starting sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium...
+2026-10-20T06:01:30+00:00 ctrl1 cluster-bootstrap.sh[4400]: [cluster-bootstrap] ctrl1: init in sfab-m2, API k8s.tarnwick.example:6443 (VIP 10.20.1.10)
+2026-10-20T06:01:30+00:00 ctrl1 cluster-bootstrap.sh[4400]: [cluster-bootstrap] the cluster exists (kubeadm init ran before)
+2026-10-20T06:01:32+00:00 ctrl1 cluster-bootstrap.sh[4400]: [cluster-bootstrap] Gateway API v1.4.1 CRDs established
+2026-10-20T06:01:32+00:00 ctrl1 cluster-bootstrap.sh[4400]: [cluster-bootstrap] helm v3.22.0 from docker.io/alpine/helm@sha256:e29ba4b553fa9648d0a35a9e29c8744c597a3e400d5574daf0f20a4c3854b852
+2026-10-20T06:01:32+00:00 ctrl1 cluster-bootstrap.sh[4478]: time="2026-10-20T06:01:32Z" level=warning msg="Config \"/etc/crictl.yaml\" does not exist, trying next: \"/usr/bin/crictl.yaml\""
+2026-10-20T06:01:32+00:00 ctrl1 cluster-bootstrap.sh[4488]: ctr: failed to mount [{bind /run/containerd/io.containerd.mount-manager.v1.bolt/t/10/1  []}]: mount source: "/run/containerd/io.containerd.mount-manager.v1.bolt/t/10/1", target: "/run/sfab/helm-image.Z7RJ6d", fstype: bind, flags: 0, data: "", err: no such device
+2026-10-20T06:01:32+00:00 ctrl1 systemd[1]: sfab-cluster.service: Main process exited, code=exited, status=1/FAILURE
+2026-10-20T06:01:32+00:00 ctrl1 systemd[1]: sfab-cluster.service: Failed with result 'exit-code'.
+2026-10-20T06:01:32+00:00 ctrl1 systemd[1]: Failed to start sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium.
+2026-10-20T06:01:52+00:00 ctrl1 systemd[1]: sfab-cluster.service: Scheduled restart job, restart counter is at 10.
+2026-10-20T06:01:52+00:00 ctrl1 systemd[1]: Starting sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium...
+2026-10-20T06:01:52+00:00 ctrl1 cluster-bootstrap.sh[4610]: [cluster-bootstrap] ctrl1: init in sfab-m2, API k8s.tarnwick.example:6443 (VIP 10.20.1.10)
+2026-10-20T06:01:52+00:00 ctrl1 cluster-bootstrap.sh[4610]: [cluster-bootstrap] the cluster exists (kubeadm init ran before)
+2026-10-20T06:01:53+00:00 ctrl1 cluster-bootstrap.sh[4610]: [cluster-bootstrap] Gateway API v1.4.1 CRDs established
+2026-10-20T06:01:53+00:00 ctrl1 cluster-bootstrap.sh[4610]: [cluster-bootstrap] helm v3.22.0 from docker.io/alpine/helm@sha256:e29ba4b553fa9648d0a35a9e29c8744c597a3e400d5574daf0f20a4c3854b852
+2026-10-20T06:01:53+00:00 ctrl1 cluster-bootstrap.sh[4694]: time="2026-10-20T06:01:53Z" level=warning msg="Config \"/etc/crictl.yaml\" does not exist, trying next: \"/usr/bin/crictl.yaml\""
+2026-10-20T06:01:53+00:00 ctrl1 cluster-bootstrap.sh[4705]: ctr: failed to mount [{bind /run/containerd/io.containerd.mount-manager.v1.bolt/t/11/1  []}]: mount source: "/run/containerd/io.containerd.mount-manager.v1.bolt/t/11/1", target: "/run/sfab/helm-image.GF82KP", fstype: bind, flags: 0, data: "", err: no such device
+2026-10-20T06:01:53+00:00 ctrl1 systemd[1]: sfab-cluster.service: Main process exited, code=exited, status=1/FAILURE
+2026-10-20T06:01:53+00:00 ctrl1 systemd[1]: sfab-cluster.service: Failed with result 'exit-code'.
+2026-10-20T06:01:53+00:00 ctrl1 systemd[1]: Failed to start sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium.
+2026-10-20T06:02:13+00:00 ctrl1 systemd[1]: sfab-cluster.service: Scheduled restart job, restart counter is at 11.
+2026-10-20T06:02:13+00:00 ctrl1 systemd[1]: Starting sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium...
+2026-10-20T06:02:13+00:00 ctrl1 cluster-bootstrap.sh[5043]: [cluster-bootstrap] ctrl1: init in sfab-m2, API k8s.tarnwick.example:6443 (VIP 10.20.1.10)
+2026-10-20T06:02:13+00:00 ctrl1 cluster-bootstrap.sh[5043]: [cluster-bootstrap] the cluster exists (kubeadm init ran before)
+2026-10-20T06:02:14+00:00 ctrl1 cluster-bootstrap.sh[5043]: [cluster-bootstrap] Gateway API v1.4.1 CRDs established
+2026-10-20T06:02:14+00:00 ctrl1 cluster-bootstrap.sh[5043]: [cluster-bootstrap] helm v3.22.0 from docker.io/alpine/helm@sha256:e29ba4b553fa9648d0a35a9e29c8744c597a3e400d5574daf0f20a4c3854b852
+2026-10-20T06:02:14+00:00 ctrl1 cluster-bootstrap.sh[5173]: time="2026-10-20T06:02:14Z" level=warning msg="Config \"/etc/crictl.yaml\" does not exist, trying next: \"/usr/bin/crictl.yaml\""
+2026-10-20T06:02:14+00:00 ctrl1 cluster-bootstrap.sh[5293]: Pulled: 192.0.2.6:5000/charts/cilium:1.19.7
+2026-10-20T06:02:14+00:00 ctrl1 cluster-bootstrap.sh[5293]: Digest: sha256:753abe04417696fd7edd5af9266a9b9654a7b064e4df144537192ea2371cb39d
+2026-10-20T06:02:15+00:00 ctrl1 cluster-bootstrap.sh[5043]: [cluster-bootstrap] Cilium 1.19.7 installed from oci://192.0.2.6:5000/charts/cilium (release kube-system/cilium)
+2026-10-20T06:02:15+00:00 ctrl1 cluster-bootstrap.sh[5043]: [cluster-bootstrap] waiting for Cilium's agent on ctrl1
+2026-10-20T06:02:45+00:00 ctrl1 cluster-bootstrap.sh[5043]: [cluster-bootstrap] Cilium's agent and operator ready, ctrl1 Ready
+2026-10-20T06:02:45+00:00 ctrl1 cluster-bootstrap.sh[5043]: [cluster-bootstrap] ctrl1: done
+2026-10-20T06:02:45+00:00 ctrl1 systemd[1]: sfab-cluster.service: Deactivated successfully.
+2026-10-20T06:02:45+00:00 ctrl1 systemd[1]: Finished sfab-cluster.service - sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium.
+2026-10-20T06:02:45+00:00 ctrl1 systemd[1]: sfab-cluster.service: Consumed 1.637s CPU time, 105.8M memory peak, 0B memory swap peak.

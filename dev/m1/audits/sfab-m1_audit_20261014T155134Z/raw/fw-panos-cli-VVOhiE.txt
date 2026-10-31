@@ -1,0 +1,475 @@
+Last login: Wed Oct 14 15:51:27 2026 from 172.21.40.1
+set cli pager off
+show system info
+show interface all
+show lacp aggregate-ethernet all
+show interface ae1.100
+show interface ae1.200
+show interface ae1.300
+show routing route
+show running security-policy
+show running nat-policy
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show system 
+admin@fw> show system info
+
+hostname: fw
+ip-address: 10.0.0.15
+public-ip-address: unknown
+netmask: 255.255.255.0
+default-gateway: 10.0.0.2
+ip-assignment: dhcp
+ip6-assignment: static
+ipv6-address: unknown
+ipv6-link-local-address: fe80::e00:31ff:fe5a:e200/64
+ipv6-default-gateway: 
+mac-address: 0c:00:31:5a:e2:00
+time: Wed Oct 14 15:51:38 2026
+uptime: 0 days, 0:05:47
+family: vm
+model: PA-VM
+serial: unknown
+vm-mac-base: BA:DB:EE:FB:AD:00
+vm-mac-count: 255
+vm-uuid: AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA
+vm-cpuid: [redacted: host-cpuid]
+vm-license: none
+vm-cap-tier: unknown
+vm-cpu-count: 8
+vm-memory: 16354236
+vm-mode: KVM
+cloud-mode: non-cloud
+sw-version: 12.1.2
+global-protect-client-package-version: 0.0.0
+device-dictionary-version: 82-406
+device-dictionary-release-date: 
+app-version: 9010-9583
+app-release-date: 
+av-version: 0
+av-release-date: 
+threat-version: 0
+threat-release-date: 
+wf-private-version: 0
+wf-private-release-date: unknown
+url-db: paloaltonetworks
+wildfire-version: 0
+wildfire-release-date: 
+wildfire-rt: Disabled
+url-filtering-version: 0000.00.00.000
+global-protect-datafile-version: 0
+global-protect-datafile-release-date: unknown
+global-protect-clientless-vpn-version: 0
+global-protect-clientless-vpn-release-date: 
+logdb-version: 12.1.4
+vm_series: vm_series-6.1.0
+dlp: dlp-6.0.1
+platform-family: vm
+vpn-disable-mode: off
+multi-vsys: off
+operational-mode: normal
+advanced-routing: off
+duplicate-ip: Disabled
+device-certificate-status: None
+
+admin@fw> show 
+admin@fw> show interface 
+admin@fw> show interface all
+
+total configured hardware interfaces: 4
+
+name                    id    speed/duplex/state            mac address       
+--------------------------------------------------------------------------------
+ethernet1/1             16    10000/full/up                 ba:db:ee:fb:ad:f0 
+ethernet1/2             17    10000/full/up                 ba:db:ee:fb:ad:f0 
+ethernet1/3             18    10000/full/up                 aa:c1:ab:a2:b2:70 
+ae1                     240   [n/a]/[n/a]/up                ba:db:ee:fb:ad:f0 
+
+aggregation groups: 1
+ae1 members:
+  ethernet1/1 ethernet1/2 
+
+
+total configured logical interfaces: 5
+
+name                      id    vsys zone             forwarding               tag    address                                         
+------------------------- ----- ---- ---------------- ------------------------ ------ ------------------
+ethernet1/3               18    1    oob              vr:core                  0      10.20.9.254/24    
+ae1                       240   1                     N/A                      0      N/A               
+ae1.100                   256   1    data             vr:core                  100    10.20.1.1/24      
+ae1.200                   257   1    stor-mgmt        vr:core                  200    10.20.2.1/24      
+ae1.300                   258   1    bastion          vr:core                  300    10.20.3.1/24      
+
+admin@fw> show 
+admin@fw> show lacp 
+admin@fw> show lacp aggregate-ethernet 
+admin@fw> show lacp aggregate-ethernet all
+
+LACP:
+
+**********************************************************************************
+AE group: ae1
+Members:                Bndl Rx state       Mux state  Sel state
+  ethernet1/1           yes  Current        Tx_Rx      Selected
+  ethernet1/2           yes  Current        Tx_Rx      Selected
+Status:           Enabled
+Mode:             Active
+Rate:             Fast
+Max-port:         8
+Fast-failover:    Disabled
+Pre-negotiation:  Disabled
+Local:            System Priority: 32768
+                  System MAC:      ba:db:ee:fb:ad:01
+                  Key:             240
+Partner:          System Priority: 65535
+                  System MAC:      02:5a:00:00:00:01
+                  Key:             10
+Port State
+--------------------------------------------------------------------------------
+Interface                       Port                                
+                    Number Priority  Mode    Rate  Key      State
+--------------------------------------------------------------------------------
+ethernet1/1          16     32768    Active  Fast  240      0x3F                          
+Partner              3      255      Active  Fast  10       0x3F
+
+ethernet1/2          17     32768    Active  Fast  240      0x3F                          
+Partner              3      255      Active  Fast  10       0x3F
+
+Port Counters
+--------------------------------------------------------------------------------
+Interface               LACPDUs         Marker      Marker Response       Error        
+                    Sent     Recv     Sent Recv     Sent     Recv     Unknown  Illegal 
+--------------------------------------------------------------------------------
+ethernet1/1          173      174      0    0        0        0        0        0       
+ethernet1/2          172      175      0    0        0        0        0        0       
+
+admin@fw> show 
+admin@fw> show interface 
+admin@fw> show interface ae1.100
+
+--------------------------------------------------------------------------------
+Name: ae1.100, ID: 256, 802.1q tag: 100
+Operation mode: layer3
+Virtual router core
+Interface MTU 9216
+Interface IP address: 10.20.1.1/24
+Interface management profile: ping-only
+  ping: yes  telnet: no  ssh: no  http: no  https: no  
+  snmp: no  response-pages: no  userid-service: no
+Service configured: 
+Zone: data, virtual system: vsys1
+Adjust TCP MSS: no
+Ignore IPv4 DF: no
+Policing: no
+--------------------------------------------------------------------------------
+Logical interface counters read from CPU:
+--------------------------------------------------------------------------------
+bytes received                           3240
+bytes transmitted                        1736
+packets received                         40
+packets transmitted                      28
+receive errors                           0
+packets dropped                          0
+packets dropped by flow state check      0
+forwarding errors                        0
+no route                                 0
+arp not found                            0
+neighbor not found                       0
+neighbor info pending                    0
+mac not found                            0
+packets routed to different zone         0
+land attacks                             0
+ping-of-death attacks                    0
+teardrop attacks                         0
+ip spoof attacks                         0
+mac spoof attacks                        0
+ICMP fragment                            0
+layer2 encapsulated packets              0
+layer2 decapsulated packets              0
+tcp cps                                  0
+udp cps                                  0
+sctp cps                                 0
+other cps                                2
+--------------------------------------------------------------------------------
+
+
+admin@fw> show 
+admin@fw> show interface 
+admin@fw> show interface ae1.200
+
+--------------------------------------------------------------------------------
+Name: ae1.200, ID: 257, 802.1q tag: 200
+Operation mode: layer3
+Virtual router core
+Interface MTU 9216
+Interface IP address: 10.20.2.1/24
+Interface management profile: ping-only
+  ping: yes  telnet: no  ssh: no  http: no  https: no  
+  snmp: no  response-pages: no  userid-service: no
+Service configured: 
+Zone: stor-mgmt, virtual system: vsys1
+Adjust TCP MSS: no
+Ignore IPv4 DF: no
+Policing: no
+--------------------------------------------------------------------------------
+Logical interface counters read from CPU:
+--------------------------------------------------------------------------------
+bytes received                           240
+bytes transmitted                        736
+packets received                         4
+packets transmitted                      16
+receive errors                           0
+packets dropped                          0
+packets dropped by flow state check      0
+forwarding errors                        0
+no route                                 0
+arp not found                            0
+neighbor not found                       0
+neighbor info pending                    0
+mac not found                            0
+packets routed to different zone         0
+land attacks                             0
+ping-of-death attacks                    0
+teardrop attacks                         0
+ip spoof attacks                         0
+mac spoof attacks                        0
+ICMP fragment                            0
+layer2 encapsulated packets              0
+layer2 decapsulated packets              0
+tcp cps                                  0
+udp cps                                  0
+sctp cps                                 0
+other cps                                0
+--------------------------------------------------------------------------------
+
+
+admin@fw> show 
+admin@fw> show interface 
+admin@fw> show interface ae1.300
+
+--------------------------------------------------------------------------------
+Name: ae1.300, ID: 258, 802.1q tag: 300
+Operation mode: layer3
+Virtual router core
+Interface MTU 9216
+Interface IP address: 10.20.3.1/24
+Interface management profile: ping-only
+  ping: yes  telnet: no  ssh: no  http: no  https: no  
+  snmp: no  response-pages: no  userid-service: no
+Service configured: 
+Zone: bastion, virtual system: vsys1
+Adjust TCP MSS: no
+Ignore IPv4 DF: no
+Policing: no
+--------------------------------------------------------------------------------
+Logical interface counters read from CPU:
+--------------------------------------------------------------------------------
+bytes received                           240
+bytes transmitted                        736
+packets received                         4
+packets transmitted                      16
+receive errors                           0
+packets dropped                          0
+packets dropped by flow state check      0
+forwarding errors                        0
+no route                                 0
+arp not found                            0
+neighbor not found                       0
+neighbor info pending                    0
+mac not found                            0
+packets routed to different zone         0
+land attacks                             0
+ping-of-death attacks                    0
+teardrop attacks                         0
+ip spoof attacks                         0
+mac spoof attacks                        0
+ICMP fragment                            0
+layer2 encapsulated packets              0
+layer2 decapsulated packets              0
+tcp cps                                  0
+udp cps                                  0
+sctp cps                                 0
+other cps                                0
+--------------------------------------------------------------------------------
+
+
+admin@fw> show 
+admin@fw> show routing 
+admin@fw> show routing route
+
+flags: A:active, ?:loose, C:connect, H:host, S:static, ~:internal, R:rip, O:ospf, B:bgp, 
+       Oi:ospf intra-area, Oo:ospf inter-area, O1:ospf ext-type-1, O2:ospf ext-type-2, E:ecmp, M:multicast
+
+  
+VIRTUAL ROUTER: core (id 2)
+  ==========
+destination                                 nexthop                                 metric flags      age   interface          next-AS    
+10.20.1.0/24                                10.20.1.1                               0      A C              ae1.100                       
+10.20.1.1/32                                0.0.0.0                                 0      A H                                            
+10.20.2.0/24                                10.20.2.1                               0      A C              ae1.200                       
+10.20.2.1/32                                0.0.0.0                                 0      A H                                            
+10.20.3.0/24                                10.20.3.1                               0      A C              ae1.300                       
+10.20.3.1/32                                0.0.0.0                                 0      A H                                            
+10.20.9.0/24                                10.20.9.254                             0      A C              ethernet1/3                   
+10.20.9.254/32                              0.0.0.0                                 0      A H                                            
+total routes shown: 8
+
+admin@fw> show 
+admin@fw> show running 
+admin@fw> show running security-policy
+
+"data-intrazone; index: 1" {
+        from data;
+        source any;
+        source-region none;
+        to data;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"stor-mgmt-intrazone; index: 2" {
+        from stor-mgmt;
+        source any;
+        source-region none;
+        to stor-mgmt;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-intrazone; index: 3" {
+        from bastion;
+        source any;
+        source-region none;
+        to bastion;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"oob-intrazone; index: 4" {
+        from oob;
+        source any;
+        source-region none;
+        to oob;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"deny-all-log; index: 5" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal no;
+}
+
+"intrazone-default; index: 6" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+        type intrazone;
+}
+
+"interzone-default; index: 7" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal yes;
+        type interzone;
+}
+
+dynamic url: no
+
+
+admin@fw> show 
+admin@fw> show running 
+admin@fw> show running nat-policy
+
+Nat policy configured on vsys1:
+
+
+admin@fw> exit

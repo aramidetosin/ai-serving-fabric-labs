@@ -1,0 +1,13 @@
+== heal-7a: a new key for chat loaded by every API gateway pod but one
+  PASS  api-gateway-64bc7b94df-hm4sq deleted, and its Deployment api-gateway rolled out with a new pod in its place (api-gateway-64bc7b94df-7b74q,api-gateway-64bc7b94df-kjsww)
+== heal-7a: recorded
+  PASS  pods, heal: the per-pod probe of batch.fa000001 on chat's route: api-gateway-64bc7b94df-7b74q 200; api-gateway-64bc7b94df-kjsww 200 (recorded)
+  PASS  users, heal, pass 1: 0 of 20 requests through gw-users to chat failed (recorded)
+== heal-7a: healed
+  PASS  pods: every API gateway pod accepted the key (api-gateway-64bc7b94df-7b74q,api-gateway-64bc7b94df-kjsww)
+  PASS  users: every request succeeds (20 of 20)
+== heal-7a: cleanup
+  PASS  the key Job revoked batch.fa000001 in Secret inference/api-keys (sha256:6b38bbf9af91)
+== the chapter audit after the heal
+  PASS  audit.sh after the heal: RESULT: 982 passed, 0 failed, 0 known platform limitation(s), 2 skipped (ch07/audits/sfab-ch07_audit_20261030T143046Z)
+== RESULT: 7 passed, 0 failed, 0 known platform limitation(s), 0 skipped

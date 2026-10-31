@@ -1,0 +1,29 @@
+# sfab-ch06 load balancer pools: rendered from spec/profile-a.yaml by render/k8s.py; edit the spec and run make render
+# One pool per Gateway, its VIP's range in the data VLAN, for the Service that carries the Gateway's pool label.
+apiVersion: cilium.io/v2
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: gw-internal
+  labels:
+    decision.tarnwick.example/id: dec-routeset-internal
+spec:
+  blocks:
+  - start: "10.20.11.200"
+    stop: "10.20.11.209"
+  serviceSelector:
+    matchLabels:
+      tarnwick.example/lb-pool: gw-internal
+---
+apiVersion: cilium.io/v2
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: gw-users
+  labels:
+    decision.tarnwick.example/id: dec-routeset-enterprise
+spec:
+  blocks:
+  - start: "10.20.11.210"
+    stop: "10.20.11.214"
+  serviceSelector:
+    matchLabels:
+      tarnwick.example/lb-pool: gw-users

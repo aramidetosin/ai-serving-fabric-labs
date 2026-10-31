@@ -1,0 +1,29 @@
+model_list:
+- model_name: chat
+  litellm_params:
+    model: openai/chat
+    api_base: http://chat.serving.svc.cluster.local:8080/v1
+    api_key: os.environ/SERVING_KEY
+    timeout: 280
+    stream_timeout: 60
+    max_retries: 0
+- model_name: staff
+  litellm_params:
+    model: openai/staff
+    api_base: http://staff.serving.svc.cluster.local:8080/v1
+    api_key: os.environ/SERVING_KEY
+    timeout: 280
+    stream_timeout: 60
+    max_retries: 0
+router_settings:
+  routing_strategy: simple-shuffle
+  num_retries: 1
+  timeout: 280
+  retry_after: 0
+litellm_settings:
+  num_retries: 1
+  request_timeout: 280
+  drop_params: true
+  telemetry: false
+general_settings:
+  master_key: os.environ/ROUTER_MASTER_KEY

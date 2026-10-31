@@ -1,0 +1,113 @@
+make: Entering directory '/root/sfab/labs/images'
+/root/sfab/labs/images/build-if-stale.sh sfab/vm-node:1-k8s1.35.8-runtime /root/sfab/labs/images/vm-node --watch /root/sfab/labs/images/vm-node/Dockerfile --watch /root/sfab/images/vm-node-base/.pins -- --network host \
+  --target runtime --build-arg UBUNTU_BASE=ubuntu:24.04@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3 --build-arg UBUNTU_SNAPSHOT=20260912T000000Z
+[build] sfab/vm-node:1-k8s1.35.8-runtime is current
+/root/sfab/labs/images/build-if-stale.sh sfab/vm-node:1-k8s1.35.8 /root/sfab/labs/images/vm-node \
+  --watch /root/sfab/labs/images/vm-node/Dockerfile --watch /root/sfab/labs/images/vm-node/vm-init.sh --watch /root/sfab/labs/images/vm-node/node-files \
+  --watch /root/sfab/images/vm-node-base/node.qcow2 --watch /root/sfab/images/vm-node-base/node.id --watch /root/sfab/images/vm-node-base/.pins \
+  -- --network host --target node --build-context base=/root/sfab/images/vm-node-base \
+  --build-arg UBUNTU_BASE=ubuntu:24.04@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3 --build-arg UBUNTU_SNAPSHOT=20260912T000000Z \
+  --build-arg IMAGE_VERSION=1-k8s1.35.8
+[build] sfab/vm-node:1-k8s1.35.8: /root/sfab/labs/images/vm-node/node-files/lldpd.conf is newer than the image
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 3.39kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:24.04@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3
+#2 DONE 0.0s
+
+#3 [context base] load .dockerignore
+#3 transferring base: 2B done
+#3 DONE 0.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 238B done
+#4 DONE 0.0s
+
+#5 [runtime 1/2] FROM docker.io/library/ubuntu:24.04@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3
+#5 DONE 0.0s
+
+#6 [context base] load from client
+#6 transferring base: 61B done
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 21.73kB done
+#7 DONE 0.0s
+
+#8 [node 1/4] COPY --from=base --chmod=0444 node.qcow2 node.id /base/
+#8 CACHED
+
+#9 [runtime 2/2] RUN set -eu;     retry() { n=1; until "$@"; do [ "$n" -ge 8 ] && return 1; echo "retry $n: $*" >&2; sleep $((n * 10)); n=$((n + 1)); done; };     apt_get() { apt-get -q -o Acquire::Retries=10 -o APT::Update::Error-Mode=any "$@"; };     pkgs="qemu-system-x86 qemu-utils cloud-image-utils genisoimage iproute2 ethtool gettext-base socat ca-certificates curl procps iputils-ping";     src=/etc/apt/sources.list.d/ubuntu.sources;     cp "$src" /tmp/ubuntu.sources.base;     if [ -n "20260912T000000Z" ]; then       retry apt_get update;       apt_get install -y --no-install-recommends ca-certificates;       rm -rf /var/lib/apt/lists/*;       sed -i -E "s#^URIs:.*#URIs: https://snapshot.ubuntu.com/ubuntu/20260912T000000Z/#" "$src";     fi;     retry apt_get update;     retry apt_get install -y --no-install-recommends --download-only $pkgs;     apt_get install -y --no-install-recommends $pkgs;     mv /tmp/ubuntu.sources.base "$src";     apt-get clean;     rm -rf /var/lib/apt/lists/*;     dpkg-query -W -f='${Package} ${Version}\n' | LC_ALL=C sort > /usr/share/sfab-runtime-packages.txt
+#9 CACHED
+
+#10 [node 2/4] COPY --chmod=0755 vm-init.sh /usr/local/bin/vm-init.sh
+#10 CACHED
+
+#11 [node 3/4] COPY node-files/ /opt/sfab/node-files/
+#11 DONE 0.1s
+
+#12 [node 4/4] RUN chmod 0755 /opt/sfab/node-files/*.sh
+#12 DONE 0.1s
+
+#13 exporting to image
+#13 exporting layers done
+#13 writing image sha256:c638745d801c010c41ca36cae13e6bf7d5d13f464966010e0724d2f435812ca2 done
+#13 naming to docker.io/sfab/vm-node:1-k8s1.35.8 done
+#13 DONE 0.0s
+/root/sfab/labs/images/build-if-stale.sh sfab/bastion:1 /root/sfab/labs/images/bastion -- --network host \
+  --build-arg UBUNTU_BASE=ubuntu:24.04@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3 --build-arg UBUNTU_SNAPSHOT=20260912T000000Z \
+  --build-arg KUBECTL_VERSION=v1.35.8 --build-arg KUBECTL_SHA256=874d5e72dbb819f43cff16bcd1e4f8bac5b7f2361fe1e55049b0a6c676fb0cbf \
+  --build-arg HELM_VERSION=v3.22.0 --build-arg HELM_SHA256=1e4ab49e429626cf6c6958d914248b78c9730803c2751b87627e171dc800e7bb \
+  --build-arg CILIUM_CLI_VERSION=v0.19.7 --build-arg CILIUM_CLI_SHA256=cd15e0983bf0acc7946cd05d453d1e58376ea92dec2642e745212df2b07d8852 \
+  --build-arg IMAGE_VERSION=1
+[build] sfab/bastion:1: /root/sfab/labs/images/bastion/bastion-init.sh is newer than the image
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 5.50kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:24.04@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 135B done
+#3 DONE 0.0s
+
+#4 [1/8] FROM docker.io/library/ubuntu:24.04@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 15.80kB done
+#5 DONE 0.0s
+
+#6 [2/8] RUN set -eu;     retry() { n=1; until "$@"; do [ "$n" -ge 8 ] && return 1; echo "retry $n: $*" >&2; sleep $((n * 10)); n=$((n + 1)); done; };     apt_get() { apt-get -q -o Acquire::Retries=10 -o APT::Update::Error-Mode=any "$@"; };     pkgs="bind9 bind9-utils bind9-dnsutils chrony openssh-server lldpd jq openssl ca-certificates curl           iproute2 ethtool procps iputils-ping sudo bash-completion netcat-openbsd tcpdump less";     src=/etc/apt/sources.list.d/ubuntu.sources;     cp "$src" /tmp/ubuntu.sources.base;     if [ -n "20260912T000000Z" ]; then       retry apt_get update;       apt_get install -y --no-install-recommends ca-certificates;       rm -rf /var/lib/apt/lists/*;       sed -i -E "s#^URIs:.*#URIs: https://snapshot.ubuntu.com/ubuntu/20260912T000000Z/#" "$src";     fi;     retry apt_get update;     retry apt_get install -y --no-install-recommends --download-only $pkgs;     apt_get install -y --no-install-recommends $pkgs;     mv /tmp/ubuntu.sources.base "$src";     apt-get clean;     rm -rf /var/lib/apt/lists/*;     dpkg-query -W -f='${Package} ${Version}\n' | LC_ALL=C sort > /usr/share/sfab-bastion-packages.txt
+#6 CACHED
+
+#7 [3/8] RUN set -eu;     for v in KUBECTL_VERSION KUBECTL_SHA256 HELM_VERSION HELM_SHA256 CILIUM_CLI_VERSION CILIUM_CLI_SHA256; do       eval "x=${$v:-}"; [ -n "$x" ] || { echo "build argument $v is empty: pin it in spec/versions.yaml" >&2; exit 1; };     done;     get() { curl -fsSL --retry 5 --retry-delay 10 -o "$1" "$2"; echo "$3  $1" | sha256sum -c -; };     cd /tmp;     get kubectl "https://dl.k8s.io/release/v1.35.8/bin/linux/amd64/kubectl" "874d5e72dbb819f43cff16bcd1e4f8bac5b7f2361fe1e55049b0a6c676fb0cbf";     install -m 0755 kubectl /usr/local/bin/kubectl;     get helm.tar.gz "https://get.helm.sh/helm-v3.22.0-linux-amd64.tar.gz" "1e4ab49e429626cf6c6958d914248b78c9730803c2751b87627e171dc800e7bb";     tar -xzf helm.tar.gz linux-amd64/helm;     install -m 0755 linux-amd64/helm /usr/local/bin/helm;     get cilium.tar.gz "https://github.com/cilium/cilium-cli/releases/download/v0.19.7/cilium-linux-amd64.tar.gz" "cd15e0983bf0acc7946cd05d453d1e58376ea92dec2642e745212df2b07d8852";     tar -xzf cilium.tar.gz cilium;     install -m 0755 cilium /usr/local/bin/cilium;     rm -rf /tmp/kubectl /tmp/helm.tar.gz /tmp/linux-amd64 /tmp/cilium.tar.gz /tmp/cilium;     printf 'kubectl %s\nhelm %s\ncilium-cli %s\n' "v1.35.8" "v3.22.0" "v0.19.7" > /usr/share/sfab-bastion-tools.txt
+#7 CACHED
+
+#8 [4/8] RUN rm -f /etc/ssh/ssh_host_* /etc/bind/rndc.key /etc/chrony/chrony.keys  && if id -u ubuntu >/dev/null 2>&1; then userdel -r ubuntu 2>/dev/null || userdel ubuntu; fi  && mkdir -p /etc/sfab /workspace /run/sfab
+#8 CACHED
+
+#9 [5/8] COPY bastion-init.sh /usr/local/sbin/bastion-init.sh
+#9 DONE 0.0s
+
+#10 [6/8] COPY sfab-ca sfab-dns /usr/local/bin/
+#10 DONE 0.0s
+
+#11 [7/8] COPY operator-shell.sh /etc/profile.d/sfab-operator.sh
+#11 DONE 0.0s
+
+#12 [8/8] RUN chmod 0755 /usr/local/sbin/bastion-init.sh /usr/local/bin/sfab-ca /usr/local/bin/sfab-dns  && chmod 0644 /etc/profile.d/sfab-operator.sh  && printf '\n# the operator environment (images/bastion/operator-shell.sh)\n[ -r /etc/profile.d/sfab-operator.sh ] && . /etc/profile.d/sfab-operator.sh\n' >> /etc/bash.bashrc
+#12 DONE 0.1s
+
+#13 exporting to image
+#13 exporting layers 0.0s done
+#13 writing image sha256:61f795ccbaa1860e9388765e6f1a3313f2f58809846f1b058112175f9fec80e4 done
+#13 naming to docker.io/sfab/bastion:1 done
+#13 DONE 0.0s
+make: Leaving directory '/root/sfab/labs/images'

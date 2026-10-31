@@ -1,0 +1,52 @@
+# Read on the lab host after the refused preflight. Read only: nothing here changed the host.
+date -u: 2026-10-20T04:43:37Z
+
+## containerlab version
+version: 0.81.1
+commit: 1e15948d5
+date: 2026-10-15T08:17:35Z
+
+## the binary
+-rwsr-xr-x 80937122 2026-10-15T08:19:45 /usr/bin/containerlab
+
+## the pin (spec/versions.yaml on the lab host)
+94:  containerlab: 0.81.0
+
+## containerlab deploy --help: the skip flags
+--skip-labdir-acl    Skip the lab directory extended ACLs provisioning
+--skip-post-deploy   Skip post deploy action
+
+## disk
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/md1p1      3.5T  3.0T  287G  92% /
+Avail Mounted on
+ 287G /
+[redacted: host-note]
+du -sh dev/m2/state: 52K
+du -sh dev/m1/state: 328M
+
+## memory
+MemTotal:       395562972 kB
+MemAvailable:   139725592 kB
+
+## nothing of sfab-m2 exists
+containers named sfab-m2-*: 0
+containers named sfab-m1-*: 0
+docker network sfab-a-mgmt: 0
+clab-sfab-m2/: absent
+units sfab-m2-*: 0
+/etc/ssh/ssh_config.d/clab-sfab-m2.conf: absent
+/etc/hosts lines naming sfab-m2: 0
+
+## dev/m2/state/
+images.json
+lock
+logs
+preflight.last
+run
+secrets
+secrets.env
+stage
+state/logs/:
+preflight-20261020T042713Z.log
+preflight-20261020T044237Z.log

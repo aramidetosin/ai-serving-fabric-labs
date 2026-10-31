@@ -1,0 +1,9 @@
+# The platform's recursive resolvers, which also serve time: SLUG SURFACE COMMAND. judge.py's
+# services group judges these files: the users' name from the internal view, a reverse name, a name
+# outside the platform's zone NXDOMAIN at once, and chrony following the reference over NTS.
++res_users           exec        dig +time=3 +tries=2 +short @127.0.0.1 {users_fqdn}
+res_reverse          exec        dig +time=3 +tries=2 +short @127.0.0.1 -x {api_vip}
+res_outside          exec        dig +time=3 +tries=1 @127.0.0.1 www.example.org A | grep -E 'status:|flags:' || echo 'no answer'
++chrony_sources      exec        chronyc -n sources
+chrony_authdata      exec        chronyc -n authdata
+chrony_tracking      exec        chronyc -n tracking

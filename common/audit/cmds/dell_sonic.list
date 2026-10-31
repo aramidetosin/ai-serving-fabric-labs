@@ -1,0 +1,18 @@
+# Every SONiC switch: SLUG SURFACE COMMAND (see README.md). The judge reads these files only.
++launcher_log        host        launcher_log
++container_env       host        container_env
++container_links     host-json   container_links
++container_ipv6      host        container_ipv6
++version             klish       show version
++ip_interfaces       klish       show ip interfaces
++ip_route            klish       show ip route
++ip_vrf              klish       show ip vrf
++running_config      klish       show running-configuration
++running_router      klish       show running-configuration | grep router
++vlan                klish       show vlan
++mac_table           klish       show mac address-table
++interface_status    klish       show interface status
++frr_running         vtysh       show running-config
++kernel_addr         shell-json  ip -j addr show
++offloads            shell       for i in $(ls /sys/class/net | grep '^eth[1-9][0-9]*$' | sort -V); do echo "== $i"; /usr/sbin/ethtool -k "$i" | grep -E '^(generic-receive-offload|rx-gro-hw|large-receive-offload):'; done
+config_db            shell-json  sudo sonic-cfggen -d --print-data

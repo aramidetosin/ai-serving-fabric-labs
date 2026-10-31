@@ -1,0 +1,42 @@
+Script started on 2026-10-29 00:17:54+00:00 [COMMAND="make break-5a" TERM="tmux-256color" TTY="/dev/pts/9" COLUMNS="80" LINES="24"]
+PYTHONDONTWRITEBYTECODE=1 python3 /root/sfab/labs/ai-serving-fabric-labs/common/breakheal.py break 5a
+repostate: 1 of 1483 files differ from the stamp; the tree is not the stamped one
+== break-5a: the source pin of k8s-gpu1's relay route from rail 1 to rail 2 removed
+  PASS  k8s-gpu1, namespace gpu1: ip -n gpu1 route replace 10.21.2.0/24 via 10.21.250.2 dev relay (reads back: 10.21.2.0/24 via 10.21.250.2 dev relay )
+== break-5a: recorded
+  PASS  rail1-to-rail2, break, pass 1: 10 of 10 pings from k8s-gpu1 (namespace gpu1) to 10.21.2.12 unanswered (recorded)
+  PASS  rail1-to-rail2, break, pass 2: 10 of 10 pings from k8s-gpu1 (namespace gpu1) to 10.21.2.12 unanswered (recorded)
+  PASS  rail1-to-rail2, break, pass 3: 10 of 10 pings from k8s-gpu1 (namespace gpu1) to 10.21.2.12 unanswered (recorded)
+  PASS  rail1-to-rail3, break, pass 1: 0 of 10 pings from k8s-gpu1 (namespace gpu1) to 10.21.3.12 unanswered (recorded)
+  PASS  k8s-gpu2-rail1-to-rail2, break, pass 1: 0 of 10 pings from k8s-gpu2 (namespace gpu1) to 10.21.2.11 unanswered (recorded)
+  PASS  same-rail-k8s-gpu1, break, pass 1: 0 of 3 pings from k8s-gpu1 (namespace gpu1) to 10.21.1.12 unanswered (recorded)
+  PASS  same-rail-k8s-gpu1, break, pass 1: 0 of 3 pings from k8s-gpu1 (namespace gpu2) to 10.21.2.12 unanswered (recorded)
+  PASS  same-rail-k8s-gpu1, break, pass 1: 0 of 3 pings from k8s-gpu1 (namespace gpu3) to 10.21.3.12 unanswered (recorded)
+  PASS  same-rail-k8s-gpu1, break, pass 1: 0 of 3 pings from k8s-gpu1 (namespace gpu4) to 10.21.4.12 unanswered (recorded)
+  PASS  same-rail-k8s-gpu1, break, pass 1: 0 of 3 pings from k8s-gpu1 (namespace gpu5) to 10.21.5.12 unanswered (recorded)
+  PASS  same-rail-k8s-gpu1, break, pass 1: 0 of 3 pings from k8s-gpu1 (namespace gpu6) to 10.21.6.12 unanswered (recorded)
+  PASS  same-rail-k8s-gpu1, break, pass 1: 0 of 3 pings from k8s-gpu1 (namespace gpu7) to 10.21.7.12 unanswered (recorded)
+  PASS  same-rail-k8s-gpu1, break, pass 1: 0 of 3 pings from k8s-gpu1 (namespace gpu8) to 10.21.8.12 unanswered (recorded)
+  PASS  same-rail-k8s-gpu2, break, pass 1: 0 of 3 pings from k8s-gpu2 (namespace gpu1) to 10.21.1.11 unanswered (recorded)
+  PASS  same-rail-k8s-gpu2, break, pass 1: 0 of 3 pings from k8s-gpu2 (namespace gpu2) to 10.21.2.11 unanswered (recorded)
+  PASS  same-rail-k8s-gpu2, break, pass 1: 0 of 3 pings from k8s-gpu2 (namespace gpu3) to 10.21.3.11 unanswered (recorded)
+  PASS  same-rail-k8s-gpu2, break, pass 1: 0 of 3 pings from k8s-gpu2 (namespace gpu4) to 10.21.4.11 unanswered (recorded)
+  PASS  same-rail-k8s-gpu2, break, pass 1: 0 of 3 pings from k8s-gpu2 (namespace gpu5) to 10.21.5.11 unanswered (recorded)
+  PASS  same-rail-k8s-gpu2, break, pass 1: 0 of 3 pings from k8s-gpu2 (namespace gpu6) to 10.21.6.11 unanswered (recorded)
+  PASS  same-rail-k8s-gpu2, break, pass 1: 0 of 3 pings from k8s-gpu2 (namespace gpu7) to 10.21.7.11 unanswered (recorded)
+  PASS  same-rail-k8s-gpu2, break, pass 1: 0 of 3 pings from k8s-gpu2 (namespace gpu8) to 10.21.8.11 unanswered (recorded)
+== break-5a: broken as designed
+  PASS  k8s-gpu1, namespace gpu1: the route to rail 2 carries no source pin (10.21.2.0/24 via 10.21.250.2 dev relay )
+  PASS  k8s-gpu1, namespace gpu1: the route to rail 3 carries its rendered source pin, src 10.21.1.11 (10.21.3.0/24 via 10.21.250.3 dev relay src 10.21.1.11 )
+  PASS  rail1-to-rail2: every ping fails (30 of 30 across the passes)
+  PASS  rail1-to-rail2: k8s-gpu2 saw 30 requests arrive on rail2 from 10.21.250.1, and its 30 replies go into its relay bridge relay0 toward 10.21.250.1 (3 passes captured): the source left unpinned took the relay address, of 10.21.250.0/24, which on k8s-gpu2 is its own namespace's, so no reply leaves it
+  PASS  rail1-to-rail3: every ping succeeds (10 of 10)
+  PASS  k8s-gpu2-rail1-to-rail2: every ping succeeds (10 of 10)
+  PASS  same-rail-k8s-gpu1: every ping succeeds (24 of 24)
+  PASS  same-rail-k8s-gpu2: every ping succeeds (24 of 24)
+  PASS  rail-sw1: parity, 0 missing lines
+  PASS  rail-sw2: parity, 0 missing lines
+== RESULT: 32 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+== result set: ch05/audits/sfab-ch05_break-5a_20261029T001754Z
+
+Script done on 2026-10-29 00:18:55+00:00 [COMMAND_EXIT_CODE="0"]

@@ -1,0 +1,62 @@
+== pass 1, drill keepalive-and-peer-link: the keepalive link and the peer link shut together on fe-sw1, both keepalive paths gone
+  PASS  pass 1 keepalive-and-peer-link: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 1 keepalive-and-peer-link: probes located before the fault as the drill needs them (try 1): ping: requests leave fe-sw1, fe-sw2
+  PASS  pass 1 keepalive-and-peer-link: KLISH shutdown of Ethernet0,Ethernet1,Ethernet12 (PortChannel1 and the keepalive link Ethernet12) on fe-sw1 accepted
+  PASS  pass 1 keepalive-and-peer-link: no shutdown accepted on fe-sw1 after 70 s
+  PASS  pass 1 keepalive-and-peer-link: the pair whole and every bond back on its legs 31 s after the restore (polls 5 s apart; an event, drill.py analyze times it from the monitor)
+  PASS  pass 1 keepalive-and-peer-link: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 1 keepalive-and-peer-link: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+  KNOWN pass 1 keepalive-and-peer-link: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+== pass 1, drill standby-reboot: the standby rebooted
+  PASS  pass 1 standby-reboot: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 1 standby-reboot: probes located before the fault as the drill needs them (try 1): ping: 4 of 8 ids cross fe-sw2, 4 do not
+  PASS  pass 1 standby-reboot: sudo reboot sent to fe-sw2, the standby (the session is cut by the reboot, under a 25 s timeout)
+  PASS  pass 1 standby-reboot: fe-sw2 returned: every bond toward the pair back on two legs (an event; drill.py analyze times it)
+  PASS  pass 1 standby-reboot: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 1 standby-reboot: fe-sw2 after its reboot: GRO, rx-gro-hw and LRO off on all 19 data NICs
+  PASS  pass 1 standby-reboot: fe-sw2 after its reboot: parity, 0 missing lines
+  PASS  pass 1 standby-reboot: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+  KNOWN pass 1 standby-reboot: delay-restore holds nothing down, so the return is boot plus LACP, recorded as an event and never as a span: L2
+  KNOWN pass 1 standby-reboot: 1 duplicate ping replies (peer-link isolation is not enforced): L1
+== pass 2, drill keepalive-and-peer-link: the keepalive link and the peer link shut together on fe-sw1, both keepalive paths gone
+  PASS  pass 2 keepalive-and-peer-link: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 2 keepalive-and-peer-link: probes located before the fault as the drill needs them (try 1): ping: requests leave fe-sw1, fe-sw2
+  PASS  pass 2 keepalive-and-peer-link: KLISH shutdown of Ethernet0,Ethernet1,Ethernet12 (PortChannel1 and the keepalive link Ethernet12) on fe-sw1 accepted
+  PASS  pass 2 keepalive-and-peer-link: no shutdown accepted on fe-sw1 after 70 s
+  PASS  pass 2 keepalive-and-peer-link: the pair whole and every bond back on its legs 32 s after the restore (polls 5 s apart; an event, drill.py analyze times it from the monitor)
+  PASS  pass 2 keepalive-and-peer-link: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 2 keepalive-and-peer-link: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+  KNOWN pass 2 keepalive-and-peer-link: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+  KNOWN pass 2 keepalive-and-peer-link: 1 duplicate ping replies (peer-link isolation is not enforced): L1
+== pass 2, drill standby-reboot: the standby rebooted
+  PASS  pass 2 standby-reboot: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 2 standby-reboot: probes located before the fault as the drill needs them (try 1): ping: 4 of 8 ids cross fe-sw2, 4 do not
+  PASS  pass 2 standby-reboot: sudo reboot sent to fe-sw2, the standby (the session is cut by the reboot, under a 25 s timeout)
+  PASS  pass 2 standby-reboot: fe-sw2 returned: every bond toward the pair back on two legs (an event; drill.py analyze times it)
+  PASS  pass 2 standby-reboot: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 2 standby-reboot: fe-sw2 after its reboot: GRO, rx-gro-hw and LRO off on all 19 data NICs
+  PASS  pass 2 standby-reboot: fe-sw2 after its reboot: parity, 0 missing lines
+  PASS  pass 2 standby-reboot: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+  KNOWN pass 2 standby-reboot: delay-restore holds nothing down, so the return is boot plus LACP, recorded as an event and never as a span: L2
+== pass 3, drill keepalive-and-peer-link: the keepalive link and the peer link shut together on fe-sw1, both keepalive paths gone
+  PASS  pass 3 keepalive-and-peer-link: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 3 keepalive-and-peer-link: probes located before the fault as the drill needs them (try 1): ping: requests leave fe-sw1, fe-sw2
+  PASS  pass 3 keepalive-and-peer-link: KLISH shutdown of Ethernet0,Ethernet1,Ethernet12 (PortChannel1 and the keepalive link Ethernet12) on fe-sw1 accepted
+  PASS  pass 3 keepalive-and-peer-link: no shutdown accepted on fe-sw1 after 70 s
+  PASS  pass 3 keepalive-and-peer-link: the pair whole and every bond back on its legs 31 s after the restore (polls 5 s apart; an event, drill.py analyze times it from the monitor)
+  PASS  pass 3 keepalive-and-peer-link: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 3 keepalive-and-peer-link: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+  KNOWN pass 3 keepalive-and-peer-link: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+== pass 3, drill standby-reboot: the standby rebooted
+  PASS  pass 3 standby-reboot: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 3 standby-reboot: probes located before the fault as the drill needs them (try 1): ping: 4 of 8 ids cross fe-sw2, 4 do not
+  PASS  pass 3 standby-reboot: sudo reboot sent to fe-sw2, the standby (the session is cut by the reboot, under a 25 s timeout)
+  PASS  pass 3 standby-reboot: fe-sw2 returned: every bond toward the pair back on two legs (an event; drill.py analyze times it)
+  PASS  pass 3 standby-reboot: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 3 standby-reboot: fe-sw2 after its reboot: GRO, rx-gro-hw and LRO off on all 19 data NICs
+  PASS  pass 3 standby-reboot: fe-sw2 after its reboot: parity, 0 missing lines
+  PASS  pass 3 standby-reboot: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+  KNOWN pass 3 standby-reboot: delay-restore holds nothing down, so the return is boot plus LACP, recorded as an event and never as a span: L2
+== the passes compared
+  PASS  compare_passes.py: no disagreement between the passes
+== RESULT: 46 passed, 0 failed, 8 known platform limitation(s), 0 skipped

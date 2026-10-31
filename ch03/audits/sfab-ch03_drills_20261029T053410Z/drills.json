@@ -1,0 +1,515 @@
+{
+  "bonded": [
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet3",
+          "node": "k8s-cp1",
+          "switch": "fe-sw1",
+          "switch_eth": "eth4"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet3",
+          "node": "k8s-cp1",
+          "switch": "fe-sw2",
+          "switch_eth": "eth4"
+        }
+      ],
+      "node": "k8s-cp1"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet4",
+          "node": "k8s-cp2",
+          "switch": "fe-sw1",
+          "switch_eth": "eth5"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet4",
+          "node": "k8s-cp2",
+          "switch": "fe-sw2",
+          "switch_eth": "eth5"
+        }
+      ],
+      "node": "k8s-cp2"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet5",
+          "node": "k8s-cp3",
+          "switch": "fe-sw1",
+          "switch_eth": "eth6"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet5",
+          "node": "k8s-cp3",
+          "switch": "fe-sw2",
+          "switch_eth": "eth6"
+        }
+      ],
+      "node": "k8s-cp3"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet6",
+          "node": "k8s-gpu1",
+          "switch": "fe-sw1",
+          "switch_eth": "eth7"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet6",
+          "node": "k8s-gpu1",
+          "switch": "fe-sw2",
+          "switch_eth": "eth7"
+        }
+      ],
+      "node": "k8s-gpu1"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet7",
+          "node": "k8s-gpu2",
+          "switch": "fe-sw1",
+          "switch_eth": "eth8"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet7",
+          "node": "k8s-gpu2",
+          "switch": "fe-sw2",
+          "switch_eth": "eth8"
+        }
+      ],
+      "node": "k8s-gpu2"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet13",
+          "node": "k8s-ingress1",
+          "switch": "fe-sw1",
+          "switch_eth": "eth14"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet13",
+          "node": "k8s-ingress1",
+          "switch": "fe-sw2",
+          "switch_eth": "eth14"
+        }
+      ],
+      "node": "k8s-ingress1"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet14",
+          "node": "k8s-ingress2",
+          "switch": "fe-sw1",
+          "switch_eth": "eth15"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet14",
+          "node": "k8s-ingress2",
+          "switch": "fe-sw2",
+          "switch_eth": "eth15"
+        }
+      ],
+      "node": "k8s-ingress2"
+    },
+    {
+      "bond": "bond0",
+      "kind": "bastion",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet8",
+          "node": "bastion",
+          "switch": "fe-sw1",
+          "switch_eth": "eth9"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet8",
+          "node": "bastion",
+          "switch": "fe-sw2",
+          "switch_eth": "eth9"
+        }
+      ],
+      "node": "bastion"
+    }
+  ],
+  "lab": "sfab-ch03",
+  "list": [
+    {
+      "await_return": false,
+      "eths": [
+        "eth3"
+      ],
+      "faces": "fw",
+      "id": "fw-leg",
+      "keepalive_link": false,
+      "kind": "shut",
+      "klish": [
+        "configure terminal",
+        "interface Ethernet2",
+        "shutdown",
+        "end"
+      ],
+      "members": [
+        "Ethernet2"
+      ],
+      "peer_link": false,
+      "peer_link_counters": true,
+      "place": {
+        "tcp": "target"
+      },
+      "portchannel": "PortChannel10",
+      "probes": [
+        "ping",
+        "tcp"
+      ],
+      "restore": [
+        "configure terminal",
+        "interface Ethernet2",
+        "no shutdown",
+        "end"
+      ],
+      "switch": "fe-sw1",
+      "title": "the firewall bundle's leg on fe-sw1 shut from the switch side"
+    },
+    {
+      "await_return": false,
+      "eths": [
+        "eth7"
+      ],
+      "faces": "k8s-gpu1",
+      "id": "server-member",
+      "keepalive_link": false,
+      "kind": "shut",
+      "klish": [
+        "configure terminal",
+        "interface Ethernet6",
+        "shutdown",
+        "end"
+      ],
+      "members": [
+        "Ethernet6"
+      ],
+      "peer_link": false,
+      "peer_link_counters": true,
+      "place": {
+        "ping": "target"
+      },
+      "portchannel": "PortChannel21",
+      "probes": [
+        "ping",
+        "tcp"
+      ],
+      "restore": [
+        "configure terminal",
+        "interface Ethernet6",
+        "no shutdown",
+        "end"
+      ],
+      "switch": "fe-sw1",
+      "title": "k8s-gpu1's member on fe-sw1 shut from the switch side"
+    },
+    {
+      "await_return": false,
+      "eths": [
+        "eth1",
+        "eth2"
+      ],
+      "faces": "the peer switch",
+      "id": "peer-link",
+      "keepalive_link": false,
+      "kind": "shut",
+      "klish": [
+        "configure terminal",
+        "interface range Ethernet0-1",
+        "shutdown",
+        "end"
+      ],
+      "members": [
+        "Ethernet0",
+        "Ethernet1"
+      ],
+      "peer_link": true,
+      "peer_link_counters": false,
+      "place": {
+        "ping": "both"
+      },
+      "portchannel": "PortChannel1",
+      "probes": [
+        "ping",
+        "tcp"
+      ],
+      "restore": [
+        "configure terminal",
+        "interface range Ethernet0-1",
+        "no shutdown",
+        "end"
+      ],
+      "switch": "fe-sw1",
+      "title": "the peer link shut on fe-sw1 with the keepalive link up"
+    },
+    {
+      "await_return": true,
+      "eths": [
+        "eth13"
+      ],
+      "faces": "the peer switch",
+      "hold_s": 70,
+      "id": "keepalive-link",
+      "keepalive_link": true,
+      "kind": "shut",
+      "klish": [
+        "configure terminal",
+        "interface Ethernet12",
+        "shutdown",
+        "end"
+      ],
+      "members": [
+        "Ethernet12"
+      ],
+      "peer_link": false,
+      "peer_link_counters": false,
+      "place": {
+        "ping": "both"
+      },
+      "portchannel": "the keepalive link Ethernet12",
+      "probes": [
+        "ping",
+        "tcp"
+      ],
+      "restore": [
+        "configure terminal",
+        "interface Ethernet12",
+        "no shutdown",
+        "end"
+      ],
+      "switch": "fe-sw1",
+      "title": "the dedicated keepalive link shut on fe-sw1 with the peer link and the backup keepalive up"
+    },
+    {
+      "await_return": true,
+      "eths": [
+        "eth1",
+        "eth2",
+        "eth13"
+      ],
+      "faces": "the peer switch",
+      "hold_s": 70,
+      "id": "keepalive-and-peer-link",
+      "keepalive_link": true,
+      "kind": "shut",
+      "klish": [
+        "configure terminal",
+        "interface Ethernet0",
+        "shutdown",
+        "exit",
+        "interface Ethernet1",
+        "shutdown",
+        "exit",
+        "interface Ethernet12",
+        "shutdown",
+        "end"
+      ],
+      "members": [
+        "Ethernet0",
+        "Ethernet1",
+        "Ethernet12"
+      ],
+      "peer_link": true,
+      "peer_link_counters": false,
+      "place": {
+        "ping": "both"
+      },
+      "portchannel": "PortChannel1 and the keepalive link Ethernet12",
+      "probes": [
+        "ping",
+        "tcp"
+      ],
+      "restore": [
+        "configure terminal",
+        "interface Ethernet0",
+        "no shutdown",
+        "exit",
+        "interface Ethernet1",
+        "no shutdown",
+        "exit",
+        "interface Ethernet12",
+        "no shutdown",
+        "end"
+      ],
+      "switch": "fe-sw1",
+      "title": "the keepalive link and the peer link shut together on fe-sw1, both keepalive paths gone"
+    },
+    {
+      "command": "sudo reboot",
+      "command_timeout_s": 25,
+      "id": "standby-reboot",
+      "kind": "reboot",
+      "peer_link_counters": false,
+      "place": {
+        "ping": "target"
+      },
+      "probes": [
+        "ping",
+        "tcp"
+      ],
+      "role": "standby",
+      "title": "the standby rebooted"
+    }
+  ],
+  "pair": {
+    "domain": 1,
+    "members": [
+      "fe-sw1",
+      "fe-sw2"
+    ],
+    "name": "fe",
+    "peer_link": {
+      "fe-sw1": {
+        "eths": [
+          "eth1",
+          "eth2"
+        ],
+        "members": [
+          "Ethernet0",
+          "Ethernet1"
+        ],
+        "portchannel": "PortChannel1"
+      },
+      "fe-sw2": {
+        "eths": [
+          "eth1",
+          "eth2"
+        ],
+        "members": [
+          "Ethernet0",
+          "Ethernet1"
+        ],
+        "portchannel": "PortChannel1"
+      }
+    },
+    "source_ip": {
+      "fe-sw1": "10.20.255.0",
+      "fe-sw2": "10.20.255.1"
+    },
+    "system_mac": "02:5a:00:00:00:01"
+  },
+  "probes": {
+    "ping": {
+      "capture": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet6",
+          "node": "k8s-gpu1",
+          "switch": "fe-sw1",
+          "switch_eth": "eth7"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet6",
+          "node": "k8s-gpu1",
+          "switch": "fe-sw2",
+          "switch_eth": "eth7"
+        },
+        {
+          "eth": "eth1",
+          "native": "Ethernet7",
+          "node": "k8s-gpu2",
+          "switch": "fe-sw1",
+          "switch_eth": "eth8"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet7",
+          "node": "k8s-gpu2",
+          "switch": "fe-sw2",
+          "switch_eth": "eth8"
+        }
+      ],
+      "count": 8,
+      "dst": "k8s-gpu2",
+      "dst_addr": "10.20.1.22",
+      "id_base": 3100,
+      "interval_s": 0.3,
+      "src": "k8s-gpu1",
+      "src_addr": "10.20.1.21"
+    },
+    "tcp": {
+      "capture": [
+        {
+          "eth": "eth1",
+          "ifname": "ethernet1/1",
+          "native": "Ethernet2",
+          "node": "fw",
+          "switch": "fe-sw1",
+          "switch_eth": "eth3"
+        },
+        {
+          "eth": "eth2",
+          "ifname": "ethernet1/2",
+          "native": "Ethernet2",
+          "node": "fw",
+          "switch": "fe-sw2",
+          "switch_eth": "eth3"
+        }
+      ],
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "dst_addr": "10.20.11.210",
+      "gateway": "gw-users",
+      "interval_s": 0.3,
+      "port": 443,
+      "timeout_s": 1
+    }
+  },
+  "schema": 1,
+  "timing": {
+    "cut_window_s": 15,
+    "hold_s": 30,
+    "late_ms": 1000,
+    "lead_s": 10,
+    "place_s": 4,
+    "place_tries": 5,
+    "restore_window_s": 25,
+    "return_max_s": 600,
+    "return_tail_s": 30,
+    "tail_s": 20,
+    "whole_polls": 60
+  }
+}

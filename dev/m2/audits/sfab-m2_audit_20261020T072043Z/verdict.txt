@@ -1,0 +1,545 @@
+== preflight, as run at 2026-10-20T06:59:06Z
+  PASS  identity: lab sfab-m2 in m2, prefix sfab-m2-, network sfab-a-mgmt
+  PASS  topo.clab.yml present
+  PASS  docker 29.5.2 answers
+  PASS  containerlab at the pinned 0.81.1
+  PASS  python3 3.12 (3.10 or later)
+  PASS  tools: sshpass tcpdump nsenter ethtool openssl and the rest present
+  PASS  /dev/kvm read-write
+  PASS  host tick 10000
+  PASS  no other sfab lab's container running
+  PASS  containerlab knows no other sfab lab
+  PASS  no containerlab deploy in progress
+  PASS  subnet: sfab-a-mgmt exists with 172.21.40.0/24 and only this lab on it
+  PASS  image sfab/bastion:1 present (61f795ccbaa1)
+  PASS  image sfab/client:1 present (65f9d5060772)
+  PASS  image sfab/frr:10.5.4-1 present (b8cd88419a8a)
+  PASS  image sfab/registry:1 present (ee8b09575ec0)
+  PASS  image sfab/vm-node:1-k8s1.35.8 present (c638745d801c)
+  PASS  image vrnetlab/dell_sonic:4.6.0 present (c0214f532277)
+  PASS  image vrnetlab/paloalto_pa-vm:12.1.2 present (d1ca9a0f1687)
+  PASS  image vrnetlab/truenas_truenas:27.0.0-RC.1 present (d0b0a42ff2d3)
+  PASS  registry data seeded: images/registry/data holds SEED.json (a link to the image store)
+  PASS  free memory: MemAvailable 122.5 GiB covers 0 GiB for the nodes not yet running plus the 16.0 GiB floor
+  PASS  vCPUs: 54.0 for the lab within 2 x 128 host CPUs
+  PASS  disk: 281.3 GiB free covers 66.8 GiB under state/ (budget 83.0 GiB, 16.2 GiB of it already there) and 0.0 GiB of container layers under /var/lib/docker for the nodes not yet running, one filesystem (66.8 GiB)
+  PASS  module bonding loaded
+  PASS  module vrf loaded
+  PASS  state/secrets.env (0600) and the lab SSH key present
+  PASS  render: sfab check clean
+== preflight, read again now
+  PASS  host tick 10000
+  PASS  no other sfab lab's container running
+  PASS  containerlab knows no other sfab lab
+  PASS  no containerlab deploy in progress
+== collect (2026-10-20T07:20:43Z, 17 nodes)
+  PASS  collect fe-sw1: 20 of 20 commands saved
+  PASS  collect fe-sw2: 20 of 20 commands saved
+  PASS  collect rail-sw1: 18 of 18 commands saved
+  PASS  collect rail-sw2: 18 of 18 commands saved
+  PASS  collect oob-sw: 18 of 18 commands saved
+  PASS  collect fw: 14 of 14 commands saved
+  PASS  collect truenas1: 3 of 3 commands saved
+  PASS  collect ctrl1: 26 of 26 commands saved
+  PASS  collect ctrl2: 21 of 21 commands saved
+  PASS  collect ctrl3: 21 of 21 commands saved
+  PASS  collect gpu1: 62 of 62 commands saved
+  PASS  collect gpu2: 62 of 62 commands saved
+  PASS  collect bastion: 32 of 32 commands saved
+  PASS  collect uplink-rtr: 12 of 12 commands saved
+  PASS  collect op-client: 10 of 10 commands saved
+  PASS  collect registry: 8 of 8 commands saved
+  PASS  collect ent-client: 13 of 13 commands saved
+== fe-sw1: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 12
+  PASS  CLAB_MGMT_PASSTHROUGH is true
+  PASS  data NICs inside the switch VM: 12
+  PASS  GRO, rx-gro-hw and LRO off on all 12 data NICs
+  PASS  IPv6 off on the container's 12 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (113 of 113 rendered lines present)
+== fe-sw2: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 11
+  PASS  CLAB_MGMT_PASSTHROUGH is true
+  PASS  data NICs inside the switch VM: 11
+  PASS  GRO, rx-gro-hw and LRO off on all 11 data NICs
+  PASS  IPv6 off on the container's 11 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (109 of 109 rendered lines present)
+== oob-sw: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 7
+  PASS  data NICs inside the switch VM: 7
+  PASS  GRO, rx-gro-hw and LRO off on all 7 data NICs
+  PASS  IPv6 off on the container's 7 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (30 of 30 rendered lines present)
+== rail-sw1: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 8
+  PASS  data NICs inside the switch VM: 8
+  PASS  GRO, rx-gro-hw and LRO off on all 8 data NICs
+  PASS  IPv6 off on the container's 8 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (37 of 37 rendered lines present)
+== rail-sw2: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 8
+  PASS  data NICs inside the switch VM: 8
+  PASS  GRO, rx-gro-hw and LRO off on all 8 data NICs
+  PASS  IPv6 off on the container's 8 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (37 of 37 rendered lines present)
+== fe-sw1: VLAN membership
+  PASS  Vlan100: PortChannel1(T),PortChannel10(T),PortChannel11(A),PortChannel12(A),PortChannel13(A),PortChannel21(A),PortChannel22(A),PortChannel31(A)
+  PASS  Vlan200: Ethernet11(A),PortChannel1(T),PortChannel10(T)
+  PASS  Vlan300: PortChannel1(T),PortChannel10(T),PortChannel30(A)
+  PASS  no VLAN outside the render
+== fe-sw2: VLAN membership
+  PASS  Vlan100: PortChannel1(T),PortChannel10(T),PortChannel11(A),PortChannel12(A),PortChannel13(A),PortChannel21(A),PortChannel22(A),PortChannel31(A)
+  PASS  Vlan200: PortChannel1(T),PortChannel10(T)
+  PASS  Vlan300: PortChannel1(T),PortChannel10(T),PortChannel30(A)
+  PASS  no VLAN outside the render
+== oob-sw: VLAN membership
+  PASS  Vlan90: Ethernet0(A),Ethernet1(A),Ethernet2(A),Ethernet3(A),Ethernet4(A),Ethernet5(A),Ethernet6(A)
+  PASS  no VLAN outside the render
+== rail-sw1: VLAN membership
+  PASS  Vlan101: Ethernet0(A),Ethernet4(A)
+  PASS  Vlan103: Ethernet1(A),Ethernet5(A)
+  PASS  Vlan105: Ethernet2(A),Ethernet6(A)
+  PASS  Vlan107: Ethernet3(A),Ethernet7(A)
+  PASS  no VLAN outside the render
+== rail-sw2: VLAN membership
+  PASS  Vlan102: Ethernet0(A),Ethernet4(A)
+  PASS  Vlan104: Ethernet1(A),Ethernet5(A)
+  PASS  Vlan106: Ethernet2(A),Ethernet6(A)
+  PASS  Vlan108: Ethernet3(A),Ethernet7(A)
+  PASS  no VLAN outside the render
+== fe-sw1: MAC table
+  PASS  MAC table holds host MACs only (13 entries; 8 VLAN 1 or container veth entries set aside)
+== fe-sw2: MAC table
+  PASS  MAC table holds host MACs only (13 entries; 8 VLAN 1 or container veth entries set aside)
+== oob-sw: MAC table
+  PASS  MAC table holds host MACs only (5 entries; 2 VLAN 1 or container veth entries set aside)
+== rail-sw1: MAC table
+  PASS  MAC table holds host MACs only (16 entries; 0 VLAN 1 or container veth entries set aside)
+== rail-sw2: MAC table
+  PASS  MAC table holds host MACs only (16 entries; 0 VLAN 1 or container veth entries set aside)
+== fw: firewall
+  PASS  commit marker present
+  PASS  delivered /config/startup-config.cfg matches the render byte for byte
+  PASS  enforced.txt present (195 lines)
+  PASS  all 195 enforced lines in the set-format running configuration
+  PASS  ethernet1/1 and ethernet1/2 in the aggregate (bundled, current, selected)
+  PASS  LACP partner is the pair's mclag-system-mac 02:5a:00:00:00:01
+  PASS  ae1.100 up: tag 100, 10.20.1.1/24, zone data, on ae1 which is up
+  PASS  ae1.200 up: tag 200, 10.20.2.1/24, zone stor-mgmt, on ae1 which is up
+  PASS  ae1.300 up: tag 300, 10.20.3.1/24, zone bastion, on ae1 which is up
+== ctrl1: guest
+  PASS  sfab-netsetup.service ran in this boot and succeeded
+  PASS  bond0 has 2 slaves
+  PASS  bond0 slaves under one aggregator ID
+  PASS  bond0 partner MAC is the mclag-system-mac
+  PASS  TX checksum offload off on the container's 3 data NICs
+  PASS  TX checksum offload off on the guest's 3 data NICs
+  PASS  management default in table 150 via 172.21.40.1
+  PASS  10.20.1.1 answers ping
+  PASS  10.20.1.1 is one hop away (an echo sent with TTL 1 is answered)
+  PASS  10.20.9.254 answers over the out-of-band network
+== ctrl2: guest
+  PASS  sfab-netsetup.service ran in this boot and succeeded
+  PASS  bond0 has 2 slaves
+  PASS  bond0 slaves under one aggregator ID
+  PASS  bond0 partner MAC is the mclag-system-mac
+  PASS  TX checksum offload off on the container's 3 data NICs
+  PASS  TX checksum offload off on the guest's 3 data NICs
+  PASS  management default in table 150 via 172.21.40.1
+  PASS  10.20.1.1 answers ping
+  PASS  10.20.1.1 is one hop away (an echo sent with TTL 1 is answered)
+  PASS  10.20.9.254 answers over the out-of-band network
+== ctrl3: guest
+  PASS  sfab-netsetup.service ran in this boot and succeeded
+  PASS  bond0 has 2 slaves
+  PASS  bond0 slaves under one aggregator ID
+  PASS  bond0 partner MAC is the mclag-system-mac
+  PASS  TX checksum offload off on the container's 3 data NICs
+  PASS  TX checksum offload off on the guest's 3 data NICs
+  PASS  management default in table 150 via 172.21.40.1
+  PASS  10.20.1.1 answers ping
+  PASS  10.20.1.1 is one hop away (an echo sent with TTL 1 is answered)
+  PASS  10.20.9.254 answers over the out-of-band network
+== gpu1: guest
+  PASS  sfab-netsetup.service ran in this boot and succeeded
+  PASS  bond0 has 2 slaves
+  PASS  bond0 slaves under one aggregator ID
+  PASS  bond0 partner MAC is the mclag-system-mac
+  PASS  TX checksum offload off on the container's 11 data NICs
+  PASS  TX checksum offload off on the guest's 11 data NICs
+  PASS  management default in table 150 via 172.21.40.1
+  PASS  10.20.1.1 answers ping
+  PASS  10.20.1.1 is one hop away (an echo sent with TTL 1 is answered)
+  PASS  10.20.9.254 answers over the out-of-band network
+== gpu2: guest
+  PASS  sfab-netsetup.service ran in this boot and succeeded
+  PASS  bond0 has 2 slaves
+  PASS  bond0 slaves under one aggregator ID
+  PASS  bond0 partner MAC is the mclag-system-mac
+  PASS  TX checksum offload off on the container's 11 data NICs
+  PASS  TX checksum offload off on the guest's 11 data NICs
+  PASS  management default in table 150 via 172.21.40.1
+  PASS  10.20.1.1 answers ping
+  PASS  10.20.1.1 is one hop away (an echo sent with TTL 1 is answered)
+  PASS  10.20.9.254 answers over the out-of-band network
+== gpu1: relay and rails
+  PASS  8 relay namespaces (gpu1,gpu2,gpu3,gpu4,gpu5,gpu6,gpu7,gpu8)
+  PASS  gpu1: no default route
+  PASS  gpu1: rp_filter 2 on rail1,relay
+  PASS  rail 1: 9000-byte DF ping gpu1 to gpu2 (10.21.1.12)
+  PASS  rail 1 to rail 2: gpu1 to gpu2 (10.21.2.12)
+  PASS  rail 1 to rail 2 leaves gpu1 through the relay (10.21.250.0/24)
+  PASS  gpu2: no default route
+  PASS  gpu2: rp_filter 2 on rail2,relay
+  PASS  rail 2: 9000-byte DF ping gpu1 to gpu2 (10.21.2.12)
+  PASS  rail 2 to rail 3: gpu1 to gpu2 (10.21.3.12)
+  PASS  rail 2 to rail 3 leaves gpu2 through the relay (10.21.250.0/24)
+  PASS  gpu3: no default route
+  PASS  gpu3: rp_filter 2 on rail3,relay
+  PASS  rail 3: 9000-byte DF ping gpu1 to gpu2 (10.21.3.12)
+  PASS  rail 3 to rail 4: gpu1 to gpu2 (10.21.4.12)
+  PASS  rail 3 to rail 4 leaves gpu3 through the relay (10.21.250.0/24)
+  PASS  gpu4: no default route
+  PASS  gpu4: rp_filter 2 on rail4,relay
+  PASS  rail 4: 9000-byte DF ping gpu1 to gpu2 (10.21.4.12)
+  PASS  rail 4 to rail 5: gpu1 to gpu2 (10.21.5.12)
+  PASS  rail 4 to rail 5 leaves gpu4 through the relay (10.21.250.0/24)
+  PASS  gpu5: no default route
+  PASS  gpu5: rp_filter 2 on rail5,relay
+  PASS  rail 5: 9000-byte DF ping gpu1 to gpu2 (10.21.5.12)
+  PASS  rail 5 to rail 6: gpu1 to gpu2 (10.21.6.12)
+  PASS  rail 5 to rail 6 leaves gpu5 through the relay (10.21.250.0/24)
+  PASS  gpu6: no default route
+  PASS  gpu6: rp_filter 2 on rail6,relay
+  PASS  rail 6: 9000-byte DF ping gpu1 to gpu2 (10.21.6.12)
+  PASS  rail 6 to rail 7: gpu1 to gpu2 (10.21.7.12)
+  PASS  rail 6 to rail 7 leaves gpu6 through the relay (10.21.250.0/24)
+  PASS  gpu7: no default route
+  PASS  gpu7: rp_filter 2 on rail7,relay
+  PASS  rail 7: 9000-byte DF ping gpu1 to gpu2 (10.21.7.12)
+  PASS  rail 7 to rail 8: gpu1 to gpu2 (10.21.8.12)
+  PASS  rail 7 to rail 8 leaves gpu7 through the relay (10.21.250.0/24)
+  PASS  gpu8: no default route
+  PASS  gpu8: rp_filter 2 on rail8,relay
+  PASS  rail 8: 9000-byte DF ping gpu1 to gpu2 (10.21.8.12)
+  PASS  rail 8 to rail 1: gpu1 to gpu2 (10.21.1.12)
+  PASS  rail 8 to rail 1 leaves gpu8 through the relay (10.21.250.0/24)
+== gpu2: relay and rails
+  PASS  8 relay namespaces (gpu1,gpu2,gpu3,gpu4,gpu5,gpu6,gpu7,gpu8)
+  PASS  gpu1: no default route
+  PASS  gpu1: rp_filter 2 on rail1,relay
+  PASS  rail 1: 9000-byte DF ping gpu2 to gpu1 (10.21.1.11)
+  PASS  rail 1 to rail 2: gpu2 to gpu1 (10.21.2.11)
+  PASS  rail 1 to rail 2 leaves gpu1 through the relay (10.21.250.0/24)
+  PASS  gpu2: no default route
+  PASS  gpu2: rp_filter 2 on rail2,relay
+  PASS  rail 2: 9000-byte DF ping gpu2 to gpu1 (10.21.2.11)
+  PASS  rail 2 to rail 3: gpu2 to gpu1 (10.21.3.11)
+  PASS  rail 2 to rail 3 leaves gpu2 through the relay (10.21.250.0/24)
+  PASS  gpu3: no default route
+  PASS  gpu3: rp_filter 2 on rail3,relay
+  PASS  rail 3: 9000-byte DF ping gpu2 to gpu1 (10.21.3.11)
+  PASS  rail 3 to rail 4: gpu2 to gpu1 (10.21.4.11)
+  PASS  rail 3 to rail 4 leaves gpu3 through the relay (10.21.250.0/24)
+  PASS  gpu4: no default route
+  PASS  gpu4: rp_filter 2 on rail4,relay
+  PASS  rail 4: 9000-byte DF ping gpu2 to gpu1 (10.21.4.11)
+  PASS  rail 4 to rail 5: gpu2 to gpu1 (10.21.5.11)
+  PASS  rail 4 to rail 5 leaves gpu4 through the relay (10.21.250.0/24)
+  PASS  gpu5: no default route
+  PASS  gpu5: rp_filter 2 on rail5,relay
+  PASS  rail 5: 9000-byte DF ping gpu2 to gpu1 (10.21.5.11)
+  PASS  rail 5 to rail 6: gpu2 to gpu1 (10.21.6.11)
+  PASS  rail 5 to rail 6 leaves gpu5 through the relay (10.21.250.0/24)
+  PASS  gpu6: no default route
+  PASS  gpu6: rp_filter 2 on rail6,relay
+  PASS  rail 6: 9000-byte DF ping gpu2 to gpu1 (10.21.6.11)
+  PASS  rail 6 to rail 7: gpu2 to gpu1 (10.21.7.11)
+  PASS  rail 6 to rail 7 leaves gpu6 through the relay (10.21.250.0/24)
+  PASS  gpu7: no default route
+  PASS  gpu7: rp_filter 2 on rail7,relay
+  PASS  rail 7: 9000-byte DF ping gpu2 to gpu1 (10.21.7.11)
+  PASS  rail 7 to rail 8: gpu2 to gpu1 (10.21.8.11)
+  PASS  rail 7 to rail 8 leaves gpu7 through the relay (10.21.250.0/24)
+  PASS  gpu8: no default route
+  PASS  gpu8: rp_filter 2 on rail8,relay
+  PASS  rail 8: 9000-byte DF ping gpu2 to gpu1 (10.21.8.11)
+  PASS  rail 8 to rail 1: gpu2 to gpu1 (10.21.1.11)
+  PASS  rail 8 to rail 1 leaves gpu8 through the relay (10.21.250.0/24)
+== fe-sw1: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any interface Vlan block
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== fe-sw2: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any interface Vlan block
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== rail-sw1: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any interface Vlan block
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== rail-sw2: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any interface Vlan block
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== oob-sw: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any interface Vlan block
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== pair fe-sw1 fe-sw2
+  PASS  fe-sw1: MCLAG domain
+  PASS  fe-sw1: session up
+  PASS  fe-sw1: peer link up
+  PASS  fe-sw1: peer link PortChannel1
+  PASS  fe-sw1: keepalive in VRF mgmt
+  PASS  fe-sw1: keepalive source is the passthrough address 172.21.40.11
+  PASS  fe-sw1: keepalive peer is 172.21.40.12
+  PASS  fe-sw1: mclag-system-mac 02:5a:00:00:00:01
+  PASS  fe-sw1: MLAG interface PortChannel10 up/up
+  PASS  fe-sw1: MLAG interface PortChannel11 up/up
+  PASS  fe-sw1: MLAG interface PortChannel12 up/up
+  PASS  fe-sw1: MLAG interface PortChannel13 up/up
+  PASS  fe-sw1: MLAG interface PortChannel21 up/up
+  PASS  fe-sw1: MLAG interface PortChannel22 up/up
+  PASS  fe-sw1: MLAG interface PortChannel30 up/up
+  PASS  fe-sw1: MLAG interface PortChannel31 up/up
+  PASS  fe-sw1: PortChannel1 up with Ethernet0,Ethernet1
+  PASS  fe-sw1: PortChannel10 up with Ethernet2
+  PASS  fe-sw1: PortChannel11 up with Ethernet3
+  PASS  fe-sw1: PortChannel12 up with Ethernet4
+  PASS  fe-sw1: PortChannel13 up with Ethernet5
+  PASS  fe-sw1: PortChannel21 up with Ethernet6
+  PASS  fe-sw1: PortChannel22 up with Ethernet7
+  PASS  fe-sw1: PortChannel30 up with Ethernet8
+  PASS  fe-sw1: PortChannel31 up with Ethernet9,Ethernet10
+  PASS  fe-sw2: MCLAG domain
+  PASS  fe-sw2: session up
+  PASS  fe-sw2: peer link up
+  PASS  fe-sw2: peer link PortChannel1
+  PASS  fe-sw2: keepalive in VRF mgmt
+  PASS  fe-sw2: keepalive source is the passthrough address 172.21.40.12
+  PASS  fe-sw2: keepalive peer is 172.21.40.11
+  PASS  fe-sw2: mclag-system-mac 02:5a:00:00:00:01
+  PASS  fe-sw2: MLAG interface PortChannel10 up/up
+  PASS  fe-sw2: MLAG interface PortChannel11 up/up
+  PASS  fe-sw2: MLAG interface PortChannel12 up/up
+  PASS  fe-sw2: MLAG interface PortChannel13 up/up
+  PASS  fe-sw2: MLAG interface PortChannel21 up/up
+  PASS  fe-sw2: MLAG interface PortChannel22 up/up
+  PASS  fe-sw2: MLAG interface PortChannel30 up/up
+  PASS  fe-sw2: MLAG interface PortChannel31 up/up
+  PASS  fe-sw2: PortChannel1 up with Ethernet0,Ethernet1
+  PASS  fe-sw2: PortChannel10 up with Ethernet2
+  PASS  fe-sw2: PortChannel11 up with Ethernet3
+  PASS  fe-sw2: PortChannel12 up with Ethernet4
+  PASS  fe-sw2: PortChannel13 up with Ethernet5
+  PASS  fe-sw2: PortChannel21 up with Ethernet6
+  PASS  fe-sw2: PortChannel22 up with Ethernet7
+  PASS  fe-sw2: PortChannel30 up with Ethernet8
+  PASS  fe-sw2: PortChannel31 up with Ethernet9,Ethernet10
+  PASS  roles: one active, one standby
+== ctrl1: cluster node
+  PASS  sfab-cluster.service finished in this boot with status 0
+  PASS  kubelet active
+  PASS  containerd mirrors: a hosts.toml for each of docker.io, ghcr.io, quay.io, registry.k8s.io naming http://192.0.2.6:5000 with override_path
+  PASS  the registry answers through the firewall's source NAT (GET http://192.0.2.6:5000/v2/ is 200)
+  PASS  the bastion answers NTP from the data network (10.20.3.10, stratum 10)
+  PASS  the internal view answers llm.tarnwick.example with 10.20.1.200
+  PASS  the internal view answers an infrastructure name: truenas1.tarnwick.example is 10.20.1.31
+  PASS  TrueNAS's data address 10.20.1.31 answers on NFS 2049
+  PASS  TrueNAS's data address 10.20.1.31 answers ping
+== ctrl2: cluster node
+  PASS  sfab-cluster.service finished in this boot with status 0
+  PASS  kubelet active
+  PASS  containerd mirrors: a hosts.toml for each of docker.io, ghcr.io, quay.io, registry.k8s.io naming http://192.0.2.6:5000 with override_path
+  PASS  the registry answers through the firewall's source NAT (GET http://192.0.2.6:5000/v2/ is 200)
+  PASS  the bastion answers NTP from the data network (10.20.3.10, stratum 10)
+  PASS  the internal view answers llm.tarnwick.example with 10.20.1.200
+  PASS  the internal view answers an infrastructure name: truenas1.tarnwick.example is 10.20.1.31
+  PASS  TrueNAS's data address 10.20.1.31 answers on NFS 2049
+  PASS  TrueNAS's data address 10.20.1.31 answers ping
+== ctrl3: cluster node
+  PASS  sfab-cluster.service finished in this boot with status 0
+  PASS  kubelet active
+  PASS  containerd mirrors: a hosts.toml for each of docker.io, ghcr.io, quay.io, registry.k8s.io naming http://192.0.2.6:5000 with override_path
+  PASS  the registry answers through the firewall's source NAT (GET http://192.0.2.6:5000/v2/ is 200)
+  PASS  the bastion answers NTP from the data network (10.20.3.10, stratum 10)
+  PASS  the internal view answers llm.tarnwick.example with 10.20.1.200
+  PASS  the internal view answers an infrastructure name: truenas1.tarnwick.example is 10.20.1.31
+  PASS  TrueNAS's data address 10.20.1.31 answers on NFS 2049
+  PASS  TrueNAS's data address 10.20.1.31 answers ping
+== gpu1: cluster node
+  PASS  sfab-cluster.service finished in this boot with status 0
+  PASS  kubelet active
+  PASS  containerd mirrors: a hosts.toml for each of docker.io, ghcr.io, quay.io, registry.k8s.io naming http://192.0.2.6:5000 with override_path
+  PASS  the registry answers through the firewall's source NAT (GET http://192.0.2.6:5000/v2/ is 200)
+  PASS  the bastion answers NTP from the data network (10.20.3.10, stratum 10)
+  PASS  the internal view answers llm.tarnwick.example with 10.20.1.200
+  PASS  the internal view answers an infrastructure name: truenas1.tarnwick.example is 10.20.1.31
+  PASS  TrueNAS's data address 10.20.1.31 answers on NFS 2049
+  PASS  TrueNAS's data address 10.20.1.31 answers ping
+== gpu2: cluster node
+  PASS  sfab-cluster.service finished in this boot with status 0
+  PASS  kubelet active
+  PASS  containerd mirrors: a hosts.toml for each of docker.io, ghcr.io, quay.io, registry.k8s.io naming http://192.0.2.6:5000 with override_path
+  PASS  the registry answers through the firewall's source NAT (GET http://192.0.2.6:5000/v2/ is 200)
+  PASS  the bastion answers NTP from the data network (10.20.3.10, stratum 10)
+  PASS  the internal view answers llm.tarnwick.example with 10.20.1.200
+  PASS  the internal view answers an infrastructure name: truenas1.tarnwick.example is 10.20.1.31
+  PASS  TrueNAS's data address 10.20.1.31 answers on NFS 2049
+  PASS  TrueNAS's data address 10.20.1.31 answers ping
+== bastion: bastion
+  PASS  bond0 has 2 slaves
+  PASS  bond0 slaves under one aggregator ID
+  PASS  bond0 partner MAC is the mclag-system-mac
+  PASS  bond0 holds 10.20.3.10/24 and is up
+  PASS  default via 10.20.3.1 in the main table
+  PASS  management default in table 150 via 172.21.40.1
+  PASS  eth3 holds 10.20.9.10/24 and is up
+  PASS  out-of-band default in table 100 via 10.20.9.254
+  PASS  TX checksum offload off on the container's 3 data NICs
+  PASS  named running
+  PASS  chronyd running
+  PASS  sshd running
+  PASS  the lab root CA published: state/shared/ca/root.crt, subject Tarnwick Lab Root CA
+  PASS  the kubernetes intermediate (Tarnwick Kubernetes CA) chains to the lab root
+  PASS  the kubernetes intermediate's name constraints: 10.20.1.0/24, 10.23.0.0/16, cluster.local, ctrl1, ctrl2, ctrl3, kubernetes, kubernetes.default, kubernetes.default.svc, tarnwick.example
+  PASS  the platform intermediate (Tarnwick Platform CA) chains to the lab root
+  PASS  the platform intermediate's name constraints: 10.20.0.0/14, 10.24.10.0/24, tarnwick.example
+  PASS  no private key under state/shared/ (kubeadm's keys retracted once every control node joined)
+  PASS  kubectl reaches the API from the bastion: server v1.35.8
+  PASS  kubectl's API endpoint is the VIP (k8s.tarnwick.example or 10.20.1.10, port 6443)
+  PASS  helm is the pinned v3.22.0
+  PASS  TrueNAS's web interface answers on its management address from the bastion (https://10.20.2.31, rule bastion-to-stor-mgmt)
+== uplink-rtr: router
+  PASS  FRR 10.5.4 running
+  PASS  eth0 in VRF mgmt
+  PASS  no management default in the main table
+  PASS  management default in VRF mgmt via 172.21.40.1
+  PASS  eth1 holds 198.51.100.1/29 and is up
+  PASS  connected route 198.51.100.0/29 on eth1
+  PASS  eth2 holds 192.0.2.1/30 and is up
+  PASS  connected route 192.0.2.0/30 on eth2
+  PASS  eth3 holds 192.0.2.5/30 and is up
+  PASS  connected route 192.0.2.4/30 on eth3
+  PASS  IP forwarding on
+  PASS  TX checksum offload off on the container's 3 data NICs
+  PASS  fw answers ARP on 198.51.100.2 (eth1)
+  PASS  op-client answers ping on 192.0.2.2
+  PASS  registry answers ping on 192.0.2.6
+== registry: registry
+  PASS  eth1 holds 192.0.2.6/30 and is up
+  PASS  default via 192.0.2.5 in the main table
+  PASS  management default in table 150 via 172.21.40.1
+  PASS  TX checksum offload off on the container's 1 data NICs
+  PASS  the catalog holds images mirrored from each upstream (docker.io, ghcr.io, quay.io, registry.k8s.io; 26 repositories)
+  PASS  the catalog holds the charts (3 under charts/)
+  PASS  its access log shows pulls from 198.51.100.2, the firewall's public address (a node's pull crossed the source NAT)
+== op-client: client
+  PASS  eth1 holds 192.0.2.2/30 and is up
+  PASS  default via 192.0.2.1 in the main table
+  PASS  management default in table 150 via 172.21.40.1
+  PASS  TX checksum offload off on the container's 1 data NICs
+  PASS  192.0.2.1 answers ping
+  PASS  the lab root CA is in the system bundle
+== ent-client: client
+  PASS  eth1 holds 10.24.10.10/24 and is up
+  PASS  default via 10.24.10.1 in the main table
+  PASS  management default in table 150 via 172.21.40.1
+  PASS  TX checksum offload off on the container's 1 data NICs
+  PASS  10.24.10.1 answers ping
+  PASS  the lab root CA is in the system bundle
+  PASS  resolv.conf names 10.20.3.10
+  PASS  resolv.conf options timeout:10 attempts:4
+== truenas1: storage
+  PASS  the container running and healthy
+  PASS  the launcher was given a username and a password (presence and a sha256 prefix only, never a value)
+== population enterprise
+  PASS  ent-client: the resolver 10.20.3.10 answers llm.tarnwick.example with 10.20.1.210
+  PASS  ent-client: the resolver 10.20.3.10 answers admin.tarnwick.example with 10.20.1.210
+  PASS  ent-client: ctrl1.tarnwick.example answers 10.20.1.210 (the wildcard), never 10.20.1.11: the enterprise view holds no infrastructure record
+  PASS  ent-client: https://llm.tarnwick.example/echo: 200, the message echoed, the chain verified against the lab root
+  PASS  ent-client: https://admin.tarnwick.example/echo: 404 from gw-users (the Gateway has no route for the name)
+== population nodes
+  PASS  ctrl1: the resolver 10.20.3.10 answers llm.tarnwick.example with 10.20.1.200
+  PASS  ctrl1: the resolver 10.20.3.10 answers admin.tarnwick.example with 10.20.1.200
+  PASS  ctrl1: ctrl1.tarnwick.example is 10.20.1.11: the internal view holds the infrastructure records
+  PASS  ctrl1: https://llm.tarnwick.example/echo: 200, the message echoed, the chain verified against the lab root
+  PASS  ctrl1: https://admin.tarnwick.example/echo: 200, the message echoed, the chain verified against the lab root
+== population operator
+  PASS  op-client: https://llm.tarnwick.example/echo: 200, the message echoed, the chain verified against the lab root (name pinned to 198.51.100.2: the population's resolver is not in this lab)
+  PASS  op-client: https://admin.tarnwick.example/echo: 200, the message echoed, the chain verified against the lab root (name pinned to 198.51.100.2: the population's resolver is not in this lab)
+== cluster
+  PASS  ctrl1 Ready, kubelet v1.35.8, InternalIP 10.20.1.11, label node-role.tarnwick.example/control
+  PASS  ctrl2 Ready, kubelet v1.35.8, InternalIP 10.20.1.12, label node-role.tarnwick.example/control
+  PASS  ctrl3 Ready, kubelet v1.35.8, InternalIP 10.20.1.13, label node-role.tarnwick.example/control
+  PASS  gpu1 Ready, kubelet v1.35.8, InternalIP 10.20.1.21, label node-role.tarnwick.example/gpu
+  PASS  gpu2 Ready, kubelet v1.35.8, InternalIP 10.20.1.22, label node-role.tarnwick.example/gpu
+  PASS  the cluster has the spec's 5 nodes and no other
+  PASS  every pod in kube-system Running and Ready (29 pods)
+  PASS  no kube-proxy DaemonSet (Cilium replaces kube-proxy)
+  PASS  Cilium: one ready agent per node (5 of 5)
+  PASS  Cilium kube-proxy-replacement on
+  PASS  Cilium devices are the spec's (bond0)
+  PASS  Cilium L2 announcements enabled
+  PASS  Cilium Gateway API support enabled
+  PASS  every Cilium agent started after cilium-config last changed (5 agents)
+  PASS  the API VIP 10.20.1.10: the kube-vip lease held by a control node (ctrl3)
+  PASS  the API server's certificate is issued by Tarnwick Kubernetes CA and verifies against the lab root
+  PASS  cert-manager ready (3 Deployments available)
+  PASS  ClusterIssuer lab-ca Ready
+  PASS  the Certificate for wildcard-tls Ready
+  PASS  the wildcard certificate (*.tarnwick.example) is issued by Tarnwick Platform CA
+  PASS  Gateway gw-internal Programmed with address 10.20.1.200
+  PASS  Gateway gw-users Programmed with address 10.20.1.210
+  PASS  a load-balancer pool covers gw-internal's range 10.20.1.200 to 10.20.1.209
+  PASS  a load-balancer pool covers gw-users's range 10.20.1.210 to 10.20.1.214
+  PASS  an L2 announcement policy on ^bond0$ from the control nodes (node-role.tarnwick.example/control)
+  PASS  gw-internal's Service announced: its lease held by a control node (ctrl2)
+  PASS  gw-users's Service announced: its lease held by a control node (ctrl2)
+  PASS  the test backend echo/echo: 2 of 2 replicas ready
+  PASS  an HTTPRoute on gw-internal Accepted with its references resolved, listing admin.tarnwick.example, grafana.tarnwick.example, llm.tarnwick.example, to echo
+  PASS  an HTTPRoute on gw-users Accepted with its references resolved, listing llm.tarnwick.example, to echo
+  PASS  StorageClass truenas-nvmeof present, the cluster's default
+  PASS  StorageClass truenas-nfs present
+  PASS  democratic-csi: a controller and a node pod per class, every pod in democratic-csi Running and Ready (12 pods)
+  PASS  no Warning event since finish archived them
+== storage: a volume on each class
+  PASS  truenas-nvmeof: with the claim bound, TrueNAS's data address 10.20.1.31 answers on NVMe/TCP 4420 from every node (5 of 5)
+  PASS  truenas-nvmeof: the claim binds; a pod on gpu1 writes 1 MiB and a second pod reads back the same sha256
+  PASS  truenas-nfs: the claim binds; a pod on gpu1 writes 1 MiB and a second pod reads back the same sha256
+  PASS  the claims, pods and namespace sfab-audit deleted again
+== repository
+  PASS  namecheck clean
+  PASS  sfab check clean
+== RESULT: 495 passed, 0 failed, 0 known platform limitation(s), 0 skipped

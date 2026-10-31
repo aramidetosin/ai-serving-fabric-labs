@@ -1,0 +1,46 @@
+# break-2a (Chapter 2, exercise 5): the enterprise view publishes the admin hostnames, with the
+# internal Gateway's VIP.
+#
+# The enterprise view, on the platform's authoritative pair (dns-auth1 the primary, dns-auth2 its
+# secondary by transfer), answers the corporate resolver ent-dns, and holds the names users type
+# only: a staff lookup of an admin hostname is answered NXDOMAIN, and the matrix tries the cell
+# pinned to the users' Gateway's VIP, 10.20.11.210, which carries no route for it and answers 404:
+# the cell of the matrix the chapter writes as a 404 from the route set. The break adds admin and
+# grafana to that view, both answering the internal Gateway's VIP, 10.20.11.200: the names users
+# type still answer as rendered, so no staff request to a model or to the users' hostname changes. A
+# staff request for an admin hostname now resolves and goes to the internal Gateway, which no rule
+# admits the enterprise to: it falls to deny-all-log and times out at the client. The cell's mode
+# moved from the route set's 404 to security policy's log line, and only the matrix notices, since
+# no user calls an admin hostname.
+#
+# The break installs the view's forward zone, rendered with the two names added, in a copy of
+# dns-auth1's render inside its container, and reloads BIND on it (sfab-dns reload, which checks the
+# zone before named sees it); the zone's serial follows its data, so dns-auth2 takes it by transfer
+# at the NOTIFY. record: runs ten requests from the enterprise client to the users' hostname through
+# its own resolver, then the matrix's cells for the staff's admin hostnames, their users' Gateway
+# and their two model routes, as matrix.sh tries them. The heal installs dns-auth1's render again
+# and reloads it, and its record runs the same. ent-dns caches an answer for the zone's TTL (300 s):
+# each side's record looks the admin names up afresh only after the resolvers that cache them were
+# cleared.
+title: the enterprise view answers the admin hostnames with the internal Gateway's VIP
+exercise: 5
+since: 2
+break:
+  - dns_answer: {node: dns-auth1, view: enterprise, names: [admin, grafana], answer: "vip:gw-internal"}
+record:
+  - probe_http: {id: users, from: ent-client, hostname: llm, path: "/echo?msg=sfab-break-2a", count: 10, interval_s: 0.5, timeout_s: 5, passes: 1}
+  - matrix_cells: {id: cells, cells: [enterprise/admin, enterprise/gw-users, enterprise/chat, enterprise/staff]}
+expect_broken:
+  - probe_share: {probe: users, failing: none}
+  - cell_mode: {probe: cells, cell: enterprise/admin, mode: log-line, rule: deny-all-log}
+  - cell_mode: {probe: cells, cell: enterprise/gw-users, mode: allowed}
+  - cell_mode: {probe: cells, cell: enterprise/chat, mode: allowed}
+  - cell_mode: {probe: cells, cell: enterprise/staff, mode: allowed}
+heal:
+  - restore: dns-auth1
+expect_healed:
+  - probe_share: {probe: users, failing: none}
+  - cell_mode: {probe: cells, cell: enterprise/admin, mode: "404"}
+  - cell_mode: {probe: cells, cell: enterprise/gw-users, mode: allowed}
+  - cell_mode: {probe: cells, cell: enterprise/chat, mode: allowed}
+  - cell_mode: {probe: cells, cell: enterprise/staff, mode: allowed}

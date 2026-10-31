@@ -1,0 +1,326 @@
+admin@fw> show running security-policy
+
+"enterprise-to-users-gateway; index: 1" {
+        from enterprise;
+        source 10.24.10.0/24;
+        source-region none;
+        to data;
+        destination 10.20.1.210;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"enterprise-to-bastion-dns; index: 2" {
+        from enterprise;
+        source 10.24.10.0/24;
+        source-region none;
+        to bastion;
+        destination 10.20.3.10;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:any/tcp/any/53 1:any/udp/any/53 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-data; index: 3" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to data;
+        destination 10.20.1.0/24;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:any/tcp/any/22 1:any/tcp/any/443 2:any/tcp/any/6443 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-stor-mgmt; index: 4" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to stor-mgmt;
+        destination 10.20.2.0/24;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-oob; index: 5" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to oob;
+        destination 10.20.9.0/24;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"oob-to-bastion-dns-ntp; index: 6" {
+        from oob;
+        source 10.20.9.0/24;
+        source-region none;
+        to bastion;
+        destination 10.20.3.10;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:any/tcp/any/53 1:any/udp/any/53 2:any/udp/any/123 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"inside-to-bastion-dns-ntp; index: 7" {
+        from [ data stor-mgmt ];
+        source [ 10.20.1.0/24 10.20.2.0/24 ];
+        source-region none;
+        to bastion;
+        destination 10.20.3.10;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:any/tcp/any/53 1:any/udp/any/53 2:any/udp/any/123 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"inside-to-internet; index: 8" {
+        from [ data stor-mgmt bastion ];
+        source [ 10.20.3.0/24 10.20.1.0/24 10.20.2.0/24 ];
+        source-region none;
+        to uplink;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"uplink-to-internal-gateway; index: 9" {
+        from uplink;
+        source any;
+        source-region none;
+        to data;
+        destination 198.51.100.2;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"data-intrazone; index: 10" {
+        from data;
+        source any;
+        source-region none;
+        to data;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"stor-mgmt-intrazone; index: 11" {
+        from stor-mgmt;
+        source any;
+        source-region none;
+        to stor-mgmt;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-intrazone; index: 12" {
+        from bastion;
+        source any;
+        source-region none;
+        to bastion;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"oob-intrazone; index: 13" {
+        from oob;
+        source any;
+        source-region none;
+        to oob;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"enterprise-intrazone; index: 14" {
+        from enterprise;
+        source any;
+        source-region none;
+        to enterprise;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"deny-all-log; index: 15" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal no;
+}
+
+"intrazone-default; index: 16" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+        type intrazone;
+}
+
+"interzone-default; index: 17" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal yes;
+        type interzone;
+}
+
+dynamic url: no

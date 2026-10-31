@@ -1,0 +1,784 @@
+{
+  "access": {},
+  "addresses": {
+    "data": [],
+    "ip_interfaces": [
+      {
+        "address": "172.21.40.11/24",
+        "gateway": "172.21.40.1",
+        "interface": "Management0",
+        "source": "passthrough",
+        "vrf": "mgmt"
+      },
+      {
+        "address": "10.20.255.0/31",
+        "interface": "Ethernet12",
+        "source": "keepalive",
+        "vrf": "VrfMclagKa"
+      },
+      {
+        "address": "10.20.255.4/31",
+        "interface": "Vlan3966",
+        "source": "backup-keepalive",
+        "vrf": "VrfMclagKa"
+      }
+    ]
+  },
+  "bgp": null,
+  "container": "sfab-ch03-fe-sw1",
+  "es": null,
+  "evpn": null,
+  "keepalive": {
+    "address": "10.20.255.0/31",
+    "backup_address": "10.20.255.4/31",
+    "backup_interface": "Vlan3966",
+    "backup_peer": "10.20.255.5",
+    "peer_address": "10.20.255.1",
+    "port": "Ethernet12",
+    "vrf": "VrfMclagKa"
+  },
+  "known_macs": {
+    "02:5a:65:00:00:01": {
+      "node": "k8s-cp1",
+      "source": "bond",
+      "via": "PortChannel11",
+      "vlan": 100
+    },
+    "02:5a:66:00:00:01": {
+      "node": "k8s-cp2",
+      "source": "bond",
+      "via": "PortChannel12",
+      "vlan": 100
+    },
+    "02:5a:67:00:00:01": {
+      "node": "k8s-cp3",
+      "source": "bond",
+      "via": "PortChannel13",
+      "vlan": 100
+    },
+    "02:5a:68:00:00:01": {
+      "node": "k8s-ingress1",
+      "source": "bond",
+      "via": "PortChannel14",
+      "vlan": 100
+    },
+    "02:5a:69:00:00:01": {
+      "node": "k8s-ingress2",
+      "source": "bond",
+      "via": "PortChannel15",
+      "vlan": 100
+    },
+    "02:5a:6f:00:00:01": {
+      "node": "k8s-gpu1",
+      "source": "bond",
+      "via": "PortChannel21",
+      "vlan": 100
+    },
+    "02:5a:70:00:00:01": {
+      "node": "k8s-gpu2",
+      "source": "bond",
+      "via": "PortChannel22",
+      "vlan": 100
+    }
+  },
+  "lab": "sfab-ch03",
+  "mclag": {
+    "backup": {
+      "interval": 1,
+      "peer_ip": "10.20.255.5",
+      "session": "up",
+      "source_ip": "10.20.255.4",
+      "vrf": "VrfMclagKa"
+    },
+    "domain": 1,
+    "interfaces": [
+      "PortChannel10",
+      "PortChannel11",
+      "PortChannel12",
+      "PortChannel13",
+      "PortChannel14",
+      "PortChannel15",
+      "PortChannel21",
+      "PortChannel22",
+      "PortChannel30",
+      "PortChannel31",
+      "PortChannel32",
+      "PortChannel41",
+      "PortChannel42",
+      "PortChannel43",
+      "PortChannel44"
+    ],
+    "pair_roles": [
+      "active",
+      "standby"
+    ],
+    "peer": "fe-sw2",
+    "peer_ip": "10.20.255.1",
+    "peer_link": "PortChannel1",
+    "peer_link_status": "up",
+    "session": "up",
+    "session_vrf": "VrfMclagKa",
+    "source_ip": "10.20.255.0",
+    "system_mac": "02:5a:00:00:00:01"
+  },
+  "mgmt": "172.21.40.11",
+  "mgmt_vrf": "mgmt",
+  "num_nics": 19,
+  "passthrough": true,
+  "portchannels": {
+    "PortChannel1": {
+      "desc": "peer-link",
+      "fast_rate": true,
+      "id": 1,
+      "kind": "peer-link",
+      "mclag": false,
+      "member_peers": {
+        "Ethernet0": "fe-sw2:eth1",
+        "Ethernet1": "fe-sw2:eth2"
+      },
+      "members": [
+        "Ethernet0",
+        "Ethernet1"
+      ],
+      "members_selected": true,
+      "mode": "trunk",
+      "mtu": 9216,
+      "peer_node": null,
+      "status": "up",
+      "vlans": [
+        100,
+        110,
+        120,
+        130,
+        131,
+        200,
+        300,
+        3966
+      ]
+    },
+    "PortChannel10": {
+      "desc": "fw-ae1",
+      "fast_rate": true,
+      "id": 10,
+      "kind": "mclag",
+      "mclag": true,
+      "member_peers": {
+        "Ethernet2": "fw:eth1"
+      },
+      "members": [
+        "Ethernet2"
+      ],
+      "members_selected": true,
+      "mode": "trunk",
+      "mtu": 9216,
+      "peer_node": "fw",
+      "status": "up",
+      "vlans": [
+        100,
+        110,
+        130,
+        131,
+        200,
+        300
+      ]
+    },
+    "PortChannel11": {
+      "desc": "k8s-cp1-bond",
+      "fast_rate": true,
+      "id": 11,
+      "kind": "mclag",
+      "mclag": true,
+      "member_peers": {
+        "Ethernet3": "k8s-cp1:eth1"
+      },
+      "members": [
+        "Ethernet3"
+      ],
+      "members_selected": true,
+      "mode": "access",
+      "mtu": 9216,
+      "peer_node": "k8s-cp1",
+      "status": "up",
+      "vlans": [
+        100
+      ]
+    },
+    "PortChannel12": {
+      "desc": "k8s-cp2-bond",
+      "fast_rate": true,
+      "id": 12,
+      "kind": "mclag",
+      "mclag": true,
+      "member_peers": {
+        "Ethernet4": "k8s-cp2:eth1"
+      },
+      "members": [
+        "Ethernet4"
+      ],
+      "members_selected": true,
+      "mode": "access",
+      "mtu": 9216,
+      "peer_node": "k8s-cp2",
+      "status": "up",
+      "vlans": [
+        100
+      ]
+    },
+    "PortChannel13": {
+      "desc": "k8s-cp3-bond",
+      "fast_rate": true,
+      "id": 13,
+      "kind": "mclag",
+      "mclag": true,
+      "member_peers": {
+        "Ethernet5": "k8s-cp3:eth1"
+      },
+      "members": [
+        "Ethernet5"
+      ],
+      "members_selected": true,
+      "mode": "access",
+      "mtu": 9216,
+      "peer_node": "k8s-cp3",
+      "status": "up",
+      "vlans": [
+        100
+      ]
+    },
+    "PortChannel14": {
+      "desc": "k8s-ingress1-bond",
+      "fast_rate": true,
+      "id": 14,
+      "kind": "mclag",
+      "mclag": true,
+      "member_peers": {
+        "Ethernet13": "k8s-ingress1:eth1"
+      },
+      "members": [
+        "Ethernet13"
+      ],
+      "members_selected": true,
+      "mode": "access",
+      "mtu": 9216,
+      "peer_node": "k8s-ingress1",
+      "status": "up",
+      "vlans": [
+        100
+      ]
+    },
+    "PortChannel15": {
+      "desc": "k8s-ingress2-bond",
+      "fast_rate": true,
+      "id": 15,
+      "kind": "mclag",
+      "mclag": true,
+      "member_peers": {
+        "Ethernet14": "k8s-ingress2:eth1"
+      },
+      "members": [
+        "Ethernet14"
+      ],
+      "members_selected": true,
+      "mode": "access",
+      "mtu": 9216,
+      "peer_node": "k8s-ingress2",
+      "status": "up",
+      "vlans": [
+        100
+      ]
+    },
+    "PortChannel21": {
+      "desc": "k8s-gpu1-bond",
+      "fast_rate": true,
+      "id": 21,
+      "kind": "mclag",
+      "mclag": true,
+      "member_peers": {
+        "Ethernet6": "k8s-gpu1:eth1"
+      },
+      "members": [
+        "Ethernet6"
+      ],
+      "members_selected": true,
+      "mode": "access",
+      "mtu": 9216,
+      "peer_node": "k8s-gpu1",
+      "status": "up",
+      "vlans": [
+        100
+      ]
+    },
+    "PortChannel22": {
+      "desc": "k8s-gpu2-bond",
+      "fast_rate": true,
+      "id": 22,
+      "kind": "mclag",
+      "mclag": true,
+      "member_peers": {
+        "Ethernet7": "k8s-gpu2:eth1"
+      },
+      "members": [
+        "Ethernet7"
+      ],
+      "members_selected": true,
+      "mode": "access",
+      "mtu": 9216,
+      "peer_node": "k8s-gpu2",
+      "status": "up",
+      "vlans": [
+        100
+      ]
+    },
+    "PortChannel30": {
+      "desc": "bastion-bond",
+      "fast_rate": true,
+      "id": 30,
+      "kind": "mclag",
+      "mclag": true,
+      "member_peers": {
+        "Ethernet8": "bastion:eth1"
+      },
+      "members": [
+        "Ethernet8"
+      ],
+      "members_selected": true,
+      "mode": "access",
+      "mtu": 9216,
+      "peer_node": "bastion",
+      "status": "up",
+      "vlans": [
+        300
+      ]
+    },
+    "PortChannel31": {
+      "desc": "truenas1-data",
+      "fast_rate": true,
+      "id": 31,
+      "kind": "mclag",
+      "mclag": true,
+      "member_peers": {
+        "Ethernet10": "truenas1:eth2",
+        "Ethernet9": "truenas1:eth1"
+      },
+      "members": [
+        "Ethernet9",
+        "Ethernet10"
+      ],
+      "members_selected": true,
+      "mode": "access",
+      "mtu": 9216,
+      "peer_node": "truenas1",
+      "status": "up",
+      "vlans": [
+        120
+      ]
+    },
+    "PortChannel32": {
+      "desc": "truenas1-mgmt",
+      "fast_rate": true,
+      "id": 32,
+      "kind": "mclag",
+      "mclag": true,
+      "member_peers": {
+        "Ethernet11": "truenas1:eth5"
+      },
+      "members": [
+        "Ethernet11"
+      ],
+      "members_selected": true,
+      "mode": "access",
+      "mtu": 9216,
+      "peer_node": "truenas1",
+      "status": "up",
+      "vlans": [
+        200
+      ]
+    },
+    "PortChannel41": {
+      "desc": "dns-auth1-bond",
+      "fast_rate": true,
+      "id": 41,
+      "kind": "mclag",
+      "mclag": true,
+      "member_peers": {
+        "Ethernet15": "dns-auth1:eth1"
+      },
+      "members": [
+        "Ethernet15"
+      ],
+      "members_selected": true,
+      "mode": "access",
+      "mtu": 9216,
+      "peer_node": "dns-auth1",
+      "status": "up",
+      "vlans": [
+        130
+      ]
+    },
+    "PortChannel42": {
+      "desc": "dns-res1-bond",
+      "fast_rate": true,
+      "id": 42,
+      "kind": "mclag",
+      "mclag": true,
+      "member_peers": {
+        "Ethernet16": "dns-res1:eth1"
+      },
+      "members": [
+        "Ethernet16"
+      ],
+      "members_selected": true,
+      "mode": "access",
+      "mtu": 9216,
+      "peer_node": "dns-res1",
+      "status": "up",
+      "vlans": [
+        130
+      ]
+    },
+    "PortChannel43": {
+      "desc": "dns-auth2-bond",
+      "fast_rate": true,
+      "id": 43,
+      "kind": "mclag",
+      "mclag": true,
+      "member_peers": {
+        "Ethernet17": "dns-auth2:eth1"
+      },
+      "members": [
+        "Ethernet17"
+      ],
+      "members_selected": true,
+      "mode": "access",
+      "mtu": 9216,
+      "peer_node": "dns-auth2",
+      "status": "up",
+      "vlans": [
+        131
+      ]
+    },
+    "PortChannel44": {
+      "desc": "dns-res2-bond",
+      "fast_rate": true,
+      "id": 44,
+      "kind": "mclag",
+      "mclag": true,
+      "member_peers": {
+        "Ethernet18": "dns-res2:eth1"
+      },
+      "members": [
+        "Ethernet18"
+      ],
+      "members_selected": true,
+      "mode": "access",
+      "mtu": 9216,
+      "peer_node": "dns-res2",
+      "status": "up",
+      "vlans": [
+        131
+      ]
+    }
+  },
+  "ports": {
+    "Ethernet0": {
+      "admin": "up",
+      "desc": "peer-link-1",
+      "eth": "eth1",
+      "mtu": 9216,
+      "peer": "fe-sw2:eth1",
+      "portchannel": "PortChannel1",
+      "role": "peer-link"
+    },
+    "Ethernet1": {
+      "admin": "up",
+      "desc": "peer-link-2",
+      "eth": "eth2",
+      "mtu": 9216,
+      "peer": "fe-sw2:eth2",
+      "portchannel": "PortChannel1",
+      "role": "peer-link"
+    },
+    "Ethernet10": {
+      "admin": "up",
+      "desc": "truenas1-eth2",
+      "eth": "eth11",
+      "mtu": 9216,
+      "peer": "truenas1:eth2",
+      "portchannel": "PortChannel31",
+      "role": "bundle-member"
+    },
+    "Ethernet11": {
+      "admin": "up",
+      "desc": "truenas1-eth5",
+      "eth": "eth12",
+      "mtu": 9216,
+      "peer": "truenas1:eth5",
+      "portchannel": "PortChannel32",
+      "role": "bundle-member"
+    },
+    "Ethernet12": {
+      "admin": "up",
+      "desc": "mclag-keepalive",
+      "eth": "eth13",
+      "mtu": 9100,
+      "peer": "fe-sw2:eth13",
+      "portchannel": null,
+      "role": "keepalive"
+    },
+    "Ethernet13": {
+      "admin": "up",
+      "desc": "k8s-ingress1-eth1",
+      "eth": "eth14",
+      "mtu": 9216,
+      "peer": "k8s-ingress1:eth1",
+      "portchannel": "PortChannel14",
+      "role": "bundle-member"
+    },
+    "Ethernet14": {
+      "admin": "up",
+      "desc": "k8s-ingress2-eth1",
+      "eth": "eth15",
+      "mtu": 9216,
+      "peer": "k8s-ingress2:eth1",
+      "portchannel": "PortChannel15",
+      "role": "bundle-member"
+    },
+    "Ethernet15": {
+      "admin": "up",
+      "desc": "dns-auth1-eth1",
+      "eth": "eth16",
+      "mtu": 9216,
+      "peer": "dns-auth1:eth1",
+      "portchannel": "PortChannel41",
+      "role": "bundle-member"
+    },
+    "Ethernet16": {
+      "admin": "up",
+      "desc": "dns-res1-eth1",
+      "eth": "eth17",
+      "mtu": 9216,
+      "peer": "dns-res1:eth1",
+      "portchannel": "PortChannel42",
+      "role": "bundle-member"
+    },
+    "Ethernet17": {
+      "admin": "up",
+      "desc": "dns-auth2-eth1",
+      "eth": "eth18",
+      "mtu": 9216,
+      "peer": "dns-auth2:eth1",
+      "portchannel": "PortChannel43",
+      "role": "bundle-member"
+    },
+    "Ethernet18": {
+      "admin": "up",
+      "desc": "dns-res2-eth1",
+      "eth": "eth19",
+      "mtu": 9216,
+      "peer": "dns-res2:eth1",
+      "portchannel": "PortChannel44",
+      "role": "bundle-member"
+    },
+    "Ethernet2": {
+      "admin": "up",
+      "desc": "fw-eth1",
+      "eth": "eth3",
+      "mtu": 9216,
+      "peer": "fw:eth1",
+      "portchannel": "PortChannel10",
+      "role": "bundle-member"
+    },
+    "Ethernet3": {
+      "admin": "up",
+      "desc": "k8s-cp1-eth1",
+      "eth": "eth4",
+      "mtu": 9216,
+      "peer": "k8s-cp1:eth1",
+      "portchannel": "PortChannel11",
+      "role": "bundle-member"
+    },
+    "Ethernet4": {
+      "admin": "up",
+      "desc": "k8s-cp2-eth1",
+      "eth": "eth5",
+      "mtu": 9216,
+      "peer": "k8s-cp2:eth1",
+      "portchannel": "PortChannel12",
+      "role": "bundle-member"
+    },
+    "Ethernet5": {
+      "admin": "up",
+      "desc": "k8s-cp3-eth1",
+      "eth": "eth6",
+      "mtu": 9216,
+      "peer": "k8s-cp3:eth1",
+      "portchannel": "PortChannel13",
+      "role": "bundle-member"
+    },
+    "Ethernet6": {
+      "admin": "up",
+      "desc": "k8s-gpu1-eth1",
+      "eth": "eth7",
+      "mtu": 9216,
+      "peer": "k8s-gpu1:eth1",
+      "portchannel": "PortChannel21",
+      "role": "bundle-member"
+    },
+    "Ethernet7": {
+      "admin": "up",
+      "desc": "k8s-gpu2-eth1",
+      "eth": "eth8",
+      "mtu": 9216,
+      "peer": "k8s-gpu2:eth1",
+      "portchannel": "PortChannel22",
+      "role": "bundle-member"
+    },
+    "Ethernet8": {
+      "admin": "up",
+      "desc": "bastion-eth1",
+      "eth": "eth9",
+      "mtu": 9216,
+      "peer": "bastion:eth1",
+      "portchannel": "PortChannel30",
+      "role": "bundle-member"
+    },
+    "Ethernet9": {
+      "admin": "up",
+      "desc": "truenas1-eth1",
+      "eth": "eth10",
+      "mtu": 9216,
+      "peer": "truenas1:eth1",
+      "portchannel": "PortChannel31",
+      "role": "bundle-member"
+    }
+  },
+  "role": "mclag_member",
+  "router": false,
+  "routes": {
+    "VrfMclagKa": [
+      "10.20.255.0/31",
+      "10.20.255.4/31"
+    ],
+    "default": []
+  },
+  "schema": 1,
+  "switch": "fe-sw1",
+  "used_ports": [
+    "Ethernet0",
+    "Ethernet1",
+    "Ethernet2",
+    "Ethernet3",
+    "Ethernet4",
+    "Ethernet5",
+    "Ethernet6",
+    "Ethernet7",
+    "Ethernet8",
+    "Ethernet9",
+    "Ethernet10",
+    "Ethernet11",
+    "Ethernet12",
+    "Ethernet13",
+    "Ethernet14",
+    "Ethernet15",
+    "Ethernet16",
+    "Ethernet17",
+    "Ethernet18"
+  ],
+  "vlans": {
+    "100": {
+      "tagged": [
+        "PortChannel1",
+        "PortChannel10"
+      ],
+      "untagged": [
+        "PortChannel11",
+        "PortChannel12",
+        "PortChannel13",
+        "PortChannel14",
+        "PortChannel15",
+        "PortChannel21",
+        "PortChannel22"
+      ]
+    },
+    "110": {
+      "tagged": [
+        "PortChannel1",
+        "PortChannel10"
+      ],
+      "untagged": []
+    },
+    "120": {
+      "tagged": [
+        "PortChannel1"
+      ],
+      "untagged": [
+        "PortChannel31"
+      ]
+    },
+    "130": {
+      "tagged": [
+        "PortChannel1",
+        "PortChannel10"
+      ],
+      "untagged": [
+        "PortChannel41",
+        "PortChannel42"
+      ]
+    },
+    "131": {
+      "tagged": [
+        "PortChannel1",
+        "PortChannel10"
+      ],
+      "untagged": [
+        "PortChannel43",
+        "PortChannel44"
+      ]
+    },
+    "200": {
+      "tagged": [
+        "PortChannel1",
+        "PortChannel10"
+      ],
+      "untagged": [
+        "PortChannel32"
+      ]
+    },
+    "300": {
+      "tagged": [
+        "PortChannel1",
+        "PortChannel10"
+      ],
+      "untagged": [
+        "PortChannel30"
+      ]
+    },
+    "3966": {
+      "tagged": [
+        "PortChannel1"
+      ],
+      "untagged": []
+    }
+  },
+  "vm_data_nics": [
+    "eth1",
+    "eth2",
+    "eth3",
+    "eth4",
+    "eth5",
+    "eth6",
+    "eth7",
+    "eth8",
+    "eth9",
+    "eth10",
+    "eth11",
+    "eth12",
+    "eth13",
+    "eth14",
+    "eth15",
+    "eth16",
+    "eth17",
+    "eth18",
+    "eth19"
+  ]
+}

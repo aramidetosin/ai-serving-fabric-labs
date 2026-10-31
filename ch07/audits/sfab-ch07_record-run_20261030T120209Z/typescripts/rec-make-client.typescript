@@ -1,0 +1,14 @@
+Script started on 2026-10-30 14:23:34+00:00 [COMMAND="make client" TERM="tmux-256color" TTY="/dev/pts/0" COLUMNS="80" LINES="24"]
+make -C /root/sfab/labs/ai-serving-fabric-labs/serving-layer client SERVING_ENV=/root/sfab/labs/ai-serving-fabric-labs/ch07/bootstrap/k8s/serving.env
+make[1]: Entering directory '/root/sfab/labs/ai-serving-fabric-labs/serving-layer'
+PYTHONDONTWRITEBYTECODE=1 python3 /root/sfab/labs/ai-serving-fabric-labs/serving-layer/serving.py client --env /root/sfab/labs/ai-serving-fabric-labs/ch07/bootstrap/k8s/serving.env --max-tokens 64 
+== client: base URL https://serve.ai.tarnwick.example/chat/v1 (serve.ai.tarnwick.example pinned to 10.20.11.200), model chat, the key from /tmp/sfab-client.key as a bearer token
+  POST /chat/v1/chat/completions -> HTTP 200, application/json; charset=utf-8
+  model: chat
+  finish_reason: stop
+  answer: Red, Green, Blue
+  PASS  an OpenAI-compatible chat completion at https://serve.ai.tarnwick.example/chat/v1 answered HTTP 200 with a finished answer
+== RESULT: 1 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+make[1]: Leaving directory '/root/sfab/labs/ai-serving-fabric-labs/serving-layer'
+
+Script done on 2026-10-30 14:23:37+00:00 [COMMAND_EXIT_CODE="0"]

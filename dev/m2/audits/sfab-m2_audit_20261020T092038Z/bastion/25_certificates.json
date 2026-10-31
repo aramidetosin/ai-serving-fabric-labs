@@ -1,0 +1,59 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "cert-manager.io/v1",
+            "kind": "Certificate",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T06:03:37Z",
+                "generation": 1,
+                "name": "wildcard",
+                "namespace": "gateways",
+                "resourceVersion": "2413",
+                "uid": "c2813f43-a6ae-41c8-a2ad-93cd749ae9c2"
+            },
+            "spec": {
+                "dnsNames": [
+                    "*.tarnwick.example"
+                ],
+                "duration": "2160h",
+                "issuerRef": {
+                    "group": "cert-manager.io",
+                    "kind": "ClusterIssuer",
+                    "name": "lab-ca"
+                },
+                "privateKey": {
+                    "algorithm": "ECDSA",
+                    "rotationPolicy": "Always",
+                    "size": 256
+                },
+                "renewBefore": "360h",
+                "secretName": "wildcard-tls",
+                "usages": [
+                    "digital signature",
+                    "server auth"
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-20T06:03:37Z",
+                        "message": "Certificate is up to date and has not expired",
+                        "observedGeneration": 1,
+                        "reason": "Ready",
+                        "status": "True",
+                        "type": "Ready"
+                    }
+                ],
+                "notAfter": "2027-01-18T06:03:37Z",
+                "notBefore": "2026-10-20T06:03:37Z",
+                "renewalTime": "2027-01-03T06:03:37Z",
+                "revision": 1
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

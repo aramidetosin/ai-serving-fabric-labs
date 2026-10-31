@@ -1,0 +1,100 @@
+== pass 1 land: no-nat-public removed, a node's requests to the public address discarded as a LAND attack
+  PASS  pass 1 land: the rulebase in the render's order before the drill (order: security 25 rules as rendered;order: nat 2 rules as rendered)
+  PASS  pass 1 land: no-nat-public deleted through the XML API (success: command succeeded)
+  PASS  pass 1 land: committed: sfab drill land: no-nat-public removed (commit job 10: OK (Configuration committed successfully; Local configuration size: 56 KB; Predefined configuration size: 13 MB; Merged configuration size(local, panorama pushed, predefined): 16 MB; Maximum recommended merged configuration size: 47 MB (34% configured); Warning: Default master-key configured please change to custom master-key))
+  PASS  pass 1 land: committed: sfab drill land: no-nat-public back where the render puts it (commit job 11: OK (Configuration committed successfully; Local configuration size: 56 KB; Predefined configuration size: 13 MB; Merged configuration size(local, panorama pushed, predefined): 16 MB; Maximum recommended merged configuration size: 47 MB (34% configured); Warning: Default master-key configured please change to custom master-key))
+  PASS  pass 1 land: flow_policy_nat_land is in this firewall's own show counter global table (6415 counters read)
+  PASS  pass 1 land: with no-nat-public in place, k8s-cp2 (10.20.1.12) reaches 198.51.100.2: 5 of 5 answered
+  PASS  pass 1 land: ... and flow_policy_nat_land did not rise
+  PASS  pass 1 land: without it, 0 of 5 answered: the firewall discards every request
+  PASS  pass 1 land: ... and flow_policy_nat_land rose by 5 while 5 requests were sent
+  PASS  pass 1 land: drop counters that moved during it: flow_fwd_notopology +3, flow_ingress_ifp_lookup_invalid_mode +2, flow_no_interface +2, flow_policy_nat_land +5, flow_rcv_dot1q_tag_err +2 (recorded; not judged)
+  PASS  pass 1 land: show counter global filter delta yes severity drop, read after the probe, lists flow_policy_nat_land +5 (drop-delta-after.txt)
+  PASS  pass 1 land: the receive stage captured 5 frame(s) from 10.20.1.12 to 198.51.100.2 (recorded)
+  PASS  pass 1 land: the drop stage captured 5 frame(s) from 10.20.1.12 to 198.51.100.2 (diag/drop.decode.txt)
+  PASS  pass 1 land: the host-side captures saw 5 requests arrive at the firewall (eth1 5) and 0 replies leave it
+  PASS  pass 1 land: nothing of it left on the uplink (eth5: 0 frames)
+  PASS  pass 1 land: no-nat-public back where the render puts it (before internet-snat): the running rulebase in the render's order
+  PASS  pass 1 land: with it back, 5 of 5 answered
+  PASS  pass 1 land: ... and flow_policy_nat_land did not rise
+== pass 1 ntp-uplink: the firewall's own NTP and DNS sent from the uplink by their service routes, dropped by deny-all-log
+  PASS  pass 1 ntp-uplink: the ntp service route set to ethernet1/5 (198.51.100.2) through the XML API
+  PASS  pass 1 ntp-uplink: the dns service route set to ethernet1/5 (198.51.100.2) with it: its server is the same address
+  PASS  pass 1 ntp-uplink: committed: sfab drill ntp-uplink: the service routes to ethernet1/5 (commit job 12: OK (Configuration committed successfully; Local configuration size: 56 KB; Predefined configuration size: 13 MB; Merged configuration size(local, panorama pushed, predefined): 16 MB; Maximum recommended merged configuration size: 47 MB (34% configured); Warning: Default master-key configured please change to custom master-key))
+  PASS  pass 1 ntp-uplink: committed: sfab drill ntp-uplink: the service routes back to ae1.130 (commit job 13: OK (Configuration committed successfully; Local configuration size: 56 KB; Predefined configuration size: 13 MB; Merged configuration size(local, panorama pushed, predefined): 16 MB; Maximum recommended merged configuration size: 47 MB (34% configured); Warning: Default master-key configured please change to custom master-key))
+  PASS  pass 1 ntp-uplink: the firewall's own NTP from 198.51.100.2 (ethernet1/5) to 10.20.13.21:123 logged under deny-all-log, deny, zone uplink to zone services
+  PASS  pass 1 ntp-uplink: the firewall's own DNS from 198.51.100.2 to 10.20.13.21:53 (a name looked up through it) logged under deny-all-log, deny, zone uplink to zone services
+  PASS  pass 1 ntp-uplink: with the route back, the firewall's DNS from 10.20.13.1 allowed again by inside-to-resolvers
+  PASS  pass 1 ntp-uplink: no NTP/DNS frame from 198.51.100.2 reached the server's side (the bundle: 0 frames)
+  PASS  pass 1 ntp-uplink: NTP/DNS frames from 198.51.100.2 on the uplink (eth5): 1 (recorded; not judged)
+  PASS  pass 1 ntp-uplink: with the route back, the firewall's NTP from 10.20.13.1 allowed again by inside-to-ntp
+  PASS  pass 1 ntp-uplink: the ntp service route reads ae1.130 again
+  PASS  pass 1 ntp-uplink: the dns service route reads ae1.130 again
+== pass 2 land: no-nat-public removed, a node's requests to the public address discarded as a LAND attack
+  PASS  pass 2 land: the rulebase in the render's order before the drill (order: security 25 rules as rendered;order: nat 2 rules as rendered)
+  PASS  pass 2 land: no-nat-public deleted through the XML API (success: command succeeded)
+  PASS  pass 2 land: committed: sfab drill land: no-nat-public removed (commit job 14: OK (Configuration committed successfully; Local configuration size: 56 KB; Predefined configuration size: 13 MB; Merged configuration size(local, panorama pushed, predefined): 16 MB; Maximum recommended merged configuration size: 47 MB (34% configured); Warning: Default master-key configured please change to custom master-key))
+  PASS  pass 2 land: committed: sfab drill land: no-nat-public back where the render puts it (commit job 15: OK (Configuration committed successfully; Local configuration size: 56 KB; Predefined configuration size: 13 MB; Merged configuration size(local, panorama pushed, predefined): 16 MB; Maximum recommended merged configuration size: 47 MB (34% configured); Warning: Default master-key configured please change to custom master-key))
+  PASS  pass 2 land: flow_policy_nat_land is in this firewall's own show counter global table (6415 counters read)
+  PASS  pass 2 land: with no-nat-public in place, k8s-cp2 (10.20.1.12) reaches 198.51.100.2: 5 of 5 answered
+  PASS  pass 2 land: ... and flow_policy_nat_land did not rise
+  PASS  pass 2 land: without it, 0 of 5 answered: the firewall discards every request
+  PASS  pass 2 land: ... and flow_policy_nat_land rose by 5 while 5 requests were sent
+  PASS  pass 2 land: drop counters that moved during it: flow_fwd_notopology +2, flow_ingress_ifp_lookup_invalid_mode +3, flow_no_interface +3, flow_policy_nat_land +5, flow_rcv_dot1q_tag_err +3 (recorded; not judged)
+  PASS  pass 2 land: show counter global filter delta yes severity drop, read after the probe, lists flow_policy_nat_land +5 (drop-delta-after.txt)
+  PASS  pass 2 land: the receive stage captured 5 frame(s) from 10.20.1.12 to 198.51.100.2 (recorded)
+  PASS  pass 2 land: the drop stage captured 5 frame(s) from 10.20.1.12 to 198.51.100.2 (diag/drop.decode.txt)
+  PASS  pass 2 land: the host-side captures saw 5 requests arrive at the firewall (eth1 5) and 0 replies leave it
+  PASS  pass 2 land: nothing of it left on the uplink (eth5: 0 frames)
+  PASS  pass 2 land: no-nat-public back where the render puts it (before internet-snat): the running rulebase in the render's order
+  PASS  pass 2 land: with it back, 5 of 5 answered
+  PASS  pass 2 land: ... and flow_policy_nat_land did not rise
+== pass 2 ntp-uplink: the firewall's own NTP and DNS sent from the uplink by their service routes, dropped by deny-all-log
+  PASS  pass 2 ntp-uplink: the ntp service route set to ethernet1/5 (198.51.100.2) through the XML API
+  PASS  pass 2 ntp-uplink: the dns service route set to ethernet1/5 (198.51.100.2) with it: its server is the same address
+  PASS  pass 2 ntp-uplink: committed: sfab drill ntp-uplink: the service routes to ethernet1/5 (commit job 16: OK (Configuration committed successfully; Local configuration size: 56 KB; Predefined configuration size: 13 MB; Merged configuration size(local, panorama pushed, predefined): 16 MB; Maximum recommended merged configuration size: 47 MB (34% configured); Warning: Default master-key configured please change to custom master-key))
+  PASS  pass 2 ntp-uplink: committed: sfab drill ntp-uplink: the service routes back to ae1.130 (commit job 17: OK (Configuration committed successfully; Local configuration size: 56 KB; Predefined configuration size: 13 MB; Merged configuration size(local, panorama pushed, predefined): 16 MB; Maximum recommended merged configuration size: 47 MB (34% configured); Warning: Default master-key configured please change to custom master-key))
+  PASS  pass 2 ntp-uplink: the firewall's own NTP from 198.51.100.2 (ethernet1/5) to 10.20.13.21:123 logged under deny-all-log, deny, zone uplink to zone services
+  PASS  pass 2 ntp-uplink: the firewall's own DNS from 198.51.100.2 to 10.20.13.21:53 (a name looked up through it) logged under deny-all-log, deny, zone uplink to zone services
+  PASS  pass 2 ntp-uplink: with the route back, the firewall's DNS from 10.20.13.1 allowed again by inside-to-resolvers
+  PASS  pass 2 ntp-uplink: no NTP/DNS frame from 198.51.100.2 reached the server's side (the bundle: 0 frames)
+  PASS  pass 2 ntp-uplink: NTP/DNS frames from 198.51.100.2 on the uplink (eth5): 0 (recorded; not judged)
+  PASS  pass 2 ntp-uplink: with the route back, the firewall's NTP from 10.20.13.1 allowed again by inside-to-ntp
+  PASS  pass 2 ntp-uplink: the ntp service route reads ae1.130 again
+  PASS  pass 2 ntp-uplink: the dns service route reads ae1.130 again
+== pass 3 land: no-nat-public removed, a node's requests to the public address discarded as a LAND attack
+  PASS  pass 3 land: the rulebase in the render's order before the drill (order: security 25 rules as rendered;order: nat 2 rules as rendered)
+  PASS  pass 3 land: no-nat-public deleted through the XML API (success: command succeeded)
+  PASS  pass 3 land: committed: sfab drill land: no-nat-public removed (commit job 18: OK (Configuration committed successfully; Local configuration size: 56 KB; Predefined configuration size: 13 MB; Merged configuration size(local, panorama pushed, predefined): 16 MB; Maximum recommended merged configuration size: 47 MB (34% configured); Warning: Default master-key configured please change to custom master-key))
+  PASS  pass 3 land: committed: sfab drill land: no-nat-public back where the render puts it (commit job 19: OK (Configuration committed successfully; Local configuration size: 56 KB; Predefined configuration size: 13 MB; Merged configuration size(local, panorama pushed, predefined): 16 MB; Maximum recommended merged configuration size: 47 MB (34% configured); Warning: Default master-key configured please change to custom master-key))
+  PASS  pass 3 land: flow_policy_nat_land is in this firewall's own show counter global table (6415 counters read)
+  PASS  pass 3 land: with no-nat-public in place, k8s-cp2 (10.20.1.12) reaches 198.51.100.2: 5 of 5 answered
+  PASS  pass 3 land: ... and flow_policy_nat_land did not rise
+  PASS  pass 3 land: without it, 0 of 5 answered: the firewall discards every request
+  PASS  pass 3 land: ... and flow_policy_nat_land rose by 5 while 5 requests were sent
+  PASS  pass 3 land: drop counters that moved during it: flow_fwd_notopology +3, flow_ingress_ifp_lookup_invalid_mode +2, flow_no_interface +2, flow_policy_nat_land +5, flow_rcv_dot1q_tag_err +2 (recorded; not judged)
+  PASS  pass 3 land: show counter global filter delta yes severity drop, read after the probe, lists flow_policy_nat_land +5 (drop-delta-after.txt)
+  PASS  pass 3 land: the receive stage captured 5 frame(s) from 10.20.1.12 to 198.51.100.2 (recorded)
+  PASS  pass 3 land: the drop stage captured 5 frame(s) from 10.20.1.12 to 198.51.100.2 (diag/drop.decode.txt)
+  PASS  pass 3 land: the host-side captures saw 5 requests arrive at the firewall (eth2 5) and 0 replies leave it
+  PASS  pass 3 land: nothing of it left on the uplink (eth5: 0 frames)
+  PASS  pass 3 land: no-nat-public back where the render puts it (before internet-snat): the running rulebase in the render's order
+  PASS  pass 3 land: with it back, 5 of 5 answered
+  PASS  pass 3 land: ... and flow_policy_nat_land did not rise
+== pass 3 ntp-uplink: the firewall's own NTP and DNS sent from the uplink by their service routes, dropped by deny-all-log
+  PASS  pass 3 ntp-uplink: the ntp service route set to ethernet1/5 (198.51.100.2) through the XML API
+  PASS  pass 3 ntp-uplink: the dns service route set to ethernet1/5 (198.51.100.2) with it: its server is the same address
+  PASS  pass 3 ntp-uplink: committed: sfab drill ntp-uplink: the service routes to ethernet1/5 (commit job 20: OK (Configuration committed successfully; Local configuration size: 56 KB; Predefined configuration size: 13 MB; Merged configuration size(local, panorama pushed, predefined): 16 MB; Maximum recommended merged configuration size: 47 MB (34% configured); Warning: Default master-key configured please change to custom master-key))
+  PASS  pass 3 ntp-uplink: committed: sfab drill ntp-uplink: the service routes back to ae1.130 (commit job 21: OK (Configuration committed successfully; Local configuration size: 56 KB; Predefined configuration size: 13 MB; Merged configuration size(local, panorama pushed, predefined): 16 MB; Maximum recommended merged configuration size: 47 MB (34% configured); Warning: Default master-key configured please change to custom master-key))
+  PASS  pass 3 ntp-uplink: the firewall's own NTP from 198.51.100.2 (ethernet1/5) to 10.20.13.21:123 logged under deny-all-log, deny, zone uplink to zone services
+  PASS  pass 3 ntp-uplink: the firewall's own DNS from 198.51.100.2 to 10.20.13.21:53 (a name looked up through it) logged under deny-all-log, deny, zone uplink to zone services
+  PASS  pass 3 ntp-uplink: with the route back, the firewall's DNS from 10.20.13.1 allowed again by inside-to-resolvers
+  PASS  pass 3 ntp-uplink: no NTP/DNS frame from 198.51.100.2 reached the server's side (the bundle: 0 frames)
+  PASS  pass 3 ntp-uplink: NTP/DNS frames from 198.51.100.2 on the uplink (eth5): 0 (recorded; not judged)
+  PASS  pass 3 ntp-uplink: with the route back, the firewall's NTP from 10.20.13.1 allowed again by inside-to-ntp
+  PASS  pass 3 ntp-uplink: the ntp service route reads ae1.130 again
+  PASS  pass 3 ntp-uplink: the dns service route reads ae1.130 again
+== after the drills
+  PASS  the running rulebase in the render's order after every drill (order: security 25 rules as rendered;order: nat 2 rules as rendered)
+  PASS  audit.sh --quick after the drills: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+== RESULT: 92 passed, 0 failed, 0 known platform limitation(s), 0 skipped

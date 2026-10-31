@@ -1,0 +1,256 @@
+{
+  "about": "sfab-ch01 truenas1: rendered from spec/profile-a.yaml; edit the spec and run make render. common/storage/truenas-setup.py applies it through the TrueNAS API, in the order of steps.",
+  "api": {
+    "host": "172.21.40.121",
+    "password_from": "the launcher's --password, read from the container",
+    "path": "/api/current",
+    "port": 80,
+    "user": "truenas_admin"
+  },
+  "arc_max_mb": 6144,
+  "container": "sfab-ch01-truenas1",
+  "csi": {
+    "api": "mgmt",
+    "api_address": "10.20.2.31",
+    "classes": [
+      {
+        "config_key": "driver-config-file.yaml",
+        "config_secret": "truenas-nvmeof-driver-config",
+        "driver_config": {
+          "_private": {
+            "csi": {
+              "volume": {
+                "idHash": {
+                  "strategy": "crc16"
+                }
+              }
+            }
+          },
+          "driver": "freenas-api-nvmeof",
+          "httpConnection": {
+            "allowInsecure": true,
+            "host": "10.20.2.31",
+            "port": 443,
+            "protocol": "https",
+            "username": "democratic-csi"
+          },
+          "instance_id": "tw-truenas1-nvmeof",
+          "nvmeof": {
+            "namePrefix": "csi-",
+            "nameSuffix": "-tw",
+            "namespaceTemplate": {},
+            "subsystemTemplate": {},
+            "transports": [
+              "tcp://10.20.12.31:4420"
+            ]
+          },
+          "zfs": {
+            "datasetParentName": "tank/k8s/nvmeof",
+            "detachedSnapshotsDatasetParentName": "tank/k8s/nvmeof-snaps",
+            "zvolBlocksize": "16K",
+            "zvolCompression": null,
+            "zvolDedup": null,
+            "zvolEnableReservation": false
+          }
+        },
+        "name": "nvmeof",
+        "release": "truenas-nvmeof",
+        "storage_class": "truenas-nvmeof"
+      },
+      {
+        "config_key": "driver-config-file.yaml",
+        "config_secret": "truenas-nfs-driver-config",
+        "driver_config": {
+          "driver": "freenas-api-nfs",
+          "httpConnection": {
+            "allowInsecure": true,
+            "host": "10.20.2.31",
+            "port": 443,
+            "protocol": "https",
+            "username": "democratic-csi"
+          },
+          "instance_id": "tw-truenas1-nfs",
+          "nfs": {
+            "shareAlldirs": false,
+            "shareAllowedHosts": [],
+            "shareAllowedNetworks": [
+              "10.20.12.0/24"
+            ],
+            "shareHost": "10.20.12.31",
+            "shareMapallGroup": "",
+            "shareMapallUser": "",
+            "shareMaprootGroup": "root",
+            "shareMaprootUser": "root"
+          },
+          "zfs": {
+            "datasetEnableQuotas": true,
+            "datasetEnableReservation": false,
+            "datasetParentName": "tank/k8s/nfs",
+            "datasetPermissionsGroup": 0,
+            "datasetPermissionsMode": "0777",
+            "datasetPermissionsUser": 0,
+            "detachedSnapshotsDatasetParentName": "tank/k8s/nfs-snaps"
+          }
+        },
+        "name": "nfs",
+        "release": "truenas-nfs",
+        "storage_class": "truenas-nfs"
+      }
+    ],
+    "default_class": "nvmeof",
+    "kubernetes": {
+      "kubectl": [
+        "common/bin/sfab-kubectl",
+        "ch01"
+      ],
+      "namespace": "democratic-csi",
+      "secret_labels": {
+        "decision.tarnwick.example/id": "dec-storage-data-address"
+      }
+    },
+    "runtime_fields": [
+      "httpConnection.password",
+      "nvmeof.ports"
+    ],
+    "users": [
+      {
+        "administrator": true,
+        "full_name": "Kubernetes CSI driver",
+        "password_from": "the administrator's password",
+        "username": "democratic-csi"
+      }
+    ]
+  },
+  "datasets": [
+    "tank/k8s",
+    "tank/k8s/nvmeof",
+    "tank/k8s/nvmeof-snaps",
+    "tank/k8s/nfs",
+    "tank/k8s/nfs-snaps"
+  ],
+  "decision": "dec-storage-data-address",
+  "domain": "ai.tarnwick.example",
+  "hostname": "truenas1",
+  "lab": "sfab-ch01",
+  "network": {
+    "bond": {
+      "address": "10.20.12.31/24",
+      "lacpdu_rate": "FAST",
+      "members": [
+        {
+          "eth": "eth1",
+          "match": "mac",
+          "peer": "fe-sw1:eth10"
+        },
+        {
+          "eth": "eth2",
+          "match": "mac",
+          "peer": "fe-sw1:eth11"
+        },
+        {
+          "eth": "eth3",
+          "match": "mac",
+          "peer": "fe-sw2:eth10"
+        },
+        {
+          "eth": "eth4",
+          "match": "mac",
+          "peer": "fe-sw2:eth11"
+        }
+      ],
+      "mtu": 9000,
+      "name": "bond0",
+      "protocol": "LACP",
+      "vlan": 120,
+      "xmit_hash_policy": "LAYER3+4"
+    },
+    "commit": {
+      "call_timeout_s": 420,
+      "checkin_timeout_s": 600,
+      "rollback": true
+    },
+    "gateway": "10.20.2.1",
+    "mgmt": {
+      "address": "10.20.2.31/24",
+      "lacpdu_rate": "FAST",
+      "members": [
+        {
+          "eth": "eth5",
+          "match": "mac",
+          "peer": "fe-sw1:eth12"
+        },
+        {
+          "eth": "eth6",
+          "match": "mac",
+          "peer": "fe-sw2:eth12"
+        }
+      ],
+      "mtu": 1500,
+      "name": "bond1",
+      "protocol": "LACP",
+      "vlan": 200,
+      "xmit_hash_policy": "LAYER3+4"
+    },
+    "nameservers": [
+      "10.20.13.21",
+      "10.20.14.21"
+    ],
+    "ntp": [
+      "10.20.13.21",
+      "10.20.14.21"
+    ],
+    "qemu_user": {
+      "address": "10.0.0.15/24",
+      "gateway": "10.0.0.2",
+      "prefix": "10.0.0.0/24"
+    },
+    "routes": [
+      {
+        "description": "management network via the VM's user-mode NIC",
+        "dest": "172.21.40.0/24",
+        "first": true,
+        "gateway": "10.0.0.2",
+        "id": "mgmt-return",
+        "via": "qemu-user"
+      }
+    ]
+  },
+  "node": "truenas1",
+  "pool": "tank",
+  "product": "truenas",
+  "schema": 1,
+  "services": {
+    "nfs": {
+      "bindip": [
+        "10.20.12.31"
+      ],
+      "protocols": [
+        "NFSV3",
+        "NFSV4"
+      ]
+    },
+    "nvmet": {
+      "ports": [
+        {
+          "traddr": "10.20.12.31",
+          "trsvcid": 4420,
+          "trtype": "TCP"
+        }
+      ]
+    }
+  },
+  "steps": [
+    "wait",
+    "network",
+    "services",
+    "users",
+    "csi",
+    "ui"
+  ],
+  "ui": {
+    "addresses": [
+      "10.20.2.31",
+      "10.0.0.15"
+    ]
+  }
+}

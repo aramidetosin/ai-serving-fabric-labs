@@ -1,0 +1,16 @@
+# A DNS or time server (sfab/resolver): the platform's authoritative pair, its resolvers, the
+# corporate resolver, the public servers and the time reference. SLUG SURFACE COMMAND. Its own
+# state, saved as evidence; each role's list adds its answers (dns-auth.list, dns-res.list,
+# dns-corporate.list, inet-ntp.list), and a population's client reads the answers it gets
+# (population.list). container_links is also read by the quick audit: the pair learns a bonded
+# server's container MACs (the bond's members), which the MAC table check sets aside.
+ip_addr              exec-json   ip -j addr show
+table_main           exec        ip route show
+table_mgmt           exec        ip route show table {inv.guest.tables.mgmt}
+bonding              exec        cat /proc/net/bonding/{bond.name}
+tx_container         host        container_offloads
++container_links     host-json   container_links
+ping_gw              exec        ping -c 3 -W 2 {gateway}
+resolv_conf          exec        cat /etc/resolv.conf
+services             exec        for p in named dnsmasq chronyd; do if pgrep -x "$p" >/dev/null; then echo "$p running"; else echo "$p absent"; fi; done
+named_running        exec        ps -o pid,args | grep '[n]amed' || echo 'no named process'

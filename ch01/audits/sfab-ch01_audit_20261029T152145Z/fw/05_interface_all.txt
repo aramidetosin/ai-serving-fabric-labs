@@ -1,0 +1,37 @@
+admin@fw> show interface all
+
+total configured hardware interfaces: 8
+
+name                    id    speed/duplex/state            mac address
+--------------------------------------------------------------------------------
+ethernet1/1             16    10000/full/up                 ba:db:ee:fb:ad:f0
+ethernet1/2             17    10000/full/up                 ba:db:ee:fb:ad:f0
+ethernet1/3             18    10000/full/up                 aa:c1:ab:8e:b6:e9
+ethernet1/4             19    10000/full/up                 aa:c1:ab:23:d0:0d
+ethernet1/5             20    10000/full/up                 aa:c1:ab:9b:e5:d9
+ethernet1/7             22    10000/full/up                 aa:c1:ab:8d:bf:98
+ae1                     240   [n/a]/[n/a]/up                ba:db:ee:fb:ad:f0
+tunnel                  4     [n/a]/[n/a]/up                ba:db:ee:fb:ad:04
+
+aggregation groups: 1
+ae1 members:
+  ethernet1/1 ethernet1/2
+
+
+total configured logical interfaces: 13
+
+name                      id    vsys zone             forwarding               tag    address
+------------------------- ----- ---- ---------------- ------------------------ ------ ------------------
+ethernet1/3               18    1    oob              vr:core                  0      10.20.9.254/24
+ethernet1/4               19    1    enterprise       vr:core                  0      10.24.10.9/30
+ethernet1/5               20    1    uplink           vr:core                  0      198.51.100.2/29
+ethernet1/7               22    1    enterprise       vr:core                  0      10.24.10.54/30
+ae1                       240   1                     N/A                      0      N/A
+ae1.100                   256   1    k8s-nodes        vr:core                  100    10.20.1.1/24
+ae1.110                   257   1    ingress          vr:core                  110    10.20.11.1/24
+ae1.130                   260   1    services         vr:core                  130    10.20.13.1/24
+ae1.131                   261   1    services         vr:core                  131    10.20.14.1/24
+ae1.200                   258   1    stor-mgmt        vr:core                  200    10.20.2.1/24
+ae1.300                   259   1    bastion          vr:core                  300    10.20.3.1/24
+tunnel                    4     1                     N/A                      0      N/A
+tunnel.1                  262   1    operator-vpn     vr:core                  0      N/A

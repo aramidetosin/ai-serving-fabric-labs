@@ -1,0 +1,341 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "kind": "Service",
+            "metadata": {
+                "annotations": {
+                    "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"labels\":{\"app.kubernetes.io/name\":\"serving\",\"tarnwick.example/model\":\"chat\"},\"name\":\"chat\",\"namespace\":\"serving\"},\"spec\":{\"ports\":[{\"name\":\"http\",\"port\":8080,\"protocol\":\"TCP\",\"targetPort\":\"http\"}],\"selector\":{\"tarnwick.example/model\":\"chat\",\"tarnwick.example/role\":\"server\"}}}\n"
+                },
+                "creationTimestamp": "2026-10-30T12:39:21Z",
+                "labels": {
+                    "app.kubernetes.io/name": "serving",
+                    "tarnwick.example/model": "chat"
+                },
+                "name": "chat",
+                "namespace": "serving",
+                "resourceVersion": "5040",
+                "uid": "e8a52aca-f8e9-4569-b72d-f3627f9a874a"
+            },
+            "spec": {
+                "clusterIP": "10.23.244.151",
+                "clusterIPs": [
+                    "10.23.244.151"
+                ],
+                "internalTrafficPolicy": "Cluster",
+                "ipFamilies": [
+                    "IPv4"
+                ],
+                "ipFamilyPolicy": "SingleStack",
+                "ports": [
+                    {
+                        "name": "http",
+                        "port": 8080,
+                        "protocol": "TCP",
+                        "targetPort": "http"
+                    }
+                ],
+                "selector": {
+                    "tarnwick.example/model": "chat",
+                    "tarnwick.example/role": "server"
+                },
+                "sessionAffinity": "None",
+                "type": "ClusterIP"
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Service",
+            "metadata": {
+                "annotations": {
+                    "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"labels\":{\"app.kubernetes.io/name\":\"serving\",\"tarnwick.example/copy\":\"a\",\"tarnwick.example/model\":\"chat\"},\"name\":\"chat-a\",\"namespace\":\"serving\"},\"spec\":{\"ports\":[{\"name\":\"http\",\"port\":8080,\"protocol\":\"TCP\",\"targetPort\":\"http\"}],\"selector\":{\"tarnwick.example/copy\":\"a\",\"tarnwick.example/model\":\"chat\",\"tarnwick.example/role\":\"server\"}}}\n"
+                },
+                "creationTimestamp": "2026-10-30T12:39:21Z",
+                "labels": {
+                    "app.kubernetes.io/name": "serving",
+                    "tarnwick.example/copy": "a",
+                    "tarnwick.example/model": "chat"
+                },
+                "name": "chat-a",
+                "namespace": "serving",
+                "resourceVersion": "5048",
+                "uid": "5bf8e1fb-9e5d-4cd5-bea2-23b4d19ebb3d"
+            },
+            "spec": {
+                "clusterIP": "10.23.201.112",
+                "clusterIPs": [
+                    "10.23.201.112"
+                ],
+                "internalTrafficPolicy": "Cluster",
+                "ipFamilies": [
+                    "IPv4"
+                ],
+                "ipFamilyPolicy": "SingleStack",
+                "ports": [
+                    {
+                        "name": "http",
+                        "port": 8080,
+                        "protocol": "TCP",
+                        "targetPort": "http"
+                    }
+                ],
+                "selector": {
+                    "tarnwick.example/copy": "a",
+                    "tarnwick.example/model": "chat",
+                    "tarnwick.example/role": "server"
+                },
+                "sessionAffinity": "None",
+                "type": "ClusterIP"
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Service",
+            "metadata": {
+                "annotations": {
+                    "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"labels\":{\"app.kubernetes.io/name\":\"serving\",\"tarnwick.example/copy\":\"b\",\"tarnwick.example/model\":\"chat\"},\"name\":\"chat-b\",\"namespace\":\"serving\"},\"spec\":{\"ports\":[{\"name\":\"http\",\"port\":8080,\"protocol\":\"TCP\",\"targetPort\":\"http\"}],\"selector\":{\"tarnwick.example/copy\":\"b\",\"tarnwick.example/model\":\"chat\",\"tarnwick.example/role\":\"server\"}}}\n"
+                },
+                "creationTimestamp": "2026-10-30T12:39:21Z",
+                "labels": {
+                    "app.kubernetes.io/name": "serving",
+                    "tarnwick.example/copy": "b",
+                    "tarnwick.example/model": "chat"
+                },
+                "name": "chat-b",
+                "namespace": "serving",
+                "resourceVersion": "5052",
+                "uid": "e3c0757c-9d47-4cac-b744-86c5e9ab701b"
+            },
+            "spec": {
+                "clusterIP": "10.23.52.200",
+                "clusterIPs": [
+                    "10.23.52.200"
+                ],
+                "internalTrafficPolicy": "Cluster",
+                "ipFamilies": [
+                    "IPv4"
+                ],
+                "ipFamilyPolicy": "SingleStack",
+                "ports": [
+                    {
+                        "name": "http",
+                        "port": 8080,
+                        "protocol": "TCP",
+                        "targetPort": "http"
+                    }
+                ],
+                "selector": {
+                    "tarnwick.example/copy": "b",
+                    "tarnwick.example/model": "chat",
+                    "tarnwick.example/role": "server"
+                },
+                "sessionAffinity": "None",
+                "type": "ClusterIP"
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Service",
+            "metadata": {
+                "annotations": {
+                    "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"labels\":{\"app.kubernetes.io/name\":\"serving\",\"tarnwick.example/copy\":\"c\",\"tarnwick.example/model\":\"chat\"},\"name\":\"chat-c\",\"namespace\":\"serving\"},\"spec\":{\"ports\":[{\"name\":\"http\",\"port\":8080,\"protocol\":\"TCP\",\"targetPort\":\"http\"}],\"selector\":{\"tarnwick.example/copy\":\"c\",\"tarnwick.example/model\":\"chat\",\"tarnwick.example/role\":\"server\"}}}\n"
+                },
+                "creationTimestamp": "2026-10-30T12:39:21Z",
+                "labels": {
+                    "app.kubernetes.io/name": "serving",
+                    "tarnwick.example/copy": "c",
+                    "tarnwick.example/model": "chat"
+                },
+                "name": "chat-c",
+                "namespace": "serving",
+                "resourceVersion": "5056",
+                "uid": "bb67b2fc-ec9b-4fdd-a28a-059a11bee7ac"
+            },
+            "spec": {
+                "clusterIP": "10.23.7.138",
+                "clusterIPs": [
+                    "10.23.7.138"
+                ],
+                "internalTrafficPolicy": "Cluster",
+                "ipFamilies": [
+                    "IPv4"
+                ],
+                "ipFamilyPolicy": "SingleStack",
+                "ports": [
+                    {
+                        "name": "http",
+                        "port": 8080,
+                        "protocol": "TCP",
+                        "targetPort": "http"
+                    }
+                ],
+                "selector": {
+                    "tarnwick.example/copy": "c",
+                    "tarnwick.example/model": "chat",
+                    "tarnwick.example/role": "server"
+                },
+                "sessionAffinity": "None",
+                "type": "ClusterIP"
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Service",
+            "metadata": {
+                "annotations": {
+                    "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"labels\":{\"app.kubernetes.io/name\":\"serving\",\"tarnwick.example/model\":\"staff\"},\"name\":\"staff\",\"namespace\":\"serving\"},\"spec\":{\"ports\":[{\"name\":\"http\",\"port\":8080,\"protocol\":\"TCP\",\"targetPort\":\"http\"}],\"selector\":{\"tarnwick.example/model\":\"staff\",\"tarnwick.example/role\":\"server\"}}}\n"
+                },
+                "creationTimestamp": "2026-10-30T12:39:21Z",
+                "labels": {
+                    "app.kubernetes.io/name": "serving",
+                    "tarnwick.example/model": "staff"
+                },
+                "name": "staff",
+                "namespace": "serving",
+                "resourceVersion": "5044",
+                "uid": "f5ef32f6-957e-4bc4-87a6-929aa462aef1"
+            },
+            "spec": {
+                "clusterIP": "10.23.76.28",
+                "clusterIPs": [
+                    "10.23.76.28"
+                ],
+                "internalTrafficPolicy": "Cluster",
+                "ipFamilies": [
+                    "IPv4"
+                ],
+                "ipFamilyPolicy": "SingleStack",
+                "ports": [
+                    {
+                        "name": "http",
+                        "port": 8080,
+                        "protocol": "TCP",
+                        "targetPort": "http"
+                    }
+                ],
+                "selector": {
+                    "tarnwick.example/model": "staff",
+                    "tarnwick.example/role": "server"
+                },
+                "sessionAffinity": "None",
+                "type": "ClusterIP"
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Service",
+            "metadata": {
+                "annotations": {
+                    "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"labels\":{\"app.kubernetes.io/name\":\"serving\",\"tarnwick.example/copy\":\"a\",\"tarnwick.example/model\":\"staff\"},\"name\":\"staff-a\",\"namespace\":\"serving\"},\"spec\":{\"ports\":[{\"name\":\"http\",\"port\":8080,\"protocol\":\"TCP\",\"targetPort\":\"http\"}],\"selector\":{\"tarnwick.example/copy\":\"a\",\"tarnwick.example/model\":\"staff\",\"tarnwick.example/role\":\"server\"}}}\n"
+                },
+                "creationTimestamp": "2026-10-30T12:39:21Z",
+                "labels": {
+                    "app.kubernetes.io/name": "serving",
+                    "tarnwick.example/copy": "a",
+                    "tarnwick.example/model": "staff"
+                },
+                "name": "staff-a",
+                "namespace": "serving",
+                "resourceVersion": "5060",
+                "uid": "1b388fcf-dc47-43d2-af22-b248b2249cc2"
+            },
+            "spec": {
+                "clusterIP": "10.23.200.88",
+                "clusterIPs": [
+                    "10.23.200.88"
+                ],
+                "internalTrafficPolicy": "Cluster",
+                "ipFamilies": [
+                    "IPv4"
+                ],
+                "ipFamilyPolicy": "SingleStack",
+                "ports": [
+                    {
+                        "name": "http",
+                        "port": 8080,
+                        "protocol": "TCP",
+                        "targetPort": "http"
+                    }
+                ],
+                "selector": {
+                    "tarnwick.example/copy": "a",
+                    "tarnwick.example/model": "staff",
+                    "tarnwick.example/role": "server"
+                },
+                "sessionAffinity": "None",
+                "type": "ClusterIP"
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Service",
+            "metadata": {
+                "annotations": {
+                    "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"annotations\":{},\"labels\":{\"app.kubernetes.io/name\":\"serving\",\"tarnwick.example/copy\":\"b\",\"tarnwick.example/model\":\"staff\"},\"name\":\"staff-b\",\"namespace\":\"serving\"},\"spec\":{\"ports\":[{\"name\":\"http\",\"port\":8080,\"protocol\":\"TCP\",\"targetPort\":\"http\"}],\"selector\":{\"tarnwick.example/copy\":\"b\",\"tarnwick.example/model\":\"staff\",\"tarnwick.example/role\":\"server\"}}}\n"
+                },
+                "creationTimestamp": "2026-10-30T12:39:21Z",
+                "labels": {
+                    "app.kubernetes.io/name": "serving",
+                    "tarnwick.example/copy": "b",
+                    "tarnwick.example/model": "staff"
+                },
+                "name": "staff-b",
+                "namespace": "serving",
+                "resourceVersion": "5064",
+                "uid": "44624bb1-3bf3-42fb-b805-d5c8b8a71551"
+            },
+            "spec": {
+                "clusterIP": "10.23.238.136",
+                "clusterIPs": [
+                    "10.23.238.136"
+                ],
+                "internalTrafficPolicy": "Cluster",
+                "ipFamilies": [
+                    "IPv4"
+                ],
+                "ipFamilyPolicy": "SingleStack",
+                "ports": [
+                    {
+                        "name": "http",
+                        "port": 8080,
+                        "protocol": "TCP",
+                        "targetPort": "http"
+                    }
+                ],
+                "selector": {
+                    "tarnwick.example/copy": "b",
+                    "tarnwick.example/model": "staff",
+                    "tarnwick.example/role": "server"
+                },
+                "sessionAffinity": "None",
+                "type": "ClusterIP"
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

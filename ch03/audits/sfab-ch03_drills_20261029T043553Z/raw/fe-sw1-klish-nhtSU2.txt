@@ -1,0 +1,157 @@
+terminal length 0
+show mclag brief
+show PortChannel summary
+show interface counters
+exit
+terminal length 0
+show mclag brief
+show PortChannel summary
+show interface counters
+exit
+fe-sw1# terminal length 0
+fe-sw1# show mclag brief
+ 
+Domain ID            : 1
+Role                 : active
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.0
+Peer Address         : 10.20.255.1
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:7a:3a:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.4
+Peer Address         : 10.20.255.5
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw1# show PortChannel summary
+Flags(oper-status):  D - Down U - Up (portchannel) P - Up in portchannel (members) I - LACP individual
+----------------------------------------------------------------------------------------------------------------------------
+Group               PortChannel                   Type                Protocol          Member Ports
+----------------------------------------------------------------------------------------------------------------------------
+1                   PortChannel1   (U)            Eth                 LACP              Ethernet0(P)
+                                                                                        Ethernet1(P)
+10                  PortChannel10  (U)            Eth                 LACP              Ethernet2(P)
+11                  PortChannel11  (U)            Eth                 LACP              Ethernet3(P)
+12                  PortChannel12  (U)            Eth                 LACP              Ethernet4(P)
+13                  PortChannel13  (U)            Eth                 LACP              Ethernet5(P)
+14                  PortChannel14  (U)            Eth                 LACP             Ethernet13(P)
+15                  PortChannel15  (U)            Eth                 LACP             Ethernet14(P)
+21                  PortChannel21  (U)            Eth                 LACP              Ethernet6(P)
+22                  PortChannel22  (U)            Eth                 LACP              Ethernet7(P)
+30                  PortChannel30  (U)            Eth                 LACP              Ethernet8(P)
+31                  PortChannel31  (U)            Eth                 LACP              Ethernet9(P)
+                                                                                       Ethernet10(P)
+32                  PortChannel32  (U)            Eth                 LACP             Ethernet11(P)
+41                  PortChannel41  (U)            Eth                 LACP             Ethernet15(P)
+42                  PortChannel42  (U)            Eth                 LACP             Ethernet16(P)
+43                  PortChannel43  (U)            Eth                 LACP             Ethernet17(P)
+44                  PortChannel44  (U)            Eth                 LACP             Ethernet18(P)
+fe-sw1# show interface counters
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Interface      State     RX_OK                 RX_ERR                RX_DRP                RX_OVERSIZE           TX_OK                 TX_ERR                TX_DRP                TX_OVERSIZE           
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Ethernet0      U         2105                  0                     0                     0                     2663                  0                     0                     0                     
+Ethernet1      U         4246                  0                     1                     0                     4183                  0                     0                     0                     
+Ethernet2      U         1749569               0                     0                     0                     530513                0                     0                     0                     
+Ethernet3      U         232094                0                     0                     0                     339940                0                     0                     0                     
+Ethernet4      U         95504                 0                     0                     0                     235573                0                     0                     0                     
+Ethernet5      U         222149                0                     2                     0                     396513                0                     0                     0                     
+Ethernet6      U         40537                 0                     2                     0                     225407                0                     0                     0                     
+Ethernet7      U         98472                 0                     0                     0                     309500                0                     0                     0                     
+Ethernet8      U         2018                  0                     2                     0                     3129                  0                     0                     0                     
+Ethernet9      U         1831                  0                     0                     0                     2002                  0                     0                     0                     
+Ethernet10     U         2212                  0                     4                     0                     3771                  0                     0                     0                     
+Ethernet11     U         1168                  0                     0                     0                     2851                  0                     0                     0                     
+Ethernet12     U         3830                  0                     2                     0                     3828                  0                     0                     0                     
+Ethernet13     U         66985                 0                     0                     0                     265506                0                     0                     0                     
+Ethernet14     U         82151                 0                     2                     0                     305385                0                     0                     0                     
+Ethernet15     U         1903                  0                     8                     0                     3030                  0                     0                     0                     
+Ethernet16     U         2080                  0                     8                     0                     3189                  0                     0                     0                     
+Ethernet17     U         1859                  0                     2                     0                     3055                  0                     0                     0                     
+Ethernet18     U         1925                  0                     0                     0                     3121                  0                     0                     0                     
+Ethernet19     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet20     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet21     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet22     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet23     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet24     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet25     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet26     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet27     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet28     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet29     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet30     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet31     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet32     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet33     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet34     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet35     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet36     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet37     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet38     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet39     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet40     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet41     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet42     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet43     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet44     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet45     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet46     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet47     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet48     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet52     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet56     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet60     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet64     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet68     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet72     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet76     D         0                     0                     0                     0                     0                     0                     0                     0                     
+PortChannel1   U         6351                  0                     1                     0                     6846                  0                     0                     0                     
+PortChannel10  U         1749569               0                     0                     0                     530513                0                     0                     0                     
+PortChannel11  U         232094                0                     0                     0                     339940                0                     0                     0                     
+PortChannel12  U         95504                 0                     0                     0                     235573                0                     0                     0                     
+PortChannel13  U         222149                0                     2                     0                     396513                0                     0                     0                     
+PortChannel14  U         66985                 0                     0                     0                     265506                0                     0                     0                     
+PortChannel15  U         82151                 0                     2                     0                     305385                0                     0                     0                     
+PortChannel21  U         40537                 0                     2                     0                     225407                0                     0                     0                     
+PortChannel22  U         98472                 0                     0                     0                     309500                0                     0                     0                     
+PortChannel30  U         2018                  0                     2                     0                     3129                  0                     0                     0                     
+PortChannel31  U         4043                  0                     4                     0                     5773                  0                     0                     0                     
+PortChannel32  U         1168                  0                     0                     0                     2851                  0                     0                     0                     
+PortChannel41  U         1903                  0                     8                     0                     3030                  0                     0                     0                     
+PortChannel42  U         2080                  0                     8                     0                     3189                  0                     0                     0                     
+PortChannel43  U         1859                  0                     2                     0                     3055                  0                     0                     0                     
+PortChannel44  U         1925                  0                     0                     0                     3121                  0                     0                     0                     
+fe-sw1# exit

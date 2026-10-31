@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# M2 stand-in for sshpass: a firewall session that reads the traffic log gets one (the session
+# common/tests/shims-m2/_m2.py makes); every other session goes to the shared stand-in.
+exec python3 "$(dirname "$0")/_m2.py" sshpass "$@"

@@ -1,0 +1,17 @@
+# Collection plans
+
+`common/audit/collect.sh` saves, for each node in a lab, the commands its plans list. A node's plan is `<kind>.list` followed by `<role>.list` when that file exists (a GPU node reads `vm-node.list`, then `gpu.list`; an MCLAG member reads `dell_sonic.list`, then `mclag_member.list`). With the cluster on (the inventory's `stages.cluster`), a node with a Kubernetes role also reads `k8s-node.list`, and the bastion `k8s.list` (the cluster, read with kubectl). The node that probes a population (its client, or for a population with no client node the first Kubernetes node inside it) also reads `population.list`. `judge.py plan` prints the expanded plan for one node.
+
+Each line is `SLUG SURFACE COMMAND`:
+
+- **SLUG** names the saved file, `NN_<slug>.txt` (or `.json`, `.xml`), numbered in plan order. A slug that starts with `+` is also collected by `audit.sh --quick`. A slug holding `{r}` is expanded once per rail of the node, and one holding `{subif}` once per firewall sub-interface.
+- **SURFACE** is where the command runs: `klish` (one `sonic-cli` session per switch, split by prompt), `vtysh` (FRR on the switch), `shell` and `shell-json` (the switch's Linux shell), `cli` and `cli-set` (PAN-OS CLI; `cli-set` reads the running configuration in set format), `xml` (PAN-OS XML API operational command), `guest` and `guest-json` (a VM guest over SSH, as root), `host`, `host-json` and `host-xml` (a named function in `collect.sh`, run on the lab host against the node's own container), `exec` and `exec-json` (`sh -c` in the node's own container, through docker exec), `frr` and `frr-json` (vtysh in an FRR container), `kubectl` and `kubectl-json` (a shell in the bastion, where kubectl and helm run), and `node` and `node-json` (the node's own shell: a VM guest over SSH, any other node through docker exec).
+- **COMMAND** may name fields of the node's inventory entry in braces (`{{` and `}}` are literal braces): `{gateway}`, `{oob.gateway}`, `{oob.address|ip}` (the address without its length), `{inv.guest.tables.mgmt}` (a top-level inventory field), and on rail lines `{ns}`, `{rail_addr}`, `{peer_addr}` (the next GPU node's address on the same rail), `{next_r}` and `{next_peer_addr}` (that node's address on the next rail). A line whose fields do not resolve for a node is left out of that node's plan.
+
+KLISH lines follow the session rules: no `?`, and output filters use `| grep word` only.
+
+On a switch, `shell` lines run as the `admin` login, whose PATH has no `/usr/sbin` or `/sbin`: name those tools in full (`/usr/sbin/ethtool`), or run them under `sudo`.
+
+Fields judge.py computes for every node (`base_ctx`): `{ca_root}` (`/shared/ca/root.crt`, which the containers bind and the guests mount), `{registry_url}`, `{storage_addr}` and `{storage_fqdn}` (the first storage node's data address and name), `{stor_mgmt_addr}`, `{users_fqdn}`, `{api_vip}`, `{api_fqdn}` and `{wildcard_secret}`. On a population's probe node also `{pop}`, `{pop_answer}`, `{pop_resolver}` (absent when the population's resolver is not in the lab), `{admin_fqdn}`, `{infra_fqdn}`, `{pop_pin_users}` and `{pop_pin_admin}` (a `--resolve` pin when there is no resolver, else empty), `{echo_path}` and `{echo_msg}`. A slug holding `{p2p}` is expanded once per point-to-point peer of a routed node, with `{p2p_addr}` that peer's address on the link.
+
+A `kubectl-json` or `exec-json` read keeps stdout only, so a read that fails leaves a file the judge refuses as not JSON (a FAIL that names the file), never a pass.

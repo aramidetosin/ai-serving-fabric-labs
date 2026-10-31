@@ -1,0 +1,1717 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"cilium\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"10.22.1.137\"\n    ],\n    \"mac\": \"62:62:c0:09:5e:f7\",\n    \"default\": true,\n    \"dns\": {},\n    \"gateway\": [\n        \"10.22.1.36\"\n    ]\n}]",
+                    "tarnwick.example/config": "87ea1637f18da058"
+                },
+                "creationTimestamp": "2026-10-30T12:39:43Z",
+                "generateName": "api-gateway-64bc7b94df-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/component": "api-gateway",
+                    "app.kubernetes.io/name": "api-gateway",
+                    "app.kubernetes.io/part-of": "inference",
+                    "pod-template-hash": "64bc7b94df"
+                },
+                "name": "api-gateway-64bc7b94df-7b74q",
+                "namespace": "inference",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "ReplicaSet",
+                        "name": "api-gateway-64bc7b94df",
+                        "uid": "bfabd2dd-bfa8-4328-aecd-d95098d3061e"
+                    }
+                ],
+                "resourceVersion": "5572",
+                "uid": "b276adc7-aa26-4e4d-8789-7dae4a6ec3ad"
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "/bin/sh",
+                            "-c",
+                            "/usr/bin/apisix init \u0026\u0026 exec /usr/local/openresty/bin/openresty -p /usr/local/apisix -g 'daemon off;'"
+                        ],
+                        "env": [
+                            {
+                                "name": "ROUTER_MASTER_KEY",
+                                "valueFrom": {
+                                    "secretKeyRef": {
+                                        "key": "key",
+                                        "name": "router-master-key"
+                                    }
+                                }
+                            }
+                        ],
+                        "image": "docker.io/apache/apisix@sha256:57a4001b6fb865d844c5f099069423c98b469f876bfba7ae88bbafc6ddd3748b",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "apisix",
+                        "ports": [
+                            {
+                                "containerPort": 9080,
+                                "name": "http",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "tcpSocket": {
+                                "port": "http"
+                            },
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {
+                            "limits": {
+                                "memory": "512Mi"
+                            },
+                            "requests": {
+                                "cpu": "100m",
+                                "memory": "128Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/usr/local/apisix/conf/config.yaml",
+                                "name": "config",
+                                "readOnly": true,
+                                "subPath": "config.yaml"
+                            },
+                            {
+                                "mountPath": "/usr/local/apisix/conf/apisix.yaml",
+                                "name": "standalone",
+                                "subPath": "apisix.yaml"
+                            },
+                            {
+                                "mountPath": "/usr/local/apisix/apisix/plugins/oidc-consumer.lua",
+                                "name": "plugins",
+                                "readOnly": true,
+                                "subPath": "oidc-consumer.lua"
+                            }
+                        ]
+                    },
+                    {
+                        "command": [
+                            "sfab-keys",
+                            "compose",
+                            "--base",
+                            "/base/apisix.yaml",
+                            "--keys",
+                            "/keys",
+                            "--out",
+                            "/standalone/apisix.yaml",
+                            "--format",
+                            "Bearer {key}",
+                            "--hold",
+                            "/standalone/hold"
+                        ],
+                        "image": "192.0.2.6:5000/sfab/keys:3",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "keys",
+                        "resources": {
+                            "limits": {
+                                "memory": "128Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "32Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/base",
+                                "name": "base",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/keys",
+                                "name": "keys",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/standalone",
+                                "name": "standalone"
+                            }
+                        ]
+                    }
+                ],
+                "dnsConfig": {
+                    "options": [
+                        {
+                            "name": "ndots",
+                            "value": "1"
+                        }
+                    ]
+                },
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": false,
+                "initContainers": [
+                    {
+                        "command": [
+                            "sfab-keys",
+                            "compose",
+                            "--base",
+                            "/base/apisix.yaml",
+                            "--keys",
+                            "/keys",
+                            "--out",
+                            "/standalone/apisix.yaml",
+                            "--format",
+                            "Bearer {key}",
+                            "--once"
+                        ],
+                        "image": "192.0.2.6:5000/sfab/keys:3",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "compose",
+                        "resources": {
+                            "limits": {
+                                "memory": "128Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "32Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/base",
+                                "name": "base",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/keys",
+                                "name": "keys",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/standalone",
+                                "name": "standalone"
+                            }
+                        ]
+                    }
+                ],
+                "nodeName": "k8s-ingress2",
+                "nodeSelector": {
+                    "node-role.tarnwick.example/ingress": ""
+                },
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 636,
+                    "runAsGroup": 636,
+                    "runAsNonRoot": true,
+                    "runAsUser": 636,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 10,
+                "tolerations": [
+                    {
+                        "effect": "NoSchedule",
+                        "key": "node-role.tarnwick.example/ingress",
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "topologySpreadConstraints": [
+                    {
+                        "labelSelector": {
+                            "matchLabels": {
+                                "app.kubernetes.io/name": "api-gateway"
+                            }
+                        },
+                        "maxSkew": 1,
+                        "topologyKey": "kubernetes.io/hostname",
+                        "whenUnsatisfiable": "ScheduleAnyway"
+                    }
+                ],
+                "volumes": [
+                    {
+                        "configMap": {
+                            "defaultMode": 420,
+                            "name": "api-gateway-config"
+                        },
+                        "name": "config"
+                    },
+                    {
+                        "configMap": {
+                            "defaultMode": 420,
+                            "name": "api-gateway-routes"
+                        },
+                        "name": "base"
+                    },
+                    {
+                        "name": "keys",
+                        "secret": {
+                            "defaultMode": 288,
+                            "secretName": "api-keys"
+                        }
+                    },
+                    {
+                        "emptyDir": {},
+                        "name": "standalone"
+                    },
+                    {
+                        "configMap": {
+                            "defaultMode": 420,
+                            "name": "api-gateway-plugins"
+                        },
+                        "name": "plugins"
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-30T12:39:50Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-30T12:39:51Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-30T12:40:31Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-30T12:40:31Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-30T12:39:43Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "100m",
+                            "memory": "128Mi"
+                        },
+                        "containerID": "containerd://814fc30d2e73c37e2f8ef9796f82838ab06bf21f0e06281fb2fffe56f026d243",
+                        "image": "sha256:aba04e70e509a06b264c9528381b48f9f3d9f2d34cfd9ed493aa8d6d616dadeb",
+                        "imageID": "docker.io/apache/apisix@sha256:57a4001b6fb865d844c5f099069423c98b469f876bfba7ae88bbafc6ddd3748b",
+                        "lastState": {},
+                        "name": "apisix",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "memory": "512Mi"
+                            },
+                            "requests": {
+                                "cpu": "100m",
+                                "memory": "128Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-30T12:40:29Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 636,
+                                "supplementalGroups": [
+                                    636
+                                ],
+                                "uid": 636
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/usr/local/apisix/conf/config.yaml",
+                                "name": "config",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/usr/local/apisix/conf/apisix.yaml",
+                                "name": "standalone"
+                            },
+                            {
+                                "mountPath": "/usr/local/apisix/apisix/plugins/oidc-consumer.lua",
+                                "name": "plugins",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "allocatedResources": {
+                            "cpu": "10m",
+                            "memory": "32Mi"
+                        },
+                        "containerID": "containerd://e79bb4acef64e89f5b45d03ba0b586bd1cce0ff878b42ca34bf995cc60b4272c",
+                        "image": "192.0.2.6:5000/sfab/keys:3",
+                        "imageID": "192.0.2.6:5000/sfab/keys@sha256:d1edba274b133f726c614b577ad9da621fd09f93924b233e6d9696309f4ed482",
+                        "lastState": {},
+                        "name": "keys",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "memory": "128Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "32Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-30T12:40:30Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 636,
+                                "supplementalGroups": [
+                                    636
+                                ],
+                                "uid": 636
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/base",
+                                "name": "base",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/keys",
+                                "name": "keys",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/standalone",
+                                "name": "standalone"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "10.20.1.32",
+                "hostIPs": [
+                    {
+                        "ip": "10.20.1.32"
+                    }
+                ],
+                "initContainerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "10m",
+                            "memory": "32Mi"
+                        },
+                        "containerID": "containerd://fc5d50b36cae4217ee72af05126815a0cef215cbd5d4c1d58891df15ac651316",
+                        "image": "192.0.2.6:5000/sfab/keys:3",
+                        "imageID": "192.0.2.6:5000/sfab/keys@sha256:d1edba274b133f726c614b577ad9da621fd09f93924b233e6d9696309f4ed482",
+                        "lastState": {},
+                        "name": "compose",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "memory": "128Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "32Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://fc5d50b36cae4217ee72af05126815a0cef215cbd5d4c1d58891df15ac651316",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-30T12:39:51Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-30T12:39:50Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 636,
+                                "supplementalGroups": [
+                                    636
+                                ],
+                                "uid": 636
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/base",
+                                "name": "base",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/keys",
+                                "name": "keys",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/standalone",
+                                "name": "standalone"
+                            }
+                        ]
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.22.1.137",
+                "podIPs": [
+                    {
+                        "ip": "10.22.1.137"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-10-30T12:39:43Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"cilium\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"10.22.0.7\"\n    ],\n    \"mac\": \"b2:b1:9b:01:90:8a\",\n    \"default\": true,\n    \"dns\": {},\n    \"gateway\": [\n        \"10.22.0.189\"\n    ]\n}]",
+                    "tarnwick.example/config": "87ea1637f18da058"
+                },
+                "creationTimestamp": "2026-10-30T12:39:43Z",
+                "generateName": "api-gateway-64bc7b94df-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/component": "api-gateway",
+                    "app.kubernetes.io/name": "api-gateway",
+                    "app.kubernetes.io/part-of": "inference",
+                    "pod-template-hash": "64bc7b94df"
+                },
+                "name": "api-gateway-64bc7b94df-hm4sq",
+                "namespace": "inference",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "ReplicaSet",
+                        "name": "api-gateway-64bc7b94df",
+                        "uid": "bfabd2dd-bfa8-4328-aecd-d95098d3061e"
+                    }
+                ],
+                "resourceVersion": "5590",
+                "uid": "d78a1bb7-3bd3-4367-ab2d-8721442c3e39"
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "/bin/sh",
+                            "-c",
+                            "/usr/bin/apisix init \u0026\u0026 exec /usr/local/openresty/bin/openresty -p /usr/local/apisix -g 'daemon off;'"
+                        ],
+                        "env": [
+                            {
+                                "name": "ROUTER_MASTER_KEY",
+                                "valueFrom": {
+                                    "secretKeyRef": {
+                                        "key": "key",
+                                        "name": "router-master-key"
+                                    }
+                                }
+                            }
+                        ],
+                        "image": "docker.io/apache/apisix@sha256:57a4001b6fb865d844c5f099069423c98b469f876bfba7ae88bbafc6ddd3748b",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "apisix",
+                        "ports": [
+                            {
+                                "containerPort": 9080,
+                                "name": "http",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "tcpSocket": {
+                                "port": "http"
+                            },
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {
+                            "limits": {
+                                "memory": "512Mi"
+                            },
+                            "requests": {
+                                "cpu": "100m",
+                                "memory": "128Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/usr/local/apisix/conf/config.yaml",
+                                "name": "config",
+                                "readOnly": true,
+                                "subPath": "config.yaml"
+                            },
+                            {
+                                "mountPath": "/usr/local/apisix/conf/apisix.yaml",
+                                "name": "standalone",
+                                "subPath": "apisix.yaml"
+                            },
+                            {
+                                "mountPath": "/usr/local/apisix/apisix/plugins/oidc-consumer.lua",
+                                "name": "plugins",
+                                "readOnly": true,
+                                "subPath": "oidc-consumer.lua"
+                            }
+                        ]
+                    },
+                    {
+                        "command": [
+                            "sfab-keys",
+                            "compose",
+                            "--base",
+                            "/base/apisix.yaml",
+                            "--keys",
+                            "/keys",
+                            "--out",
+                            "/standalone/apisix.yaml",
+                            "--format",
+                            "Bearer {key}",
+                            "--hold",
+                            "/standalone/hold"
+                        ],
+                        "image": "192.0.2.6:5000/sfab/keys:3",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "keys",
+                        "resources": {
+                            "limits": {
+                                "memory": "128Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "32Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/base",
+                                "name": "base",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/keys",
+                                "name": "keys",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/standalone",
+                                "name": "standalone"
+                            }
+                        ]
+                    }
+                ],
+                "dnsConfig": {
+                    "options": [
+                        {
+                            "name": "ndots",
+                            "value": "1"
+                        }
+                    ]
+                },
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": false,
+                "initContainers": [
+                    {
+                        "command": [
+                            "sfab-keys",
+                            "compose",
+                            "--base",
+                            "/base/apisix.yaml",
+                            "--keys",
+                            "/keys",
+                            "--out",
+                            "/standalone/apisix.yaml",
+                            "--format",
+                            "Bearer {key}",
+                            "--once"
+                        ],
+                        "image": "192.0.2.6:5000/sfab/keys:3",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "compose",
+                        "resources": {
+                            "limits": {
+                                "memory": "128Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "32Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/base",
+                                "name": "base",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/keys",
+                                "name": "keys",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/standalone",
+                                "name": "standalone"
+                            }
+                        ]
+                    }
+                ],
+                "nodeName": "k8s-ingress1",
+                "nodeSelector": {
+                    "node-role.tarnwick.example/ingress": ""
+                },
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 636,
+                    "runAsGroup": 636,
+                    "runAsNonRoot": true,
+                    "runAsUser": 636,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 10,
+                "tolerations": [
+                    {
+                        "effect": "NoSchedule",
+                        "key": "node-role.tarnwick.example/ingress",
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "topologySpreadConstraints": [
+                    {
+                        "labelSelector": {
+                            "matchLabels": {
+                                "app.kubernetes.io/name": "api-gateway"
+                            }
+                        },
+                        "maxSkew": 1,
+                        "topologyKey": "kubernetes.io/hostname",
+                        "whenUnsatisfiable": "ScheduleAnyway"
+                    }
+                ],
+                "volumes": [
+                    {
+                        "configMap": {
+                            "defaultMode": 420,
+                            "name": "api-gateway-config"
+                        },
+                        "name": "config"
+                    },
+                    {
+                        "configMap": {
+                            "defaultMode": 420,
+                            "name": "api-gateway-routes"
+                        },
+                        "name": "base"
+                    },
+                    {
+                        "name": "keys",
+                        "secret": {
+                            "defaultMode": 288,
+                            "secretName": "api-keys"
+                        }
+                    },
+                    {
+                        "emptyDir": {},
+                        "name": "standalone"
+                    },
+                    {
+                        "configMap": {
+                            "defaultMode": 420,
+                            "name": "api-gateway-plugins"
+                        },
+                        "name": "plugins"
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-30T12:40:20Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-30T12:40:21Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-30T12:40:31Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-30T12:40:31Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-30T12:39:43Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "100m",
+                            "memory": "128Mi"
+                        },
+                        "containerID": "containerd://cb33ee8b511609b6694f456f2029eb620f3684e5a7ff89f806063bb0adc7b4a4",
+                        "image": "sha256:aba04e70e509a06b264c9528381b48f9f3d9f2d34cfd9ed493aa8d6d616dadeb",
+                        "imageID": "docker.io/apache/apisix@sha256:57a4001b6fb865d844c5f099069423c98b469f876bfba7ae88bbafc6ddd3748b",
+                        "lastState": {},
+                        "name": "apisix",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "memory": "512Mi"
+                            },
+                            "requests": {
+                                "cpu": "100m",
+                                "memory": "128Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-30T12:40:31Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 636,
+                                "supplementalGroups": [
+                                    636
+                                ],
+                                "uid": 636
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/usr/local/apisix/conf/config.yaml",
+                                "name": "config",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/usr/local/apisix/conf/apisix.yaml",
+                                "name": "standalone"
+                            },
+                            {
+                                "mountPath": "/usr/local/apisix/apisix/plugins/oidc-consumer.lua",
+                                "name": "plugins",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    },
+                    {
+                        "allocatedResources": {
+                            "cpu": "10m",
+                            "memory": "32Mi"
+                        },
+                        "containerID": "containerd://626f7c6aefc4461e9fb45822dbc5e20a907f54b79fd93f3a7fecb49ff9c15fa1",
+                        "image": "192.0.2.6:5000/sfab/keys:3",
+                        "imageID": "192.0.2.6:5000/sfab/keys@sha256:d1edba274b133f726c614b577ad9da621fd09f93924b233e6d9696309f4ed482",
+                        "lastState": {},
+                        "name": "keys",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "memory": "128Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "32Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-30T12:40:31Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 636,
+                                "supplementalGroups": [
+                                    636
+                                ],
+                                "uid": 636
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/base",
+                                "name": "base",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/keys",
+                                "name": "keys",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/standalone",
+                                "name": "standalone"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "10.20.1.31",
+                "hostIPs": [
+                    {
+                        "ip": "10.20.1.31"
+                    }
+                ],
+                "initContainerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "10m",
+                            "memory": "32Mi"
+                        },
+                        "containerID": "containerd://78e1061d2f63e4f1b332a8aa502cb6a6458f73502db06e2adbd184a51c808a3b",
+                        "image": "192.0.2.6:5000/sfab/keys:3",
+                        "imageID": "192.0.2.6:5000/sfab/keys@sha256:d1edba274b133f726c614b577ad9da621fd09f93924b233e6d9696309f4ed482",
+                        "lastState": {},
+                        "name": "compose",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "memory": "128Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "32Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "containerd://78e1061d2f63e4f1b332a8aa502cb6a6458f73502db06e2adbd184a51c808a3b",
+                                "exitCode": 0,
+                                "finishedAt": "2026-10-30T12:40:20Z",
+                                "reason": "Completed",
+                                "startedAt": "2026-10-30T12:40:20Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 636,
+                                "supplementalGroups": [
+                                    636
+                                ],
+                                "uid": 636
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/base",
+                                "name": "base",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/keys",
+                                "name": "keys",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/standalone",
+                                "name": "standalone"
+                            }
+                        ]
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.22.0.7",
+                "podIPs": [
+                    {
+                        "ip": "10.22.0.7"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-10-30T12:39:43Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"cilium\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"10.22.0.229\"\n    ],\n    \"mac\": \"7a:d1:c2:ab:fc:cc\",\n    \"default\": true,\n    \"dns\": {},\n    \"gateway\": [\n        \"10.22.0.189\"\n    ]\n}]",
+                    "tarnwick.example/config": "b319f282246d1425"
+                },
+                "creationTimestamp": "2026-10-30T12:39:43Z",
+                "generateName": "router-76cf778fb6-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/component": "router",
+                    "app.kubernetes.io/name": "router",
+                    "app.kubernetes.io/part-of": "inference",
+                    "pod-template-hash": "76cf778fb6"
+                },
+                "name": "router-76cf778fb6-4mbxs",
+                "namespace": "inference",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "ReplicaSet",
+                        "name": "router-76cf778fb6",
+                        "uid": "18e3a177-1398-4e56-a468-d55ed1c672bc"
+                    }
+                ],
+                "resourceVersion": "5640",
+                "uid": "530ec728-afd0-46ac-bb2d-9f07a08d9261"
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "args": [
+                            "--config",
+                            "/etc/router/config.yaml",
+                            "--port",
+                            "4000"
+                        ],
+                        "env": [
+                            {
+                                "name": "ROUTER_MASTER_KEY",
+                                "valueFrom": {
+                                    "secretKeyRef": {
+                                        "key": "key",
+                                        "name": "router-master-key"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "SERVING_KEY",
+                                "valueFrom": {
+                                    "secretKeyRef": {
+                                        "key": "key",
+                                        "name": "backend-key"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "HOME",
+                                "value": "/tmp"
+                            },
+                            {
+                                "name": "LITELLM_LOCAL_MODEL_COST_MAP",
+                                "value": "True"
+                            },
+                            {
+                                "name": "DISABLE_ADMIN_UI",
+                                "value": "True"
+                            }
+                        ],
+                        "image": "ghcr.io/berriai/litellm@sha256:5ce1ebf7f26ed82501b598e0ebecd4fe63d0e61817178427d4df86f2a16729ec",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "router",
+                        "ports": [
+                            {
+                                "containerPort": 4000,
+                                "name": "http",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/health/readiness",
+                                "port": "http",
+                                "scheme": "HTTP"
+                            },
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 3
+                        },
+                        "resources": {
+                            "limits": {
+                                "memory": "2Gi"
+                            },
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "512Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/etc/router",
+                                "name": "config",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            }
+                        ]
+                    }
+                ],
+                "dnsConfig": {
+                    "options": [
+                        {
+                            "name": "ndots",
+                            "value": "1"
+                        }
+                    ]
+                },
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": false,
+                "nodeName": "k8s-ingress1",
+                "nodeSelector": {
+                    "node-role.tarnwick.example/ingress": ""
+                },
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 65532,
+                    "runAsGroup": 65532,
+                    "runAsNonRoot": true,
+                    "runAsUser": 65532,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 10,
+                "tolerations": [
+                    {
+                        "effect": "NoSchedule",
+                        "key": "node-role.tarnwick.example/ingress",
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "topologySpreadConstraints": [
+                    {
+                        "labelSelector": {
+                            "matchLabels": {
+                                "app.kubernetes.io/name": "router"
+                            }
+                        },
+                        "maxSkew": 1,
+                        "topologyKey": "kubernetes.io/hostname",
+                        "whenUnsatisfiable": "ScheduleAnyway"
+                    }
+                ],
+                "volumes": [
+                    {
+                        "configMap": {
+                            "defaultMode": 420,
+                            "name": "router-config"
+                        },
+                        "name": "config"
+                    },
+                    {
+                        "emptyDir": {},
+                        "name": "tmp"
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-30T12:40:17Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-30T12:39:43Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-30T12:40:39Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-30T12:40:39Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-30T12:39:43Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "200m",
+                            "memory": "512Mi"
+                        },
+                        "containerID": "containerd://4bdf4775be7ff463b380c94ce4bce44e6e120e6c4a57d953600efae4f06e3f5f",
+                        "image": "sha256:c1809fa704d51ae1ac000d4033e1d80ad04a110ae51090630977ea2448b9d905",
+                        "imageID": "ghcr.io/berriai/litellm@sha256:5ce1ebf7f26ed82501b598e0ebecd4fe63d0e61817178427d4df86f2a16729ec",
+                        "lastState": {},
+                        "name": "router",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "memory": "2Gi"
+                            },
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "512Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-30T12:40:16Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 65532,
+                                "supplementalGroups": [
+                                    65532
+                                ],
+                                "uid": 65532
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/etc/router",
+                                "name": "config",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "10.20.1.31",
+                "hostIPs": [
+                    {
+                        "ip": "10.20.1.31"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.22.0.229",
+                "podIPs": [
+                    {
+                        "ip": "10.22.0.229"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-10-30T12:39:43Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"cilium\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"10.22.1.250\"\n    ],\n    \"mac\": \"82:61:1b:94:70:5d\",\n    \"default\": true,\n    \"dns\": {},\n    \"gateway\": [\n        \"10.22.1.36\"\n    ]\n}]",
+                    "tarnwick.example/config": "b319f282246d1425"
+                },
+                "creationTimestamp": "2026-10-30T12:39:43Z",
+                "generateName": "router-76cf778fb6-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/component": "router",
+                    "app.kubernetes.io/name": "router",
+                    "app.kubernetes.io/part-of": "inference",
+                    "pod-template-hash": "76cf778fb6"
+                },
+                "name": "router-76cf778fb6-bh7gc",
+                "namespace": "inference",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "ReplicaSet",
+                        "name": "router-76cf778fb6",
+                        "uid": "18e3a177-1398-4e56-a468-d55ed1c672bc"
+                    }
+                ],
+                "resourceVersion": "5653",
+                "uid": "34459d73-47f0-43d8-9b71-acf22d5edda4"
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "args": [
+                            "--config",
+                            "/etc/router/config.yaml",
+                            "--port",
+                            "4000"
+                        ],
+                        "env": [
+                            {
+                                "name": "ROUTER_MASTER_KEY",
+                                "valueFrom": {
+                                    "secretKeyRef": {
+                                        "key": "key",
+                                        "name": "router-master-key"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "SERVING_KEY",
+                                "valueFrom": {
+                                    "secretKeyRef": {
+                                        "key": "key",
+                                        "name": "backend-key"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "HOME",
+                                "value": "/tmp"
+                            },
+                            {
+                                "name": "LITELLM_LOCAL_MODEL_COST_MAP",
+                                "value": "True"
+                            },
+                            {
+                                "name": "DISABLE_ADMIN_UI",
+                                "value": "True"
+                            }
+                        ],
+                        "image": "ghcr.io/berriai/litellm@sha256:5ce1ebf7f26ed82501b598e0ebecd4fe63d0e61817178427d4df86f2a16729ec",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "router",
+                        "ports": [
+                            {
+                                "containerPort": 4000,
+                                "name": "http",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/health/readiness",
+                                "port": "http",
+                                "scheme": "HTTP"
+                            },
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 3
+                        },
+                        "resources": {
+                            "limits": {
+                                "memory": "2Gi"
+                            },
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "512Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/etc/router",
+                                "name": "config",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            }
+                        ]
+                    }
+                ],
+                "dnsConfig": {
+                    "options": [
+                        {
+                            "name": "ndots",
+                            "value": "1"
+                        }
+                    ]
+                },
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": false,
+                "nodeName": "k8s-ingress2",
+                "nodeSelector": {
+                    "node-role.tarnwick.example/ingress": ""
+                },
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 65532,
+                    "runAsGroup": 65532,
+                    "runAsNonRoot": true,
+                    "runAsUser": 65532,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 10,
+                "tolerations": [
+                    {
+                        "effect": "NoSchedule",
+                        "key": "node-role.tarnwick.example/ingress",
+                        "operator": "Exists"
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "topologySpreadConstraints": [
+                    {
+                        "labelSelector": {
+                            "matchLabels": {
+                                "app.kubernetes.io/name": "router"
+                            }
+                        },
+                        "maxSkew": 1,
+                        "topologyKey": "kubernetes.io/hostname",
+                        "whenUnsatisfiable": "ScheduleAnyway"
+                    }
+                ],
+                "volumes": [
+                    {
+                        "configMap": {
+                            "defaultMode": 420,
+                            "name": "router-config"
+                        },
+                        "name": "config"
+                    },
+                    {
+                        "emptyDir": {},
+                        "name": "tmp"
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-30T12:40:19Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-30T12:39:43Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-30T12:40:42Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-30T12:40:42Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-30T12:39:43Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "200m",
+                            "memory": "512Mi"
+                        },
+                        "containerID": "containerd://8cb4ff975a561d36c2690d3548cf5ba46e889b07d4aa23c9fd2bee6d62352812",
+                        "image": "sha256:c1809fa704d51ae1ac000d4033e1d80ad04a110ae51090630977ea2448b9d905",
+                        "imageID": "ghcr.io/berriai/litellm@sha256:5ce1ebf7f26ed82501b598e0ebecd4fe63d0e61817178427d4df86f2a16729ec",
+                        "lastState": {},
+                        "name": "router",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "memory": "2Gi"
+                            },
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "512Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-30T12:40:19Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 65532,
+                                "supplementalGroups": [
+                                    65532
+                                ],
+                                "uid": 65532
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/etc/router",
+                                "name": "config",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "10.20.1.32",
+                "hostIPs": [
+                    {
+                        "ip": "10.20.1.32"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.22.1.250",
+                "podIPs": [
+                    {
+                        "ip": "10.22.1.250"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-10-30T12:39:43Z"
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

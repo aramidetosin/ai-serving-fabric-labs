@@ -1,0 +1,163 @@
+{
+  "breaks": {
+    "4a": {
+      "break": [
+        {
+          "kind": "panos_api",
+          "node": "fw",
+          "op": "del",
+          "order": [
+            "no-nat-public",
+            "internet-snat"
+          ],
+          "place": {
+            "dst": "internet-snat",
+            "where": "before"
+          },
+          "rule": "no-nat-public",
+          "rules_xpath": "/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/nat/rules",
+          "table": "nat",
+          "xpath": "/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/nat/rules/entry[@name='no-nat-public']"
+        }
+      ],
+      "exercise": 4,
+      "expect_broken": [
+        {
+          "failing": "all",
+          "kind": "probe_share",
+          "probe": "node-delta"
+        },
+        {
+          "failing": "all",
+          "kind": "probe_share",
+          "probe": "node-public"
+        },
+        {
+          "kind": "counter",
+          "name": "flow_policy_nat_land",
+          "node": "fw",
+          "probe": "node-public",
+          "rise": true
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "users"
+        }
+      ],
+      "expect_healed": [
+        {
+          "kind": "rule_order",
+          "node": "fw"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "node-delta"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "node-public"
+        },
+        {
+          "kind": "counter",
+          "name": "flow_policy_nat_land",
+          "node": "fw",
+          "probe": "node-public",
+          "rise": false
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "users"
+        }
+      ],
+      "heal": [
+        {
+          "element": "<entry name=\"no-nat-public\"><from><member>k8s-nodes</member><member>services</member></from><to><member>uplink</member></to><source><member>any</member></source><destination><member>198.51.100.2</member></destination><service>any</service><description>dec-nat-no-land</description></entry>",
+          "kind": "panos_api",
+          "node": "fw",
+          "op": "set",
+          "order": [
+            "no-nat-public",
+            "internet-snat"
+          ],
+          "place": {
+            "dst": "internet-snat",
+            "where": "before"
+          },
+          "rule": "no-nat-public",
+          "rules_xpath": "/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/nat/rules",
+          "table": "nat",
+          "xpath": "/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/nat/rules/entry[@name='no-nat-public']"
+        }
+      ],
+      "id": "4a",
+      "note": null,
+      "record": [
+        {
+          "kind": "fw_show",
+          "lines": [
+            "show counter global filter delta yes severity drop"
+          ],
+          "node": "fw"
+        },
+        {
+          "count": 10,
+          "counters": [],
+          "dst": "public",
+          "dst_addr": "198.51.100.2",
+          "fw": "fw",
+          "id": "node-delta",
+          "interval_s": 0.5,
+          "kind": "probe_ping",
+          "node": "k8s-cp2",
+          "node_kind": "vm-node",
+          "passes": 1,
+          "src_addr": "10.20.1.12",
+          "timeout_s": 1
+        },
+        {
+          "kind": "fw_show",
+          "lines": [
+            "show counter global filter delta yes severity drop",
+            "show running nat-policy"
+          ],
+          "node": "fw"
+        },
+        {
+          "count": 10,
+          "counters": [
+            "flow_policy_nat_land"
+          ],
+          "dst": "public",
+          "dst_addr": "198.51.100.2",
+          "fw": "fw",
+          "id": "node-public",
+          "interval_s": 0.5,
+          "kind": "probe_ping",
+          "node": "k8s-cp2",
+          "node_kind": "vm-node",
+          "passes": 3,
+          "src_addr": "10.20.1.12",
+          "timeout_s": 1
+        },
+        {
+          "client_addr": "10.24.10.10",
+          "count": 10,
+          "id": "users",
+          "interval_s": 0.5,
+          "kind": "probe_http",
+          "node": "ent-client",
+          "passes": 1,
+          "timeout_s": 10,
+          "url": "https://llm.ai.tarnwick.example/echo?msg=sfab-break-4a"
+        }
+      ],
+      "title": "the no-translation rule for the public address removed"
+    }
+  },
+  "lab": "sfab-ch04",
+  "schema": 1
+}

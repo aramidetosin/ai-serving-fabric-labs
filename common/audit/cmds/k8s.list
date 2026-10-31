@@ -1,0 +1,23 @@
+# The cluster, read with the harness's kubectl on the init node (stages.kubectl, the admin kubeconfig
+# kubeadm wrote there; stages.cluster): SLUG SURFACE COMMAND. judge.py adds this file to that node's
+# plan, and its "cluster" group judges these files. The wildcard
+# certificate line decodes the certificate only; the secret's key is never read.
+kube_version         kubectl-json  kubectl version -o json
+kube_server          kubectl       kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'; echo
+helm_version         kubectl       helm version --short
+nodes                kubectl-json  kubectl get nodes -o json
+pods                 kubectl-json  kubectl get pods -A -o json
+daemonsets           kubectl-json  kubectl get daemonsets -A -o json
+deployments          kubectl-json  kubectl get deployments -A -o json
+cilium_config        kubectl-json  kubectl -n kube-system get configmap cilium-config -o json
+leases               kubectl-json  kubectl get leases -A -o json
+api_cert             kubectl       cat {ca_root} /shared/ca/kubernetes.crt >/tmp/sfab-api-chain.pem; openssl s_client -connect {api_vip}:6443 -servername {api_fqdn} -CAfile /tmp/sfab-api-chain.pem -verify_return_error </dev/null 2>&1 | grep -E '^(depth=|verify error|Verify return code)'; openssl s_client -connect {api_vip}:6443 -servername {api_fqdn} </dev/null 2>/dev/null | openssl x509 -noout -subject -issuer -nameopt RFC2253
+clusterissuers       kubectl-json  kubectl get clusterissuers -o json
+certificates         kubectl-json  kubectl get certificates -A -o json
+wildcard_cert        kubectl       kubectl -n {inv.k8s.gateway_namespace} get secret {wildcard_secret} -o jsonpath='{.data.tls\.crt}' | base64 -d | openssl x509 -noout -subject -issuer -ext subjectAltName -nameopt RFC2253
+gateways             kubectl-json  kubectl get gateways -A -o json
+httproutes           kubectl-json  kubectl get httproutes -A -o json
+lb_pools             kubectl-json  kubectl get ciliumloadbalancerippools -o json
+l2_policies          kubectl-json  kubectl get ciliuml2announcementpolicies -o json
+storageclasses       kubectl-json  kubectl get storageclasses -o json
+events_warning       kubectl-json  kubectl get events -A --field-selector type=Warning -o json

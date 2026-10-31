@@ -1,0 +1,39 @@
+admin@fw> show lacp aggregate-ethernet all
+
+LACP:
+
+**********************************************************************************
+AE group: ae1
+Members:                Bndl Rx state       Mux state  Sel state
+  ethernet1/1           yes  Current        Tx_Rx      Selected
+  ethernet1/2           yes  Current        Tx_Rx      Selected
+Status:           Enabled
+Mode:             Active
+Rate:             Fast
+Max-port:         8
+Fast-failover:    Disabled
+Pre-negotiation:  Disabled
+Local:            System Priority: 32768
+                  System MAC:      ba:db:ee:fb:ad:01
+                  Key:             240
+Partner:          System Priority: 65535
+                  System MAC:      02:5a:00:00:00:01
+                  Key:             10
+Port State
+--------------------------------------------------------------------------------
+Interface                       Port
+                    Number Priority  Mode    Rate  Key      State
+--------------------------------------------------------------------------------
+ethernet1/1          16     32768    Active  Fast  240      0x3F
+Partner              3      255      Active  Fast  10       0x3F
+
+ethernet1/2          17     32768    Active  Fast  240      0x3F
+Partner              3      255      Active  Fast  10       0x3F
+
+Port Counters
+--------------------------------------------------------------------------------
+Interface               LACPDUs         Marker      Marker Response       Error
+                    Sent     Recv     Sent Recv     Sent     Recv     Unknown  Illegal
+--------------------------------------------------------------------------------
+ethernet1/1          4220     4221     0    0        0        0        0        0
+ethernet1/2          4220     4221     0    0        0        0        0        0

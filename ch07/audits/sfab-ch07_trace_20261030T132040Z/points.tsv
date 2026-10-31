@@ -1,0 +1,19 @@
+1-k8s-ingress1-bond0	guest	k8s-ingress1	-	-	bond0	tcp port 443 and host 10.20.11.210	96	0
+2-api-gateway-64bc7b94df-7b74q-eth0	pod	k8s-ingress2	inference	api-gateway-64bc7b94df-7b74q	eth0	tcp port 9080 or tcp port 4000	2048	1
+2-api-gateway-64bc7b94df-hm4sq-eth0	pod	k8s-ingress1	inference	api-gateway-64bc7b94df-hm4sq	eth0	tcp port 9080 or tcp port 4000	2048	1
+3-router-76cf778fb6-4mbxs-eth0	pod	k8s-ingress1	inference	router-76cf778fb6-4mbxs	eth0	tcp port 4000 or tcp port 8080	2048	1
+3-router-76cf778fb6-bh7gc-eth0	pod	k8s-ingress2	inference	router-76cf778fb6-bh7gc	eth0	tcp port 4000 or tcp port 8080	2048	1
+4-chat-a-server-0-eth0	pod	k8s-gpu1	serving	chat-a-server-0	eth0	tcp port 8080	66	0
+4-chat-a-server-0-rail3	pod	k8s-gpu1	serving	chat-a-server-0	rail3	tcp port 50052	128	0
+5-chat-a-worker0-0-rail3	pod	k8s-gpu1	serving	chat-a-worker0-0	rail3	tcp port 50052	128	0
+6-rail-sw1-Ethernet1	host	rail-sw1	-	-	eth2	tcp port 50052	128	0
+4-chat-b-server-0-eth0	pod	k8s-gpu2	serving	chat-b-server-0	eth0	tcp port 8080	66	0
+4-chat-b-server-0-rail6	pod	k8s-gpu2	serving	chat-b-server-0	rail6	tcp port 50052	128	0
+5-chat-b-worker0-0-rail6	pod	k8s-gpu2	serving	chat-b-worker0-0	rail6	tcp port 50052	128	0
+6-rail-sw2-Ethernet6	host	rail-sw2	-	-	eth7	tcp port 50052	128	0
+4-chat-c-server-0-eth0	pod	k8s-gpu1	serving	chat-c-server-0	eth0	tcp port 8080	66	0
+4-chat-c-server-0-rail7	pod	k8s-gpu1	serving	chat-c-server-0	rail7	tcp port 50052	128	0
+5-chat-c-worker0-0-rail7	pod	k8s-gpu2	serving	chat-c-worker0-0	rail7	tcp port 50052	128	0
+5-chat-c-worker1-0-rail7	pod	k8s-gpu1	serving	chat-c-worker1-0	rail7	tcp port 50052	128	0
+6-rail-sw1-Ethernet3	host	rail-sw1	-	-	eth4	tcp port 50052	128	0
+6-rail-sw1-Ethernet7	host	rail-sw1	-	-	eth8	tcp port 50052	128	0

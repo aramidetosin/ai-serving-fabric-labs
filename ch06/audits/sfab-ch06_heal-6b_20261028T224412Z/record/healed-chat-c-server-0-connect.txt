@@ -1,0 +1,2 @@
+root@k8s-cp1:~# kubectl -n inference exec router-76cf778fb6-gwr7f -- python3 -c "import socket,sys; socket.create_connection((sys.argv[1], int(sys.argv[2])), 5); print('connected')" 10.22.1.35 8080
+connected

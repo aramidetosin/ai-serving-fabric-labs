@@ -1,0 +1,37 @@
+# break-1a (Chapter 1, exercise 4): the enterprise rule's destination moved off the users' Gateway /32.
+#
+# staff-to-users-gateway admits the enterprise LAN to the users' Gateway VIP, 10.20.11.210, on TCP
+# 443, and nothing else in the rulebase admits the enterprise to the ingress zone. The break moves
+# the rule's destination to 10.20.11.211, the next address of the users' Gateway's pool, where no
+# Gateway listens: the rule still exists, still logs, and still reads right at a glance. The staff's
+# requests now match no allow rule and fall to the last rule, deny-all-log. The client sees a
+# timeout; the SYN reaches the firewall's enterprise interface, ethernet1/4, and never leaves on
+# either leg of the bundle; the traffic log names deny-all-log for every attempt.
+#
+# The break replaces the rule's destination node through the XML API (an edit, so the rendered
+# member does not stay beside the new one) and commits. record: runs ten requests from the
+# enterprise client to the users' hostname through its own resolver, then three connects to the
+# users' VIP from pinned source ports while the firewall's enterprise interface and both legs of ae1
+# are captured on the lab host, and reads the running security rulebase. The heal edits the rendered
+# destination back and commits, and its record runs the same probes.
+title: the enterprise rule's destination moved off the users' Gateway VIP
+exercise: 4
+since: 1
+break:
+  - panos_api: {edit: security, rule: staff-to-users-gateway, destination: ["10.20.11.211"]}
+record:
+  - probe_http: {id: users, from: ent-client, hostname: llm, path: "/echo?msg=sfab-break-1a", count: 10, interval_s: 0.5, timeout_s: 5, passes: 1}
+  - probe_syn: {id: syn, from: ent-client, to: "vip:gw-users", port: 443, count: 3, sport: 42150, timeout_s: 5, passes: 1, capture: ["fw:eth4", "fw:eth1", "fw:eth2"]}
+  - fw_show: {lines: [show running security-policy]}
+expect_broken:
+  - probe_share: {probe: users, failing: all}
+  - probe_share: {probe: syn, failing: all}
+  - syn_at: {probe: syn, seen: ["fw:eth4"], unseen: ["fw:eth1", "fw:eth2"]}
+  - tlog_rule: {probe: syn, rule: deny-all-log, action: deny}
+heal:
+  - panos_api: {edit: security, rule: staff-to-users-gateway, destination: rendered}
+expect_healed:
+  - probe_share: {probe: users, failing: none}
+  - probe_share: {probe: syn, failing: none}
+  - syn_at: {probe: syn, seen: ["fw:eth4"], seen_any: ["fw:eth1", "fw:eth2"]}
+  - tlog_rule: {probe: syn, rule: staff-to-users-gateway, action: allow}

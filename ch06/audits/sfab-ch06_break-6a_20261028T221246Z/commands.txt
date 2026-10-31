@@ -1,0 +1,37 @@
+### 2026-10-28T22:13:03Z k8s-cp1 kubectl
++ kubectl -n serving get pods -o wide
+NAME                READY   STATUS    RESTARTS   AGE   IP            NODE       NOMINATED NODE   READINESS GATES
+chat-a-server-0     1/1     Running   0          87m   10.22.1.33    k8s-gpu1   <none>           <none>
+chat-a-worker0-0    1/1     Running   0          88m   10.22.1.251   k8s-gpu1   <none>           <none>
+chat-b-server-0     0/1     Running   0          87m   10.22.2.77    k8s-gpu2   <none>           <none>
+chat-b-worker0-0    1/1     Running   0          10s   10.22.2.147   k8s-gpu2   <none>           <none>
+chat-c-server-0     1/1     Running   0          87m   10.22.1.122   k8s-gpu1   <none>           <none>
+chat-c-worker0-0    1/1     Running   0          88m   10.22.2.70    k8s-gpu2   <none>           <none>
+chat-c-worker1-0    1/1     Running   0          88m   10.22.1.100   k8s-gpu1   <none>           <none>
+staff-a-server-0    1/1     Running   0          87m   10.22.1.1     k8s-gpu1   <none>           <none>
+staff-a-worker0-0   1/1     Running   0          88m   10.22.1.229   k8s-gpu1   <none>           <none>
+staff-b-server-0    1/1     Running   0          87m   10.22.2.81    k8s-gpu2   <none>           <none>
+staff-b-worker0-0   1/1     Running   0          88m   10.22.2.211   k8s-gpu2   <none>           <none>
+
+### 2026-10-28T22:13:04Z k8s-cp1 kubectl
++ kubectl -n serving get endpointslices -o wide
+NAME            ADDRESSTYPE   PORTS   ENDPOINTS                           AGE
+chat-a-h4wl2    IPv4          8080    10.22.1.33                          84m
+chat-b-6hkjn    IPv4          8080    10.22.2.77                          84m
+chat-c-b75b4    IPv4          8080    10.22.1.122                         84m
+chat-ljc9n      IPv4          8080    10.22.1.33,10.22.2.77,10.22.1.122   84m
+staff-a-rn9v8   IPv4          8080    10.22.1.1                           84m
+staff-b-5wbht   IPv4          8080    10.22.2.81                          84m
+staff-pklsm     IPv4          8080    10.22.1.1,10.22.2.81                84m
+
+### 2026-10-28T22:13:05Z k8s-cp1 kubectl
++ kubectl -n serving get events --field-selector type=Warning --sort-by=.lastTimestamp
+LAST SEEN   TYPE      REASON      OBJECT                 MESSAGE
+13s         Warning   Unhealthy   pod/chat-b-worker0-0   Readiness probe errored and resulted in unknown state: rpc error: code = Canceled desc = context canceled
+0s          Warning   Unhealthy   pod/chat-b-server-0    Readiness probe failed: not ready: no RPC session to the worker 10.21.6.101:50052
+
+### 2026-10-28T22:14:08Z ent-client container
++ sh -c rm -f /tmp/sfab-break-probe/records-*.jsonl; python3 /tmp/sfab-break-probe/probe_gateway.py --dir /tmp/sfab-break-probe --target chat https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions --target staff https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions --every staff 15  --interval 2 --timeout 400 --max-tokens 8 --count 20 
+chat: sent 20, answered 20, failed 0
+staff: sent 2, answered 2, failed 0
+

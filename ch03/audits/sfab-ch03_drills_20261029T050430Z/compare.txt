@@ -1,0 +1,22 @@
+Passes compared: pass1, pass2, pass3 in sfab-ch03_drills_20261029T050430Z
+
+## keepalive-link
+
+| measure | across every pass and probe | agrees? |
+|---|---|---|
+| placed before the fault | pass 1 yes, pass 2 yes, pass 3 yes | yes |
+| ping round trips lost, ids crossing fe-sw1 | 0 | yes |
+|   of them at the cut | 0 | yes |
+|   of them at the restore | 0 | yes |
+| ping round trips lost, ids not crossing fe-sw1 | 19 to 22 | yes |
+| longest stretch with no reply at the cut, ids crossing fe-sw1 (s) | 0.30 to 0.36 | - |
+| ping ids crossing the target, per pass | pass 1 4 of 8, pass 2 4 of 8, pass 3 4 of 8 | - |
+| TCP connects failed at the cut | 0 | yes |
+| TCP connects failed at the restore | 0 | yes |
+| TCP connects failed elsewhere | 30 to 31 | yes |
+| every bond on one leg, seconds after the reboot command | 73.8 to 74.6 | - |
+| the standby returned (every bond back on two legs) | pass 1 yes, pass 2 yes, pass 3 yes | yes |
+
+Ranges span every probe instance of every pass. A ping lost is a round trip lost, on either leg.
+
+no disagreement between the passes

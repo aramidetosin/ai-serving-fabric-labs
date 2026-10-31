@@ -1,0 +1,416 @@
+{
+  "breaks": {
+    "6a": {
+      "break": [
+        {
+          "kind": "pod_rail",
+          "moved": {
+            "address": "10.21.8.100/24",
+            "copy": "b",
+            "decision": "dec-place-chat",
+            "index": 0,
+            "mac": "02:5a:fe:08:00:64",
+            "master": "rail8",
+            "model": "chat",
+            "nad": "rail8",
+            "native": "Ethernet7",
+            "node": "k8s-gpu2",
+            "pod": "chat-b-worker0-0",
+            "rail": 8,
+            "role": "worker",
+            "switch": "rail-sw2",
+            "vlan": 108
+          },
+          "namespace": "serving",
+          "new_nad": true,
+          "node": "k8s-gpu2",
+          "pod": "chat-b-worker0-0",
+          "row": {
+            "address": "10.21.6.101/24",
+            "copy": "b",
+            "decision": "dec-place-chat",
+            "index": 0,
+            "mac": "02:5a:fe:06:00:65",
+            "model": "chat",
+            "nad": "rail6",
+            "node": "k8s-gpu2",
+            "pod": "chat-b-worker0-0",
+            "rail": 6,
+            "role": "worker"
+          }
+        }
+      ],
+      "exercise": 4,
+      "expect_broken": [
+        {
+          "kind": "placement",
+          "matches_table": false,
+          "namespace": "serving",
+          "pod": "chat-b-worker0-0",
+          "rail": 8,
+          "table_rail": 6
+        },
+        {
+          "kind": "endpoints",
+          "namespace": "serving",
+          "ready": 0,
+          "servers": [
+            "chat-b-server-0"
+          ],
+          "service": "chat-b"
+        },
+        {
+          "kind": "endpoints",
+          "namespace": "serving",
+          "ready": 2,
+          "servers": [
+            "chat-a-server-0",
+            "chat-b-server-0",
+            "chat-c-server-0"
+          ],
+          "service": "chat"
+        },
+        {
+          "kind": "endpoints",
+          "namespace": "serving",
+          "ready": 1,
+          "servers": [
+            "chat-a-server-0"
+          ],
+          "service": "chat-a"
+        },
+        {
+          "kind": "endpoints",
+          "namespace": "serving",
+          "ready": 1,
+          "servers": [
+            "chat-c-server-0"
+          ],
+          "service": "chat-c"
+        },
+        {
+          "kind": "endpoints",
+          "namespace": "serving",
+          "ready": 2,
+          "servers": [
+            "staff-a-server-0",
+            "staff-b-server-0"
+          ],
+          "service": "staff"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "users"
+        }
+      ],
+      "expect_healed": [
+        {
+          "kind": "placement",
+          "matches_table": true,
+          "namespace": "serving",
+          "pod": "chat-b-worker0-0",
+          "rail": 6,
+          "table_rail": 6
+        },
+        {
+          "kind": "endpoints",
+          "namespace": "serving",
+          "ready": 1,
+          "servers": [
+            "chat-b-server-0"
+          ],
+          "service": "chat-b"
+        },
+        {
+          "kind": "endpoints",
+          "namespace": "serving",
+          "ready": 3,
+          "servers": [
+            "chat-a-server-0",
+            "chat-b-server-0",
+            "chat-c-server-0"
+          ],
+          "service": "chat"
+        },
+        {
+          "kind": "endpoints",
+          "namespace": "serving",
+          "ready": 2,
+          "servers": [
+            "staff-a-server-0",
+            "staff-b-server-0"
+          ],
+          "service": "staff"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "users"
+        },
+        {
+          "kind": "mac_gone",
+          "mac": "02:5a:fe:08:00:64",
+          "native": "Ethernet7",
+          "node": "rail-sw2",
+          "pod": "chat-b-worker0-0",
+          "switch": "rail-sw2",
+          "vlan": 108,
+          "wait_s": 660
+        }
+      ],
+      "heal": [
+        {
+          "kind": "serve",
+          "namespace": "serving",
+          "replace": [
+            "chat-b-server-0"
+          ]
+        }
+      ],
+      "id": "6a",
+      "note": null,
+      "record": [
+        {
+          "kind": "k8s_show",
+          "namespace": "serving"
+        },
+        {
+          "client": "ent-client",
+          "client_addr": "10.24.10.10",
+          "count": 20,
+          "gateway": "gw-users",
+          "hostname": "llm.ai.tarnwick.example",
+          "id": "users",
+          "interval_s": 2,
+          "key": null,
+          "keys": {
+            "namespace": "inference",
+            "secret": "api-keys"
+          },
+          "kind": "probe_gateway",
+          "max_tokens": 8,
+          "models": [
+            {
+              "model": "chat",
+              "model_name": "openai/chat",
+              "route_id": "a48b3df9-3b7f-58f0-9c52-c6f3004f05f7",
+              "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+            },
+            {
+              "every": 15,
+              "model": "staff",
+              "model_name": "openai/staff",
+              "route_id": "8242d5c4-9bce-5497-8414-f5bad94fdd84",
+              "url": "https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions"
+            }
+          ],
+          "node": "ent-client",
+          "passes": 1,
+          "resolve": null,
+          "timeout_s": 400,
+          "vip": "10.20.11.210"
+        }
+      ],
+      "title": "chat-b's worker0 created on rail 8 instead of the table's rail 6"
+    },
+    "6b": {
+      "break": [
+        {
+          "dst": "10.22.0.0/16",
+          "kind": "pod_route",
+          "master": "rail7",
+          "nad": "rail7-route",
+          "namespace": "serving",
+          "node": "k8s-gpu1",
+          "pod": "chat-c-server-0",
+          "row": {
+            "address": "10.21.7.100/24",
+            "copy": "c",
+            "decision": "dec-place-chat",
+            "index": 0,
+            "mac": "02:5a:fe:07:00:64",
+            "model": "chat",
+            "nad": "rail7",
+            "node": "k8s-gpu1",
+            "pod": "chat-c-server-0",
+            "rail": 7,
+            "role": "server"
+          },
+          "via": "10.21.7.101"
+        }
+      ],
+      "exercise": null,
+      "expect_broken": [
+        {
+          "dst": "10.22.0.0/16",
+          "iface": "rail7",
+          "kind": "reply_path",
+          "leaves": "rail",
+          "nad": "rail7-route",
+          "namespace": "serving",
+          "node": "k8s-gpu1",
+          "pod": "chat-c-server-0",
+          "via": "10.21.7.101"
+        },
+        {
+          "kind": "endpoints",
+          "namespace": "serving",
+          "ready": 1,
+          "servers": [
+            "chat-c-server-0"
+          ],
+          "service": "chat-c"
+        },
+        {
+          "kind": "endpoints",
+          "namespace": "serving",
+          "ready": 3,
+          "servers": [
+            "chat-a-server-0",
+            "chat-b-server-0",
+            "chat-c-server-0"
+          ],
+          "service": "chat"
+        },
+        {
+          "kind": "endpoints",
+          "namespace": "serving",
+          "ready": 2,
+          "servers": [
+            "staff-a-server-0",
+            "staff-b-server-0"
+          ],
+          "service": "staff"
+        }
+      ],
+      "expect_healed": [
+        {
+          "kind": "placement",
+          "matches_table": true,
+          "namespace": "serving",
+          "pod": "chat-c-server-0",
+          "rail": 7,
+          "table_rail": 7
+        },
+        {
+          "dst": "10.22.0.0/16",
+          "iface": "rail7",
+          "kind": "reply_path",
+          "leaves": "eth0",
+          "nad": "rail7-route",
+          "namespace": "serving",
+          "node": "k8s-gpu1",
+          "pod": "chat-c-server-0",
+          "via": "10.21.7.101"
+        },
+        {
+          "kind": "endpoints",
+          "namespace": "serving",
+          "ready": 1,
+          "servers": [
+            "chat-c-server-0"
+          ],
+          "service": "chat-c"
+        },
+        {
+          "kind": "endpoints",
+          "namespace": "serving",
+          "ready": 3,
+          "servers": [
+            "chat-a-server-0",
+            "chat-b-server-0",
+            "chat-c-server-0"
+          ],
+          "service": "chat"
+        },
+        {
+          "kind": "endpoints",
+          "namespace": "serving",
+          "ready": 2,
+          "servers": [
+            "staff-a-server-0",
+            "staff-b-server-0"
+          ],
+          "service": "staff"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "users"
+        }
+      ],
+      "heal": [
+        {
+          "kind": "serve",
+          "namespace": "serving",
+          "replace": [
+            "chat-c-server-0"
+          ]
+        }
+      ],
+      "id": "6b",
+      "note": null,
+      "record": [
+        {
+          "kind": "k8s_show",
+          "namespace": "serving"
+        },
+        {
+          "capture_s": 12,
+          "iface": "rail7",
+          "kind": "pod_net",
+          "namespace": "serving",
+          "node": "k8s-gpu1",
+          "peer": {
+            "name": "router",
+            "namespace": "inference",
+            "selector": "app.kubernetes.io/name=router"
+          },
+          "pod": "chat-c-server-0",
+          "port": 8080,
+          "rail": 7
+        },
+        {
+          "client": "ent-client",
+          "client_addr": "10.24.10.10",
+          "count": 20,
+          "gateway": "gw-users",
+          "hostname": "llm.ai.tarnwick.example",
+          "id": "users",
+          "interval_s": 2,
+          "key": null,
+          "keys": {
+            "namespace": "inference",
+            "secret": "api-keys"
+          },
+          "kind": "probe_gateway",
+          "max_tokens": 8,
+          "models": [
+            {
+              "model": "chat",
+              "model_name": "openai/chat",
+              "route_id": "a48b3df9-3b7f-58f0-9c52-c6f3004f05f7",
+              "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+            },
+            {
+              "every": 15,
+              "model": "staff",
+              "model_name": "openai/staff",
+              "route_id": "8242d5c4-9bce-5497-8414-f5bad94fdd84",
+              "url": "https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions"
+            }
+          ],
+          "node": "ent-client",
+          "passes": 1,
+          "resolve": null,
+          "timeout_s": 400,
+          "vip": "10.20.11.210"
+        }
+      ],
+      "title": "chat-c's server attached through a copy of rail7 that routes the pod network over the rail"
+    }
+  },
+  "lab": "sfab-ch06",
+  "schema": 1
+}

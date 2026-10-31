@@ -1,0 +1,420 @@
+<config version="12.1.0" urldb="paloaltonetworks" detail-version="12.1.2">
+  <devices>
+    <entry name="localhost.localdomain">
+      <deviceconfig>
+        <system>
+          <hostname>fw</hostname>
+          <timezone>UTC</timezone>
+        </system>
+        <setting>
+          <management>
+            <idle-timeout>0</idle-timeout>
+          </management>
+          <auto-mac-detect>yes</auto-mac-detect>
+          <jumbo-frame>
+            <mtu>9216</mtu>
+          </jumbo-frame>
+        </setting>
+      </deviceconfig>
+      <network>
+        <profiles>
+          <interface-management-profile>
+            <entry name="ping-only">
+              <ping>yes</ping>
+            </entry>
+            <entry name="bastion-admin">
+              <https>yes</https>
+              <ssh>yes</ssh>
+              <ping>yes</ping>
+              <permitted-ip>
+                <entry name="10.20.3.10/32"/>
+              </permitted-ip>
+            </entry>
+          </interface-management-profile>
+        </profiles>
+        <interface>
+          <ethernet>
+            <entry name="ethernet1/1">
+              <aggregate-group>ae1</aggregate-group>
+            </entry>
+            <entry name="ethernet1/2">
+              <aggregate-group>ae1</aggregate-group>
+            </entry>
+            <entry name="ethernet1/3">
+              <layer3>
+                <ip>
+                  <entry name="10.20.9.254/24"/>
+                </ip>
+                <interface-management-profile>ping-only</interface-management-profile>
+              </layer3>
+            </entry>
+          </ethernet>
+          <aggregate-ethernet>
+            <entry name="ae1">
+              <layer3>
+                <mtu>9216</mtu>
+                <lacp>
+                  <enable>yes</enable>
+                  <mode>active</mode>
+                  <transmission-rate>fast</transmission-rate>
+                </lacp>
+                <units>
+                  <entry name="ae1.100">
+                    <tag>100</tag>
+                    <ip>
+                      <entry name="10.20.1.1/24"/>
+                    </ip>
+                    <mtu>9000</mtu>
+                    <interface-management-profile>ping-only</interface-management-profile>
+                  </entry>
+                  <entry name="ae1.110">
+                    <tag>110</tag>
+                    <ip>
+                      <entry name="10.20.11.1/24"/>
+                    </ip>
+                    <mtu>1500</mtu>
+                    <interface-management-profile>ping-only</interface-management-profile>
+                    <adjust-tcp-mss>
+                      <enable>yes</enable>
+                      <ipv4-mss-adjustment>140</ipv4-mss-adjustment>
+                    </adjust-tcp-mss>
+                  </entry>
+                  <entry name="ae1.200">
+                    <tag>200</tag>
+                    <ip>
+                      <entry name="10.20.2.1/24"/>
+                    </ip>
+                    <mtu>1500</mtu>
+                    <interface-management-profile>ping-only</interface-management-profile>
+                  </entry>
+                  <entry name="ae1.300">
+                    <tag>300</tag>
+                    <ip>
+                      <entry name="10.20.3.1/24"/>
+                    </ip>
+                    <mtu>1500</mtu>
+                    <interface-management-profile>bastion-admin</interface-management-profile>
+                  </entry>
+                  <entry name="ae1.130">
+                    <tag>130</tag>
+                    <ip>
+                      <entry name="10.20.13.1/24"/>
+                    </ip>
+                    <mtu>1500</mtu>
+                    <interface-management-profile>ping-only</interface-management-profile>
+                  </entry>
+                  <entry name="ae1.131">
+                    <tag>131</tag>
+                    <ip>
+                      <entry name="10.20.14.1/24"/>
+                    </ip>
+                    <mtu>1500</mtu>
+                    <interface-management-profile>ping-only</interface-management-profile>
+                  </entry>
+                </units>
+              </layer3>
+            </entry>
+          </aggregate-ethernet>
+        </interface>
+        <virtual-router>
+          <entry name="core">
+            <interface>
+              <member>ae1.100</member>
+              <member>ae1.110</member>
+              <member>ae1.200</member>
+              <member>ae1.300</member>
+              <member>ae1.130</member>
+              <member>ae1.131</member>
+              <member>ethernet1/3</member>
+            </interface>
+            <routing-table>
+              <ip>
+                <static-route>
+                  <entry name="discard-10">
+                    <destination>10.0.0.0/8</destination>
+                    <nexthop>
+                      <discard/>
+                    </nexthop>
+                  </entry>
+                  <entry name="discard-172-16">
+                    <destination>172.16.0.0/12</destination>
+                    <nexthop>
+                      <discard/>
+                    </nexthop>
+                  </entry>
+                  <entry name="discard-192-168">
+                    <destination>192.168.0.0/16</destination>
+                    <nexthop>
+                      <discard/>
+                    </nexthop>
+                  </entry>
+                </static-route>
+              </ip>
+            </routing-table>
+          </entry>
+        </virtual-router>
+      </network>
+      <vsys>
+        <entry name="vsys1">
+          <import>
+            <network>
+              <interface>
+                <member>ae1.100</member>
+                <member>ae1.110</member>
+                <member>ae1.200</member>
+                <member>ae1.300</member>
+                <member>ae1.130</member>
+                <member>ae1.131</member>
+                <member>ethernet1/3</member>
+              </interface>
+            </network>
+          </import>
+          <zone>
+            <entry name="k8s-nodes">
+              <network>
+                <layer3>
+                  <member>ae1.100</member>
+                </layer3>
+              </network>
+            </entry>
+            <entry name="ingress">
+              <network>
+                <layer3>
+                  <member>ae1.110</member>
+                </layer3>
+              </network>
+            </entry>
+            <entry name="stor-mgmt">
+              <network>
+                <layer3>
+                  <member>ae1.200</member>
+                </layer3>
+              </network>
+            </entry>
+            <entry name="bastion">
+              <network>
+                <layer3>
+                  <member>ae1.300</member>
+                </layer3>
+              </network>
+            </entry>
+            <entry name="services">
+              <network>
+                <layer3>
+                  <member>ae1.130</member>
+                  <member>ae1.131</member>
+                </layer3>
+              </network>
+            </entry>
+            <entry name="oob">
+              <network>
+                <layer3>
+                  <member>ethernet1/3</member>
+                </layer3>
+              </network>
+            </entry>
+          </zone>
+          <address>
+            <entry name="collector">
+              <ip-netmask>10.20.3.20/32</ip-netmask>
+              <description>the monitoring collector's reserved address, no host until chapter 20</description>
+            </entry>
+          </address>
+          <profile-group>
+            <entry name="bp-default">
+              <virus>
+                <member>default</member>
+              </virus>
+              <spyware>
+                <member>default</member>
+              </spyware>
+              <vulnerability>
+                <member>default</member>
+              </vulnerability>
+              <file-blocking>
+                <member>basic file blocking</member>
+              </file-blocking>
+            </entry>
+          </profile-group>
+          <rulebase>
+            <security>
+              <rules>
+                <entry name="bastion-to-bmc">
+                  <from>
+                    <member>bastion</member>
+                  </from>
+                  <to>
+                    <member>oob</member>
+                  </to>
+                  <source>
+                    <member>collector</member>
+                  </source>
+                  <destination>
+                    <member>10.20.9.0/24</member>
+                  </destination>
+                  <application>
+                    <member>ssh</member>
+                    <member>ssl</member>
+                  </application>
+                  <service>
+                    <member>application-default</member>
+                  </service>
+                  <action>allow</action>
+                  <log-end>yes</log-end>
+                  <profile-setting>
+                    <group>
+                      <member>bp-default</member>
+                    </group>
+                  </profile-setting>
+                </entry>
+                <entry name="inside-to-gateway-ping">
+                  <from>
+                    <member>k8s-nodes</member>
+                    <member>ingress</member>
+                    <member>stor-mgmt</member>
+                    <member>services</member>
+                    <member>bastion</member>
+                    <member>oob</member>
+                  </from>
+                  <to>
+                    <member>k8s-nodes</member>
+                    <member>ingress</member>
+                    <member>stor-mgmt</member>
+                    <member>services</member>
+                    <member>bastion</member>
+                    <member>oob</member>
+                  </to>
+                  <source>
+                    <member>10.20.1.0/24</member>
+                    <member>10.20.11.0/24</member>
+                    <member>10.20.2.0/24</member>
+                    <member>10.20.13.0/24</member>
+                    <member>10.20.14.0/24</member>
+                    <member>10.20.3.0/24</member>
+                    <member>10.20.9.0/24</member>
+                    <member>10.24.10.0/24</member>
+                  </source>
+                  <destination>
+                    <member>10.20.1.1</member>
+                    <member>10.20.11.1</member>
+                    <member>10.20.13.1</member>
+                    <member>10.20.14.1</member>
+                    <member>10.20.2.1</member>
+                    <member>10.20.3.1</member>
+                    <member>10.20.9.254</member>
+                    <member>10.24.10.9</member>
+                    <member>10.24.10.54</member>
+                  </destination>
+                  <application>
+                    <member>ping</member>
+                  </application>
+                  <service>
+                    <member>application-default</member>
+                  </service>
+                  <action>allow</action>
+                  <log-end>yes</log-end>
+                  <profile-setting>
+                    <group>
+                      <member>bp-default</member>
+                    </group>
+                  </profile-setting>
+                </entry>
+                <entry name="nodes-to-internal-gateway">
+                  <from>
+                    <member>k8s-nodes</member>
+                  </from>
+                  <to>
+                    <member>ingress</member>
+                  </to>
+                  <source>
+                    <member>10.20.1.0/24</member>
+                  </source>
+                  <destination>
+                    <member>10.20.11.200</member>
+                  </destination>
+                  <application>
+                    <member>ssl</member>
+                  </application>
+                  <service>
+                    <member>application-default</member>
+                  </service>
+                  <action>allow</action>
+                  <log-end>yes</log-end>
+                  <profile-setting>
+                    <group>
+                      <member>bp-default</member>
+                    </group>
+                  </profile-setting>
+                </entry>
+                <entry name="csi-to-storage-api">
+                  <from>
+                    <member>k8s-nodes</member>
+                  </from>
+                  <to>
+                    <member>stor-mgmt</member>
+                  </to>
+                  <source>
+                    <member>10.20.1.0/24</member>
+                  </source>
+                  <destination>
+                    <member>10.20.2.31</member>
+                  </destination>
+                  <application>
+                    <member>ssl</member>
+                  </application>
+                  <service>
+                    <member>application-default</member>
+                  </service>
+                  <action>allow</action>
+                  <log-end>yes</log-end>
+                  <profile-setting>
+                    <group>
+                      <member>bp-default</member>
+                    </group>
+                  </profile-setting>
+                </entry>
+                <entry name="deny-all-log">
+                  <from>
+                    <member>any</member>
+                  </from>
+                  <to>
+                    <member>any</member>
+                  </to>
+                  <source>
+                    <member>any</member>
+                  </source>
+                  <destination>
+                    <member>any</member>
+                  </destination>
+                  <application>
+                    <member>any</member>
+                  </application>
+                  <service>
+                    <member>any</member>
+                  </service>
+                  <action>deny</action>
+                  <log-end>yes</log-end>
+                  <description>dec-policy-deny-all-log</description>
+                </entry>
+              </rules>
+            </security>
+            <default-security-rules>
+              <rules>
+                <entry name="intrazone-default">
+                  <action>deny</action>
+                  <log-start>no</log-start>
+                  <log-end>yes</log-end>
+                </entry>
+                <entry name="interzone-default">
+                  <action>deny</action>
+                  <log-start>no</log-start>
+                  <log-end>yes</log-end>
+                </entry>
+              </rules>
+            </default-security-rules>
+          </rulebase>
+        </entry>
+      </vsys>
+    </entry>
+  </devices>
+</config>

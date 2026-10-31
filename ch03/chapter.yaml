@@ -1,0 +1,119 @@
+# Chapter 3, "Layer 2 Frontend with MCLAG" (FRAMEWORK.md 6.3, second row), lab sfab-ch03.
+#
+# Build A's one-tenant state as milestone M2 renders it (the same slice and features), so the pair
+# runs its full port plan: 19 data ports on each switch (book Table 3-2). The chapter prints
+# both pair members, so both deploy whole (FRAMEWORK.md 1.4, step 7). Serving stays off: the drills
+# and the trace reach the test backend behind the users' Gateway, not a model.
+lab: sfab-ch03
+profile: a
+state: one
+slice:
+  nodes: [fe, rail, oob, fw, k8s-gpu1, k8s-gpu2, k8s-cp1, k8s-cp2, k8s-cp3, bastion, inet-registry, uplink-rtr, ops-client, ent-client, truenas1]
+features: {k8s: true, serving: false, storage_setup: true}
+prints: [fe-sw1, fe-sw2]
+extends: null
+variants: {}
+
+# The four-point SYN trace (trace.sh, common/trace/): one SYN from the enterprise client to the
+# users' VIP (VLAN 110), seen leaving the firewall on one ae1 leg tagged 110, entering the pair on
+# the trunk port that leg lands on, leaving that switch tagged 110 on the server port toward the
+# lease holder (an ingress node), and on the holder's bond0. same_frame asks the judge for one frame
+# at all four points: the same source and destination MACs, addresses, IP id, TTL and sequence
+# number, so nothing between the firewall and the node routed it. ttl_drop_after 0: every point is
+# past the firewall.
+#
+# A point is <depth>-<name>; node and eth name a container port (on the firewall ethN is
+# ethernet1/N). A point with at: lease-holder is found when the trace runs, from the ingress node
+# holding the Gateway Service's L2 announcement lease: side: pair gives the pair ports facing that
+# node's bond legs, iface: an interface inside the node (captured and decoded in the guest). vlan is
+# the 802.1Q tag the SYN must carry there (none: untagged). A point in a group is one of several
+# legs: the SYN crosses exactly one of them.
+trace:
+  flows:
+    - id: enterprise-users-vip
+      client: ent-client
+      gateway: gw-users
+      hostname: llm
+      port: 443
+      path: /echo?msg=sfab-ch03-trace
+      sport: 41443
+      warm_sport: 41442
+      ttl_drop_after: 0
+      same_frame: true
+      expect: {status: 200, rule: staff-to-users-gateway, from_zone: enterprise, to_zone: ingress}
+  points:
+    - {id: 1-fw-ae1-leg1, node: fw, eth: eth1, vlan: 110, group: ae1}
+    - {id: 1-fw-ae1-leg2, node: fw, eth: eth2, vlan: 110, group: ae1}
+    - {id: 2-fe-sw1-Ethernet2, node: fe-sw1, eth: eth3, vlan: 110, group: trunk}
+    - {id: 2-fe-sw2-Ethernet2, node: fe-sw2, eth: eth3, vlan: 110, group: trunk}
+    - {id: "3-{switch}-{native}", at: lease-holder, side: pair, vlan: 110, group: server}
+    - {id: "4-{holder}-bond0", at: lease-holder, iface: bond0, vlan: 110}
+
+# The drills (drills.sh, common/drill/; FRAMEWORK.md 4.6). Every drill runs two probes: a ping from
+# k8s-gpu1 to k8s-gpu2, count ICMP ids at once (ping -e), each id hashed onto a bond leg by the guests'
+# layer3+4 policy; and a TCP connect loop from the enterprise client to the users' VIP, which
+# answers no ping, a new source port each time, hashed onto an ae1 leg by the firewall. Captures on
+# the lab host (the guests' and the firewall's container ports) locate every probe before the cut
+# and timestamp it on the host's clock; the guest's own ping log is the second witness of each
+# round trip. A shut is a KLISH shutdown on the switch side, held hold_s, then no shutdown; the
+# reboot is sudo reboot on the switch that show mclag brief names standby when the drill runs.
+# TrueNAS's management address is a bond with one leg on each switch (revision 2), so no port of
+# the pair is an orphan and the peer-link drill has no orphan probe; unplugging one of those legs
+# is chapter 3's break exercise instead.
+#
+# The pair's two keepalive paths (revision 2) get three drills of their own, each cut on fe-sw1:
+# the dedicated keepalive link alone (the backup keepalive over Vlan3966 stays up), the peer link
+# alone (the keepalive link stays up; the peer link drill above), and both at once. A keepalive cut
+# is held 70 s, past the 30 s session timeout, and the drill then waits (await_return) for the pair
+# whole and every bond back on two legs: the keepalive probe saw the standby shut its own MCLAG
+# PortChannels when the keepalive link alone failed while the backup was up, and hold them down
+# for delay-restore (300 s) after the link returned. The monitor reads both switches every few
+# seconds through each of these, so the standby's shut and return are recorded as events.
+#
+# Both probes run every 0.3 s (revision 1 ran them every 0.1 s): the keepalive drills hold their
+# captures through the 300 s hold-down, and at 0.1 s three passes of the six drills recorded about
+# 270 MiB of captures and decodes, and at 0.2 s three passes of keepalive-link alone 72 MiB, over
+# the recording size policy's 64 MiB set cap. The drills are recorded as three sets of three passes
+# each (make drills DRILLS=...), each within the cap.
+drills:
+  probes:
+    ping: {from: k8s-gpu1, to: k8s-gpu2, count: 8, id_base: 3100, interval_s: 0.3}
+    tcp: {from: ent-client, gateway: gw-users, port: 443, interval_s: 0.3, timeout_s: 1}
+  timing: {lead_s: 10, place_s: 4, place_tries: 5, hold_s: 30, tail_s: 20, return_max_s: 600, return_tail_s: 30}
+  list:
+    - id: fw-leg
+      title: the firewall bundle's leg on fe-sw1 shut from the switch side
+      shut: {switch: fe-sw1, portchannel: 10}
+      probes: [ping, tcp]
+      place: {tcp: target}
+      peer_link_counters: true
+    - id: server-member
+      title: k8s-gpu1's member on fe-sw1 shut from the switch side
+      shut: {switch: fe-sw1, portchannel: 21}
+      probes: [ping, tcp]
+      place: {ping: target}
+      peer_link_counters: true
+    - id: peer-link
+      title: the peer link shut on fe-sw1 with the keepalive link up
+      shut: {switch: fe-sw1, portchannel: 1}
+      probes: [ping, tcp]
+      place: {ping: both}
+    - id: keepalive-link
+      title: the dedicated keepalive link shut on fe-sw1 with the peer link and the backup keepalive up
+      shut: {switch: fe-sw1, keepalive: true}
+      hold_s: 70
+      await_return: true
+      probes: [ping, tcp]
+      place: {ping: both}
+    - id: keepalive-and-peer-link
+      title: the keepalive link and the peer link shut together on fe-sw1, both keepalive paths gone
+      shut: {switch: fe-sw1, portchannel: 1, keepalive: true}
+      hold_s: 70
+      await_return: true
+      probes: [ping, tcp]
+      place: {ping: both}
+    - id: standby-reboot
+      title: the standby rebooted
+      reboot: standby
+      probes: [ping, tcp]
+      place: {ping: target}

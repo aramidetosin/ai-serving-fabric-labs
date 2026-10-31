@@ -1,0 +1,68 @@
+Last login: Fri Oct 30 08:10:54 2026 from 172.21.40.1
+set cli pager off
+show session id 1225
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show session 
+admin@fw> show session id 
+admin@fw> show session id 1225
+
+Session            1225
+
+        c2s flow:
+                source:      192.0.2.2 [operator-vpn]
+                dst:         10.20.11.200
+                proto:       6
+                sport:       42444           dport:      443
+                state:       ACTIVE          type:       FLOW
+                src user:    unknown
+                dst user:    unknown
+
+        s2c flow:
+                source:      10.20.11.200 [ingress]
+                dst:         192.0.2.2
+                proto:       6
+                sport:       443             dport:      42444
+                state:       ACTIVE          type:       FLOW
+                src user:    unknown
+                dst user:    unknown
+
+        start time                           : Fri Oct 30 08:10:52 2026
+        timeout                              : 1800 sec
+        time to live                         : 1779 sec 
+        total byte count(c2s)                : 1292
+        total byte count(s2c)                : 2465
+        layer7 packet count(c2s)             : 8
+        layer7 packet count(s2c)             : 7
+        vsys                                 : vsys1
+        application                          : ssl  
+        rule                                 : operator-to-internal-gateway
+        service timeout override(index)      : False
+        session is promoted                  : False
+        session to be logged at end          : True
+        session in session ager              : True
+        session updated by HA peer           : False
+        layer7 processing                    : enabled
+        ctd version                          : 1
+        URL filtering enabled                : False
+        session via syn-cookies              : False
+        session terminated on host           : False
+        session traverses tunnel             : True
+        session terminate tunnel             : False
+        captive portal session               : False
+        ingress interface                    : tunnel.1
+        egress interface                     : ae1.110
+        session QoS rule                     : N/A (class 4)
+        end-reason                           : unknown
+admin@fw> exit

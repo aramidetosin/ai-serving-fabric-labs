@@ -1,0 +1,78 @@
+# Chapter 6, "Rail-Aware Model Placement" (FRAMEWORK.md 6.3, fifth row), lab sfab-ch06.
+#
+# Build A's one-tenant state with serving on: every switch, the firewall, the cluster (k8s-cp1 to
+# k8s-cp3 and both GPU nodes), the bastion, the registry and the uplink router, and both clients.
+# TrueNAS is left out (storage_setup off): nothing in this chapter stores to it. With serving on,
+# finish runs the serving recipe with the placement table (bootstrap/k8s/serving.env) and then the
+# API gateway and the router (bootstrap/k8s/60- to 62-inference*.yaml), so a request reaches a model
+# through a Gateway, the API gateway, the router and the model's Service. The chapter prints no
+# device configuration. It extends chapter 4's lab: the same deploy, without storage, with the
+# models placed on the rails chapter 5's lab audits.
+lab: sfab-ch06
+profile: a
+state: one
+slice:
+  nodes: [fe, rail, oob, fw, k8s-gpu1, k8s-gpu2, k8s-cp1, k8s-cp2, k8s-cp3, bastion, inet-registry, uplink-rtr, ops-client, ent-client]
+features: {k8s: true, serving: true, storage_setup: false}
+prints: []
+extends: ch04
+variants: {}
+
+# The serving trace (trace.sh, common/trace/lib-servetrace.sh; rendered to gen/trace.json). One
+# chat completion from the enterprise client to the model chat through the users' Gateway, with its
+# key, its source port pinned. Captured, each for the request alone: the node announcing the users'
+# VIP (bond0, port 443), each API gateway pod and each router pod on its cluster interface, each of
+# the model's servers on its cluster interface and its rail attachment, each worker on its rail
+# attachment, and the rail switch ports facing the nodes of each copy on its rail. copy: c asks for
+# the request that the router sends to copy c, the copy that spans both nodes: the trace sends it
+# again (the source port one higher each time, the captures of a miss discarded) until chat-c's
+# server took it, at most tries times. The judge follows the request hop by hop: which API gateway
+# pod took it, which router pod, which server, and that server's RPC to its workers on the rail the
+# table names, across the rail switch for the worker on the other node and inside the node for the
+# one beside it, while the other copies' rails carry none.
+trace:
+  serving:
+    client: ent-client
+    gateway: gw-users
+    model: chat
+    copy: c
+    tries: 12
+    max_tokens: 16
+    sport: 42606
+
+# The drills (drills.sh, common/drill/lib-servedrill.sh; rendered to gen/drills.json). The gateway
+# probe sends one chat completion every interval_s to each model through the users' Gateway, each
+# request on its own, and the endpoints probe reads the serving Services' endpoints every second,
+# both on the lab host's clock. The probe's interval and timeout come from the speeds measured on
+# the lab hosts on 2026-10-28: chat answers its 8 tokens in a few seconds on the GPU nodes' CPUs,
+# so chat gets one request every 2 s; staff, the dense model, takes tens of seconds a request on
+# the CPUs of the host this lab was recorded on, so it gets one every 15th interval (every 30 s),
+# which keeps its two copies inside their capacity.
+#
+#   dark-switch  every port of rail-sw1 shut in one KLISH session (chapter 5's drill), held, then
+#                given no shutdown: chat-c, the copy that spans the nodes on rail 7, leaves its
+#                Services; the node-local copies on rail-sw1's rails (chat-a on rail 3, staff-b on
+#                rail 5) keep their RPC inside their nodes and stay (KNOWN L9: the virtual switch
+#                drops no carrier at the rail NICs), and no request through the Gateway fails
+#   worker-port  the one port of rail-sw1 facing chat-c's worker0 (k8s-gpu2, rail 7) shut, held, then
+#                given no shutdown: chat-c leaves its Services while chat-a and chat-b answer
+#   rail-move    chat-a's worker0 moved in the table to rail 5 and the manifests rendered again from
+#                it: the recipe refuses the table and the audit fails against it while nothing in
+#                the cluster moved; then the audit against the table as rendered is green
+drills:
+  probes:
+    gateway: {from: ent-client, gateway: gw-users, models: [chat, staff], every: {staff: 15}, interval_s: 2, timeout_s: 400, max_tokens: 8}
+    endpoints: {interval_s: 1}
+  timing: {lead_s: 20, hold_s: 40, tail_s: 30, return_max_s: 600, whole_polls: 30}
+  list:
+    - id: dark-switch
+      title: every port of rail-sw1 shut with interface range under the Gateway probe, held, then no shutdown
+      dark: {switch: rail-sw1}
+      probes: [gateway, endpoints]
+    - id: worker-port
+      title: the rail-sw1 port facing chat-c's worker on k8s-gpu2 shut while chat-a and chat-b answer, held, then no shutdown
+      worker_port: {model: chat, copy: c, worker: 0}
+      probes: [gateway, endpoints]
+    - id: rail-move
+      title: chat-a's worker0 moved to rail 5 in the table; the audit fails first, then the table is restored
+      rail_move: {model: chat, copy: a, worker: 0, to_rail: 5}

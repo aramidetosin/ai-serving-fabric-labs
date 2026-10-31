@@ -1,0 +1,102 @@
+terminal length 0
+show vlan
+show running-configuration interface PortChannel 10
+show mclag brief
+exit
+terminal length 0
+show vlan
+show running-configuration interface PortChannel 10
+show mclag brief
+exit
+fe-sw1# terminal length 0
+fe-sw1# show vlanVlan
+Q: A - Access (Untagged), T - Tagged
+NUM        Status      Q Ports            Autostate   Dynamic     
+100        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel11                No         
+                       A  PortChannel12                No         
+                       A  PortChannel13                No         
+                       A  PortChannel14                No         
+                       A  PortChannel15                No         
+                       A  PortChannel21                No         
+                       A  PortChannel22                No         
+110        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       T  PortChannel14                No         
+                       T  PortChannel15                No         
+120        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel21                No         
+                       T  PortChannel22                No         
+                       A  PortChannel31                No         
+130        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel41                No         
+                       A  PortChannel42                No         
+131        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel43                No         
+                       A  PortChannel44                No         
+200        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel32                No         
+300        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel30                No         
+3966       Active      T  PortChannel1     Enable      No         
+fe-sw1# show running-configuration interface PortChannel 10
+!
+interface PortChannel10
+ description fw-ae1
+ switchport trunk allowed Vlan 100,110,130-131,200,300
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+fe-sw1# show mclag brief
+ 
+Domain ID            : 1
+Role                 : active
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.0
+Peer Address         : 10.20.255.1
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:7a:3a:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.4
+Peer Address         : 10.20.255.5
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw1# exit

@@ -1,0 +1,87 @@
+### 2026-10-28T22:40:46Z k8s-cp1 kubectl
++ kubectl -n serving get pods -o wide
+NAME                READY   STATUS    RESTARTS   AGE     IP            NODE       NOMINATED NODE   READINESS GATES
+chat-a-server-0     1/1     Running   0          115m    10.22.1.33    k8s-gpu1   <none>           <none>
+chat-a-worker0-0    1/1     Running   0          115m    10.22.1.251   k8s-gpu1   <none>           <none>
+chat-b-server-0     1/1     Running   0          26m     10.22.2.174   k8s-gpu2   <none>           <none>
+chat-b-worker0-0    1/1     Running   0          26m     10.22.2.201   k8s-gpu2   <none>           <none>
+chat-c-server-0     1/1     Running   0          3m50s   10.22.1.92    k8s-gpu1   <none>           <none>
+chat-c-worker0-0    1/1     Running   0          115m    10.22.2.70    k8s-gpu2   <none>           <none>
+chat-c-worker1-0    1/1     Running   0          115m    10.22.1.100   k8s-gpu1   <none>           <none>
+staff-a-server-0    1/1     Running   0          115m    10.22.1.1     k8s-gpu1   <none>           <none>
+staff-a-worker0-0   1/1     Running   0          115m    10.22.1.229   k8s-gpu1   <none>           <none>
+staff-b-server-0    1/1     Running   0          115m    10.22.2.81    k8s-gpu2   <none>           <none>
+staff-b-worker0-0   1/1     Running   0          115m    10.22.2.211   k8s-gpu2   <none>           <none>
+
+### 2026-10-28T22:40:48Z k8s-cp1 kubectl
++ kubectl -n serving get endpointslices -o wide
+NAME            ADDRESSTYPE   PORTS   ENDPOINTS                           AGE
+chat-a-h4wl2    IPv4          8080    10.22.1.33                          112m
+chat-b-6hkjn    IPv4          8080    10.22.2.174                         112m
+chat-c-b75b4    IPv4          8080    10.22.1.92                          112m
+chat-ljc9n      IPv4          8080    10.22.1.33,10.22.2.174,10.22.1.92   112m
+staff-a-rn9v8   IPv4          8080    10.22.1.1                           112m
+staff-b-5wbht   IPv4          8080    10.22.2.81                          112m
+staff-pklsm     IPv4          8080    10.22.1.1,10.22.2.81                112m
+
+### 2026-10-28T22:40:49Z k8s-cp1 kubectl
++ kubectl -n serving get events --field-selector type=Warning --sort-by=.lastTimestamp
+LAST SEEN   TYPE      REASON                 OBJECT                MESSAGE
+3m53s       Warning   AlreadyMountedVolume   pod/chat-c-server-0   The requested fsGroup is 65532, but the volume serving-models-k8s-gpu1 has GID 0. The volume may not be shareable.
+3m6s        Warning   Unhealthy              pod/chat-c-server-0   Readiness probe failed: not ready: llama-server answered GET /health with 503 Service Unavailable
+
+### 2026-10-28T22:40:52Z k8s-gpu1 guest
++ for n in $(ip netns list | awk '{print $1}'); do ip -n $n -4 -o addr show dev eth0 2>/dev/null | grep -q ' 10.22.1.92/' && echo $n; done
+cni-a8f0ca99-d14b-fecf-a43d-b1661bccf0c6
+
+### 2026-10-28T22:40:53Z k8s-gpu1 guest
++ ip -n cni-a8f0ca99-d14b-fecf-a43d-b1661bccf0c6 -br address
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+rail7@if12       UP             10.21.7.100/24 fe80::5a:feff:fe07:64/64 
+eth0@if56        UP             10.22.1.92/32 fe80::2c5c:a4ff:feeb:383d/64 
+
+### 2026-10-28T22:40:53Z k8s-gpu1 guest
++ ip -n cni-a8f0ca99-d14b-fecf-a43d-b1661bccf0c6 route
+default via 10.22.1.227 dev eth0 mtu 8855 
+10.21.7.0/24 dev rail7 proto kernel scope link src 10.21.7.100 
+10.22.0.0/16 via 10.21.7.101 dev rail7 
+10.22.1.227 dev eth0 scope link 
+
+### 2026-10-28T22:40:54Z k8s-gpu1 guest
++ rm -f /tmp/sfab-break-chat-c-server-0.pcap
+
+
+### 2026-10-28T22:40:54Z k8s-gpu1 guest
++ setsid timeout 12 tcpdump -ni rail7 -U -c 50 -w /tmp/sfab-break-chat-c-server-0.pcap 'ip and src host 10.22.1.92 and dst host 10.22.4.84' &
+
+
+### 2026-10-28T22:41:02Z k8s-cp1 kubectl
++ kubectl -n inference exec router-76cf778fb6-gwr7f -- python3 -c import socket,sys; socket.create_connection((sys.argv[1], int(sys.argv[2])), 5); print('connected') 10.22.1.92 8080
+
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import socket,sys; socket.create_connection((sys.argv[1], int(sys.argv[2])), 5); print('connected')
+                       ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/socket.py", line 868, in create_connection
+    raise exceptions[0]
+  File "/usr/lib/python3.13/socket.py", line 853, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+TimeoutError: timed out
+command terminated with exit code 1
+
+### 2026-10-28T22:41:15Z k8s-gpu1 guest
++ tcpdump -nr /tmp/sfab-break-chat-c-server-0.pcap 2>/dev/null; rm -f /tmp/sfab-break-chat-c-server-0.pcap
+22:40:57.631749 IP 10.22.1.92.8080 > 10.22.4.84.58474: Flags [S.], seq 1437423638, ack 1412876288, win 62636, options [mss 8960,sackOK,TS val 1611410681 ecr 2297895022,nop,wscale 7], length 0
+22:40:58.652670 IP 10.22.1.92.8080 > 10.22.4.84.58474: Flags [S.], seq 1437423638, ack 1412876288, win 62636, options [mss 8960,sackOK,TS val 1611411702 ecr 2297895022,nop,wscale 7], length 0
+22:40:58.682449 IP 10.22.1.92.8080 > 10.22.4.84.58474: Flags [S.], seq 1437423638, ack 1412876288, win 62636, options [mss 8960,sackOK,TS val 1611411731 ecr 2297895022,nop,wscale 7], length 0
+22:40:59.706633 IP 10.22.1.92.8080 > 10.22.4.84.58474: Flags [S.], seq 1437423638, ack 1412876288, win 62636, options [mss 8960,sackOK,TS val 1611412755 ecr 2297895022,nop,wscale 7], length 0
+22:41:00.730656 IP 10.22.1.92.8080 > 10.22.4.84.58474: Flags [S.], seq 1437423638, ack 1412876288, win 62636, options [mss 8960,sackOK,TS val 1611413780 ecr 2297895022,nop,wscale 7], length 0
+22:41:01.754543 IP 10.22.1.92.8080 > 10.22.4.84.58474: Flags [S.], seq 1437423638, ack 1412876288, win 62636, options [mss 8960,sackOK,TS val 1611414803 ecr 2297895022,nop,wscale 7], length 0
+22:41:03.772662 IP 10.22.1.92.8080 > 10.22.4.84.58474: Flags [S.], seq 1437423638, ack 1412876288, win 62636, options [mss 8960,sackOK,TS val 1611416822 ecr 2297895022,nop,wscale 7], length 0
+
+### 2026-10-28T22:44:02Z ent-client container
++ sh -c rm -f /tmp/sfab-break-probe/records-*.jsonl; python3 /tmp/sfab-break-probe/probe_gateway.py --dir /tmp/sfab-break-probe --target chat https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions --target staff https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions --every staff 15  --interval 2 --timeout 400 --max-tokens 8 --count 20 
+chat: sent 20, answered 20, failed 0
+staff: sent 2, answered 2, failed 0
+

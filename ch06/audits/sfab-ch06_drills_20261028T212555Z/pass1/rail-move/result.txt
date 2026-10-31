@@ -1,0 +1,9 @@
+  FAIL  the table keeps the recipe's rules (every pod of a copy on one rail, one server and a worker a copy, every address once) -> copy chat-a spans the attachments ['rail3', 'rail5']: every pod of a copy sits on one rail
+  FAIL  chat-a-worker0-0 (chat copy a, worker): on k8s-gpu1, rail 5 as rail5 10.21.5.102 02:5a:fe:05:00:66, Ready -> network-status names serving/rail3 10.21.3.101; label rail=rail3
+  PASS  no StatefulSet the table does not name
+  FAIL  chat-a-worker0-0: ggml-rpc-server bound to its rail address 10.21.5.102:50052 -> bound to 10.21.3.101:50052
+  FAIL  chat-a-worker0-0: listening on 10.21.5.102:50052 alone (ggml-rpc only on the rail; the pod's cluster interface answers nothing) -> listening on 10.21.3.101:50052
+  PASS  one macvlan attachment per rail the table uses (rail3, rail4, rail5, rail6, rail7): the rail NIC as master, bridge mode, MTU 9000, the static IPAM plugin and no route
+  PASS  no rail attachment the table does not use
+  FAIL  in every pod the default route on eth0, and on its rail attachment only the rail's connected prefix (11 pods read on their nodes) -> chat-a-worker0-0: on rail5:
+  PASS  no server or worker pod the table does not name

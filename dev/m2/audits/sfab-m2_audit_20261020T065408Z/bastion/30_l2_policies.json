@@ -1,0 +1,47 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "cilium.io/v2alpha1",
+            "kind": "CiliumL2AnnouncementPolicy",
+            "metadata": {
+                "creationTimestamp": "2026-10-20T06:03:16Z",
+                "generation": 1,
+                "name": "gateways",
+                "resourceVersion": "2050",
+                "uid": "e7fe8dec-adb5-462e-b214-002fd5c9b582"
+            },
+            "spec": {
+                "externalIPs": false,
+                "interfaces": [
+                    "^bond0$"
+                ],
+                "loadBalancerIPs": true,
+                "nodeSelector": {
+                    "matchExpressions": [
+                        {
+                            "key": "node-role.tarnwick.example/control",
+                            "operator": "Exists"
+                        }
+                    ]
+                },
+                "serviceSelector": {
+                    "matchExpressions": [
+                        {
+                            "key": "tarnwick.example/lb-pool",
+                            "operator": "In",
+                            "values": [
+                                "gw-internal",
+                                "gw-users"
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

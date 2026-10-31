@@ -1,0 +1,69 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "addressType": "IPv4",
+            "apiVersion": "discovery.k8s.io/v1",
+            "endpoints": [
+                {
+                    "addresses": [
+                        "10.22.1.33"
+                    ],
+                    "conditions": {
+                        "ready": true,
+                        "serving": true,
+                        "terminating": false
+                    },
+                    "nodeName": "k8s-gpu1",
+                    "targetRef": {
+                        "kind": "Pod",
+                        "name": "chat-a-server-0",
+                        "namespace": "serving",
+                        "uid": "92279575-4219-472f-90b7-90d8a1c2f5fd"
+                    }
+                }
+            ],
+            "kind": "EndpointSlice",
+            "metadata": {
+                "annotations": {
+                    "endpoints.kubernetes.io/last-change-trigger-time": "2026-10-28T20:48:09Z"
+                },
+                "creationTimestamp": "2026-10-28T20:48:09Z",
+                "generateName": "chat-a-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/name": "serving",
+                    "endpointslice.kubernetes.io/managed-by": "endpointslice-controller.k8s.io",
+                    "kubernetes.io/service-name": "chat-a",
+                    "tarnwick.example/copy": "a",
+                    "tarnwick.example/model": "chat"
+                },
+                "name": "chat-a-h4wl2",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Service",
+                        "name": "chat-a",
+                        "uid": "d713b7c5-d626-4a4f-967b-37ffacbc76ee"
+                    }
+                ],
+                "resourceVersion": "3990",
+                "uid": "328f6170-65f6-44bb-a3ed-68aa29966a70"
+            },
+            "ports": [
+                {
+                    "name": "http",
+                    "port": 8080,
+                    "protocol": "TCP"
+                }
+            ]
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

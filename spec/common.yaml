@@ -1,0 +1,229 @@
+# Platform constants shared by both builds (FRAMEWORK.md sections 2 to 4).
+#
+# A profile is deep_merge(common.yaml, profile-<x>.yaml), so a profile may override any key here.
+# Nothing in this file is a secret. Budgets are planning figures for preflight, not measurements;
+# each lab records what it measured.
+
+# Node kinds: the containerlab kind, the image key in versions.yaml and the host budget per node.
+# A kind whose budget is null takes it from each node's own entry. modules lists the host kernel
+# modules a node of the kind needs, which preflight loads when the lab has one (beside
+# host.modules, which every lab loads).
+#
+# The disk budget is what a deploy writes, where it writes it (FRAMEWORK.md 3.1), never a disk's
+# virtual size:
+# - state_gib: the expected growth of what the node writes under the lab's state/ (a VM guest's
+#   overlay and seed in state/nodes/<n>, a storage VM's disks in state/nodes/<n>/persist);
+# - layer_gib: the expected growth of the node's container layer under Docker's data root, where
+#   vrnetlab's launcher writes a VM's overlay next to its image disk when no directory is bound
+#   for it (the switches and the PA-VM).
+# A VM guest's disk_gib (its own entry in the profile) is the virtual size of its root disk, the
+# guest's VM_DISK_GIB; the thin overlay grows only as the guest writes, so it is not the budget.
+# The containers keep no disk image, and write nothing under state/ beyond the bastion's shared/
+# and ca/ files, which host.state_base_gib covers. The registry binds images/registry/data read-only: its data is
+# seeded before any lab (make -C images registry-seed; preflight's pf_registry checks it), so a
+# deploy writes nothing there and it is budgeted nowhere.
+kinds:
+  dell_sonic:
+    clab_kind: dell_sonic
+    image: dell_sonic
+    section: switches
+    mem_gib: 4.6
+    vcpus: 2
+    # The overlay of the image disk (64 GiB virtual), in the container layer. A planning
+    # allowance, above every size the deploys have recorded (FRAMEWORK.md 3.1).
+    state_gib: 0
+    layer_gib: 8
+  paloalto_panos:
+    clab_kind: paloalto_panos
+    image: pa_vm
+    section: appliances
+    mem_gib: 16.5
+    vcpus: 8
+    # The overlay of the image disk, in the container layer (its /config is bound from the
+    # containerlab lab directory). A planning allowance, above every size the deploys have recorded.
+    state_gib: 0
+    layer_gib: 16
+  truenas:
+    clab_kind: generic_vm
+    image: truenas
+    section: appliances
+    mem_gib: 16
+    vcpus: 8
+    # The launcher keeps its boot overlay and data disks in /persist (state/nodes/<n>/persist).
+    # Expected use of those thin disks, not their virtual size (four of data_disk_size); not
+    # measured yet.
+    state_gib: 40
+    layer_gib: 0
+  ontap:
+    clab_kind: generic_vm
+    image: ontap
+    section: appliances
+    mem_gib: 8.5
+    vcpus: 2
+    # Bound like TrueNAS (state/nodes/<n>/persist); unmeasured until build B's storage chapter.
+    state_gib: 60
+    layer_gib: 0
+  vm-node:
+    clab_kind: linux
+    image: vm_node
+    section: hosts
+    mem_gib: null
+    vcpus: null
+    # From each node's entry, with its basis in the profile; the disk is bound from state/.
+    state_gib: null
+    layer_gib: 0
+  bastion:
+    clab_kind: linux
+    image: bastion
+    section: hosts
+    mem_gib: 0.25
+    vcpus: 0
+    state_gib: 0
+    layer_gib: 0
+  client:
+    clab_kind: linux
+    image: client
+    section: hosts
+    mem_gib: 0.25
+    vcpus: 0
+    state_gib: 0
+    layer_gib: 0
+  resolver:
+    clab_kind: linux
+    image: resolver
+    section: hosts
+    mem_gib: 0.25
+    vcpus: 0
+    state_gib: 0
+    layer_gib: 0
+  frr:
+    clab_kind: linux
+    image: frr
+    section: hosts
+    mem_gib: 0.25
+    vcpus: 0
+    state_gib: 0
+    layer_gib: 0
+    # frr-init.sh puts eth0 in VRF mgmt, which needs the host kernel's vrf module.
+    modules: [vrf]
+  vpngw:
+    clab_kind: linux
+    image: vpngw
+    section: hosts
+    mem_gib: 0.25
+    vcpus: 0
+    state_gib: 0
+    layer_gib: 0
+  registry:
+    clab_kind: linux
+    image: registry
+    section: hosts
+    mem_gib: 0.25
+    vcpus: 0
+    state_gib: 0
+    layer_gib: 0
+
+# Every SONiC switch: at most 56 data NICs, the management VRF applied first, and its MTUs.
+switch:
+  max_nics: 56
+  mgmt_vrf: mgmt
+  factory_mtu: 9100
+  max_mtu: 9216
+  # Management0's slirp network inside every vrnetlab VM: no data address may sit in it.
+  slirp: 10.0.0.0/24
+  user: admin
+
+# The lab host (preflight, section 3.1).
+host:
+  tick: 10000
+  mem_floor_gib: 16
+  # state/'s own files: logs, markers, run directories, secrets, shared/ and ca/ (M1 held about
+  # 6 MiB of them after its runs, by du -sh).
+  state_base_gib: 1
+  vcpu_overcommit: 2
+  boot_batch: 8
+  startup_delay_s: 180
+  modules: [bonding]
+
+# Linux guests and containers.
+guest:
+  user: admin
+  data_mtu: 9000
+  tx_offload_off: true
+  # How images/vm-node/vm-init.sh joins a VM node's data NICs to their taps: bridge (a bridge per
+  # NIC, or a tc mirred redirect where the host kernel refuses group_fwd_mask 0x4004, as a stock
+  # kernel does) or tc (the redirect on any kernel: the render gives every VM node SFAB_NIC_LINK=tc
+  # in its environment). Every recorded run used bridge; tc is for testing the stock-kernel path.
+  nic_link: bridge
+  bond:
+    mode: 802.3ad
+    lacp_rate: fast
+    miimon: 100
+    xmit_hash_policy: layer3+4
+  # Routing tables: Cilium flushes table 200, so management uses 150 and out-of-band 100.
+  tables:
+    mgmt: 150
+    oob: 100
+    rail_base: 300
+  # Conventional NIC numbering on VM guests and the bastion (container side).
+  nics:
+    bond: [eth1, eth2]
+    oob: eth3
+    first_rail: 4
+  # Locally administered guest MACs: prefix, then the management octet, then 00:00, then the NIC index.
+  mac_prefix: "02:5a"
+  # The BMC stand-in of every VM guest: the out-of-band NIC moves out of the host OS into this
+  # network namespace, which holds the BMC address and answers SSH (its own sshd) and HTTPS (a
+  # listener standing in for Redfish) there; the host OS has no address on the BMC VLAN.
+  bmc:
+    netns: bmc
+    services: [ssh, https]
+
+# PAN-OS: the default ports (application-default) of the App-IDs the rules name, as the PA-VM's
+# factory content 9010-9583 defines them (read on the live PA-VM, /config/predefined/application;
+# dns and ntp are application containers, here with their base applications' ports). The render's
+# path walk (the matrix, the traces) matches a rule's application-default on these.
+panos:
+  app_default:
+    ssl: [tcp/443]
+    ssh: [tcp/22]
+    dns: [udp/53, udp/5353, tcp/53]
+    ntp: [tcp/123, udp/123]
+    ike: [tcp/500, udp/500]
+    ipsec-esp: [ip/50]
+    ipsec-esp-udp: [udp/4500, udp/4501]
+    ping: [icmp/8]
+
+# Stage timeouts and poll counts (sections 3.3 to 3.5).
+timeouts:
+  switch_boot_s: 1200
+  fw_healthy_s: 1800
+  fw_enforced_tries: 3
+  fw_enforced_pause_s: 20
+  guest_hold_s: 3600
+  guest_hold_poll_s: 5
+  fabric_poll_s: 15
+  fabric_polls: 120
+  fabric_consecutive: 2
+  cluster_poll_s: 30
+  cluster_polls: 240
+  trident_poll_s: 15
+  trident_polls: 12
+  events_quiet_s: 90
+  stop_gpu_s: 300
+  stop_storage_s: 120
+  stop_control_s: 180
+  settle_frontend: {clean_rounds: 3, max_rounds: 40, bounce_after: 2, bounce_max_nodes: 4, peer_offsets: [1, 5, 11, 17, 23, 29]}
+  settle_rails: {clean_rounds: 2, max_rounds: 10}
+
+# Harness defaults (section 4).
+harness:
+  rtt_cutoff_s: 1
+  probe_retries: 1
+  pcap_max_mib: 5
+  trace_settle_s: 3
+  capture_snaplen: 256
+
+# Lab names (section 3.1, the identity guard).
+naming:
+  lab_re: "^sfab-(ch[0-9]{2}[a-z]?|m[0-9]+)$"

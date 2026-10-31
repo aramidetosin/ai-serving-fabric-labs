@@ -1,0 +1,42 @@
+# break-7a (Chapter 7, exercise 4): a new key for chat that one API gateway pod never loads.
+#
+# Each API gateway pod composes its consumers from the mounted key Secret: its sidecar (sfab-keys
+# compose) rewrites the pod's apisix.yaml whenever the Secret's files change, and APISIX reloads it.
+# The break holds the second API gateway pod by name: a hold file in the pod's shared directory,
+# while which its sidecar keeps the apisix.yaml it has, as a sidecar would that stopped reloading.
+# Then it mints one new key for chat into the Secret, as an operator would for a new user. Every
+# other pod loads the key on its own schedule; the held pod never does. A user of the new key gets
+# 200 or 401 by which API gateway pod the Gateway's proxy picks; the lab's first key for chat keeps
+# working everywhere.
+#
+# record: the per-pod probe (a pod of the key tool, in the cluster, sending one request with the
+# new key to every API gateway pod by its address until each accepts it, 240 s at most), 20
+# requests through the users' VIP with the new key from the enterprise client, and the Secret's
+# fields with their fingerprints beside each API gateway pod's sidecar log. The exercise works from
+# the probe's one 401 to the pod, then to its sidecar's log, which says it is held. The heal
+# restarts the held pod (the Deployment makes a new one, whose sidecar composes from the Secret as
+# it starts), then checks every pod accepts the key and every request answers; the cleanup revokes
+# the key, so the Secret holds the lab's first key a model again before the chapter audit.
+#
+# The key's id sorts after any id the key Job draws for the lab's first key in all but a few
+# cases (ids are random hex), so every other check keeps reading the first key.
+title: a new key for chat loaded by every API gateway pod but one
+exercise: 4
+since: 7
+break:
+  - key_hold: {pod: 1}
+  - key_mint: {model: chat, id: fa000001}
+record:
+  - key_probe: {id: pods, model: chat, key: fa000001, expect: 200, wait_s: 240}
+  - probe_gateway: {id: users, from: ent-client, gateway: gw-users, models: [chat], key: fa000001, count: 20, interval_s: 1, timeout_s: 400, passes: 1}
+  - key_show: {}
+expect_broken:
+  - key_pods: {probe: pods, refusing: held}
+  - probe_share: {probe: users, failing: some}
+heal:
+  - gateway_restart: {pod: held}
+expect_healed:
+  - key_pods: {probe: pods, refusing: none}
+  - probe_share: {probe: users, failing: none}
+cleanup:
+  - key_revoke: {model: chat, id: fa000001}

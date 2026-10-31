@@ -1,0 +1,531 @@
+#!/usr/bin/env python3
+"""sfab-keys: API keys made, kept and checked inside the cluster, never printed.
+
+    sfab-keys ensure  --namespace NS --secret NAME --field FIELD --prefix PFX
+        Create Secret NAME holding FIELD = <PFX>-<32 hex> when it does not exist (the serving
+        recipe's key, the model router's master key). An existing Secret is never replaced.
+    sfab-keys mint    --namespace NS --secret NAME --prefix PFX --model SLUG [--id ID] [--if-none]
+        Add one key for a model to Secret NAME (created when missing) as field <SLUG>.<ID>
+        = <PFX>-<SLUG>-<32 hex>. ID is 8 hex digits, random unless given. With --if-none the key
+        is added only when the Secret holds no key for that model yet (the lab's first key per
+        model); a model that has one keeps it.
+    sfab-keys copy    --from-namespace NS --from-secret NAME --field FIELD --namespace NS2 --secret NAME2
+        Copy one field from one Secret to another, inside the cluster (the model router's backend
+        key, from the serving recipe's Secret): create NAME2 when it is missing, keep it when it
+        holds the same value, update it when the value differs. It prints which, and the
+        fingerprint only.
+    sfab-keys revoke  --namespace NS --secret NAME --model SLUG --id ID
+        Remove that key from the Secret.
+    sfab-keys list    --namespace NS --secret NAME
+        Each key's field and fingerprint.
+    sfab-keys compose --base FILE --keys DIR --out FILE [--format 'Bearer {key}'] [--hold FILE]
+                      [--interval 2] [--once]
+        The API gateway's sidecar (APISIX standalone mode): write OUT as the base apisix.yaml with
+        one consumer per key file in DIR (a mounted Secret: <SLUG>.<ID> files) added to its
+        consumers, consumer <SLUG>_key_<ID> in the consumer group SLUG (the caller), and #END as the last line,
+        which APISIX waits for before it reads the file. OUT is rewritten in place (it may be a
+        file mounted into the gateway's container) and only when its content changes; while the
+        hold file exists the last OUT is kept as it is. Without --once it repeats every interval.
+    sfab-keys probe   --namespace NS --selector SEL --port PORT --path PATH --key-file FILE
+                      [--host HOST] [--expect STATUS] [--json BODY] [--jsonl] [--label LABEL]
+                      [--repeat [--interval 1] [--max-s 240]]
+        Send one request with the key to every Running pod the selector names, by pod address, and
+        print each pod's HTTP status: which gateway pods have loaded a key. The request is a GET,
+        or with --json a POST of BODY as application/json (a route that takes only POST, as the
+        API gateway's model routes do, answers a GET 404 whatever the key). With --expect, exit 0
+        only when every pod answered that status. --jsonl prints one JSON line a pod and answer
+        (label, round, t, pod, ip, status, and for an answer other than 2xx its message), and a
+        summary line last. --repeat sends rounds every --interval seconds until every pod of a
+        round answered --expect or --max-s passes: how long a minted key takes to load, or a
+        revoked one to leave, at each pod.
+
+Nothing prints a key: every line names a key by its fingerprint, sha256:<first 12 hex digits of
+its sha256>. The Kubernetes API is reached with the pod's own service account (the in-cluster
+host, token and CA), or with SFAB_KEYS_API, SFAB_KEYS_TOKEN_FILE and SFAB_KEYS_CA in the
+environment (the tests). Standard library and PyYAML (for compose).
+"""
+
+from __future__ import annotations
+
+import argparse
+import base64
+import hashlib
+import json
+import os
+import re
+import secrets
+import ssl
+import sys
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+from pathlib import Path
+
+SA = Path("/var/run/secrets/kubernetes.io/serviceaccount")
+NAME_RE = re.compile(r"^[a-z0-9]([-a-z0-9]*[a-z0-9])?$")
+SLUG_RE = re.compile(r"^[a-z0-9]{1,16}$")
+ID_RE = re.compile(r"^[0-9a-f]{8}$")
+FIELD_RE = re.compile(r"^[-._a-zA-Z0-9]+$")
+PREFIX_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+KEY_FILE_RE = re.compile(r"^([a-z0-9]{1,16})\.([0-9a-f]{8})$")
+END = "#END"
+
+
+class KeysError(Exception):
+    pass
+
+
+def fingerprint(key: str) -> str:
+    return "sha256:" + hashlib.sha256(key.encode()).hexdigest()[:12]
+
+
+def new_key(prefix: str) -> str:
+    return f"{prefix}-{secrets.token_hex(16)}"
+
+
+def log(msg: str) -> None:
+    print(msg, flush=True)
+
+
+# ------------------------------------------------------------------------------------------
+# The Kubernetes API, with the pod's service account
+
+
+class Api:
+    def __init__(self, base: str | None = None, token: str | None = None, ca: str | None = None, opener=None):
+        host, port = os.environ.get("KUBERNETES_SERVICE_HOST"), os.environ.get("KUBERNETES_SERVICE_PORT", "443")
+        self.base = (base or os.environ.get("SFAB_KEYS_API") or (f"https://{host}:{port}" if host else "")).rstrip("/")
+        if not self.base:
+            raise KeysError("no Kubernetes API: not in a pod, and SFAB_KEYS_API is not set")
+        tf = os.environ.get("SFAB_KEYS_TOKEN_FILE") or str(SA / "token")
+        self.token = token if token is not None else (Path(tf).read_text().strip() if Path(tf).is_file() else "")
+        cafile = ca or os.environ.get("SFAB_KEYS_CA") or (str(SA / "ca.crt") if (SA / "ca.crt").is_file() else None)
+        self.ctx = ssl.create_default_context(cafile=cafile) if self.base.startswith("https") else None
+        if self.ctx is not None:
+            # A service account's ca.crt may hold an intermediate CA alone (the labs' cluster CA is an
+            # intermediate under the lab root), and OpenSSL by default wants a chain that ends at a
+            # self-signed root ("unable to get issuer certificate"). Trust the bundle's certificates
+            # as anchors, as kubectl does.
+            self.ctx.verify_flags |= ssl.VERIFY_X509_PARTIAL_CHAIN
+        self.opener = opener
+
+    def call(self, method: str, path: str, body=None, ctype: str = "application/json") -> tuple:
+        data = json.dumps(body).encode() if body is not None else None
+        headers = {"Accept": "application/json"}
+        if data is not None:
+            headers["Content-Type"] = ctype
+        if self.token:
+            headers["Authorization"] = f"Bearer {self.token}"
+        req = urllib.request.Request(self.base + path, data=data, method=method, headers=headers)
+        try:
+            if self.opener:
+                r = self.opener(req)
+            else:
+                r = urllib.request.urlopen(req, timeout=30, context=self.ctx)
+            with r:
+                return r.status, json.loads(r.read() or b"{}")
+        except urllib.error.HTTPError as e:
+            try:
+                doc = json.loads(e.read() or b"{}")
+            except ValueError:
+                doc = {}
+            return e.code, doc
+
+    def secret(self, ns: str, name: str) -> dict | None:
+        st, doc = self.call("GET", f"/api/v1/namespaces/{ns}/secrets/{name}")
+        if st == 404:
+            return None
+        if st != 200:
+            raise KeysError(f"reading Secret {ns}/{name}: HTTP {st} {doc.get('message', '')}".rstrip())
+        return doc
+
+    def create_secret(self, ns: str, name: str, data: dict, labels: dict | None = None) -> int:
+        body = {"apiVersion": "v1", "kind": "Secret", "type": "Opaque",
+                "metadata": {"name": name, "namespace": ns, "labels": labels or {"app.kubernetes.io/managed-by": "sfab-keys"}},
+                "data": {k: base64.b64encode(v.encode()).decode() for k, v in data.items()}}
+        st, doc = self.call("POST", f"/api/v1/namespaces/{ns}/secrets", body)
+        if st not in (201, 409):
+            raise KeysError(f"creating Secret {ns}/{name}: HTTP {st} {doc.get('message', '')}".rstrip())
+        return st
+
+    def patch_secret(self, ns: str, name: str, data: dict) -> None:
+        body = {"data": {k: (base64.b64encode(v.encode()).decode() if v is not None else None) for k, v in data.items()}}
+        st, doc = self.call("PATCH", f"/api/v1/namespaces/{ns}/secrets/{name}", body, "application/merge-patch+json")
+        if st != 200:
+            raise KeysError(f"updating Secret {ns}/{name}: HTTP {st} {doc.get('message', '')}".rstrip())
+
+    def pods(self, ns: str, selector: str) -> list:
+        q = urllib.parse.urlencode({"labelSelector": selector})
+        st, doc = self.call("GET", f"/api/v1/namespaces/{ns}/pods?{q}")
+        if st != 200:
+            raise KeysError(f"listing pods in {ns}: HTTP {st} {doc.get('message', '')}".rstrip())
+        return doc.get("items") or []
+
+
+def _decode(doc: dict) -> dict:
+    return {k: base64.b64decode(v).decode() for k, v in (doc.get("data") or {}).items()}
+
+
+# ------------------------------------------------------------------------------------------
+# ensure, mint, revoke, list
+
+
+def ensure(api: Api, ns: str, name: str, field: str, prefix: str) -> int:
+    have = api.secret(ns, name)
+    if have is not None:
+        val = _decode(have).get(field)
+        if not val:
+            raise KeysError(f"Secret {ns}/{name} exists without {field}; it is never replaced, so remove it first")
+        log(f"Secret {ns}/{name}: present, {field} {fingerprint(val)} (kept as it is)")
+        return 0
+    key = new_key(prefix)
+    if api.create_secret(ns, name, {field: key}) == 409:
+        val = _decode(api.secret(ns, name) or {}).get(field, "")
+        log(f"Secret {ns}/{name}: made by another run first, {field} {fingerprint(val) if val else 'missing'}")
+        return 0 if val else 1
+    log(f"Secret {ns}/{name}: created, {field} {fingerprint(key)}")
+    return 0
+
+
+def mint(api: Api, ns: str, name: str, prefix: str, slug: str, kid: str | None, if_none: bool = False) -> int:
+    have = api.secret(ns, name)
+    if if_none and have is not None:
+        held = sorted(f for f in (have.get("data") or {}) if (KEY_FILE_RE.match(f) or [None, None])[1] == slug)
+        if held:
+            vals = _decode(have)
+            log(f"Secret {ns}/{name}: {slug} holds {len(held)} key(s), kept as they are: "
+                + " ".join(f"{f} {fingerprint(vals[f])}" for f in held))
+            return 0
+    kid = kid or secrets.token_hex(4)
+    field = f"{slug}.{kid}"
+    key = new_key(f"{prefix}-{slug}")
+    if have is None:
+        api.create_secret(ns, name, {field: key})
+    else:
+        if field in (have.get("data") or {}):
+            raise KeysError(f"Secret {ns}/{name} already holds {field}")
+        api.patch_secret(ns, name, {field: key})
+    log(f"minted {field} in Secret {ns}/{name}: {fingerprint(key)}")
+    return 0
+
+
+def copy(api: Api, src_ns: str, src_name: str, field: str, ns: str, name: str) -> int:
+    src = api.secret(src_ns, src_name)
+    val = _decode(src or {}).get(field) if src is not None else None
+    if not val:
+        raise KeysError(f"Secret {src_ns}/{src_name} holds no {field} to copy")
+    have = api.secret(ns, name)
+    where = f"Secret {ns}/{name}"
+    if have is None:
+        if api.create_secret(ns, name, {field: val}) == 409:
+            have = api.secret(ns, name) or {}
+        else:
+            log(f"{where}: created, {field} {fingerprint(val)} (copied from {src_ns}/{src_name})")
+            return 0
+    if _decode(have).get(field) == val:
+        log(f"{where}: {field} {fingerprint(val)} kept, the same as {src_ns}/{src_name}")
+        return 0
+    api.patch_secret(ns, name, {field: val})
+    log(f"{where}: updated, {field} {fingerprint(val)} (copied from {src_ns}/{src_name})")
+    return 0
+
+
+def revoke(api: Api, ns: str, name: str, slug: str, kid: str) -> int:
+    field = f"{slug}.{kid}"
+    have = api.secret(ns, name)
+    if have is None or field not in (have.get("data") or {}):
+        raise KeysError(f"Secret {ns}/{name} holds no {field}")
+    fp = fingerprint(_decode(have)[field])
+    api.patch_secret(ns, name, {field: None})
+    log(f"revoked {field} from Secret {ns}/{name}: {fp}")
+    return 0
+
+
+def list_keys(api: Api, ns: str, name: str) -> int:
+    have = api.secret(ns, name)
+    if have is None:
+        raise KeysError(f"no Secret {ns}/{name}")
+    for f, v in sorted(_decode(have).items()):
+        log(f"{f} {fingerprint(v)}")
+    return 0
+
+
+# ------------------------------------------------------------------------------------------
+# compose: the API gateway's consumers from a mounted Secret
+
+
+def read_keys(directory: Path) -> list:
+    """(slug, id, key) for every <slug>.<id> file in the directory, sorted; anything else (the
+    kubelet's ..data links, a stray file) is left out."""
+    out = []
+    if not directory.is_dir():
+        return out
+    for p in sorted(directory.iterdir()):
+        m = KEY_FILE_RE.match(p.name)
+        if not m or not p.is_file():
+            continue
+        key = p.read_text(encoding="utf-8").strip()
+        if key:
+            out.append((m.group(1), m.group(2), key))
+    return out
+
+
+def composed(base_text: str, keys: list, fmt: str) -> str:
+    import yaml  # noqa: PLC0415  (PyYAML, installed in the image from the pinned wheel)
+
+    body = "\n".join(l for l in base_text.splitlines() if l.strip() != END)
+    doc = yaml.safe_load(body) if body.strip() else {}
+    if not isinstance(doc, dict):
+        raise KeysError("the base apisix.yaml is not a mapping")
+    consumers = list(doc.get("consumers") or [])
+    groups = {g.get("id") for g in doc.get("consumer_groups") or [] if isinstance(g, dict)}
+    for slug, kid, key in keys:
+        if groups and slug not in groups:
+            raise KeysError(f"key {slug}.{kid}: the base has no consumer group {slug}")
+        consumers.append({"username": f"{slug}_key_{kid}", "group_id": slug,
+                          "plugins": {"key-auth": {"key": fmt.format(key=key)}}})
+    if consumers:
+        doc["consumers"] = consumers
+    # width: no line folded, since APISIX's YAML reader (tinyyaml) cannot read a plain scalar that
+    # runs on to a second line (a long consumer group desc did, and the gateway would not start)
+    return yaml.safe_dump(doc, sort_keys=False, default_flow_style=False, width=1 << 20) + END + "\n"
+
+
+def write_in_place(out: Path, text: str) -> bool:
+    """Rewrite out in place (same file, so a mount of it sees the change); False if unchanged."""
+    try:
+        if out.read_text(encoding="utf-8") == text:
+            return False
+    except OSError:
+        pass
+    with open(out, "a+", encoding="utf-8") as f:
+        f.seek(0)
+        f.truncate()
+        f.write(text)
+        f.flush()
+        os.fsync(f.fileno())
+    return True
+
+
+def compose(base: Path, keys_dir: Path, out: Path, fmt: str, hold: Path | None, interval: float, once: bool) -> int:
+    held = False
+    while True:
+        if hold is not None and hold.exists():
+            if not held:
+                log(f"held: {hold} exists, so {out} keeps what it holds")
+                held = True
+        else:
+            if held:
+                log(f"released: {hold} is gone")
+                held = False
+            keys = read_keys(keys_dir)
+            try:
+                text = composed(base.read_text(encoding="utf-8"), keys, fmt)
+            except Exception as e:  # noqa: BLE001  (a bad base or key file: keep the last file, say why)
+                log(f"not composed, {out} keeps what it holds: {e}")
+                if once:
+                    return 1
+                time.sleep(interval)
+                continue
+            if write_in_place(out, text):
+                fps = " ".join(f"{s}.{i} {fingerprint(k)}" for s, i, k in keys) or "none"
+                log(f"composed {out}: {len(keys)} key(s) from {keys_dir}: {fps}")
+        if once:
+            return 0
+        time.sleep(interval)
+
+
+# ------------------------------------------------------------------------------------------
+# probe: which gateway pods accept a key
+
+
+def _message(raw: bytes) -> str:
+    """A refusal's message: the JSON body's message field, else the body's first line, cut short."""
+    text = raw.decode("utf-8", "replace").strip()
+    try:
+        doc = json.loads(text)
+        if isinstance(doc, dict):
+            m = doc.get("message")
+            if not m and isinstance(doc.get("error"), dict):
+                m = doc["error"].get("message")
+            if m:
+                return str(m)[:120]
+    except ValueError:
+        pass
+    return (text.splitlines() or [""])[0][:120]
+
+
+def probe_once(api: Api, ns: str, selector: str, port: int, path: str, key: str, host: str | None, body: str | None,
+               opener=None, timeout: float = 30) -> list:
+    """One round: (pod, ip, status, message) for every Running pod the selector names, by name;
+    status 0 when the pod did not answer."""
+    pods = [p for p in api.pods(ns, selector) if (p.get("status") or {}).get("phase") == "Running" and (p.get("status") or {}).get("podIP")]
+    out = []
+    for p in sorted(pods, key=lambda x: x["metadata"]["name"]):
+        ip = p["status"]["podIP"]
+        headers = {"Authorization": f"Bearer {key}"}
+        if host:
+            headers["Host"] = host
+        data = None
+        if body is not None:
+            data = body.encode()
+            headers["Content-Type"] = "application/json"
+        req = urllib.request.Request(f"http://{ip}:{port}{path}", data=data, headers=headers, method="POST" if data is not None else "GET")
+        msg = ""
+        try:
+            r = (opener or (lambda q: urllib.request.urlopen(q, timeout=timeout)))(req)
+            with r:
+                st = r.status
+                r.read()
+        except urllib.error.HTTPError as e:
+            st = e.code
+            try:
+                msg = _message(e.read() or b"")
+            except OSError:
+                msg = ""
+        except (urllib.error.URLError, OSError) as e:
+            st, msg = 0, f"no answer ({getattr(e, 'reason', e)})"
+        out.append((p["metadata"]["name"], ip, st, msg))
+    return out
+
+
+def probe(api: Api, ns: str, selector: str, port: int, path: str, key: str, host: str | None, expect: int | None,
+          opener=None, body: str | None = None, jsonl: bool = False, label: str = "", repeat: bool = False,
+          interval: float = 1.0, max_s: float = 240.0, sleep=time.sleep, clock=time.time) -> int:
+    if not jsonl:
+        log(f"key {fingerprint(key)} at {path}, port {port}{', POST' if body is not None else ''}")
+    start, n, good, total = clock(), 0, 0, 0
+    while True:
+        n += 1
+        t0 = clock()
+        res = probe_once(api, ns, selector, port, path, key, host, body, opener)
+        if not res:
+            if jsonl:
+                log(json.dumps({"label": label, "round": n, "t": round(t0, 3), "pods": 0}, sort_keys=True))
+            else:
+                log(f"no Running pod in {ns} matches {selector}")
+        for name, ip, st, msg in res:
+            if jsonl:
+                rec = {"label": label, "round": n, "t": round(t0, 3), "pod": name, "ip": ip, "status": st}
+                if st and not 200 <= st < 300 and msg:
+                    rec["message"] = msg
+                elif not st:
+                    rec["message"] = msg
+                log(json.dumps(rec, sort_keys=True))
+            else:
+                log(f"  {name} {ip}: " + (f"HTTP {st}" if st else msg))
+        good = sum(1 for x in res if expect is None or x[2] == expect)
+        total = len(res)
+        done = bool(res) and good == total
+        if not repeat or done or clock() - start >= max_s:
+            break
+        sleep(max(0.0, t0 + interval - clock()))
+    if jsonl:
+        log(json.dumps({"label": label, "summary": {"rounds": n, "pods": total, "answered": good, "expect": expect,
+                                                    "all": bool(total) and good == total, "s": round(clock() - start, 3)}}, sort_keys=True))
+    elif expect is not None:
+        log(f"{good} of {total} pod(s) answered HTTP {expect}" + (f" after {n} round(s)" if repeat else ""))
+    if expect is None:
+        return 0 if total else 1
+    return 0 if total and good == total else 1
+
+
+# ------------------------------------------------------------------------------------------
+
+
+def _check(kind: str, rx, v: str) -> str:
+    if not rx.match(v or ""):
+        raise KeysError(f"{kind} {v!r} is not valid")
+    return v
+
+
+def main(argv: list) -> int:
+    ap = argparse.ArgumentParser(prog="sfab-keys", description=__doc__.strip().splitlines()[0])
+    sub = ap.add_subparsers(dest="cmd", required=True)
+    for c in ("ensure", "mint", "revoke", "list"):
+        p = sub.add_parser(c)
+        p.add_argument("--namespace", required=True)
+        p.add_argument("--secret", required=True)
+        if c == "ensure":
+            p.add_argument("--field", required=True)
+            p.add_argument("--prefix", required=True)
+        if c == "mint":
+            p.add_argument("--prefix", required=True)
+            p.add_argument("--model", required=True)
+            p.add_argument("--id", default=None)
+            p.add_argument("--if-none", action="store_true")
+        if c == "revoke":
+            p.add_argument("--model", required=True)
+            p.add_argument("--id", required=True)
+    p = sub.add_parser("copy")
+    p.add_argument("--from-namespace", required=True)
+    p.add_argument("--from-secret", required=True)
+    p.add_argument("--field", required=True)
+    p.add_argument("--namespace", required=True)
+    p.add_argument("--secret", required=True)
+    p = sub.add_parser("compose")
+    p.add_argument("--base", required=True)
+    p.add_argument("--keys", required=True)
+    p.add_argument("--out", required=True)
+    p.add_argument("--format", default="{key}")
+    p.add_argument("--hold", default=None)
+    p.add_argument("--interval", type=float, default=2.0)
+    p.add_argument("--once", action="store_true")
+    p = sub.add_parser("probe")
+    p.add_argument("--namespace", required=True)
+    p.add_argument("--selector", required=True)
+    p.add_argument("--port", type=int, required=True)
+    p.add_argument("--path", required=True)
+    p.add_argument("--key-file", required=True)
+    p.add_argument("--host", default=None)
+    p.add_argument("--expect", type=int, default=None)
+    p.add_argument("--json", default=None, dest="body")
+    p.add_argument("--jsonl", action="store_true")
+    p.add_argument("--label", default="")
+    p.add_argument("--repeat", action="store_true")
+    p.add_argument("--interval", type=float, default=1.0)
+    p.add_argument("--max-s", type=float, default=240.0)
+    a = ap.parse_args(argv)
+    try:
+        if a.cmd == "compose":
+            if "{key}" not in a.format:
+                raise KeysError("--format must hold {key}")
+            return compose(Path(a.base), Path(a.keys), Path(a.out), a.format, Path(a.hold) if a.hold else None,
+                           a.interval, a.once)
+        api = Api()
+        ns = _check("namespace", NAME_RE, a.namespace)
+        if a.cmd == "probe":
+            if not a.path.startswith("/"):
+                raise KeysError("--path must start with /")
+            key = Path(a.key_file).read_text(encoding="utf-8").strip()
+            if not key:
+                raise KeysError("the key file is empty")
+            if a.body is not None:
+                try:
+                    json.loads(a.body)
+                except ValueError as e:
+                    raise KeysError(f"--json is not JSON: {e}") from e
+            if a.repeat and a.expect is None:
+                raise KeysError("--repeat needs --expect: the status every pod must answer")
+            return probe(api, ns, a.selector, a.port, a.path, key, a.host, a.expect, body=a.body, jsonl=a.jsonl, label=a.label,
+                         repeat=a.repeat, interval=a.interval, max_s=a.max_s)
+        name = _check("Secret name", NAME_RE, a.secret)
+        if a.cmd == "copy":
+            return copy(api, _check("namespace", NAME_RE, a.from_namespace), _check("Secret name", NAME_RE, a.from_secret),
+                        _check("field", FIELD_RE, a.field), ns, name)
+        if a.cmd == "ensure":
+            return ensure(api, ns, name, _check("field", FIELD_RE, a.field), _check("prefix", PREFIX_RE, a.prefix))
+        if a.cmd == "mint":
+            kid = _check("id", ID_RE, a.id) if a.id else None
+            return mint(api, ns, name, _check("prefix", PREFIX_RE, a.prefix), _check("model", SLUG_RE, a.model), kid, a.if_none)
+        if a.cmd == "revoke":
+            return revoke(api, ns, name, _check("model", SLUG_RE, a.model), _check("id", ID_RE, a.id))
+        return list_keys(api, ns, name)
+    except (KeysError, OSError) as e:
+        print(f"sfab-keys: {e}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

@@ -1,0 +1,83 @@
+# VM disk images: the vendor images are licensed, so each reader builds their own
+# (images/VENDOR-IMAGES.md); the node disk is built by make -C images
+*.qcow2
+# image build contexts are tracked; their large inputs and outputs are not
+images/*/base/
+# the registry data: a directory, or (SFAB_IMAGE_STORE) a link to one outside the checkout, so no trailing slash
+images/registry/data
+# the models (14 to 16 GB a file): fetched into images/models, or linked there (make -C images models-link)
+images/models
+images/**/*.qcow2
+vendor/
+# the serving recipe's default render directory and a serving.env written in place (serving-layer/Makefile)
+serving-layer/rendered/
+serving-layer/serving.env
+# no other disk, archive or model file is committed either: a vendor image, its bundle or a
+# model stays outside the repository (images/VENDOR-IMAGES.md)
+*.img
+*.iso
+*.ova
+*.vmdk
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.gguf
+# per-lab runtime state: disks, secrets, logs, markers
+**/state/
+# except the STATE_DB reads make dbs saves in its result set (state/ beside config/, appl/ and the others)
+!**/audits/*_dbs_*/state/
+# a drill's placement windows: partial decodes of the captures committed beside them, read only
+# while the drill places its probes (FRAMEWORK.md 4.4, recording size)
+**/audits/**/captures/place/
+# the labs commit a copy of the checkout without .git carries (common/bin/repostate.py stamp)
+/.repo-stamp.json
+/.repo-stamp.json.tmp
+
+# containerlab runtime state (per-node overlay disks, first-boot markers, etc.)
+clab-sfab-*/
+**/clab-*/
+.*.clab.yml.bak
+*.bak
+**/deploy.log
+
+# a lab's credentials and keys live in its state/ (common/bin/secrets.py); these keep a copy made
+# anywhere else in the checkout out of git too
+secrets.env
+secrets.env.tmp
+lab_ed25519*
+redact.key
+*.key
+*.pem
+*.p12
+kubeconfig
+
+# editors
+.DS_Store
+*.swp
+*.swo
+*~
+.#*
+\#*#
+.idea/
+.vscode/
+
+# Python: bytecode, virtual environments and test caches
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+
+# core dumps (a directory named core is not one)
+core
+!core/
+core.[0-9]*
+*.core
+vgcore.*

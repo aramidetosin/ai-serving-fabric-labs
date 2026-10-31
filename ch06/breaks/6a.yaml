@@ -1,0 +1,50 @@
+# break-6a (Chapter 6, exercise 4): one pod on the wrong rail.
+#
+# chat-b's worker0 sits on k8s-gpu2 on rail 6 in the placement table, at 10.21.6.101, beside chat-b's
+# server (k8s-gpu2, rail 6), which names that address in its --rpc list: copy b is node-local, its RPC
+# inside k8s-gpu2's rail 6 macvlan bridge. The break makes the worker again through its StatefulSet as
+# the recipe renders it, but on rail 8: its networks annotation asks for a rail 8 attachment (made for
+# it, since the table uses no rail 8) at the first free address of rail 8's pod range, and
+# ggml-rpc-server binds that address. The server's RPC session to its worker is gone and nothing
+# answers on 10.21.6.101, so its readiness probe fails and chat-b's server leaves both its Services:
+# chat-b has no endpoint, and chat holds chat-a's and chat-c's servers. Every request through the
+# users' Gateway still answers, from those copies; staff is untouched. The worker itself is Running and
+# Ready on rail 8, which is what the exercise works back to: from the empty Service to the server's
+# probe, to the worker's network-status annotation, to the table.
+#
+# record: reads the namespace's pods, the Services' endpoints, every pod's network-status annotation
+# and the Warning events, and sends 20 requests to chat and 2 to staff (staff, the slower model,
+# on every 15th interval only) through the users' Gateway. The heal runs make serve, which puts
+# every pod back where the table places it (the moved worker's rendered
+# stamp differs, so it is made again from the rendered template, and the rail 8 attachment the table
+# does not use is removed), after removing chat-b's server, whose session to the old worker cannot
+# come back: its StatefulSet starts it again, and it loads the model through its worker on rail 6. A
+# pod's rail MAC follows its rail address (render/k8s.py pod_mac), so on rail 8 the worker had a MAC
+# no row names, which rail-sw2 learned on its rail 8 port facing k8s-gpu2; the heal ends when the
+# switch's MAC table has aged it out, so the chapter audit after the heal finds every learned MAC
+# where the table places it.
+title: chat-b's worker0 created on rail 8 instead of the table's rail 6
+exercise: 4
+since: 6
+break:
+  - pod_rail: {pod: chat-b-worker0-0, to_rail: 8}
+record:
+  - k8s_show: {}
+  - probe_gateway: {id: users, from: ent-client, gateway: gw-users, models: [chat, staff], every: {staff: 15}, count: 20, interval_s: 2, timeout_s: 400, passes: 1}
+expect_broken:
+  - placement: {pod: chat-b-worker0-0, rail: 8}
+  - endpoints: {service: chat-b, ready: 0}
+  - endpoints: {service: chat, ready: 2}
+  - endpoints: {service: chat-a, ready: 1}
+  - endpoints: {service: chat-c, ready: 1}
+  - endpoints: {service: staff, ready: 2}
+  - probe_share: {probe: users, failing: none}
+heal:
+  - serve: {replace: [chat-b-server-0]}
+expect_healed:
+  - placement: {pod: chat-b-worker0-0, rail: 6}
+  - endpoints: {service: chat-b, ready: 1}
+  - endpoints: {service: chat, ready: 3}
+  - endpoints: {service: staff, ready: 2}
+  - probe_share: {probe: users, failing: none}
+  - mac_gone: {pod: chat-b-worker0-0}

@@ -1,0 +1,1726 @@
+reading from file /root/sfab/labs/ai-serving-fabric-labs/ch02/audits/sfab-ch02_trace_20261029T211401Z/captures/8-router-76cf778fb6-7m6x7-eth0.pcap, link-type EN10MB (Ethernet), snapshot length 2048
+1793308515.253105 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 24595, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.50958 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0x6b04), seq 2817564061, win 64240, options [mss 1460,sackOK,TS val 4044732738 ecr 0,nop,wscale 7], length 0
+E..<`.@.?..3
+...
+..Q...........................
+...B........
+1793308515.253140 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.50958: Flags [S.], cksum 0x1ba4 (incorrect -> 0x54b2), seq 2229932093, ack 2817564062, win 65160, options [mss 1460,sackOK,TS val 3805256369 ecr 4044732738,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+..........=...................
+.......B....
+1793308515.253230 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 24596, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.50958 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x8011), ack 2229932094, win 502, options [nop,nop,TS val 4044732738 ecr 3805256369], length 0
+E..4`.@.?..:
+...
+..Q...........>...........
+...B....
+1793308515.253545 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 24597, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.50958 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0x32fe), seq 2817564062:2817564180, ack 2229932094, win 502, options [nop,nop,TS val 4044732738 ecr 3805256369], length 118
+E...`.@.?...
+...
+..Q...........>...........
+...B....GET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308515.253561 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 49436, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.50958: Flags [.], cksum 0x1b9c (incorrect -> 0x7f94), ack 2817564180, win 509, options [nop,nop,TS val 3805256369 ecr 4044732738], length 0
+E..4..@.@.^2
+..Q
+..........>...............
+.......B
+1793308515.257540 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 49437, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.50958: Flags [P.], cksum 0x1cad (incorrect -> 0xc3ad), seq 2229932094:2229932367, ack 2817564180, win 509, options [nop,nop,TS val 3805256373 ecr 4044732738], length 273
+E..E..@.@.] 
+..Q
+..........>...............
+.......BHTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:15:15 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308515.257681 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 24598, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.50958 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x7e82), ack 2229932367, win 501, options [nop,nop,TS val 4044732743 ecr 3805256373], length 0
+E..4`.@.?..8
+...
+..Q...........O...........
+...G....
+1793308515.257826 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 49438, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.50958: Flags [F.], cksum 0x1b9c (incorrect -> 0x7e78), seq 2229932367, ack 2817564180, win 509, options [nop,nop,TS val 3805256374 ecr 4044732743], length 0
+E..4..@.@.^0
+..Q
+..........O...............
+.......G
+1793308515.257951 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 24599, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.50958 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0x7e7f), seq 2817564180, ack 2229932368, win 501, options [nop,nop,TS val 4044732743 ecr 3805256374], length 0
+E..4`.@.?..7
+...
+..Q...........P...........
+...G....
+1793308515.257978 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 49439, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.50958: Flags [.], cksum 0x1b9c (incorrect -> 0x7e77), ack 2817564181, win 509, options [nop,nop,TS val 3805256374 ecr 4044732743], length 0
+E..4..@.@.^/
+..Q
+..........P...............
+.......G
+1793308520.252068 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 9364, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.50962 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0x8fb5), seq 2526574265, win 64240, options [mss 1460,sackOK,TS val 4044737737 ecr 0,nop,wscale 7], length 0
+E..<$.@.?...
+...
+..Q......v....................
+............
+1793308520.252116 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.50962: Flags [S.], cksum 0x1ba4 (incorrect -> 0x105f), seq 668779208, ack 2526574266, win 65160, options [mss 1460,sackOK,TS val 3805261368 ecr 4044737737,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+.......'.....v................
+...8........
+1793308520.252232 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 9365, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.50962 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x3bbe), ack 668779209, win 502, options [nop,nop,TS val 4044737737 ecr 3805261368], length 0
+E..4$.@.?...
+...
+..Q......v.'..............
+.......8
+1793308520.252718 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 9366, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.50962 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0xeea9), seq 2526574266:2526574384, ack 668779209, win 502, options [nop,nop,TS val 4044737738 ecr 3805261368], length 118
+E...$.@.?..B
+...
+..Q......v.'..............
+.......8GET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308520.252740 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 51112, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.50962: Flags [.], cksum 0x1b9c (incorrect -> 0x3b3f), ack 2526574384, win 509, options [nop,nop,TS val 3805261369 ecr 4044737738], length 0
+E..4..@.@.W.
+..Q
+.......'.....w0...........
+...9....
+1793308520.256440 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 51113, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.50962: Flags [P.], cksum 0x1cad (incorrect -> 0x7e5e), seq 668779209:668779482, ack 2526574384, win 509, options [nop,nop,TS val 3805261372 ecr 4044737738], length 273
+E..E..@.@.V.
+..Q
+.......'.....w0...........
+...<....HTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:15:20 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308520.256559 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 9367, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.50962 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x3a30), ack 668779482, win 501, options [nop,nop,TS val 4044737741 ecr 3805261372], length 0
+E..4$.@.?...
+...
+..Q......w0'..............
+.......<
+1793308520.256737 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 51114, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.50962: Flags [F.], cksum 0x1b9c (incorrect -> 0x3a26), seq 668779482, ack 2526574384, win 509, options [nop,nop,TS val 3805261373 ecr 4044737741], length 0
+E..4..@.@.W.
+..Q
+.......'.....w0...........
+...=....
+1793308520.256786 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 9368, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.50962 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0x3a2e), seq 2526574384, ack 668779482, win 501, options [nop,nop,TS val 4044737742 ecr 3805261372], length 0
+E..4$.@.?...
+...
+..Q......w0'..............
+.......<
+1793308520.256802 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 51115, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.50962: Flags [.], cksum 0x1b9c (incorrect -> 0x3a24), ack 2526574385, win 509, options [nop,nop,TS val 3805261373 ecr 4044737742], length 0
+E..4..@.@.W.
+..Q
+.......'.....w1...........
+...=....
+1793308520.256872 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 9369, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.50962 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x3a2c), ack 668779483, win 501, options [nop,nop,TS val 4044737742 ecr 3805261373], length 0
+E..4$.@.?...
+...
+..Q......w1'..............
+.......=
+1793308525.252385 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 2280, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.33434 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0xc0d1), seq 1899404271, win 64240, options [mss 1460,sackOK,TS val 4044742737 ecr 0,nop,wscale 7], length 0
+E..<..@.?.._
+...
+..Q....q6.....................
+...Q........
+1793308525.252426 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.33434: Flags [S.], cksum 0x1ba4 (incorrect -> 0x0aa8), seq 3679662748, ack 1899404272, win 65160, options [mss 1460,sackOK,TS val 3805266368 ecr 4044742737,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+........S2.q6.................
+.......Q....
+1793308525.252522 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 2281, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.33434 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x3607), ack 3679662749, win 502, options [nop,nop,TS val 4044742737 ecr 3805266368], length 0
+E..4..@.?..f
+...
+..Q....q6...S2............
+...Q....
+1793308525.252804 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 2282, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.33434 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0xe8f2), seq 1899404272:1899404390, ack 3679662749, win 502, options [nop,nop,TS val 4044742738 ecr 3805266368], length 118
+E.....@.?...
+...
+..Q....q6...S2............
+...R....GET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308525.252821 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 59795, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.33434: Flags [.], cksum 0x1b9c (incorrect -> 0x3588), ack 1899404390, win 509, options [nop,nop,TS val 3805266369 ecr 4044742738], length 0
+E..4..@.@.5.
+..Q
+........S2.q6.f...........
+.......R
+1793308525.256703 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 59796, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.33434: Flags [P.], cksum 0x1cad (incorrect -> 0x78a2), seq 3679662749:3679663022, ack 1899404390, win 509, options [nop,nop,TS val 3805266373 ecr 4044742738], length 273
+E..E..@.@.4.
+..Q
+........S2.q6.f...........
+.......RHTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:15:24 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308525.256817 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 2283, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.33434 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x3477), ack 3679663022, win 501, options [nop,nop,TS val 4044742742 ecr 3805266373], length 0
+E..4..@.?..d
+...
+..Q....q6.f.S3............
+...V....
+1793308525.256960 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 59797, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.33434: Flags [F.], cksum 0x1b9c (incorrect -> 0x346e), seq 3679663022, ack 1899404390, win 509, options [nop,nop,TS val 3805266373 ecr 4044742742], length 0
+E..4..@.@.5.
+..Q
+........S3.q6.f...........
+.......V
+1793308525.256966 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 2284, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.33434 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0x3476), seq 1899404390, ack 3679663022, win 501, options [nop,nop,TS val 4044742742 ecr 3805266373], length 0
+E..4..@.?..c
+...
+..Q....q6.f.S3............
+...V....
+1793308525.257039 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 2285, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.33434 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x3475), ack 3679663023, win 501, options [nop,nop,TS val 4044742742 ecr 3805266373], length 0
+E..4..@.?..b
+...
+..Q....q6.g.S3............
+...V....
+1793308525.257051 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 59798, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.33434: Flags [.], cksum 0x1b9c (incorrect -> 0x346d), ack 1899404391, win 509, options [nop,nop,TS val 3805266373 ecr 4044742742], length 0
+E..4..@.@.5.
+..Q
+........S3.q6.g...........
+.......V
+1793308530.252893 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 33266, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.33436 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0x5755), seq 198596417, win 64240, options [mss 1460,sackOK,TS val 4044747738 ecr 0,nop,wscale 7], length 0
+E..<..@.?..T
+...
+..Q......WA...................
+............
+1793308530.252925 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.33436: Flags [S.], cksum 0x1ba4 (incorrect -> 0x7c34), seq 2226625190, ack 198596418, win 65160, options [mss 1460,sackOK,TS val 3805271369 ecr 4044747738,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+.............WB...............
+...I........
+1793308530.253040 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 33267, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.33436 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xa793), ack 2226625191, win 502, options [nop,nop,TS val 4044747738 ecr 3805271369], length 0
+E..4..@.?..[
+...
+..Q......WB...............
+.......I
+1793308530.253354 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 33268, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.33436 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0x5a80), seq 198596418:198596536, ack 2226625191, win 502, options [nop,nop,TS val 4044747738 ecr 3805271369], length 118
+E.....@.?...
+...
+..Q......WB...............
+.......IGET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308530.253369 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 44318, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.33436: Flags [.], cksum 0x1b9c (incorrect -> 0xa716), ack 198596536, win 509, options [nop,nop,TS val 3805271369 ecr 4044747738], length 0
+E..4..@.@.r0
+..Q
+.............W............
+...I....
+1793308530.255932 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 44319, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.33436: Flags [P.], cksum 0x1cad (incorrect -> 0xea2c), seq 2226625191:2226625464, ack 198596536, win 509, options [nop,nop,TS val 3805271372 ecr 4044747738], length 273
+E..E..@.@.q.
+..Q
+.............W............
+...L....HTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:15:29 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308530.256010 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 33269, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.33436 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xa607), ack 2226625464, win 501, options [nop,nop,TS val 4044747741 ecr 3805271372], length 0
+E..4..@.?..Y
+...
+..Q......W................
+.......L
+1793308530.256110 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 44320, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.33436: Flags [F.], cksum 0x1b9c (incorrect -> 0xa5fe), seq 2226625464, ack 198596536, win 509, options [nop,nop,TS val 3805271372 ecr 4044747741], length 0
+E..4. @.@.r.
+..Q
+.............W............
+...L....
+1793308530.256257 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 33270, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.33436 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0xa605), seq 198596536, ack 2226625465, win 501, options [nop,nop,TS val 4044747741 ecr 3805271372], length 0
+E..4..@.?..X
+...
+..Q......W................
+.......L
+1793308530.256278 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 44321, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.33436: Flags [.], cksum 0x1b9c (incorrect -> 0xa5fd), ack 198596537, win 509, options [nop,nop,TS val 3805271372 ecr 4044747741], length 0
+E..4.!@.@.r-
+..Q
+.............W............
+...L....
+1793308535.252994 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 43715, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.54168 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0x1f03), seq 3918286168, win 64240, options [mss 1460,sackOK,TS val 4044752738 ecr 0,nop,wscale 7], length 0
+E..<..@.?.u.
+...
+..Q......MX...................
+...b........
+1793308535.253026 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.54168: Flags [S.], cksum 0x1ba4 (incorrect -> 0x9545), seq 23640330, ack 3918286169, win 65160, options [mss 1460,sackOK,TS val 3805276369 ecr 4044752738,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+........h.
+..MY...............
+.......b....
+1793308535.253134 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 43716, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.54168 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xc0a4), ack 23640331, win 502, options [nop,nop,TS val 4044752738 ecr 3805276369], length 0
+E..4..@.?.u.
+...
+..Q......MY.h.............
+...b....
+1793308535.253812 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 43717, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.54168 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0x7390), seq 3918286169:3918286287, ack 23640331, win 502, options [nop,nop,TS val 4044752739 ecr 3805276369], length 118
+E.....@.?.u.
+...
+..Q......MY.h.............
+...c....GET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308535.253843 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 42612, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.54168: Flags [.], cksum 0x1b9c (incorrect -> 0xc025), ack 3918286287, win 509, options [nop,nop,TS val 3805276370 ecr 4044752739], length 0
+E..4.t@.@.x.
+..Q
+........h....M............
+.......c
+1793308535.258096 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 42613, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.54168: Flags [P.], cksum 0x1cad (incorrect -> 0x0240), seq 23640331:23640604, ack 3918286287, win 509, options [nop,nop,TS val 3805276374 ecr 4044752739], length 273
+E..E.u@.@.w.
+..Q
+........h....M............
+.......cHTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:15:34 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308535.258209 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 43718, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.54168 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xbf14), ack 23640604, win 501, options [nop,nop,TS val 4044752743 ecr 3805276374], length 0
+E..4..@.?.u.
+...
+..Q......M..h.............
+...g....
+1793308535.258411 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 42614, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.54168: Flags [F.], cksum 0x1b9c (incorrect -> 0xbf0b), seq 23640604, ack 3918286287, win 509, options [nop,nop,TS val 3805276374 ecr 4044752743], length 0
+E..4.v@.@.x.
+..Q
+........h....M............
+.......g
+1793308535.258442 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 43719, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.54168 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0xbf13), seq 3918286287, ack 23640604, win 501, options [nop,nop,TS val 4044752743 ecr 3805276374], length 0
+E..4..@.?.u.
+...
+..Q......M..h.............
+...g....
+1793308535.258504 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 43720, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.54168 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xbf12), ack 23640605, win 501, options [nop,nop,TS val 4044752743 ecr 3805276374], length 0
+E..4..@.?.u.
+...
+..Q......M..h.............
+...g....
+1793308535.258524 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 42615, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.54168: Flags [.], cksum 0x1b9c (incorrect -> 0xbf0a), ack 3918286288, win 509, options [nop,nop,TS val 3805276374 ecr 4044752743], length 0
+E..4.w@.@.x.
+..Q
+........h....M............
+.......g
+1793308540.252563 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 42731, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.54176 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0xc5e7), seq 4019162337, win 64240, options [mss 1460,sackOK,TS val 4044757737 ecr 0,nop,wscale 7], length 0
+E..<..@.?.y[
+...
+..Q...........................
+............
+1793308540.252620 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.54176: Flags [S.], cksum 0x1ba4 (incorrect -> 0xba2b), seq 939127023, ack 4019162338, win 65160, options [mss 1460,sackOK,TS val 3805281369 ecr 4044757737,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+.......7......................
+...Y........
+1793308540.252728 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 42732, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.54176 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xe589), ack 939127024, win 502, options [nop,nop,TS val 4044757738 ecr 3805281369], length 0
+E..4..@.?.yb
+...
+..Q........7..............
+.......Y
+1793308540.253615 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 42733, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.54176 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0x9876), seq 4019162338:4019162456, ack 939127024, win 502, options [nop,nop,TS val 4044757738 ecr 3805281369], length 118
+E.....@.?.x.
+...
+..Q........7..............
+.......YGET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308540.253641 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 14093, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.54176: Flags [.], cksum 0x1b9c (incorrect -> 0xe50b), ack 4019162456, win 509, options [nop,nop,TS val 3805281370 ecr 4044757738], length 0
+E..47.@.@..A
+..Q
+.......7......X...........
+...Z....
+1793308540.257438 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 14094, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.54176: Flags [P.], cksum 0x1cad (incorrect -> 0x2722), seq 939127024:939127297, ack 4019162456, win 509, options [nop,nop,TS val 3805281373 ecr 4044757738], length 273
+E..E7.@.@../
+..Q
+.......7......X...........
+...]....HTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:15:39 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308540.257558 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 42734, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.54176 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xe3fb), ack 939127297, win 501, options [nop,nop,TS val 4044757742 ecr 3805281373], length 0
+E..4..@.?.y`
+...
+..Q.......X7..............
+.......]
+1793308540.257765 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 14095, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.54176: Flags [F.], cksum 0x1b9c (incorrect -> 0xe3f1), seq 939127297, ack 4019162456, win 509, options [nop,nop,TS val 3805281374 ecr 4044757742], length 0
+E..47.@.@..?
+..Q
+.......7......X...........
+...^....
+1793308540.257797 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 42735, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.54176 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0xe3f9), seq 4019162456, ack 939127297, win 501, options [nop,nop,TS val 4044757743 ecr 3805281373], length 0
+E..4..@.?.y_
+...
+..Q.......X7..............
+.......]
+1793308540.257860 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 42736, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.54176 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xe3f7), ack 939127298, win 501, options [nop,nop,TS val 4044757743 ecr 3805281374], length 0
+E..4..@.?.y^
+...
+..Q.......Y7..............
+.......^
+1793308540.257872 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 14096, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.54176: Flags [.], cksum 0x1b9c (incorrect -> 0xe3ef), ack 4019162457, win 509, options [nop,nop,TS val 3805281374 ecr 4044757743], length 0
+E..47.@.@..>
+..Q
+.......7......Y...........
+...^....
+1793308545.252347 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 3040, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.51326 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0xca24), seq 1041445307, win 64240, options [mss 1460,sackOK,TS val 4044762737 ecr 0,nop,wscale 7], length 0
+E..<..@.?..g
+...
+..Q.~..>.1....................
+...q........
+1793308545.252380 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.51326: Flags [S.], cksum 0x1ba4 (incorrect -> 0x3d4e), seq 3599482864, ack 1041445308, win 65160, options [mss 1460,sackOK,TS val 3805286368 ecr 4044762737,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+......~....>.1................
+.......q....
+1793308545.252472 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 3041, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.51326 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x68ad), ack 3599482865, win 502, options [nop,nop,TS val 4044762737 ecr 3805286368], length 0
+E..4..@.?..n
+...
+..Q.~..>.1................
+...q....
+1793308545.252953 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 3042, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.51326 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0x1b99), seq 1041445308:1041445426, ack 3599482865, win 502, options [nop,nop,TS val 4044762738 ecr 3805286368], length 118
+E.....@.?...
+...
+..Q.~..>.1................
+...r....GET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308545.252988 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 4663, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.51326: Flags [.], cksum 0x1b9c (incorrect -> 0x682e), ack 1041445426, win 509, options [nop,nop,TS val 3805286369 ecr 4044762738], length 0
+E..4.7@.@...
+..Q
+......~....>.22...........
+.......r
+1793308545.256712 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 4664, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.51326: Flags [P.], cksum 0x1cad (incorrect -> 0xa948), seq 3599482865:3599483138, ack 1041445426, win 509, options [nop,nop,TS val 3805286373 ecr 4044762738], length 273
+E..E.8@.@...
+..Q
+......~....>.22...........
+.......rHTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:15:44 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308545.256830 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 3043, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.51326 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x671d), ack 3599483138, win 501, options [nop,nop,TS val 4044762742 ecr 3805286373], length 0
+E..4..@.?..l
+...
+..Q.~..>.22...............
+...v....
+1793308545.256971 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 4665, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.51326: Flags [F.], cksum 0x1b9c (incorrect -> 0x6714), seq 3599483138, ack 1041445426, win 509, options [nop,nop,TS val 3805286373 ecr 4044762742], length 0
+E..4.9@.@...
+..Q
+......~....>.22...........
+.......v
+1793308545.257220 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 3044, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.51326 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0x671b), seq 1041445426, ack 3599483139, win 501, options [nop,nop,TS val 4044762742 ecr 3805286373], length 0
+E..4..@.?..k
+...
+..Q.~..>.22...............
+...v....
+1793308545.257240 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 4666, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.51326: Flags [.], cksum 0x1b9c (incorrect -> 0x6713), ack 1041445427, win 509, options [nop,nop,TS val 3805286373 ecr 4044762742], length 0
+E..4.:@.@...
+..Q
+......~....>.23...........
+.......v
+1793308550.252375 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 3857, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.51328 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0x350d), seq 687327332, win 64240, options [mss 1460,sackOK,TS val 4044767737 ecr 0,nop,wscale 7], length 0
+E..<..@.?..6
+...
+..Q....(..d...................
+..A.........
+1793308550.252413 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.51328: Flags [S.], cksum 0x1ba4 (incorrect -> 0x854f), seq 3229214049, ack 687327333, win 65160, options [mss 1460,sackOK,TS val 3805291368 ecr 4044767737,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+........y.a(..e...............
+..#h..A.....
+1793308550.252507 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 3858, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.51328 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xb0ae), ack 3229214050, win 502, options [nop,nop,TS val 4044767737 ecr 3805291368], length 0
+E..4..@.?..=
+...
+..Q....(..e.y.b...........
+..A...#h
+1793308550.253043 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 3859, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.51328 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0x639a), seq 687327333:687327451, ack 3229214050, win 502, options [nop,nop,TS val 4044767738 ecr 3805291368], length 118
+E.....@.?...
+...
+..Q....(..e.y.b...........
+..A...#hGET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308550.253067 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 64509, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.51328: Flags [.], cksum 0x1b9c (incorrect -> 0xb02f), ack 687327451, win 509, options [nop,nop,TS val 3805291369 ecr 4044767738], length 0
+E..4..@.@.#Q
+..Q
+........y.b(..............
+..#i..A.
+1793308550.257140 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 64510, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.51328: Flags [P.], cksum 0x1cad (incorrect -> 0xf144), seq 3229214050:3229214323, ack 687327451, win 509, options [nop,nop,TS val 3805291373 ecr 4044767738], length 273
+E..E..@.@."?
+..Q
+........y.b(..............
+..#m..A.HTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:15:49 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308550.257312 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 3860, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.51328 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xaf1e), ack 3229214323, win 501, options [nop,nop,TS val 4044767742 ecr 3805291373], length 0
+E..4..@.?..;
+...
+..Q....(....y.s...........
+..A...#m
+1793308550.257496 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 64511, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.51328: Flags [F.], cksum 0x1b9c (incorrect -> 0xaf15), seq 3229214323, ack 687327451, win 509, options [nop,nop,TS val 3805291373 ecr 4044767742], length 0
+E..4..@.@.#O
+..Q
+........y.s(..............
+..#m..A.
+1793308550.257562 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 3861, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.51328 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0xaf1d), seq 687327451, ack 3229214323, win 501, options [nop,nop,TS val 4044767742 ecr 3805291373], length 0
+E..4..@.?..:
+...
+..Q....(....y.s...........
+..A...#m
+1793308550.257605 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 64512, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.51328: Flags [.], cksum 0x1b9c (incorrect -> 0xaf14), ack 687327452, win 509, options [nop,nop,TS val 3805291373 ecr 4044767742], length 0
+E..4..@.@.#N
+..Q
+........y.t(..............
+..#m..A.
+1793308550.257690 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 3862, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.51328 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xaf1b), ack 3229214324, win 501, options [nop,nop,TS val 4044767743 ecr 3805291373], length 0
+E..4..@.?..9
+...
+..Q....(....y.t...........
+..A...#m
+1793308555.252721 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 23932, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.52704 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0xbd44), seq 653732165, win 64240, options [mss 1460,sackOK,TS val 4044772737 ecr 0,nop,wscale 7], length 0
+E..<]|@.?...
+...
+..Q....&.)E...................
+..U.........
+1793308555.252768 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.52704: Flags [S.], cksum 0x1ba4 (incorrect -> 0xcb8b), seq 1278642199, ack 653732166, win 65160, options [mss 1460,sackOK,TS val 3805296369 ecr 4044772737,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+.......L6..&.)F...............
+..6...U.....
+1793308555.252896 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 23933, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.52704 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xf6e9), ack 1278642200, win 502, options [nop,nop,TS val 4044772738 ecr 3805296369], length 0
+E..4]}@.?...
+...
+..Q....&.)FL6.............
+..U...6.
+1793308555.253312 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 23934, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.52704 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0xa9d6), seq 653732166:653732284, ack 1278642200, win 502, options [nop,nop,TS val 4044772738 ecr 3805296369], length 118
+E...]~@.?..Z
+...
+..Q....&.)FL6.............
+..U...6.GET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308555.253337 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 13317, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.52704: Flags [.], cksum 0x1b9c (incorrect -> 0xf66c), ack 653732284, win 509, options [nop,nop,TS val 3805296369 ecr 4044772738], length 0
+E..44.@.@..I
+..Q
+.......L6..&.)............
+..6...U.
+1793308555.257193 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 13318, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.52704: Flags [P.], cksum 0x1cad (incorrect -> 0x3687), seq 1278642200:1278642473, ack 653732284, win 509, options [nop,nop,TS val 3805296373 ecr 4044772738], length 273
+E..E4.@.@..7
+..Q
+.......L6..&.)............
+..6...U.HTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:15:54 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308555.257315 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 23935, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.52704 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xf55b), ack 1278642473, win 501, options [nop,nop,TS val 4044772742 ecr 3805296373], length 0
+E..4].@.?...
+...
+..Q....&.).L6.)...........
+..U...6.
+1793308555.257457 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 13319, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.52704: Flags [F.], cksum 0x1b9c (incorrect -> 0xf552), seq 1278642473, ack 653732284, win 509, options [nop,nop,TS val 3805296373 ecr 4044772742], length 0
+E..44.@.@..G
+..Q
+.......L6.)&.)............
+..6...U.
+1793308555.257762 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 23936, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.52704 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0xf558), seq 653732284, ack 1278642474, win 501, options [nop,nop,TS val 4044772743 ecr 3805296373], length 0
+E..4].@.?...
+...
+..Q....&.).L6.*...........
+..U...6.
+1793308555.257787 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 13320, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.52704: Flags [.], cksum 0x1b9c (incorrect -> 0xf54f), ack 653732285, win 509, options [nop,nop,TS val 3805296374 ecr 4044772743], length 0
+E..44.@.@..F
+..Q
+.......L6.*&.)............
+..6...U.
+1793308560.252853 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 1264, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.52710 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0x30a9), seq 3560961288, win 64240, options [mss 1460,sackOK,TS val 4044777738 ecr 0,nop,wscale 7], length 0
+E..<..@.?..W
+...
+..Q.....?.....................
+..i
+........
+1793308560.252887 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.52710: Flags [S.], cksum 0x1ba4 (incorrect -> 0x1acb), seq 962767752, ack 3560961289, win 65160, options [mss 1460,sackOK,TS val 3805301369 ecr 4044777738,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+.......9b...?.	...............
+..Jy..i
+....
+1793308560.252978 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 1265, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.52710 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x462a), ack 962767753, win 502, options [nop,nop,TS val 4044777738 ecr 3805301369], length 0
+E..4..@.?..^
+...
+..Q.....?.	9b.............
+..i
+..Jy
+1793308560.253367 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 1266, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.52710 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0xf916), seq 3560961289:3560961407, ack 962767753, win 502, options [nop,nop,TS val 4044777738 ecr 3805301369], length 118
+E.....@.?...
+...
+..Q.....?.	9b.............
+..i
+..JyGET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308560.253385 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 33401, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.52710: Flags [.], cksum 0x1b9c (incorrect -> 0x45ad), ack 3560961407, win 509, options [nop,nop,TS val 3805301369 ecr 4044777738], length 0
+E..4.y@.@...
+..Q
+.......9b...?.............
+..Jy..i
+
+1793308560.256290 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 33402, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.52710: Flags [P.], cksum 0x1cad (incorrect -> 0x85c3), seq 962767753:962768026, ack 3560961407, win 509, options [nop,nop,TS val 3805301372 ecr 4044777738], length 273
+E..E.z@.@...
+..Q
+.......9b...?.............
+..J|..i
+HTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:15:59 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308560.256376 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 1267, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.52710 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x449e), ack 962768026, win 501, options [nop,nop,TS val 4044777741 ecr 3805301372], length 0
+E..4..@.?..\
+...
+..Q.....?..9b.............
+..i...J|
+1793308560.256492 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 33403, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.52710: Flags [F.], cksum 0x1b9c (incorrect -> 0x4495), seq 962768026, ack 3560961407, win 509, options [nop,nop,TS val 3805301372 ecr 4044777741], length 0
+E..4.{@.@...
+..Q
+.......9b...?.............
+..J|..i
+1793308560.256617 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 1268, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.52710 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0x449c), seq 3560961407, ack 962768027, win 501, options [nop,nop,TS val 4044777741 ecr 3805301372], length 0
+E..4..@.?..[
+...
+..Q.....?..9b.............
+..i...J|
+1793308560.256643 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 33404, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.52710: Flags [.], cksum 0x1b9c (incorrect -> 0x4493), ack 3560961408, win 509, options [nop,nop,TS val 3805301373 ecr 4044777741], length 0
+E..4.|@.@...
+..Q
+.......9b...?.............
+..J}..i
+1793308565.252764 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 32961, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.48716 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0x858f), seq 3187978864, win 64240, options [mss 1460,sackOK,TS val 4044782737 ecr 0,nop,wscale 7], length 0
+E..<..@.?...
+...
+..Q.L.....p...................
+..|.........
+1793308565.252811 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.48716: Flags [S.], cksum 0x1ba4 (incorrect -> 0xe6bf), seq 1897392444, ack 3187978865, win 65160, options [mss 1460,sackOK,TS val 3805306369 ecr 4044782737,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+......Lq..<...q...............
+..^...|.....
+1793308565.252944 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 32962, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.48716 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x121e), ack 1897392445, win 502, options [nop,nop,TS val 4044782738 ecr 3805306369], length 0
+E..4..@.?...
+...
+..Q.L.....qq..=...........
+..|...^.
+1793308565.253444 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 32963, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.48716 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0xc50a), seq 3187978865:3187978983, ack 1897392445, win 502, options [nop,nop,TS val 4044782738 ecr 3805306369], length 118
+E.....@.?...
+...
+..Q.L.....qq..=...........
+..|...^.GET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308565.253468 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 61960, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.48716: Flags [.], cksum 0x1b9c (incorrect -> 0x11a1), ack 3187978983, win 509, options [nop,nop,TS val 3805306369 ecr 4044782738], length 0
+E..4..@.@.-F
+..Q
+......Lq..=...............
+..^...|.
+1793308565.257166 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 61961, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.48716: Flags [P.], cksum 0x1cad (incorrect -> 0x55bb), seq 1897392445:1897392718, ack 3187978983, win 509, options [nop,nop,TS val 3805306373 ecr 4044782738], length 273
+E..E.	@.@.,4
+..Q
+......Lq..=...............
+..^...|.HTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:16:04 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308565.257302 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 32964, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.48716 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x1090), ack 1897392718, win 501, options [nop,nop,TS val 4044782742 ecr 3805306373], length 0
+E..4..@.?...
+...
+..Q.L......q..N...........
+..|...^.
+1793308565.257412 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 32965, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.48716 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0x108f), seq 3187978983, ack 1897392718, win 501, options [nop,nop,TS val 4044782742 ecr 3805306373], length 0
+E..4..@.?...
+...
+..Q.L......q..N...........
+..|...^.
+1793308565.257449 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 61962, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.48716: Flags [F.], cksum 0x1b9c (incorrect -> 0x1086), seq 1897392718, ack 3187978984, win 509, options [nop,nop,TS val 3805306373 ecr 4044782742], length 0
+E..4.
+@.@.-D
+..Q
+......Lq..N...............
+..^...|.
+1793308565.257530 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 32966, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.48716 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x108e), ack 1897392719, win 501, options [nop,nop,TS val 4044782742 ecr 3805306373], length 0
+E..4..@.?...
+...
+..Q.L......q..O...........
+..|...^.
+1793308570.252238 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 3585, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.48724 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0x5570), seq 165053230, win 64240, options [mss 1460,sackOK,TS val 4044787737 ecr 0,nop,wscale 7], length 0
+E..<..@.?..F
+...
+..Q.T..	......................
+............
+1793308570.252276 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.48724: Flags [S.], cksum 0x1ba4 (incorrect -> 0xbc81), seq 56245650, ack 165053231, win 65160, options [mss 1460,sackOK,TS val 3805311368 ecr 4044787737,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+......T.Z=.	../...............
+..q.........
+1793308570.252376 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 3586, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.48724 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xe7e0), ack 56245651, win 502, options [nop,nop,TS val 4044787737 ecr 3805311368], length 0
+E..4..@.?..M
+...
+..Q.T..	../.Z=............
+......q.
+1793308570.252814 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 3587, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.48724 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0x9acc), seq 165053231:165053349, ack 56245651, win 502, options [nop,nop,TS val 4044787738 ecr 3805311368], length 118
+E.....@.?...
+...
+..Q.T..	../.Z=............
+......q.GET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308570.252841 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 63975, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.48724: Flags [.], cksum 0x1b9c (incorrect -> 0xe761), ack 165053349, win 509, options [nop,nop,TS val 3805311369 ecr 4044787738], length 0
+E..4..@.@.%g
+..Q
+......T.Z=.	..............
+..q.....
+1793308570.257110 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 63976, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.48724: Flags [P.], cksum 0x1cad (incorrect -> 0x2b77), seq 56245651:56245924, ack 165053349, win 509, options [nop,nop,TS val 3805311373 ecr 4044787738], length 273
+E..E..@.@.$U
+..Q
+......T.Z=.	..............
+..q.....HTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:16:09 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308570.257248 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 3588, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.48724 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xe650), ack 56245924, win 501, options [nop,nop,TS val 4044787742 ecr 3805311373], length 0
+E..4..@.?..K
+...
+..Q.T..	....Z>............
+......q.
+1793308570.257424 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 63977, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.48724: Flags [F.], cksum 0x1b9c (incorrect -> 0xe647), seq 56245924, ack 165053349, win 509, options [nop,nop,TS val 3805311373 ecr 4044787742], length 0
+E..4..@.@.%e
+..Q
+......T.Z>.	..............
+..q.....
+1793308570.257508 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 3589, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.48724 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0xe64f), seq 165053349, ack 56245924, win 501, options [nop,nop,TS val 4044787742 ecr 3805311373], length 0
+E..4..@.?..J
+...
+..Q.T..	....Z>............
+......q.
+1793308570.257529 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 63978, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.48724: Flags [.], cksum 0x1b9c (incorrect -> 0xe646), ack 165053350, win 509, options [nop,nop,TS val 3805311373 ecr 4044787742], length 0
+E..4..@.@.%d
+..Q
+......T.Z>.	..............
+..q.....
+1793308570.257668 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 3590, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.48724 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xe64d), ack 56245925, win 501, options [nop,nop,TS val 4044787743 ecr 3805311373], length 0
+E..4..@.?..I
+...
+..Q.T..	....Z>............
+......q.
+1793308575.252514 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 44752, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.54636 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0x2c3b), seq 3510811222, win 64240, options [mss 1460,sackOK,TS val 4044792737 ecr 0,nop,wscale 7], length 0
+E..<..@.?.qv
+...
+..Q.l...B.V...................
+............
+1793308575.252544 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.54636: Flags [S.], cksum 0x1ba4 (incorrect -> 0xca07), seq 3907521984, ack 3510811223, win 65160, options [mss 1460,sackOK,TS val 3805316368 ecr 4044792737,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+......l.....B.W...............
+............
+1793308575.252630 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 44753, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.54636 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xf565), ack 3907521985, win 502, options [nop,nop,TS val 4044792738 ecr 3805316368], length 0
+E..4..@.?.q}
+...
+..Q.l...B.W...............
+........
+1793308575.252861 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 44754, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.54636 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0xa852), seq 3510811223:3510811341, ack 3907521985, win 502, options [nop,nop,TS val 4044792738 ecr 3805316368], length 118
+E.....@.?.q.
+...
+..Q.l...B.W...............
+........GET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308575.252874 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 61546, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.54636: Flags [.], cksum 0x1b9c (incorrect -> 0xf4e7), ack 3510811341, win 509, options [nop,nop,TS val 3805316369 ecr 4044792738], length 0
+E..4.j@.@...
+..Q
+......l.....B.............
+........
+1793308575.256612 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 61547, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.54636: Flags [P.], cksum 0x1cad (incorrect -> 0x3803), seq 3907521985:3907522258, ack 3510811341, win 509, options [nop,nop,TS val 3805316372 ecr 4044792738], length 273
+E..E.k@.@.-.
+..Q
+......l.....B.............
+........HTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:16:14 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308575.256743 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 44755, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.54636 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xf3d7), ack 3907522258, win 501, options [nop,nop,TS val 4044792742 ecr 3805316372], length 0
+E..4..@.?.q{
+...
+..Q.l...B.................
+........
+1793308575.256885 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 61548, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.54636: Flags [F.], cksum 0x1b9c (incorrect -> 0xf3cd), seq 3907522258, ack 3510811341, win 509, options [nop,nop,TS val 3805316373 ecr 4044792742], length 0
+E..4.l@.@...
+..Q
+......l.....B.............
+........
+1793308575.256966 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 44756, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.54636 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0xf3d6), seq 3510811341, ack 3907522258, win 501, options [nop,nop,TS val 4044792742 ecr 3805316372], length 0
+E..4..@.?.qz
+...
+..Q.l...B.................
+........
+1793308575.256982 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 61549, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.54636: Flags [.], cksum 0x1b9c (incorrect -> 0xf3cc), ack 3510811342, win 509, options [nop,nop,TS val 3805316373 ecr 4044792742], length 0
+E..4.m@.@...
+..Q
+......l.....B.............
+........
+1793308575.257104 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 44757, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.54636 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xf3d4), ack 3907522259, win 501, options [nop,nop,TS val 4044792742 ecr 3805316373], length 0
+E..4..@.?.qy
+...
+..Q.l...B.................
+........
+1793308580.252884 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 19469, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.54638 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0x2481), seq 768102912, win 64240, options [mss 1460,sackOK,TS val 4044797738 ecr 0,nop,wscale 7], length 0
+E..<L.@.?..9
+...
+..Q.n..-.R....................
+...*........
+1793308580.252914 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.54638: Flags [S.], cksum 0x1ba4 (incorrect -> 0xaf82), seq 4162715084, ack 768102913, win 65160, options [mss 1460,sackOK,TS val 3805321369 ecr 4044797738,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+......n....-.R................
+.......*....
+1793308580.252965 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 19470, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.54638 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xdae1), ack 4162715085, win 502, options [nop,nop,TS val 4044797738 ecr 3805321369], length 0
+E..4L.@.?..@
+...
+..Q.n..-.R................
+...*....
+1793308580.253622 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 19471, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.54638 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0x8dce), seq 768102913:768103031, ack 4162715085, win 502, options [nop,nop,TS val 4044797738 ecr 3805321369], length 118
+E...L.@.?...
+...
+..Q.n..-.R................
+...*....GET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308580.253653 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 49755, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.54638: Flags [.], cksum 0x1b9c (incorrect -> 0xda63), ack 768103031, win 509, options [nop,nop,TS val 3805321370 ecr 4044797738], length 0
+E..4.[@.@.\.
+..Q
+......n....-.Rw...........
+.......*
+1793308580.256610 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 49756, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.54638: Flags [P.], cksum 0x1cad (incorrect -> 0x1d7a), seq 4162715085:4162715358, ack 768103031, win 509, options [nop,nop,TS val 3805321373 ecr 4044797738], length 273
+E..E.\@.@.[.
+..Q
+......n....-.Rw...........
+.......*HTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:16:19 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308580.256692 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 19472, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.54638 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xd953), ack 4162715358, win 501, options [nop,nop,TS val 4044797742 ecr 3805321373], length 0
+E..4L.@.?..>
+...
+..Q.n..-.Rw...............
+........
+1793308580.256824 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 49757, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.54638: Flags [F.], cksum 0x1b9c (incorrect -> 0xd94a), seq 4162715358, ack 768103031, win 509, options [nop,nop,TS val 3805321373 ecr 4044797742], length 0
+E..4.]@.@.\.
+..Q
+......n....-.Rw...........
+........
+1793308580.256930 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 19473, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.54638 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0xd951), seq 768103031, ack 4162715359, win 501, options [nop,nop,TS val 4044797742 ecr 3805321373], length 0
+E..4L.@.?..=
+...
+..Q.n..-.Rw...............
+........
+1793308580.256950 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 49758, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.54638: Flags [.], cksum 0x1b9c (incorrect -> 0xd949), ack 768103032, win 509, options [nop,nop,TS val 3805321373 ecr 4044797742], length 0
+E..4.^@.@.\.
+..Q
+......n....-.Rx...........
+........
+1793308585.252189 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 62711, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.34004 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0x4401), seq 3619341728, win 64240, options [mss 1460,sackOK,TS val 4044802737 ecr 0,nop,wscale 7], length 0
+E..<..@.?.+O
+...
+..Q...........................
+............
+1793308585.252229 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.34004: Flags [S.], cksum 0x1ba4 (incorrect -> 0x0100), seq 986871188, ack 3619341729, win 65160, options [mss 1460,sackOK,TS val 3805326368 ecr 4044802737,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+.......:.u....................
+... ........
+1793308585.252325 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 62712, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.34004 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x2c5f), ack 986871189, win 502, options [nop,nop,TS val 4044802737 ecr 3805326368], length 0
+E..4..@.?.+V
+...
+..Q........:.u............
+....... 
+1793308585.252728 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 62713, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.34004 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0xdf4a), seq 3619341729:3619341847, ack 986871189, win 502, options [nop,nop,TS val 4044802738 ecr 3805326368], length 118
+E.....@.?.*.
+...
+..Q........:.u............
+....... GET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308585.252746 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 47963, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.34004: Flags [.], cksum 0x1b9c (incorrect -> 0x2be0), ack 3619341847, win 509, options [nop,nop,TS val 3805326369 ecr 4044802738], length 0
+E..4.[@.@.c.
+..Q
+.......:.u................
+...!....
+1793308585.256657 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 47964, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.34004: Flags [P.], cksum 0x1cad (incorrect -> 0x6dfa), seq 986871189:986871462, ack 3619341847, win 509, options [nop,nop,TS val 3805326373 ecr 4044802738], length 273
+E..E.\@.@.b.
+..Q
+.......:.u................
+...%....HTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:16:24 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308585.256779 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 62714, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.34004 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x2acf), ack 986871462, win 501, options [nop,nop,TS val 4044802742 ecr 3805326373], length 0
+E..4..@.?.+T
+...
+..Q........:.v............
+.......%
+1793308585.256929 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 47965, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.34004: Flags [F.], cksum 0x1b9c (incorrect -> 0x2ac6), seq 986871462, ack 3619341847, win 509, options [nop,nop,TS val 3805326373 ecr 4044802742], length 0
+E..4.]@.@.c.
+..Q
+.......:.v................
+...%....
+1793308585.257006 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 62715, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.34004 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0x2ace), seq 3619341847, ack 986871462, win 501, options [nop,nop,TS val 4044802742 ecr 3805326373], length 0
+E..4..@.?.+S
+...
+..Q........:.v............
+.......%
+1793308585.257025 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 47966, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.34004: Flags [.], cksum 0x1b9c (incorrect -> 0x2ac5), ack 3619341848, win 509, options [nop,nop,TS val 3805326373 ecr 4044802742], length 0
+E..4.^@.@.c.
+..Q
+.......:.v................
+...%....
+1793308585.257111 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 62716, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.34004 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x2acd), ack 986871463, win 501, options [nop,nop,TS val 4044802742 ecr 3805326373], length 0
+E..4..@.?.+R
+...
+..Q........:.v............
+.......%
+1793308590.252297 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 50236, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.34010 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0xd955), seq 190703899, win 64240, options [mss 1460,sackOK,TS val 4044807737 ecr 0,nop,wscale 7], length 0
+E..<.<@.?.\
+
+...
+..Q.....].....................
+...9........
+1793308590.252334 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.34010: Flags [S.], cksum 0x1ba4 (incorrect -> 0x3889), seq 835569884, ack 190703900, win 65160, options [mss 1460,sackOK,TS val 3805331368 ecr 4044807737,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+.......1....].................
+.......9....
+1793308590.252426 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 50237, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.34010 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x63e8), ack 835569885, win 502, options [nop,nop,TS val 4044807737 ecr 3805331368], length 0
+E..4.=@.?.\.
+...
+..Q.....]..1..............
+...9....
+1793308590.252807 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 50238, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.34010 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0x16d4), seq 190703900:190704018, ack 835569885, win 502, options [nop,nop,TS val 4044807738 ecr 3805331368], length 118
+E....>@.?.[.
+...
+..Q.....]..1..............
+...:....GET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308590.252830 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 39774, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.34010: Flags [.], cksum 0x1b9c (incorrect -> 0x6369), ack 190704018, win 509, options [nop,nop,TS val 3805331369 ecr 4044807738], length 0
+E..4.^@.@...
+..Q
+.......1....].............
+.......:
+1793308590.254946 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 39775, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.34010: Flags [P.], cksum 0x1cad (incorrect -> 0xa580), seq 835569885:835570158, ack 190704018, win 509, options [nop,nop,TS val 3805331371 ecr 4044807738], length 273
+E..E._@.@...
+..Q
+.......1....].............
+.......:HTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:16:29 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308590.255028 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 50239, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.34010 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x625c), ack 835570158, win 501, options [nop,nop,TS val 4044807740 ecr 3805331371], length 0
+E..4.?@.?.\.
+...
+..Q.....]..1..............
+...<....
+1793308590.255111 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 39776, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.34010: Flags [F.], cksum 0x1b9c (incorrect -> 0x6253), seq 835570158, ack 190704018, win 509, options [nop,nop,TS val 3805331371 ecr 4044807740], length 0
+E..4.`@.@...
+..Q
+.......1....].............
+.......<
+1793308590.255259 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 50240, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.34010 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0x625a), seq 190704018, ack 835570159, win 501, options [nop,nop,TS val 4044807740 ecr 3805331371], length 0
+E..4.@@.?.\.
+...
+..Q.....]..1..............
+...<....
+1793308590.255280 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 39777, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.34010: Flags [.], cksum 0x1b9c (incorrect -> 0x6252), ack 190704019, win 509, options [nop,nop,TS val 3805331371 ecr 4044807740], length 0
+E..4.a@.@...
+..Q
+.......1....].............
+.......<
+1793308595.253053 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 27226, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.46110 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0x7de1), seq 380761710, win 64240, options [mss 1460,sackOK,TS val 4044812738 ecr 0,nop,wscale 7], length 0
+E..<jZ@.?...
+...
+..Q.......n...................
+............
+1793308595.253089 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.46110: Flags [S.], cksum 0x1ba4 (incorrect -> 0x8538), seq 230699325, ack 380761711, win 65160, options [mss 1460,sackOK,TS val 3805336369 ecr 4044812738,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+.........1=...o...............
+...1........
+1793308595.253192 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 27227, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.46110 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xb097), ack 230699326, win 502, options [nop,nop,TS val 4044812738 ecr 3805336369], length 0
+E..4j[@.?...
+...
+..Q.......o..1>...........
+.......1
+1793308595.253498 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 27228, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.46110 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0x6384), seq 380761711:380761829, ack 230699326, win 502, options [nop,nop,TS val 4044812738 ecr 3805336369], length 118
+E...j\@.?..|
+...
+..Q.......o..1>...........
+.......1GET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308595.253515 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 9223, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.46110: Flags [.], cksum 0x1b9c (incorrect -> 0xb01a), ack 380761829, win 509, options [nop,nop,TS val 3805336369 ecr 4044812738], length 0
+E..4$.@.@..G
+..Q
+.........1>...............
+...1....
+1793308595.256679 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 9224, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.46110: Flags [P.], cksum 0x1cad (incorrect -> 0xf134), seq 230699326:230699599, ack 380761829, win 509, options [nop,nop,TS val 3805336373 ecr 4044812738], length 273
+E..E$.@.@..5
+..Q
+.........1>...............
+...5....HTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:16:34 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308595.256775 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 27229, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.46110 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xaf09), ack 230699599, win 501, options [nop,nop,TS val 4044812742 ecr 3805336373], length 0
+E..4j]@.?...
+...
+..Q..........2O...........
+.......5
+1793308595.256891 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 9225, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.46110: Flags [F.], cksum 0x1b9c (incorrect -> 0xaf00), seq 230699599, ack 380761829, win 509, options [nop,nop,TS val 3805336373 ecr 4044812742], length 0
+E..4$	@.@..E
+..Q
+.........2O...............
+...5....
+1793308595.257194 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 27230, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.46110 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0xaf07), seq 380761829, ack 230699600, win 501, options [nop,nop,TS val 4044812742 ecr 3805336373], length 0
+E..4j^@.?...
+...
+..Q..........2P...........
+.......5
+1793308595.257218 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 9226, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.46110: Flags [.], cksum 0x1b9c (incorrect -> 0xaeff), ack 380761830, win 509, options [nop,nop,TS val 3805336373 ecr 4044812742], length 0
+E..4$
+@.@..D
+..Q
+.........2P...............
+...5....
+1793308600.252535 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 44506, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.46114 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0x0ab2), seq 823802794, win 64240, options [mss 1460,sackOK,TS val 4044817737 ecr 0,nop,wscale 7], length 0
+E..<..@.?.rl
+...
+..Q."..1.;....................
+...I........
+1793308600.252575 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.46114: Flags [S.], cksum 0x1ba4 (incorrect -> 0xbb14), seq 419129711, ack 823802795, win 65160, options [mss 1460,sackOK,TS val 3805341368 ecr 4044817737,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+......"..io1.;................
+.......I....
+1793308600.252715 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 44507, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.46114 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xe672), ack 419129712, win 502, options [nop,nop,TS val 4044817738 ecr 3805341368], length 0
+E..4..@.?.rs
+...
+..Q."..1.;...ip...........
+...J....
+1793308600.252980 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 44508, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.46114 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0x995f), seq 823802795:823802913, ack 419129712, win 502, options [nop,nop,TS val 4044817738 ecr 3805341368], length 118
+E.....@.?.q.
+...
+..Q."..1.;...ip...........
+...J....GET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308600.252995 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 39889, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.46114: Flags [.], cksum 0x1b9c (incorrect -> 0xe5f4), ack 823802913, win 509, options [nop,nop,TS val 3805341369 ecr 4044817738], length 0
+E..4..@.@..}
+..Q
+......"..ip1.<!...........
+.......J
+1793308600.255773 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 39890, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.46114: Flags [P.], cksum 0x1cad (incorrect -> 0x270b), seq 419129712:419129985, ack 823802913, win 509, options [nop,nop,TS val 3805341372 ecr 4044817738], length 273
+E..E..@.@..k
+..Q
+......"..ip1.<!...........
+.......JHTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:16:39 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308600.255856 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 44509, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.46114 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xe4e5), ack 419129985, win 501, options [nop,nop,TS val 4044817741 ecr 3805341372], length 0
+E..4..@.?.rq
+...
+..Q."..1.<!..j............
+...M....
+1793308600.255963 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 39891, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.46114: Flags [F.], cksum 0x1b9c (incorrect -> 0xe4dc), seq 419129985, ack 823802913, win 509, options [nop,nop,TS val 3805341372 ecr 4044817741], length 0
+E..4..@.@..{
+..Q
+......"..j.1.<!...........
+.......M
+1793308600.256117 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 44510, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.46114 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0xe4e3), seq 823802913, ack 419129986, win 501, options [nop,nop,TS val 4044817741 ecr 3805341372], length 0
+E..4..@.?.rp
+...
+..Q."..1.<!..j............
+...M....
+1793308600.256143 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 39892, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.46114: Flags [.], cksum 0x1b9c (incorrect -> 0xe4db), ack 823802914, win 509, options [nop,nop,TS val 3805341372 ecr 4044817741], length 0
+E..4..@.@..z
+..Q
+......"..j.1.<"...........
+.......M
+1793308605.252319 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 9919, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.52126 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0x0bef), seq 1990904280, win 64240, options [mss 1460,sackOK,TS val 4044822737 ecr 0,nop,wscale 7], length 0
+E..<&.@.?...
+...
+..Q....v......................
+............
+1793308605.252351 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.52126: Flags [S.], cksum 0x1ba4 (incorrect -> 0x8a03), seq 452691509, ack 1990904281, win 65160, options [mss 1460,sackOK,TS val 3805346368 ecr 4044822737,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+..........5v..................
+...@........
+1793308605.252411 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 9920, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.52126 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xb562), ack 452691510, win 502, options [nop,nop,TS val 4044822737 ecr 3805346368], length 0
+E..4&.@.?...
+...
+..Q....v......6...........
+.......@
+1793308605.252672 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 9921, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.52126 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0x684e), seq 1990904281:1990904399, ack 452691510, win 502, options [nop,nop,TS val 4044822738 ecr 3805346368], length 118
+E...&.@.?...
+...
+..Q....v......6...........
+.......@GET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308605.252687 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 24548, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.52126: Flags [.], cksum 0x1b9c (incorrect -> 0xb4e3), ack 1990904399, win 509, options [nop,nop,TS val 3805346369 ecr 4044822738], length 0
+E..4_.@.@..j
+..Q
+..........6v..O...........
+...A....
+1793308605.256502 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 24549, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.52126: Flags [P.], cksum 0x1cad (incorrect -> 0xf4fe), seq 452691510:452691783, ack 1990904399, win 509, options [nop,nop,TS val 3805346372 ecr 4044822738], length 273
+E..E_.@.@..X
+..Q
+..........6v..O...........
+...D....HTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:16:44 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308605.256643 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 9922, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.52126 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xb3d3), ack 452691783, win 501, options [nop,nop,TS val 4044822742 ecr 3805346372], length 0
+E..4&.@.?...
+...
+..Q....v..O...G...........
+.......D
+1793308605.256774 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 9923, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.52126 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0xb3d2), seq 1990904399, ack 452691783, win 501, options [nop,nop,TS val 4044822742 ecr 3805346372], length 0
+E..4&.@.?...
+...
+..Q....v..O...G...........
+.......D
+1793308605.256793 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 24550, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.52126: Flags [F.], cksum 0x1b9c (incorrect -> 0xb3c8), seq 452691783, ack 1990904400, win 509, options [nop,nop,TS val 3805346373 ecr 4044822742], length 0
+E..4_.@.@..h
+..Q
+..........Gv..P...........
+...E....
+1793308605.256868 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 9924, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.52126 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xb3d0), ack 452691784, win 501, options [nop,nop,TS val 4044822742 ecr 3805346373], length 0
+E..4&.@.?...
+...
+..Q....v..P...H...........
+.......E
+1793308610.252741 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 63930, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.52134 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0x0d57), seq 2839183951, win 64240, options [mss 1460,sackOK,TS val 4044827738 ecr 0,nop,wscale 7], length 0
+E..<..@.?.&.
+...
+..Q.....:.O...................
+..,Z........
+1793308610.252776 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.52134: Flags [S.], cksum 0x1ba4 (incorrect -> 0x28fc), seq 3845196517, ack 2839183952, win 65160, options [mss 1460,sackOK,TS val 3805351369 ecr 4044827738,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+........1
+..:.P...............
+......,Z....
+1793308610.252880 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 63931, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.52134 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x545b), ack 3845196518, win 502, options [nop,nop,TS val 4044827738 ecr 3805351369], length 0
+E..4..@.?.&.
+...
+..Q.....:.P.1
+............
+..,Z...
+1793308610.253264 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 63932, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.52134 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0x0748), seq 2839183952:2839184070, ack 3845196518, win 502, options [nop,nop,TS val 4044827738 ecr 3805351369], length 118
+E.....@.?.&.
+...
+..Q.....:.P.1
+............
+..,Z....GET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308610.253281 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 38185, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.52134: Flags [.], cksum 0x1b9c (incorrect -> 0x53de), ack 2839184070, win 509, options [nop,nop,TS val 3805351369 ecr 4044827738], length 0
+E..4.)@.@..%
+..Q
+........1
+..:.............
+......,Z
+1793308610.257395 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 38186, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.52134: Flags [P.], cksum 0x1cad (incorrect -> 0x93f3), seq 3845196518:3845196791, ack 2839184070, win 509, options [nop,nop,TS val 3805351373 ecr 4044827738], length 273
+E..E.*@.@...
+..Q
+........1
+..:.............
+......,ZHTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:16:49 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308610.257524 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 63933, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.52134 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x52cd), ack 3845196791, win 501, options [nop,nop,TS val 4044827742 ecr 3805351373], length 0
+E..4..@.?.&.
+...
+..Q.....:...1.............
+..,^...
+1793308610.257701 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 38187, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.52134: Flags [F.], cksum 0x1b9c (incorrect -> 0x52c3), seq 3845196791, ack 2839184070, win 509, options [nop,nop,TS val 3805351374 ecr 4044827742], length 0
+E..4.+@.@..#
+..Q
+........1...:.............
+......,^
+1793308610.257784 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 63934, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.52134 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0x52cb), seq 2839184070, ack 3845196791, win 501, options [nop,nop,TS val 4044827743 ecr 3805351373], length 0
+E..4..@.?.&.
+...
+..Q.....:...1.............
+..,_...
+1793308610.257803 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 38188, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.52134: Flags [.], cksum 0x1b9c (incorrect -> 0x52c1), ack 2839184071, win 509, options [nop,nop,TS val 3805351374 ecr 4044827743], length 0
+E..4.,@.@.."
+..Q
+........1...:.............
+......,_
+1793308610.257869 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 63935, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.52134 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0x52c9), ack 3845196792, win 501, options [nop,nop,TS val 4044827743 ecr 3805351374], length 0
+E..4..@.?.&.
+...
+..Q.....:...1.............
+..,_...
+1793308615.253039 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 30628, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.34752 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0x59ec), seq 3381151178, win 64240, options [mss 1460,sackOK,TS val 4044832738 ecr 0,nop,wscale 7], length 0
+E..<w.@.?...
+...
+..Q......E....................
+..?.........
+1793308615.253084 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.34752: Flags [S.], cksum 0x1ba4 (incorrect -> 0xb934), seq 1582709397, ack 3381151179, win 65160, options [mss 1460,sackOK,TS val 3805356369 ecr 4044832738,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+.......^V:...E................
+..!Q..?.....
+1793308615.253191 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 30629, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.34752 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xe493), ack 1582709398, win 502, options [nop,nop,TS val 4044832738 ecr 3805356369], length 0
+E..4w.@.?...
+...
+..Q......E.^V:............
+..?...!Q
+1793308615.253605 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 30630, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.34752 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0x9780), seq 3381151179:3381151297, ack 1582709398, win 502, options [nop,nop,TS val 4044832738 ecr 3805356369], length 118
+E...w.@.?..2
+...
+..Q......E.^V:............
+..?...!QGET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308615.253636 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 32551, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.34752: Flags [.], cksum 0x1b9c (incorrect -> 0xe415), ack 3381151297, win 509, options [nop,nop,TS val 3805356370 ecr 4044832738], length 0
+E..4.'@.@..'
+..Q
+.......^V:...FA...........
+..!R..?.
+1793308615.256425 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 32552, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.34752: Flags [P.], cksum 0x1cad (incorrect -> 0x2332), seq 1582709398:1582709671, ack 3381151297, win 509, options [nop,nop,TS val 3805356372 ecr 4044832738], length 273
+E..E.(@.@...
+..Q
+.......^V:...FA...........
+..!T..?.HTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:16:54 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308615.256508 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 30631, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.34752 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xe307), ack 1582709671, win 501, options [nop,nop,TS val 4044832741 ecr 3805356372], length 0
+E..4w.@.?...
+...
+..Q......FA^V;............
+..?...!T
+1793308615.256637 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 32553, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.34752: Flags [F.], cksum 0x1b9c (incorrect -> 0xe2fd), seq 1582709671, ack 3381151297, win 509, options [nop,nop,TS val 3805356373 ecr 4044832741], length 0
+E..4.)@.@..%
+..Q
+.......^V;...FA...........
+..!U..?.
+1793308615.256770 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 30632, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.34752 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0xe303), seq 3381151297, ack 1582709672, win 501, options [nop,nop,TS val 4044832742 ecr 3805356373], length 0
+E..4w.@.?...
+...
+..Q......FA^V;............
+..?...!U
+1793308615.256795 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 32554, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.34752: Flags [.], cksum 0x1b9c (incorrect -> 0xe2fb), ack 3381151298, win 509, options [nop,nop,TS val 3805356373 ecr 4044832742], length 0
+E..4.*@.@..$
+..Q
+.......^V;...FB...........
+..!U..?.
+1793308620.252805 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 63, id 27314, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.249.34756 > 10.22.3.81.4000: Flags [S], cksum 0x1ba4 (incorrect -> 0x7168), seq 2507689682, win 64240, options [mss 1460,sackOK,TS val 4044837738 ecr 0,nop,wscale 7], length 0
+E..<j.@.?...
+...
+..Q.....xN....................
+..Sj........
+1793308620.252833 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 74: (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 60)
+    10.22.3.81.4000 > 10.22.3.249.34756: Flags [S.], cksum 0x1ba4 (incorrect -> 0xb3e2), seq 236033056, ack 2507689683, win 65160, options [mss 1460,sackOK,TS val 3805361369 ecr 4044837738,nop,wscale 7], length 0
+E..<..@.@..G
+..Q
+.......... .xN................
+..4...Sj....
+1793308620.252895 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 27315, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.34756 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xdf41), ack 236033057, win 502, options [nop,nop,TS val 4044837738 ecr 3805361369], length 0
+E..4j.@.?...
+...
+..Q.....xN....!...........
+..Sj..4.
+1793308620.253167 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 184: (tos 0x0, ttl 63, id 27316, offset 0, flags [DF], proto TCP (6), length 170)
+    10.22.3.249.34756 > 10.22.3.81.4000: Flags [P.], cksum 0x1c12 (incorrect -> 0x922e), seq 2507689683:2507689801, ack 236033057, win 502, options [nop,nop,TS val 4044837738 ecr 3805361369], length 118
+E...j.@.?..$
+...
+..Q.....xN....!...........
+..Sj..4.GET /health/readiness HTTP/1.1
+Host: 10.22.3.81:4000
+User-Agent: kube-probe/1.35
+Accept: */*
+Connection: close
+
+
+1793308620.253187 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 60971, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.34756: Flags [.], cksum 0x1b9c (incorrect -> 0xdec4), ack 2507689801, win 509, options [nop,nop,TS val 3805361369 ecr 4044837738], length 0
+E..4.+@.@.1#
+..Q
+..........!.xOI...........
+..4...Sj
+1793308620.256666 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 339: (tos 0x0, ttl 64, id 60972, offset 0, flags [DF], proto TCP (6), length 325)
+    10.22.3.81.4000 > 10.22.3.249.34756: Flags [P.], cksum 0x1cad (incorrect -> 0x1dda), seq 236033057:236033330, ack 2507689801, win 509, options [nop,nop,TS val 3805361373 ecr 4044837738], length 273
+E..E.,@.@.0.
+..Q
+..........!.xOI...........
+..4...SjHTTP/1.1 200 OK
+date: Thu, 29 Oct 2026 21:16:59 GMT
+content-length: 41
+content-type: application/json
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+Connection: close
+
+{"status":"healthy","db":"Not connected"}
+1793308620.256797 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 27317, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.34756 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xddb3), ack 236033330, win 501, options [nop,nop,TS val 4044837742 ecr 3805361373], length 0
+E..4j.@.?...
+...
+..Q.....xOI...2...........
+..Sn..4.
+1793308620.256941 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 27318, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.34756 > 10.22.3.81.4000: Flags [F.], cksum 0x1b9c (incorrect -> 0xddb2), seq 2507689801, ack 236033330, win 501, options [nop,nop,TS val 4044837742 ecr 3805361373], length 0
+E..4j.@.?...
+...
+..Q.....xOI...2...........
+..Sn..4.
+1793308620.256943 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 60973, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.34756: Flags [F.], cksum 0x1b9c (incorrect -> 0xddaa), seq 236033330, ack 2507689801, win 509, options [nop,nop,TS val 3805361373 ecr 4044837742], length 0
+E..4.-@.@.1!
+..Q
+..........2.xOI...........
+..4...Sn
+1793308620.257004 ae:76:e8:a2:39:a9 > b2:7b:11:1a:89:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 63, id 27319, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.249.34756 > 10.22.3.81.4000: Flags [.], cksum 0x1b9c (incorrect -> 0xddb1), ack 236033331, win 501, options [nop,nop,TS val 4044837742 ecr 3805361373], length 0
+E..4j.@.?...
+...
+..Q.....xOJ...3...........
+..Sn..4.
+1793308620.257016 b2:7b:11:1a:89:a9 > ae:76:e8:a2:39:a9, ethertype IPv4 (0x0800), length 66: (tos 0x0, ttl 64, id 60974, offset 0, flags [DF], proto TCP (6), length 52)
+    10.22.3.81.4000 > 10.22.3.249.34756: Flags [.], cksum 0x1b9c (incorrect -> 0xdda9), ack 2507689802, win 509, options [nop,nop,TS val 3805361373 ecr 4044837742], length 0
+E..4..@.@.1 
+..Q
+..........3.xOJ...........
+..4...Sn

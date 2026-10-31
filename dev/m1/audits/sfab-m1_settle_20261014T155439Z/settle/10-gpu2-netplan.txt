@@ -1,0 +1,35 @@
+gpu2
+
+status: done
+boot_status_code: enabled-by-generator
+detail: DataSourceNoCloud [seed=/dev/vdb]
+
+0:	from all lookup local
+32764:	from 10.20.9.22 lookup 100
+32765:	from 172.21.40.112 lookup 150 proto static
+32766:	from all lookup main
+32767:	from all lookup default
+
+default via 10.20.1.1 dev bond0 
+10.20.1.0/24 dev bond0 proto kernel scope link src 10.20.1.22 
+172.21.40.0/24 dev eth0 proto kernel scope link src 172.21.40.112 
+
+default via 10.20.9.254 dev eth3 
+10.20.9.0/24 dev eth3 scope link src 10.20.9.22 
+
+network:
+  version: 2
+  ethernets:
+    eth0:
+      match:
+        macaddress: "02:5a:70:00:00:00"
+      addresses:
+      - "172.21.40.112/24"
+      set-name: "eth0"
+      routes:
+      - table: 150
+        to: "default"
+        via: "172.21.40.1"
+      routing-policy:
+      - table: 150
+        from: "172.21.40.112"

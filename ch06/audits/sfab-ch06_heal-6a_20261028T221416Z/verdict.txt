@@ -1,0 +1,14 @@
+== heal-6a: chat-b's worker0 created on rail 8 instead of the table's rail 6
+  PASS  make serve: every pod where the table places it, chat-b-server-0 removed first and made again (RESULT: 26 passed, 0 failed, 0 known platform limitation(s), 0 skipped)
+== heal-6a: recorded
+  PASS  users, heal, pass 1: 0 of 22 requests through gw-users to chat, staff failed (recorded)
+== heal-6a: healed
+  PASS  chat-b-worker0-0's network-status names rail 6, as the table places it (serving/rail6 rail6 10.21.6.101)
+  PASS  Service chat-b holds 1 ready endpoint(s) (10.22.2.174) of its servers chat-b-server-0
+  PASS  Service chat holds 3 ready endpoint(s) (10.22.1.122 10.22.1.33 10.22.2.174) of its servers chat-a-server-0,chat-b-server-0,chat-c-server-0
+  PASS  Service staff holds 2 ready endpoint(s) (10.22.1.1 10.22.2.81) of its servers staff-a-server-0,staff-b-server-0
+  PASS  users: every request succeeds (22 of 22)
+  PASS  rail-sw2 no longer holds 02:5a:fe:08:00:64 (the moved chat-b-worker0-0's MAC on Vlan108, Ethernet7): gone 231 s into the check, the MAC table's own aging
+== the chapter audit after the heal
+  PASS  audit.sh after the heal: RESULT: 916 passed, 0 failed, 0 known platform limitation(s), 2 skipped (ch06/audits/sfab-ch06_audit_20261028T222300Z)
+== RESULT: 9 passed, 0 failed, 0 known platform limitation(s), 0 skipped

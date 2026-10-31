@@ -1,0 +1,62 @@
+Passes compared: pass1, pass2, pass3 in sfab-ch03_drills_20261029T043553Z
+
+## fw-leg
+
+| measure | across every pass and probe | agrees? |
+|---|---|---|
+| placed before the fault | pass 1 yes, pass 2 yes, pass 3 yes | yes |
+| ping round trips lost, ids crossing fe-sw1 | 0 | yes |
+|   of them at the cut | 0 | yes |
+|   of them at the restore | 0 | yes |
+| ping round trips lost, ids not crossing fe-sw1 | 0 | yes |
+| longest stretch with no reply at the cut, ids crossing fe-sw1 (s) | 0.31 to 0.34 | - |
+| ping ids crossing the target, per pass | pass 1 4 of 8, pass 2 4 of 8, pass 3 4 of 8 | - |
+| TCP connects failed at the cut | 2 to 3 | yes |
+| TCP connects failed at the restore | 0 | yes |
+| TCP connects failed elsewhere | 0 | yes |
+| peer link tx packets per second on fe-sw1, before | 2.8 to 3.3 | - |
+| peer link tx packets per second on fe-sw2, before | 2.8 to 3.6 | - |
+| peer link tx packets per second on fe-sw1, during | 6.5 to 7.5 | - |
+| peer link tx packets per second on fe-sw2, during | 4.3 to 4.5 | - |
+| peer link tx packets per second on fe-sw1, after | 3.2 to 3.5 | - |
+| peer link tx packets per second on fe-sw2, after | 2.9 to 3.1 | - |
+
+## server-member
+
+| measure | across every pass and probe | agrees? |
+|---|---|---|
+| placed before the fault | pass 1 yes, pass 2 yes, pass 3 yes | yes |
+| ping round trips lost, ids crossing fe-sw1 | 7 to 10 | yes |
+|   of them at the cut | 7 to 10 | yes |
+|   of them at the restore | 0 | yes |
+| ping round trips lost, ids not crossing fe-sw1 | 0 | yes |
+| longest stretch with no reply at the cut, ids crossing fe-sw1 (s) | 2.43 to 3.34 | - |
+| ping ids crossing the target, per pass | pass 1 4 of 8, pass 2 4 of 8, pass 3 4 of 8 | - |
+| TCP connects failed at the cut | 0 | yes |
+| TCP connects failed at the restore | 0 | yes |
+| TCP connects failed elsewhere | 0 | yes |
+| peer link tx packets per second on fe-sw1, before | 3 to 3.6 | - |
+| peer link tx packets per second on fe-sw2, before | 3.3 | - |
+| peer link tx packets per second on fe-sw1, during | 21 to 22.2 | - |
+| peer link tx packets per second on fe-sw2, during | 3.4 to 4.5 | - |
+| peer link tx packets per second on fe-sw1, after | 3.4 to 3.6 | - |
+| peer link tx packets per second on fe-sw2, after | 2.8 to 3.1 | - |
+
+## peer-link
+
+| measure | across every pass and probe | agrees? |
+|---|---|---|
+| placed before the fault | pass 1 yes, pass 2 yes, pass 3 yes | yes |
+| ping round trips lost, ids crossing fe-sw1 | 0 | yes |
+|   of them at the cut | 0 | yes |
+|   of them at the restore | 0 | yes |
+| ping round trips lost, ids not crossing fe-sw1 | 0 | yes |
+| longest stretch with no reply at the cut, ids crossing fe-sw1 (s) | 0.30 to 0.34 | - |
+| ping ids crossing the target, per pass | pass 1 4 of 8, pass 2 4 of 8, pass 3 4 of 8 | - |
+| TCP connects failed at the cut | 0 | yes |
+| TCP connects failed at the restore | 0 | yes |
+| TCP connects failed elsewhere | 0 | yes |
+
+Ranges span every probe instance of every pass. A ping lost is a round trip lost, on either leg.
+
+no disagreement between the passes

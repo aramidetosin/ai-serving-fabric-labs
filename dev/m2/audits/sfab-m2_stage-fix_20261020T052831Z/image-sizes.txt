@@ -1,0 +1,66 @@
+# The cluster images the registry holds: config plus layers as pulled (compressed), and the layers unpacked (gzip-decompressed), linux/amd64, summed from the seeded blobs under /root/sfab/images/registry-data on the lab host (read only)
++ python3 -I - < imgsizes.py  (the script follows the output)
+kubernetes.node_helm.image	docker.io/alpine/helm:3.22.0	compressed=34.5MiB	unpacked=96.7MiB
+kubernetes.democratic_csi.images.csi_proxy	ghcr.io/democratic-csi/csi-grpc-proxy:v0.5.7	compressed=8.3MiB	unpacked=16.5MiB
+kubernetes.democratic_csi.images.driver	ghcr.io/democratic-csi/democratic-csi:next	compressed=264.3MiB	unpacked=717.5MiB
+kubernetes.kube_vip.image	ghcr.io/kube-vip/kube-vip:v1.1.2	compressed=17.7MiB	unpacked=58.1MiB
+kubernetes.cilium.images.envoy	quay.io/cilium/cilium-envoy:v1.36.9-1786864149-07e8503ff34b9190d7bbe4e57d4e185c4ef8b1de	compressed=68.8MiB	unpacked=183.4MiB
+kubernetes.cilium.images.agent	quay.io/cilium/cilium:v1.19.7	compressed=247.8MiB	unpacked=715.9MiB
+kubernetes.cilium.images.operator	quay.io/cilium/operator-generic:v1.19.7	compressed=31.4MiB	unpacked=111.3MiB
+kubernetes.cert_manager.images.cainjector	quay.io/jetstack/cert-manager-cainjector:v1.21.2	compressed=11.8MiB	unpacked=36.2MiB
+kubernetes.cert_manager.images.controller	quay.io/jetstack/cert-manager-controller:v1.21.2	compressed=23.7MiB	unpacked=82.6MiB
+kubernetes.cert_manager.images.startupapicheck	quay.io/jetstack/cert-manager-startupapicheck:v1.21.2	compressed=11.0MiB	unpacked=32.5MiB
+kubernetes.cert_manager.images.webhook	quay.io/jetstack/cert-manager-webhook:v1.21.2	compressed=18.9MiB	unpacked=65.0MiB
+kubernetes.control_plane.images.coredns	registry.k8s.io/coredns/coredns:v1.13.1	compressed=22.5MiB	unpacked=75.5MiB
+kubernetes.test_backend.image	registry.k8s.io/e2e-test-images/agnhost:2.59	compressed=54.4MiB	unpacked=138.4MiB
+kubernetes.control_plane.images.etcd	registry.k8s.io/etcd:3.6.6-0	compressed=22.5MiB	unpacked=60.6MiB
+kubernetes.control_plane.images.kube_apiserver	registry.k8s.io/kube-apiserver:v1.35.8	compressed=26.6MiB	unpacked=87.7MiB
+kubernetes.control_plane.images.kube_controller_manager	registry.k8s.io/kube-controller-manager:v1.35.8	compressed=22.2MiB	unpacked=74.5MiB
+kubernetes.control_plane.images.kube_scheduler	registry.k8s.io/kube-scheduler:v1.35.8	compressed=16.6MiB	unpacked=51.1MiB
+kubernetes.control_plane.images.pause	registry.k8s.io/pause:3.10.1	compressed=0.3MiB	unpacked=0.7MiB
+kubernetes.democratic_csi.images.attacher	registry.k8s.io/sig-storage/csi-attacher:v4.4.0	compressed=25.4MiB	unpacked=60.7MiB
+kubernetes.democratic_csi.images.node_driver_registrar	registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.9.0	compressed=10.3MiB	unpacked=22.1MiB
+kubernetes.democratic_csi.images.provisioner	registry.k8s.io/sig-storage/csi-provisioner:v3.6.0	compressed=27.3MiB	unpacked=64.9MiB
+kubernetes.democratic_csi.images.resizer	registry.k8s.io/sig-storage/csi-resizer:v1.9.0	compressed=25.7MiB	unpacked=61.2MiB
+TOTAL compressed=0.97GiB unpacked=2.75GiB
+
+# imgsizes.py
+import json, os, sys, zlib, gzip
+root = "/root/sfab/images/registry-data"
+blobs = os.path.join(root, "docker/registry/v2/blobs/sha256")
+def blob(d):
+    h = d.split(":", 1)[1]
+    return os.path.join(blobs, h[:2], h, "data")
+def load(d):
+    return json.load(open(blob(d)))
+def unpacked(d, mt):
+    p = blob(d)
+    if "gzip" in mt or mt.endswith("tar+gzip") or mt.endswith(".tar.gzip"):
+        n = 0
+        with gzip.open(p, "rb") as f:
+            while True:
+                b = f.read(1 << 20)
+                if not b: break
+                n += len(b)
+        return n
+    if "zstd" in mt:
+        return None
+    return os.path.getsize(p)
+seed = json.load(open(os.path.join(root, "SEED.json")))
+tot_c = tot_u = 0
+for im in seed["images"]:
+    m = load(im["served"])
+    if "manifests" in m:
+        sel = [x for x in m["manifests"] if (x.get("platform") or {}).get("os") == "linux" and (x.get("platform") or {}).get("architecture") == "amd64"]
+        if not sel:
+            print("NOAMD64", im["id"]); continue
+        m = load(sel[0]["digest"])
+    c = m["config"]["size"] + sum(l["size"] for l in m["layers"])
+    u = 0
+    for l in m["layers"]:
+        x = unpacked(l["digest"], l["mediaType"])
+        u = None if (x is None or u is None) else u + x
+    tot_c += c
+    if u is not None: tot_u += u
+    print(f'{im["id"]}\t{im["mirror"]}\tcompressed={c/2**20:.1f}MiB\tunpacked={"?" if u is None else f"{u/2**20:.1f}MiB"}')
+print(f"TOTAL compressed={tot_c/2**30:.2f}GiB unpacked={tot_u/2**30:.2f}GiB")

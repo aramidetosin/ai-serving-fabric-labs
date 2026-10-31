@@ -1,0 +1,28 @@
+== trace enterprise-users-vip: ent-client (10.24.10.10) to llm.tarnwick.example on 10.20.1.210:443
+  PASS  ent-client resolves llm.tarnwick.example through 10.20.3.10 to the users' VIP 10.20.1.210
+  PASS  the gw-users Service's L2 announcement lease holder is a control node (ctrl3)
+  PASS  warm-up attempt from source port 41442 made first (HTTP 200; not judged)
+  PASS  the recorded SYN leaves ent-client from the pinned source port 41443 (seq 307667318)
+  PASS  9 capture points decoded (9 with a decode)
+== the SYN at each point
+  PASS  1-ent-client-eth1: the recorded SYN seen (seq 307667318)
+  PASS  2-fw-ethernet1-4: the recorded SYN seen (seq 307667318)
+  PASS  6-ctrl3-bond0: the recorded SYN seen (seq 307667318)
+  PASS  exactly one of the ae1 points carries the SYN (3-fw-ae1-leg1, 3-fw-ae1-leg2)
+  PASS  exactly one of the trunk points carries the SYN (4-fe-sw1-Ethernet2, 4-fe-sw2-Ethernet2)
+  PASS  exactly one of the server points carries the SYN (5-fe-sw1-Ethernet5, 5-fe-sw2-Ethernet5)
+  PASS  the SYN's trunk port is the pair port its ae1 leg lands on (3-fw-ae1-leg1 to fe-sw1:eth3)
+  PASS  the SYN leaves the pair on the switch that received it (fe-sw1)
+== tags, TTL and addresses
+  PASS  1-ent-client-eth1: untagged
+  PASS  2-fw-ethernet1-4: untagged
+  PASS  3-fw-ae1-leg1: tagged 802.1Q 100
+  PASS  4-fe-sw1-Ethernet2: tagged 802.1Q 100
+  PASS  5-fe-sw1-Ethernet5: untagged
+  PASS  6-ctrl3-bond0: untagged
+  PASS  TTL 64 up to the firewall, 63 after it: one routed hop
+  PASS  source 10.24.10.10 and destination 10.20.1.210:443 unchanged at every point (no translation)
+== the reply and the firewall's witness
+  PASS  https://llm.tarnwick.example/echo?msg=sfab-m2-trace answers 200 with the echoed message sfab-m2-trace
+  PASS  the firewall's traffic log has the session allowed by enterprise-to-users-gateway (shown as enterprise-to-users), zone enterprise to zone data
+== RESULT: 23 passed, 0 failed, 0 known platform limitation(s), 0 skipped

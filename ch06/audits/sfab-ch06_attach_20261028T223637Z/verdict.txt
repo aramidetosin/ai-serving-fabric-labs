@@ -1,0 +1,17 @@
+== chat-c-server-0 on k8s-gpu1: eth0 on the cluster network, rail7 at 10.21.7.100 on rail 7
+== the pod and its network-status annotation
+  PASS  network-status: eth0 (default) at 10.22.1.122, the pod's IP, and rail7 at 10.21.7.100 with MAC 02:5a:fe:07:00:64, as the table places it
+== the pod's route table, on k8s-gpu1 in the pod's network namespace
+  PASS  k8s-gpu1: the pod's network namespace is cni-4eeb716b-9eb9-1496-73ca-4e54c5956347 (its eth0 is 10.22.1.122)
+  PASS  the default route leaves on eth0 (default via 10.22.1.227 dev eth0 mtu 8855 )
+  PASS  on rail7 only the rail's own prefix, no gateway (10.21.7.0/24 dev rail7 proto kernel scope link src 10.21.7.100 )
+== the Services that select the pod: their EndpointSlices
+  PASS  Service chat-c (chat-c-b75b4): chat-c-server-0 at 10.22.1.122, its eth0 address, and not 10.21.7.100
+  PASS  Service chat (chat-ljc9n): chat-c-server-0 at 10.22.1.122, its eth0 address, and not 10.21.7.100
+== a Service's cluster DNS answer, from the Service's client
+  PASS  chat-c.serving.svc.cluster.local answers 10.23.39.253 in the router pod router-76cf778fb6-gwr7f, the Service's ClusterIP (not a pod address)
+== rail-sw1: the rail 7 pods' MACs in Vlan107
+  PASS  rail-sw1 learned chat-c-server-0's 02:5a:fe:07:00:64 in Vlan107 on Ethernet3, the port facing k8s-gpu1
+  PASS  rail-sw1 learned chat-c-worker0-0's 02:5a:fe:07:00:65 in Vlan107 on Ethernet7, the port facing k8s-gpu2
+  SKIP  rail-sw1 learned chat-c-worker1-0's 02:5a:fe:07:00:66 (absent: its copy's peers all sit on k8s-gpu1, so its traffic stays inside the node)
+== RESULT: 9 passed, 0 failed, 0 known platform limitation(s), 1 skipped

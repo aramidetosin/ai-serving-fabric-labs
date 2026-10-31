@@ -1,0 +1,39 @@
+drill peer-link, pass 2: the peer link shut on fe-sw1 with the keepalive link up
+  target switch fe-sw1; every time on the lab host's clock, relative to the cut (T0)
+  the fault's session took 3.68 s (T0 is when it started)
+  placement: ping: requests leave fe-sw1, fe-sw2
+  ping 3102, 3103, 3106, 3107 cross fe-sw1; 3100, 3101, 3104, 3105 do not
+  ping id 3100 (via fe-sw2): sent 251, answered 251, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +5.58 s to +5.91 s
+    the guest's ping: 251 transmitted, 251 received; the two witnesses agree on every round trip both saw
+  ping id 3101 (via fe-sw2): sent 251, answered 251, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +5.58 s to +5.91 s
+    the guest's ping: 251 transmitted, 251 received; the two witnesses agree on every round trip both saw
+  ping id 3102 (via fe-sw1): sent 251, answered 251, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.31 s, from +20.63 s to +20.94 s
+    the guest's ping: 251 transmitted, 251 received; the two witnesses agree on every round trip both saw
+  ping id 3103 (via fe-sw1): sent 251, answered 251, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.31 s, from +0.17 s to +0.48 s
+    the guest's ping: 251 transmitted, 251 received; the two witnesses agree on every round trip both saw
+  ping id 3104 (via fe-sw2): sent 251, answered 251, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.32 s, from +5.59 s to +5.91 s
+    the guest's ping: 251 transmitted, 251 received; the two witnesses agree on every round trip both saw
+  ping id 3105 (via fe-sw2): sent 251, answered 251, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +56.74 s to +57.07 s
+    the guest's ping: 251 transmitted, 251 received; the two witnesses agree on every round trip both saw
+  ping id 3106 (via fe-sw1): sent 251, answered 251, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from -10.05 s to -9.71 s
+    the guest's ping: 251 transmitted, 251 received; the two witnesses agree on every round trip both saw
+  ping id 3107 (via fe-sw1): sent 251, answered 251, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +10.41 s to +10.75 s
+    the guest's ping: 251 transmitted, 251 received; the two witnesses agree on every round trip both saw
+  tcp connects to the users' VIP: 250 attempts, 0 failed (0 at the cut, 0 at the restore, 0 elsewhere)
+    attempts in the cut window by the firewall leg their SYN took: {'fe-sw2': 26, 'fe-sw1': 25}

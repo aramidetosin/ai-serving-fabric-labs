@@ -1,0 +1,18 @@
+Script started on 2026-10-28 22:36:52+00:00 [COMMAND="make break-6b" TERM="tmux-256color" TTY="/dev/pts/1" COLUMNS="80" LINES="24"]
+PYTHONDONTWRITEBYTECODE=1 python3 /root/sfab/labs/ai-serving-fabric-labs/common/breakheal.py break 6b
+repostate: 3 of 1483 files differ from the stamp; the tree is not the stamped one
+== break-6b: chat-c's server attached through a copy of rail7 that routes the pod network over the rail
+  PASS  chat-c-server-0 deleted and made again at 10.21.7.100/24 through rail7-route, a copy of rail7 with a route to 10.22.0.0/16 via 10.21.7.101 (chat-c-server-0 Ready through rail7-route)
+== break-6b: recorded
+  PASS  chat-c-server-0 (10.22.1.92, on k8s-gpu1): route table read, and rail7 captured while the router pod router-76cf778fb6-gwr7f (10.22.4.84) connected to port 8080: exit 1, 7 packet(s) from 10.22.1.92 on rail7 (recorded)
+  PASS  users, break, pass 1: 0 of 22 requests through gw-users to chat, staff failed (recorded)
+== break-6b: broken as designed
+  PASS  chat-c-server-0's route table holds 10.22.0.0/16 via 10.21.7.101 dev rail7
+  PASS  chat-c-server-0's replies to the cluster network leave on the rail: 7 packet(s) from its eth0 address 10.22.1.92 captured on rail7
+  PASS  Service chat-c holds 1 ready endpoint(s) (10.22.1.92) of its servers chat-c-server-0
+  PASS  Service chat holds 3 ready endpoint(s) (10.22.1.33 10.22.1.92 10.22.2.174) of its servers chat-a-server-0,chat-b-server-0,chat-c-server-0
+  PASS  Service staff holds 2 ready endpoint(s) (10.22.1.1 10.22.2.81) of its servers staff-a-server-0,staff-b-server-0
+== RESULT: 8 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+== result set: ch06/audits/sfab-ch06_break-6b_20261028T223652Z
+
+Script done on 2026-10-28 22:44:07+00:00 [COMMAND_EXIT_CODE="0"]

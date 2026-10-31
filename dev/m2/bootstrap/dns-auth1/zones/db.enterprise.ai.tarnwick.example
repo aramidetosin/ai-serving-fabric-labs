@@ -1,0 +1,15 @@
+; sfab-m2 dns-auth1, view enterprise, zone ai.tarnwick.example: rendered from spec/profile-a.yaml by render/dns.py; edit the spec and run make render
+; decision dec-view-enterprise
+$ORIGIN ai.tarnwick.example.
+$TTL 300
+@ IN SOA dns-auth1.ai.tarnwick.example. hostmaster.ai.tarnwick.example. (
+    559997711 ; serial, from the zone's data
+    3600 ; refresh
+    600 ; retry
+    86400 ; expire
+    60 ) ; negative answers
+@         IN NS  dns-auth1.ai.tarnwick.example.
+@         IN NS  dns-auth2.ai.tarnwick.example.
+dns-auth1 IN A   10.20.13.11 ; name server
+dns-auth2 IN A   10.20.14.11 ; name server
+llm       IN A   10.20.11.210 ; a name users type

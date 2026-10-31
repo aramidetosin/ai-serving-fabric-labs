@@ -1,0 +1,49 @@
+drill fw-leg, pass 2: the firewall bundle's leg on fe-sw1 shut from the switch side
+  target switch fe-sw1; every time on the lab host's clock, relative to the cut (T0)
+  the fault's session took 3.50 s (T0 is when it started)
+  placement: tcp: 5 connects leave the firewall toward fe-sw1, 6 toward the other switch
+  ping 3102, 3103, 3106, 3107 cross fe-sw1; 3100, 3101, 3104, 3105 do not
+  ping id 3100 (via fe-sw2): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from -2.53 s to -2.19 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3101 (via fe-sw2): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from -2.53 s to -2.19 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3102 (via fe-sw1): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +72.11 s to +72.44 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3103 (via fe-sw1): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +72.11 s to +72.44 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3104 (via fe-sw2): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from -2.52 s to -2.19 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3105 (via fe-sw2): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from -2.52 s to -2.19 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3106 (via fe-sw1): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.31 s, from -9.73 s to -9.42 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3107 (via fe-sw1): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +72.11 s to +72.44 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  tcp connects to the users' VIP: 289 attempts, 3 failed (3 at the cut, 0 at the restore, 0 elsewhere)
+    attempts in the cut window by the firewall leg their SYN took: {'fe-sw1': 9, 'fe-sw2': 35}
+    failed run: last ok 2.998, first failed +3.30 s, first ok after 4.299, 1 failed, SYN legs {'fe-sw1': 1}
+    failed run: last ok 4.299, first failed +4.60 s, first ok after 5.6, 1 failed, SYN legs {'fe-sw1': 1}
+    failed run: last ok 5.6, first failed +5.90 s, first ok after 6.901, 1 failed, SYN legs {'fe-sw1': 1}
+  peer link, packets per second from the host-side counters of its member ports:
+    before fe-sw1: tx 2.8 rx 2.8 over 3.6 s
+    before fe-sw2: tx 3.3 rx 3.1 over 3.59 s
+    during fe-sw1: tx 7.5 rx 4.3 over 19.99 s
+    during fe-sw2: tx 4.3 rx 7.5 over 19.97 s
+    after  fe-sw1: tx 3.5 rx 3.0 over 10.65 s
+    after  fe-sw2: tx 2.9 rx 3.5 over 10.66 s

@@ -1,0 +1,1804 @@
+### 2026-10-29T06:23:05Z fe-sw1 klish
+terminal length 0
+configure terminal
+interface Ethernet11
+no shutdown
+end
+exit
+terminal length 0
+configure terminal
+interface Ethernet11
+no shutdown
+end
+exit
+fe-sw1# terminal length 0
+fe-sw1# configure terminal
+fe-sw1(config)# interface Ethernet11
+fe-sw1(config-if-Ethernet11)# no shutdown
+fe-sw1(config-if-Ethernet11)# end
+fe-sw1# exit
+
+### 2026-10-29T06:23:17Z fe-sw1 klish
+terminal length 0
+show mclag brief
+show interface status
+show running-configuration interface PortChannel 32
+exit
+terminal length 0
+show mclag brief
+show interface status
+show running-configuration interface PortChannel 32
+exit
+fe-sw1# terminal length 0
+fe-sw1# show mclag brief
+ 
+Domain ID            : 1
+Role                 : active
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.0
+Peer Address         : 10.20.255.1
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:7a:3a:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.4
+Peer Address         : 10.20.255.5
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw1# show interface status
+--------------------------------------------------------------------------------------------------------------------------------------
+Name                Description                   Oper        Reason         AutoNeg   Speed          MTU            Alternate Name      
+--------------------------------------------------------------------------------------------------------------------------------------
+Ethernet0           peer-link-1                   up          oper-up          off       25000          9216           Eth1/1              
+Ethernet1           peer-link-2                   up          oper-up          off       25000          9216           Eth1/2              
+Ethernet2           fw-eth1                       up          oper-up          off       25000          9216           Eth1/3              
+Ethernet3           k8s-cp1-eth1                  up          oper-up          off       25000          9216           Eth1/4              
+Ethernet4           k8s-cp2-eth1                  up          oper-up          off       25000          9216           Eth1/5              
+Ethernet5           k8s-cp3-eth1                  up          oper-up          off       25000          9216           Eth1/6              
+Ethernet6           k8s-gpu1-eth1                 up          oper-up          off       25000          9216           Eth1/7              
+Ethernet7           k8s-gpu2-eth1                 up          oper-up          off       25000          9216           Eth1/8              
+Ethernet8           bastion-eth1                  up          oper-up          off       25000          9216           Eth1/9              
+Ethernet9           truenas1-eth1                 up          oper-up          off       25000          9216           Eth1/10             
+Ethernet10          truenas1-eth2                 up          oper-up          off       25000          9216           Eth1/11             
+Ethernet11          truenas1-eth5                 up          oper-up          off       25000          9216           Eth1/12             
+Ethernet12          mclag-keepalive               up          oper-up          off       25000          9216           Eth1/13             
+Ethernet13          k8s-ingress1-eth1             up          oper-up          off       25000          9216           Eth1/14             
+Ethernet14          k8s-ingress2-eth1             up          oper-up          off       25000          9216           Eth1/15             
+Ethernet15          dns-auth1-eth1                up          oper-up          off       25000          9216           Eth1/16             
+Ethernet16          dns-res1-eth1                 up          oper-up          off       25000          9216           Eth1/17             
+Ethernet17          dns-auth2-eth1                up          oper-up          off       25000          9216           Eth1/18             
+Ethernet18          dns-res2-eth1                 up          oper-up          off       25000          9216           Eth1/19             
+Ethernet19          -                             down        admin-down       off       25000          9100           Eth1/20             
+Ethernet20          -                             down        admin-down       off       25000          9100           Eth1/21             
+Ethernet21          -                             down        admin-down       off       25000          9100           Eth1/22             
+Ethernet22          -                             down        admin-down       off       25000          9100           Eth1/23             
+Ethernet23          -                             down        admin-down       off       25000          9100           Eth1/24             
+Ethernet24          -                             down        admin-down       off       25000          9100           Eth1/25             
+Ethernet25          -                             down        admin-down       off       25000          9100           Eth1/26             
+Ethernet26          -                             down        admin-down       off       25000          9100           Eth1/27             
+Ethernet27          -                             down        admin-down       off       25000          9100           Eth1/28             
+Ethernet28          -                             down        admin-down       off       25000          9100           Eth1/29             
+Ethernet29          -                             down        admin-down       off       25000          9100           Eth1/30             
+Ethernet30          -                             down        admin-down       off       25000          9100           Eth1/31             
+Ethernet31          -                             down        admin-down       off       25000          9100           Eth1/32             
+Ethernet32          -                             down        admin-down       off       25000          9100           Eth1/33             
+Ethernet33          -                             down        admin-down       off       25000          9100           Eth1/34             
+Ethernet34          -                             down        admin-down       off       25000          9100           Eth1/35             
+Ethernet35          -                             down        admin-down       off       25000          9100           Eth1/36             
+Ethernet36          -                             down        admin-down       off       25000          9100           Eth1/37             
+Ethernet37          -                             down        admin-down       off       25000          9100           Eth1/38             
+Ethernet38          -                             down        admin-down       off       25000          9100           Eth1/39             
+Ethernet39          -                             down        admin-down       off       25000          9100           Eth1/40             
+Ethernet40          -                             down        admin-down       off       25000          9100           Eth1/41             
+Ethernet41          -                             down        admin-down       off       25000          9100           Eth1/42             
+Ethernet42          -                             down        admin-down       off       25000          9100           Eth1/43             
+Ethernet43          -                             down        admin-down       off       25000          9100           Eth1/44             
+Ethernet44          -                             down        admin-down       off       25000          9100           Eth1/45             
+Ethernet45          -                             down        admin-down       off       25000          9100           Eth1/46             
+Ethernet46          -                             down        admin-down       off       25000          9100           Eth1/47             
+Ethernet47          -                             down        admin-down       off       25000          9100           Eth1/48             
+Ethernet48          -                             down        admin-down       off       100000         9100           Eth1/49             
+Ethernet52          -                             down        admin-down       off       100000         9100           Eth1/50             
+Ethernet56          -                             down        admin-down       off       100000         9100           Eth1/51             
+Ethernet60          -                             down        admin-down       off       100000         9100           Eth1/52             
+Ethernet64          -                             down        admin-down       off       100000         9100           Eth1/53             
+Ethernet68          -                             down        admin-down       off       100000         9100           Eth1/54             
+Ethernet72          -                             down        admin-down       off       100000         9100           Eth1/55             
+Ethernet76          -                             down        admin-down       off       100000         9100           Eth1/56             
+PortChannel1        peer-link                     up          oper-up          -         50000          9216           -                   
+PortChannel10       fw-ae1                        up          oper-up          -         25000          9216           -                   
+PortChannel11       k8s-cp1-bond                  up          oper-up          -         25000          9216           -                   
+PortChannel12       k8s-cp2-bond                  up          oper-up          -         25000          9216           -                   
+PortChannel13       k8s-cp3-bond                  up          oper-up          -         25000          9216           -                   
+PortChannel14       k8s-ingress1-bond             up          oper-up          -         25000          9216           -                   
+PortChannel15       k8s-ingress2-bond             up          oper-up          -         25000          9216           -                   
+PortChannel21       k8s-gpu1-bond                 up          oper-up          -         25000          9216           -                   
+PortChannel22       k8s-gpu2-bond                 up          oper-up          -         25000          9216           -                   
+PortChannel30       bastion-bond                  up          oper-up          -         25000          9216           -                   
+PortChannel31       truenas1-data                 up          oper-up          -         50000          9216           -                   
+PortChannel32       truenas1-mgmt                 up          oper-up          -         25000          9216           -                   
+PortChannel41       dns-auth1-bond                up          oper-up          -         25000          9216           -                   
+PortChannel42       dns-res1-bond                 up          oper-up          -         25000          9216           -                   
+PortChannel43       dns-auth2-bond                up          oper-up          -         25000          9216           -                   
+PortChannel44       dns-res2-bond                 up          oper-up          -         25000          9216           -                   
+fe-sw1# show running-configuration interface PortChannel 32
+!
+interface PortChannel32
+ description truenas1-mgmt
+ switchport access Vlan 200
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+ spanning-tree bpduguard port-shutdown
+ spanning-tree portfast
+fe-sw1# exit
+
+### 2026-10-29T06:23:24Z fe-sw2 klish
+terminal length 0
+show mclag brief
+show interface status
+show running-configuration interface PortChannel 32
+exit
+terminal length 0
+show mclag brief
+show interface status
+show running-configuration interface PortChannel 32
+exit
+fe-sw2# terminal length 0
+fe-sw2# show mclag brief
+ 
+Domain ID            : 1
+Role                 : standby
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.1
+Peer Address         : 10.20.255.0
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:7a:3a:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.5
+Peer Address         : 10.20.255.4
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw2# show interface status
+--------------------------------------------------------------------------------------------------------------------------------------
+Name                Description                   Oper        Reason         AutoNeg   Speed          MTU            Alternate Name      
+--------------------------------------------------------------------------------------------------------------------------------------
+Ethernet0           peer-link-1                   up          oper-up          off       25000          9216           Eth1/1              
+Ethernet1           peer-link-2                   up          oper-up          off       25000          9216           Eth1/2              
+Ethernet2           fw-eth2                       up          oper-up          off       25000          9216           Eth1/3              
+Ethernet3           k8s-cp1-eth2                  up          oper-up          off       25000          9216           Eth1/4              
+Ethernet4           k8s-cp2-eth2                  up          oper-up          off       25000          9216           Eth1/5              
+Ethernet5           k8s-cp3-eth2                  up          oper-up          off       25000          9216           Eth1/6              
+Ethernet6           k8s-gpu1-eth2                 up          oper-up          off       25000          9216           Eth1/7              
+Ethernet7           k8s-gpu2-eth2                 up          oper-up          off       25000          9216           Eth1/8              
+Ethernet8           bastion-eth2                  up          oper-up          off       25000          9216           Eth1/9              
+Ethernet9           truenas1-eth3                 up          oper-up          off       25000          9216           Eth1/10             
+Ethernet10          truenas1-eth4                 up          oper-up          off       25000          9216           Eth1/11             
+Ethernet11          truenas1-eth6                 up          oper-up          off       25000          9216           Eth1/12             
+Ethernet12          mclag-keepalive               up          oper-up          off       25000          9216           Eth1/13             
+Ethernet13          k8s-ingress1-eth2             up          oper-up          off       25000          9216           Eth1/14             
+Ethernet14          k8s-ingress2-eth2             up          oper-up          off       25000          9216           Eth1/15             
+Ethernet15          dns-auth1-eth2                up          oper-up          off       25000          9216           Eth1/16             
+Ethernet16          dns-res1-eth2                 up          oper-up          off       25000          9216           Eth1/17             
+Ethernet17          dns-auth2-eth2                up          oper-up          off       25000          9216           Eth1/18             
+Ethernet18          dns-res2-eth2                 up          oper-up          off       25000          9216           Eth1/19             
+Ethernet19          -                             down        admin-down       off       25000          9100           Eth1/20             
+Ethernet20          -                             down        admin-down       off       25000          9100           Eth1/21             
+Ethernet21          -                             down        admin-down       off       25000          9100           Eth1/22             
+Ethernet22          -                             down        admin-down       off       25000          9100           Eth1/23             
+Ethernet23          -                             down        admin-down       off       25000          9100           Eth1/24             
+Ethernet24          -                             down        admin-down       off       25000          9100           Eth1/25             
+Ethernet25          -                             down        admin-down       off       25000          9100           Eth1/26             
+Ethernet26          -                             down        admin-down       off       25000          9100           Eth1/27             
+Ethernet27          -                             down        admin-down       off       25000          9100           Eth1/28             
+Ethernet28          -                             down        admin-down       off       25000          9100           Eth1/29             
+Ethernet29          -                             down        admin-down       off       25000          9100           Eth1/30             
+Ethernet30          -                             down        admin-down       off       25000          9100           Eth1/31             
+Ethernet31          -                             down        admin-down       off       25000          9100           Eth1/32             
+Ethernet32          -                             down        admin-down       off       25000          9100           Eth1/33             
+Ethernet33          -                             down        admin-down       off       25000          9100           Eth1/34             
+Ethernet34          -                             down        admin-down       off       25000          9100           Eth1/35             
+Ethernet35          -                             down        admin-down       off       25000          9100           Eth1/36             
+Ethernet36          -                             down        admin-down       off       25000          9100           Eth1/37             
+Ethernet37          -                             down        admin-down       off       25000          9100           Eth1/38             
+Ethernet38          -                             down        admin-down       off       25000          9100           Eth1/39             
+Ethernet39          -                             down        admin-down       off       25000          9100           Eth1/40             
+Ethernet40          -                             down        admin-down       off       25000          9100           Eth1/41             
+Ethernet41          -                             down        admin-down       off       25000          9100           Eth1/42             
+Ethernet42          -                             down        admin-down       off       25000          9100           Eth1/43             
+Ethernet43          -                             down        admin-down       off       25000          9100           Eth1/44             
+Ethernet44          -                             down        admin-down       off       25000          9100           Eth1/45             
+Ethernet45          -                             down        admin-down       off       25000          9100           Eth1/46             
+Ethernet46          -                             down        admin-down       off       25000          9100           Eth1/47             
+Ethernet47          -                             down        admin-down       off       25000          9100           Eth1/48             
+Ethernet48          -                             down        admin-down       off       100000         9100           Eth1/49             
+Ethernet52          -                             down        admin-down       off       100000         9100           Eth1/50             
+Ethernet56          -                             down        admin-down       off       100000         9100           Eth1/51             
+Ethernet60          -                             down        admin-down       off       100000         9100           Eth1/52             
+Ethernet64          -                             down        admin-down       off       100000         9100           Eth1/53             
+Ethernet68          -                             down        admin-down       off       100000         9100           Eth1/54             
+Ethernet72          -                             down        admin-down       off       100000         9100           Eth1/55             
+Ethernet76          -                             down        admin-down       off       100000         9100           Eth1/56             
+PortChannel1        peer-link                     up          oper-up          -         50000          9216           -                   
+PortChannel10       fw-ae1                        up          oper-up          -         25000          9216           -                   
+PortChannel11       k8s-cp1-bond                  up          oper-up          -         25000          9216           -                   
+PortChannel12       k8s-cp2-bond                  up          oper-up          -         25000          9216           -                   
+PortChannel13       k8s-cp3-bond                  up          oper-up          -         25000          9216           -                   
+PortChannel14       k8s-ingress1-bond             up          oper-up          -         25000          9216           -                   
+PortChannel15       k8s-ingress2-bond             up          oper-up          -         25000          9216           -                   
+PortChannel21       k8s-gpu1-bond                 up          oper-up          -         25000          9216           -                   
+PortChannel22       k8s-gpu2-bond                 up          oper-up          -         25000          9216           -                   
+PortChannel30       bastion-bond                  up          oper-up          -         25000          9216           -                   
+PortChannel31       truenas1-data                 up          oper-up          -         50000          9216           -                   
+PortChannel32       truenas1-mgmt                 up          oper-up          -         25000          9216           -                   
+PortChannel41       dns-auth1-bond                up          oper-up          -         25000          9216           -                   
+PortChannel42       dns-res1-bond                 up          oper-up          -         25000          9216           -                   
+PortChannel43       dns-auth2-bond                up          oper-up          -         25000          9216           -                   
+PortChannel44       dns-res2-bond                 up          oper-up          -         25000          9216           -                   
+fe-sw2# show running-configuration interface PortChannel 32
+!
+interface PortChannel32
+ description truenas1-mgmt
+ switchport access Vlan 200
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+ spanning-tree bpduguard port-shutdown
+ spanning-tree portfast
+fe-sw2# exit
+
+### 2026-10-29T06:23:55Z bastion container
++ bash -c for i in $(seq 0 59); do t=$(date +%s.%N); if timeout 2 bash -c 'exec 3<>/dev/tcp/10.20.2.31/443' 2>/dev/null; then ok=1; else ok=0; fi; echo "$t $i $ok"; sleep 0.5; done
+1793255005.126134083 0 1
+1793255005.637459864 1 1
+1793255006.147131485 2 1
+1793255006.658774036 3 1
+1793255007.171422195 4 1
+1793255007.690923594 5 1
+1793255008.202844487 6 1
+1793255008.714540519 7 1
+1793255009.227560455 8 1
+1793255009.739158170 9 1
+1793255010.250366170 10 1
+1793255010.761893256 11 1
+1793255011.273279972 12 1
+1793255011.791340057 13 1
+1793255012.303533956 14 1
+1793255012.814981142 15 1
+1793255013.325840564 16 1
+1793255013.841053501 17 1
+1793255014.352964769 18 1
+1793255014.865016585 19 1
+1793255015.375287295 20 1
+1793255015.886801134 21 1
+1793255016.398920364 22 1
+1793255016.910723787 23 1
+1793255017.422439961 24 1
+1793255017.935328768 25 1
+1793255018.446652900 26 1
+1793255018.957974758 27 1
+1793255019.469900694 28 1
+1793255019.981683723 29 1
+1793255020.492973403 30 1
+1793255021.004027684 31 1
+1793255021.515569039 32 1
+1793255022.032723136 33 1
+1793255022.545227278 34 1
+1793255023.056587838 35 1
+1793255023.569122096 36 1
+1793255024.084912097 37 1
+1793255024.600078384 38 1
+1793255025.112720403 39 1
+1793255025.624757981 40 1
+1793255026.137051663 41 1
+1793255026.650080074 42 1
+1793255027.159635645 43 1
+1793255027.671339246 44 1
+1793255028.184764777 45 1
+1793255028.696497947 46 1
+1793255029.207296056 47 1
+1793255029.719567975 48 1
+1793255030.234985549 49 1
+1793255030.745177333 50 1
+1793255031.256113909 51 1
+1793255031.768437434 52 1
+1793255032.287193917 53 1
+1793255032.799760906 54 1
+1793255033.318475142 55 1
+1793255033.833515804 56 1
+1793255034.345298775 57 1
+1793255034.857765173 58 1
+1793255035.370381748 59 1
+
+### 2026-10-29T06:23:59Z fe-sw1 klish
+terminal length 0
+show mclag brief
+exit
+terminal length 0
+show mclag brief
+exit
+fe-sw1# terminal length 0
+fe-sw1# show mclag brief
+ 
+Domain ID            : 1
+Role                 : active
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.0
+Peer Address         : 10.20.255.1
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:7a:3a:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.4
+Peer Address         : 10.20.255.5
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw1# exit
+
+### 2026-10-29T06:24:03Z fe-sw2 klish
+terminal length 0
+show mclag brief
+exit
+terminal length 0
+show mclag brief
+exit
+fe-sw2# terminal length 0
+fe-sw2# show mclag brief
+ 
+Domain ID            : 1
+Role                 : standby
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.1
+Peer Address         : 10.20.255.0
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:7a:3a:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.5
+Peer Address         : 10.20.255.4
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw2# exit
+
+### 2026-10-29T06:24:08Z fe-sw1 klish
+terminal length 0
+show running-configuration
+exit
+terminal length 0
+show running-configuration
+exit
+fe-sw1# terminal length 0
+fe-sw1# show running-configuration
+!
+hostname fe-sw1
+ 
+port-group 1 speed 25000
+port-group 2 speed 25000
+port-group 3 speed 25000
+port-group 4 speed 25000
+port-group 5 speed 25000
+port-group 6 speed 25000
+port-group 7 speed 25000
+port-group 8 speed 25000
+port-group 9 speed 25000
+port-group 10 speed 25000
+port-group 11 speed 25000
+port-group 12 speed 25000
+spanning-tree mode pvst
+core enable
+ip load-share hash ipv4 ipv4-dst-ip
+ip load-share hash ipv4 ipv4-src-ip
+ip load-share hash ipv4 ipv4-ip-proto
+ip load-share hash ipv4 ipv4-l4-src-port
+ip load-share hash ipv4 ipv4-l4-dst-port
+ip load-share hash ipv6 ipv6-dst-ip
+ip load-share hash ipv6 ipv6-src-ip
+ip load-share hash ipv6 ipv6-next-hdr
+ip load-share hash ipv6 ipv6-l4-src-port
+ip load-share hash ipv6 ipv6-l4-dst-port
+ip arp timeout 1800
+ipv6 nd cache expire 1800
+factory default profile l3 confirm
+mac address-table aging-time 600
+kdump enable
+kdump memory 0M-2G:256M,2G-4G:256M,4G-8G:384M,8G-:448M
+kdump num-dumps 3
+ip vrf mgmt
+ip vrf VrfMclagKa 
+! 
+! 
+!
+mclag domain 1
+ source-ip 10.20.255.0
+ peer-ip 10.20.255.1
+ session-vrf VrfMclagKa
+ mclag-system-mac 02:5a:00:00:00:01
+ keepalive-interval 1
+ session-timeout 30
+ delay-restore 300
+ backup-keepalive source-ip 10.20.255.4
+ backup-keepalive peer-ip 10.20.255.5
+ backup-keepalive interval 1
+ backup-keepalive session-vrf VrfMclagKa
+!
+nat
+ timeout 600
+ tcp-timeout 86400
+ udp-timeout 300
+!
+tam
+!
+qos scheduler-policy copp-scheduler-policy
+ !
+ queue 0
+  type wrr
+  weight 1
+ !
+ queue 1
+  meter-type packets
+  pir 100
+  type wrr
+  weight 1
+ !
+ queue 10
+  meter-type packets
+  pir 3000
+  type wrr
+  weight 2
+ !
+ queue 11
+  meter-type packets
+  pir 3000
+  type wrr
+  weight 2
+ !
+ queue 12
+  meter-type packets
+  pir 2000
+  type wrr
+  weight 2
+ !
+ queue 13
+  meter-type packets
+  pir 5000
+  type wrr
+  weight 2
+ !
+ queue 14
+  meter-type packets
+  pir 10000
+  type wrr
+  weight 6
+ !
+ queue 15
+  meter-type packets
+  pir 5000
+  type wrr
+  weight 4
+ !
+ queue 16
+  meter-type packets
+  pir 5000
+  type wrr
+  weight 4
+ !
+ queue 17
+  meter-type packets
+  pir 500
+  type wrr
+  weight 2
+ !
+ queue 18
+  meter-type packets
+  pir 500
+  type wrr
+  weight 2
+ !
+ queue 19
+  meter-type packets
+  pir 5000
+  type wrr
+  weight 3
+ !
+ queue 2
+  meter-type packets
+  pir 600
+  type wrr
+  weight 2
+ !
+ queue 20
+  meter-type packets
+  pir 2000
+  type wrr
+  weight 10
+ !
+ queue 21
+  meter-type packets
+  pir 16000
+  type wrr
+  weight 30
+ !
+ queue 22
+  meter-type packets
+  pir 500
+  type wrr
+  weight 10
+ !
+ queue 23
+  meter-type packets
+  pir 500
+  type wrr
+  weight 10
+ !
+ queue 24
+  meter-type packets
+  pir 500
+  type wrr
+  weight 1
+ !
+ port
+  meter-type packets
+ !
+ queue 28
+  meter-type packets
+  pir 100
+  type wrr
+  weight 1
+ !
+ queue 29
+  meter-type packets
+  pir 200
+  type wrr
+  weight 1
+ !
+ queue 3
+  meter-type packets
+  pir 8000
+  type wrr
+  weight 1
+ !
+ queue 30
+  meter-type packets
+  pir 5000
+  type wrr
+  weight 3
+ !
+ queue 4
+  meter-type packets
+  pir 500
+  type wrr
+  weight 1
+ !
+ queue 5
+  meter-type packets
+  pir 300
+  type wrr
+  weight 1
+ !
+ queue 6
+  meter-type packets
+  pir 2000
+  type wrr
+  weight 2
+ !
+ queue 7
+  meter-type packets
+  pir 6000
+  type wrr
+  weight 2
+ !
+ queue 8
+  meter-type packets
+  pir 1000
+  type wrr
+  weight 2
+ !
+ queue 9
+  meter-type packets
+  pir 1200
+  type wrr
+  weight 2
+!
+hardware
+ !
+ access-list
+  counters per-entry
+ !
+ access-list-logging
+ !
+ tcam
+!
+line vty
+ service-policy type qos in oob-qos-policy
+!
+interface Vlan100
+!
+interface Vlan110
+!
+interface Vlan120
+!
+interface Vlan130
+!
+interface Vlan131
+!
+interface Vlan200
+!
+interface Vlan300
+!
+interface Vlan3966
+ description mclag-backup-keepalive
+ mclag-separate-ip
+ ip vrf forwarding VrfMclagKa
+ ip address 10.20.255.4/31
+!
+interface PortChannel1
+ description peer-link
+ switchport trunk allowed Vlan 100,110,120,130-131,200,300,3966
+ fast_rate
+ mtu 9216
+ no shutdown
+!
+interface PortChannel10
+ description fw-ae1
+ switchport trunk allowed Vlan 100,110,130-131,200,300
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+!
+interface PortChannel11
+ description k8s-cp1-bond
+ switchport access Vlan 100
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+ spanning-tree bpduguard port-shutdown
+ spanning-tree portfast
+!
+interface PortChannel12
+ description k8s-cp2-bond
+ switchport access Vlan 100
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+ spanning-tree bpduguard port-shutdown
+ spanning-tree portfast
+!
+interface PortChannel13
+ description k8s-cp3-bond
+ switchport access Vlan 100
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+ spanning-tree bpduguard port-shutdown
+ spanning-tree portfast
+!
+interface PortChannel14
+ description k8s-ingress1-bond
+ switchport access Vlan 100
+ switchport trunk allowed Vlan 110
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+ spanning-tree bpduguard port-shutdown
+ spanning-tree portfast
+!
+interface PortChannel15
+ description k8s-ingress2-bond
+ switchport access Vlan 100
+ switchport trunk allowed Vlan 110
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+ spanning-tree bpduguard port-shutdown
+ spanning-tree portfast
+!
+interface PortChannel21
+ description k8s-gpu1-bond
+ switchport access Vlan 100
+ switchport trunk allowed Vlan 120
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+ spanning-tree bpduguard port-shutdown
+ spanning-tree portfast
+!
+interface PortChannel22
+ description k8s-gpu2-bond
+ switchport access Vlan 100
+ switchport trunk allowed Vlan 120
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+ spanning-tree bpduguard port-shutdown
+ spanning-tree portfast
+!
+interface PortChannel30
+ description bastion-bond
+ switchport access Vlan 300
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+ spanning-tree bpduguard port-shutdown
+ spanning-tree portfast
+!
+interface PortChannel31
+ description truenas1-data
+ switchport access Vlan 120
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+ spanning-tree bpduguard port-shutdown
+ spanning-tree portfast
+!
+interface PortChannel32
+ description truenas1-mgmt
+ switchport access Vlan 200
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+ spanning-tree bpduguard port-shutdown
+ spanning-tree portfast
+!
+interface PortChannel41
+ description dns-auth1-bond
+ switchport access Vlan 130
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+ spanning-tree bpduguard port-shutdown
+ spanning-tree portfast
+!
+interface PortChannel42
+ description dns-res1-bond
+ switchport access Vlan 130
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+ spanning-tree bpduguard port-shutdown
+ spanning-tree portfast
+!
+interface PortChannel43
+ description dns-auth2-bond
+ switchport access Vlan 131
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+ spanning-tree bpduguard port-shutdown
+ spanning-tree portfast
+!
+interface PortChannel44
+ description dns-res2-bond
+ switchport access Vlan 131
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+ spanning-tree bpduguard port-shutdown
+ spanning-tree portfast
+!
+interface Management0
+ description Management0
+ mtu 1500
+ autoneg on
+ speed 1000
+ ip address 172.21.40.11/24 gwaddr 172.21.40.1
+!
+interface Ethernet0
+ description peer-link-1
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ channel-group 1
+ no shutdown
+!
+interface Ethernet1
+ description peer-link-2
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ channel-group 1
+ no shutdown
+!
+interface Ethernet2
+ description fw-eth1
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ channel-group 10
+ no shutdown
+!
+interface Ethernet3
+ description k8s-cp1-eth1
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ channel-group 11
+ no shutdown
+ storm-control broadcast 10000
+ storm-control unknown-unicast 10000
+ storm-control unknown-multicast 10000
+!
+interface Ethernet4
+ description k8s-cp2-eth1
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ channel-group 12
+ no shutdown
+ storm-control broadcast 10000
+ storm-control unknown-unicast 10000
+ storm-control unknown-multicast 10000
+!
+interface Ethernet5
+ description k8s-cp3-eth1
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ channel-group 13
+ no shutdown
+ storm-control broadcast 10000
+ storm-control unknown-unicast 10000
+ storm-control unknown-multicast 10000
+!
+interface Ethernet6
+ description k8s-gpu1-eth1
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ channel-group 21
+ no shutdown
+ storm-control broadcast 10000
+ storm-control unknown-unicast 10000
+ storm-control unknown-multicast 10000
+!
+interface Ethernet7
+ description k8s-gpu2-eth1
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ channel-group 22
+ no shutdown
+ storm-control broadcast 10000
+ storm-control unknown-unicast 10000
+ storm-control unknown-multicast 10000
+!
+interface Ethernet8
+ description bastion-eth1
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ channel-group 30
+ no shutdown
+ storm-control broadcast 10000
+ storm-control unknown-unicast 10000
+ storm-control unknown-multicast 10000
+!
+interface Ethernet9
+ description truenas1-eth1
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ channel-group 31
+ no shutdown
+ storm-control broadcast 10000
+ storm-control unknown-unicast 10000
+ storm-control unknown-multicast 10000
+!
+interface Ethernet10
+ description truenas1-eth2
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ channel-group 31
+ no shutdown
+ storm-control broadcast 10000
+ storm-control unknown-unicast 10000
+ storm-control unknown-multicast 10000
+!
+interface Ethernet11
+ description truenas1-eth5
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ channel-group 32
+ no shutdown
+ storm-control broadcast 10000
+ storm-control unknown-unicast 10000
+ storm-control unknown-multicast 10000
+!
+interface Ethernet12
+ description mclag-keepalive
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ no shutdown
+ ip vrf forwarding VrfMclagKa
+ ip address 10.20.255.0/31
+!
+interface Ethernet13
+ description k8s-ingress1-eth1
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ channel-group 14
+ no shutdown
+ storm-control broadcast 10000
+ storm-control unknown-unicast 10000
+ storm-control unknown-multicast 10000
+!
+interface Ethernet14
+ description k8s-ingress2-eth1
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ channel-group 15
+ no shutdown
+ storm-control broadcast 10000
+ storm-control unknown-unicast 10000
+ storm-control unknown-multicast 10000
+!
+interface Ethernet15
+ description dns-auth1-eth1
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ channel-group 41
+ no shutdown
+ storm-control broadcast 10000
+ storm-control unknown-unicast 10000
+ storm-control unknown-multicast 10000
+!
+interface Ethernet16
+ description dns-res1-eth1
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ channel-group 42
+ no shutdown
+ storm-control broadcast 10000
+ storm-control unknown-unicast 10000
+ storm-control unknown-multicast 10000
+!
+interface Ethernet17
+ description dns-auth2-eth1
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ channel-group 43
+ no shutdown
+ storm-control broadcast 10000
+ storm-control unknown-unicast 10000
+ storm-control unknown-multicast 10000
+!
+interface Ethernet18
+ description dns-res2-eth1
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ channel-group 44
+ no shutdown
+ storm-control broadcast 10000
+ storm-control unknown-unicast 10000
+ storm-control unknown-multicast 10000
+!
+interface Ethernet19
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet20
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet21
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet22
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet23
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet24
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet25
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet26
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet27
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet28
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet29
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet30
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet31
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet32
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet33
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet34
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet35
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet36
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet37
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet38
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet39
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet40
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet41
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet42
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet43
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet44
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet45
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet46
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet47
+ mtu 9100
+ speed 25000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet48
+ mtu 9100
+ speed 100000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet52
+ mtu 9100
+ speed 100000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet56
+ mtu 9100
+ speed 100000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet60
+ mtu 9100
+ speed 100000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet64
+ mtu 9100
+ speed 100000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet68
+ mtu 9100
+ speed 100000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet72
+ mtu 9100
+ speed 100000
+ unreliable-los auto
+ shutdown
+!
+interface Ethernet76
+ mtu 9100
+ speed 100000
+ unreliable-los auto
+ shutdown
+!
+mclag domain 1
+ peer-link PortChannel1
+!
+class-map class-oob-arp match-type fields match-all
+ match ethertype arp
+!
+class-map class-oob-dhcp-client match-type fields match-all
+ match ethertype ip
+ match ip protocol udp
+ match destination-port eq 68
+!
+class-map class-oob-dhcp-server match-type fields match-all
+ match ethertype ip
+ match ip protocol udp
+ match destination-port eq 67
+!
+class-map class-oob-ip-multicast match-type fields match-all
+ match ethertype ip
+ match destination-address ip 224.0.0.0/4
+!
+class-map class-oob-ipv6-multicast match-type fields match-all
+ match ethertype 0x86DD
+ match destination-address ipv6 ff00::/8
+!
+class-map copp-system-arp match-type copp 
+ match protocol arp_req
+ match protocol arp_resp
+ match protocol neigh_discovery
+!
+class-map copp-system-bfd match-type copp 
+ match protocol bfd
+ match protocol bfdv6
+!
+class-map copp-system-bgp match-type copp 
+ match protocol bgp
+ match protocol bgpv6
+!
+class-map copp-system-dhcp match-type copp 
+ match protocol dhcp
+!
+class-map copp-system-dhcpl2 match-type copp 
+ match protocol dhcp_l2
+!
+class-map copp-system-dhcpv6 match-type copp 
+ match protocol dhcpv6
+!
+class-map copp-system-dhcpv6l2 match-type copp 
+ match protocol dhcpv6_l2
+!
+class-map copp-system-eapol match-type copp 
+ match protocol eapol
+!
+class-map copp-system-iccp match-type copp 
+ match protocol iccp
+!
+class-map copp-system-icmp match-type copp 
+ match protocol icmp
+ match protocol icmpv6
+!
+class-map copp-system-igmp match-type copp 
+ match protocol igmp_query
+!
+class-map copp-system-ip2me match-type copp 
+ match protocol ip2me
+!
+class-map copp-system-ipmc match-type copp 
+ match protocol known_l3_mc
+!
+class-map copp-system-ipmc-unknown match-type copp 
+ match protocol unknown_l3_mc
+!
+class-map copp-system-lacp match-type copp 
+ match protocol lacp
+!
+class-map copp-system-lldp match-type copp 
+ match protocol lldp
+!
+class-map copp-system-mtu match-type copp 
+ match protocol l3_mtu_error
+!
+class-map copp-system-nat match-type copp 
+ match protocol src_nat_miss
+ match protocol dest_nat_miss
+!
+class-map copp-system-ospf match-type copp 
+ match protocol ospf
+ match protocol ospfv6
+!
+class-map copp-system-pim match-type copp 
+ match protocol pim
+!
+class-map copp-system-ptp match-type copp 
+ match protocol ptp
+!
+class-map copp-system-sflow match-type copp 
+ match protocol sample_packet
+!
+class-map copp-system-stp match-type copp 
+ match protocol stp
+ match protocol pvrst
+!
+class-map copp-system-subnet match-type copp 
+ match protocol subnet
+!
+class-map copp-system-suppress match-type copp 
+ match protocol arp_suppress
+ match protocol nd_suppress
+!
+class-map copp-system-ttl match-type copp 
+ match protocol ttl_error
+!
+class-map copp-system-udld match-type copp 
+ match protocol udld
+!
+class-map copp-system-vrrp match-type copp 
+ match protocol vrrp
+ match protocol vrrpv6
+!
+class-map default match-type any 
+!
+copp-action copp-system-arp
+ set trap-action copy
+ set trap-queue 10
+ set trap-priority 10
+ police cir 3000 cbs 3000
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-bfd
+ set trap-action trap
+ set trap-queue 20
+ set trap-priority 20
+ police cir 2000 cbs 2000
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-bgp
+ set trap-action trap
+ set trap-queue 14
+ set trap-priority 14
+ police cir 10000 cbs 10000
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-dhcp
+ set trap-action trap
+ set trap-queue 9
+ set trap-priority 9
+ police cir 300 cbs 300
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-dhcpl2
+ set trap-action trap
+ set trap-queue 9
+ set trap-priority 9
+ police cir 300 cbs 300
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-dhcpv6
+ set trap-action trap
+ set trap-queue 9
+ set trap-priority 9
+ police cir 300 cbs 300
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-dhcpv6l2
+ set trap-action trap
+ set trap-queue 9
+ set trap-priority 9
+ police cir 300 cbs 300
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-eapol
+ set trap-action trap
+ set trap-queue 24
+ set trap-priority 24
+ police cir 500 cbs 500
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-iccp
+ set trap-action trap
+ set trap-queue 16
+ set trap-priority 16
+ police cir 5000 cbs 5000
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-icmp
+ set trap-action trap
+ set trap-queue 8
+ set trap-priority 8
+ police cir 1000 cbs 1000
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-igmp
+ set trap-action trap
+ set trap-queue 12
+ set trap-priority 12
+ police cir 2000 cbs 2000
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-ip2me
+ set trap-action trap
+ set trap-queue 7
+ set trap-priority 7
+ police cir 6000 cbs 6000
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-ipmc
+ set trap-action copy
+ set trap-queue 2
+ set trap-priority 2
+ police cir 600 cbs 600
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-ipmc-unknown
+ set trap-action copy
+ set trap-queue 1
+ set trap-priority 1
+ police cir 100 cbs 100
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-lacp
+ set trap-action trap
+ set trap-queue 23
+ set trap-priority 23
+ police cir 500 cbs 500
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-lldp
+ set trap-action trap
+ set trap-queue 18
+ set trap-priority 18
+ police cir 500 cbs 500
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-mtu
+ set trap-action trap
+ set trap-queue 4
+ set trap-priority 4
+ police cir 500 cbs 500
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-nat
+ set trap-action trap
+ set trap-queue 5
+ set trap-priority 5
+ police cir 300 cbs 300
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-ospf
+ set trap-action copy
+ set trap-queue 15
+ set trap-priority 15
+ police cir 5000 cbs 5000
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-pim
+ set trap-action trap
+ set trap-queue 13
+ set trap-priority 13
+ police cir 5000 cbs 5000
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-ptp
+ set trap-action trap
+ set trap-queue 30
+ set trap-priority 30
+ police cir 5000 cbs 5000
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-sflow
+ set trap-action trap
+ set trap-queue 3
+ set trap-priority 3
+ police cir 8000 cbs 8000
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-stp
+ set trap-action trap
+ set trap-queue 21
+ set trap-priority 21
+ police cir 16000 cbs 16000
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-subnet
+ set trap-action trap
+ set trap-queue 6
+ set trap-priority 6
+ police cir 2000 cbs 2000
+ police meter-type pps
+ police mode sr_tcm red forward
+!
+copp-action copp-system-suppress
+ set trap-action trap
+ set trap-queue 11
+ set trap-priority 11
+ police cir 3000 cbs 3000
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-ttl
+ set trap-action trap
+ set trap-queue 0
+ set trap-priority 0
+ police cir 100 cbs 100
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-udld
+ set trap-action trap
+ set trap-queue 22
+ set trap-priority 22
+ police cir 500 cbs 500
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action copp-system-vrrp
+ set trap-action trap
+ set trap-queue 17
+ set trap-priority 17
+ police cir 500 cbs 500
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+copp-action default
+ set trap-queue 0
+ police cir 100 cbs 100
+ police meter-type pps
+ police mode sr_tcm red drop
+!
+policy-map copp-system-policy type copp
+ class default priority 0
+  set copp-action default
+ !
+ class copp-system-vrrp priority 0
+  set copp-action copp-system-vrrp
+ !
+ class copp-system-udld priority 0
+  set copp-action copp-system-udld
+ !
+ class copp-system-ttl priority 0
+  set copp-action copp-system-ttl
+ !
+ class copp-system-suppress priority 0
+  set copp-action copp-system-suppress
+ !
+ class copp-system-subnet priority 0
+  set copp-action copp-system-subnet
+ !
+ class copp-system-stp priority 0
+  set copp-action copp-system-stp
+ !
+ class copp-system-sflow priority 0
+  set copp-action copp-system-sflow
+ !
+ class copp-system-ptp priority 0
+  set copp-action copp-system-ptp
+ !
+ class copp-system-pim priority 0
+  set copp-action copp-system-pim
+ !
+ class copp-system-ospf priority 0
+  set copp-action copp-system-ospf
+ !
+ class copp-system-nat priority 0
+  set copp-action copp-system-nat
+ !
+ class copp-system-mtu priority 0
+  set copp-action copp-system-mtu
+ !
+ class copp-system-lldp priority 0
+  set copp-action copp-system-lldp
+ !
+ class copp-system-lacp priority 0
+  set copp-action copp-system-lacp
+ !
+ class copp-system-ipmc-unknown priority 0
+  set copp-action copp-system-ipmc-unknown
+ !
+ class copp-system-ipmc priority 0
+  set copp-action copp-system-ipmc
+ !
+ class copp-system-ip2me priority 0
+  set copp-action copp-system-ip2me
+ !
+ class copp-system-igmp priority 0
+  set copp-action copp-system-igmp
+ !
+ class copp-system-icmp priority 0
+  set copp-action copp-system-icmp
+ !
+ class copp-system-iccp priority 0
+  set copp-action copp-system-iccp
+ !
+ class copp-system-eapol priority 0
+  set copp-action copp-system-eapol
+ !
+ class copp-system-dhcpv6l2 priority 0
+  set copp-action copp-system-dhcpv6l2
+ !
+ class copp-system-dhcpv6 priority 0
+  set copp-action copp-system-dhcpv6
+ !
+ class copp-system-dhcpl2 priority 0
+  set copp-action copp-system-dhcpl2
+ !
+ class copp-system-dhcp priority 0
+  set copp-action copp-system-dhcp
+ !
+ class copp-system-bgp priority 0
+  set copp-action copp-system-bgp
+ !
+ class copp-system-bfd priority 0
+  set copp-action copp-system-bfd
+ !
+ class copp-system-arp priority 0
+  set copp-action copp-system-arp
+ !
+!
+policy-map oob-qos-policy type qos
+ description "QoS Ratelimiting policy for OOB port"
+ class class-oob-dhcp-client priority 1020
+  police cir 512000
+ !
+ class class-oob-dhcp-server priority 1015
+  police cir 512000
+ !
+ class class-oob-arp priority 1010
+  police cir 256000
+ !
+ class class-oob-ipv6-multicast priority 1005
+  police cir 256000
+ !
+ class class-oob-ip-multicast priority 1000
+  police cir 256000
+ !
+fe-sw1# exit
+

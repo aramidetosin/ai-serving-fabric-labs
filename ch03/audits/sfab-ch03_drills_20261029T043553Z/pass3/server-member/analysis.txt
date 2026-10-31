@@ -1,0 +1,53 @@
+drill server-member, pass 3: k8s-gpu1's member on fe-sw1 shut from the switch side
+  target switch fe-sw1; every time on the lab host's clock, relative to the cut (T0)
+  the fault's session took 3.49 s (T0 is when it started)
+  placement: ping: 4 of 8 ids cross fe-sw1, 4 do not
+  ping 3102, 3103, 3106, 3107 cross fe-sw1; 3100, 3101, 3104, 3105 do not
+  ping id 3100 (via fe-sw2): sent 300, answered 300, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.32 s, from +58.28 s to +58.60 s
+    the guest's ping: 300 transmitted, 300 received; the two witnesses agree on every round trip both saw
+  ping id 3101 (via fe-sw2): sent 300, answered 300, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.32 s, from +58.28 s to +58.60 s
+    the guest's ping: 300 transmitted, 300 received; the two witnesses agree on every round trip both saw
+  ping id 3102 (via fe-sw1): sent 299, answered 292, round trips lost 7
+    7 lost at the cut
+    first lost sent at +3.51 s, last at +5.34 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 2.43 s, from +3.21 s to +5.64 s
+    the guest's ping: 299 transmitted, 292 received; the two witnesses agree on every round trip both saw
+  ping id 3103 (via fe-sw1): sent 299, answered 292, round trips lost 7
+    7 lost at the cut
+    first lost sent at +3.52 s, last at +5.34 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 2.43 s, from +3.22 s to +5.64 s
+    18 duplicate replies
+    the guest's ping: 299 transmitted, 292 received; the two witnesses agree on every round trip both saw
+  ping id 3104 (via fe-sw2): sent 300, answered 300, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.32 s, from +68.52 s to +68.83 s
+    the guest's ping: 300 transmitted, 300 received; the two witnesses agree on every round trip both saw
+  ping id 3105 (via fe-sw2): sent 299, answered 299, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.35 s, from +15.26 s to +15.61 s
+    the guest's ping: 299 transmitted, 299 received; the two witnesses agree on every round trip both saw
+  ping id 3106 (via fe-sw1): sent 299, answered 292, round trips lost 7
+    7 lost at the cut
+    first lost sent at +3.52 s, last at +5.35 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 2.43 s, from +3.23 s to +5.65 s
+    34 duplicate replies
+    the guest's ping: 299 transmitted, 292 received; the two witnesses agree on every round trip both saw
+  ping id 3107 (via fe-sw1): sent 299, answered 292, round trips lost 7
+    7 lost at the cut
+    first lost sent at +3.53 s, last at +5.35 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 2.43 s, from +3.23 s to +5.66 s
+    2 duplicate replies
+    the guest's ping: 299 transmitted, 292 received; the two witnesses agree on every round trip both saw
+  tcp connects to the users' VIP: 299 attempts, 0 failed (0 at the cut, 0 at the restore, 0 elsewhere)
+    attempts in the cut window by the firewall leg their SYN took: {'fe-sw1': 26, 'fe-sw2': 25}
+  peer link, packets per second from the host-side counters of its member ports:
+    before fe-sw1: tx 3.1 rx 3.3 over 3.59 s
+    before fe-sw2: tx 3.3 rx 3.0 over 3.62 s
+    during fe-sw1: tx 22.2 rx 4.4 over 19.97 s
+    during fe-sw2: tx 4.5 rx 22.4 over 19.98 s
+    after  fe-sw1: tx 3.4 rx 3.1 over 10.67 s
+    after  fe-sw2: tx 3.1 rx 3.2 over 10.63 s

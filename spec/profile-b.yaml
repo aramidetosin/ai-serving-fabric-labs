@@ -1,0 +1,100 @@
+# Corvane, build B: the cloud provider's pod (FRAMEWORK.md section 1.5).
+#
+# PLACEHOLDER. This file holds the organization, the management network and the addressing plan
+# only. The build B milestone (dev/b0, then the chapter 12 to 18 labs) fills in the switches,
+# pairs, hosts, appliances, firewall, routers, Kubernetes, DNS, CA and storage. Until then
+# `sfab render` refuses any lab that selects profile b.
+
+profile: b
+build: B
+placeholder: true
+
+org:
+  name: Corvane
+  domain: corvane.example
+  short: cv
+  label_domain: corvane.example
+
+mgmt:
+  network: sfab-b-mgmt
+  subnet: 172.21.41.0/24
+  gw: 1
+  bridge: sfab-b-mgmt
+
+states:
+  one:
+    steps: [12, 13, 14, 15, 16]
+    step_mode: cumulative
+  many:
+    steps: [17, 18]
+    step_mode: cumulative
+
+# Management addresses (octets in 172.21.41.0/24), FRAMEWORK 1.5.
+mgmt_plan:
+  spines: [11, 12]
+  leaf_pairs: [13, 14, 15, 16, 17, 18]
+  borders: [19, 20]
+  rail_spines: [21, 22, 23, 24]
+  rail_leaves: [31, 32, 33, 34, 35, 36, 37, 38]
+  oob: [41, 42]
+  fw: 50
+  bastion: 60
+  uplink_rtr: 61
+  isp_rtr: 62
+  registry: 70
+  carrier: [71, 72, 73, 74, 75]
+  resolvers: [53, 54, 55, 56]
+  clients: [81, 82, 83, 84, 85, 86]
+  ctrl: [101, 102, 103]
+  gpu: [111, 112, 113, 114, 115, 116, 117, 118]
+  ontap: [121, 122]
+
+# Addressing plan. A segment with within: sits inside the named segment.
+segments:
+  - {id: mgmt,         prefix: 172.21.41.0/24,    scope: mgmt,     desc: containerlab management network sfab-b-mgmt}
+  - {id: data,         prefix: 10.30.1.0/24,      scope: internal, vlan: 100, desc: "data VRF, anycast gateway .1"}
+  - {id: stor-mgmt,    prefix: 10.30.2.0/24,      scope: internal, vlan: 200}
+  - {id: bastion,      prefix: 10.30.3.0/24,      scope: internal, vlan: 300}
+  - {id: oob,          prefix: 10.30.9.0/24,      scope: internal, desc: "out-of-band, gateway .254 on the firewall"}
+  - {id: fe-loopbacks, prefix: 10.31.0.0/24,      scope: internal, desc: frontend loopbacks and VTEPs}
+  - {id: border-fw,    prefix: 10.31.254.0/24,    scope: internal, per_port: 30, desc: "border to firewall, one /30 per VRF per border"}
+  - {id: fw-ce,        prefix: 10.31.253.0/30,    scope: internal, when: many, desc: firewall to CE}
+  - {id: rail-loopbacks, prefix: 10.32.0.0/24,    scope: internal}
+  - {id: rail1,        prefix: 10.33.1.0/24,      scope: internal}
+  - {id: rail2,        prefix: 10.33.2.0/24,      scope: internal}
+  - {id: rail3,        prefix: 10.33.3.0/24,      scope: internal}
+  - {id: rail4,        prefix: 10.33.4.0/24,      scope: internal}
+  - {id: rail5,        prefix: 10.33.5.0/24,      scope: internal}
+  - {id: rail6,        prefix: 10.33.6.0/24,      scope: internal}
+  - {id: rail7,        prefix: 10.33.7.0/24,      scope: internal}
+  - {id: rail8,        prefix: 10.33.8.0/24,      scope: internal}
+  - {id: plane2-rails, prefix: 10.36.0.0/16,      scope: internal, desc: "plane 2 rails 10.36.L.0/24, chapter 16 variant"}
+  - {id: plane2-loopbacks, prefix: 10.37.0.0/24,  scope: internal, desc: "plane 2 loopbacks, chapter 16 variant"}
+  - {id: pods,         prefix: 10.34.0.0/16,      scope: internal}
+  - {id: services,     prefix: 10.35.0.0/16,      scope: internal}
+  - {id: carrier,      prefix: 10.38.0.0/16,      scope: internal, when: many, desc: "loopbacks .255.x, core /31s .254.x, PE-CE /30s .10.x"}
+  - {id: sites,        prefix: 10.39.0.0/16,      scope: internal, when: many, desc: customer sites}
+  - {id: site-lan-1,   prefix: 10.39.10.0/24,     scope: internal, within: sites, when: many}
+  - {id: site-lan-2,   prefix: 10.39.20.0/24,     scope: internal, within: sites, when: many}
+  - {id: uplink,       prefix: 198.51.100.128/29, scope: external}
+  - {id: operator,     prefix: 192.0.2.64/26,     scope: external, per_port: 30}
+  - {id: isp,          prefix: 198.51.100.136/30, scope: external, when: many}
+  - {id: internet,     prefix: 203.0.113.64/26,   scope: external, per_port: 30, when: many}
+  - {id: v6-org,       prefix: "2001:db8:b::/48",   scope: external, reserved: true}
+  - {id: v6-public,    prefix: "2001:db8:f::/48",   scope: external, reserved: true, when: many}
+
+asns:
+  fe_spines: 64600
+  leaf_pairs: [64601, 64602, 64603]
+  borders: 64604
+  firewall: 64610
+  rail_spines: 64700
+  rail_leaf_base: 64700
+  plane2_base: 64800
+  carrier: 64900
+  ces: [64911, 64912]
+
+macs:
+  guest_prefix: "02:5b"
+  anycast_gateway: "02:5b:00:00:00:01"
+  es_system_prefix: "02:5b:00:e5"

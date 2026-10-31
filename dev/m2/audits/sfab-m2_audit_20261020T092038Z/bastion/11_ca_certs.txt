@@ -1,0 +1,30 @@
+== /shared/ca/kubernetes.crt
+subject=CN=Tarnwick Kubernetes CA,O=Tarnwick
+issuer=CN=Tarnwick Lab Root CA,O=Tarnwick
+X509v3 Name Constraints: critical
+    Permitted:
+      DNS:tarnwick.example
+      DNS:kubernetes
+      DNS:kubernetes.default
+      DNS:kubernetes.default.svc
+      DNS:cluster.local
+      DNS:ctrl1
+      DNS:ctrl2
+      DNS:ctrl3
+      IP:10.20.1.0/255.255.255.0
+      IP:10.23.0.0/255.255.0.0
+/shared/ca/kubernetes.crt: OK
+== /shared/ca/platform.crt
+subject=CN=Tarnwick Platform CA,O=Tarnwick
+issuer=CN=Tarnwick Lab Root CA,O=Tarnwick
+X509v3 Name Constraints: critical
+    Permitted:
+      DNS:tarnwick.example
+      IP:10.20.0.0/255.252.0.0
+      IP:10.24.10.0/255.255.255.0
+/shared/ca/platform.crt: OK
+== /shared/ca/root.crt
+No extensions in certificate
+subject=CN=Tarnwick Lab Root CA,O=Tarnwick
+issuer=CN=Tarnwick Lab Root CA,O=Tarnwick
+/shared/ca/root.crt: OK

@@ -1,0 +1,31 @@
+== the serving trace: chat through gw-users
+  PASS  the key for chat handed to ent-client as a 0600 header file, read from its Secret in the cluster (batch.3915b3b1 sha256:afa4a482f152 <redacted hmac:efe716422df6>)
+== the request: ent-client to chat through gw-users
+  PASS  HTTP 200 for POST https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions with chat's key
+  PASS  answered by the router's openai/chat deployment, on the model's Service http://chat.serving.svc.cluster.local:8080/v1, with no retry
+== the users' VIP
+  PASS  k8s-ingress2, which holds gw-users's lease: the client's SYN from 10.24.10.10 port 42706 to 10.20.11.210:443 on bond0, and data both ways (4 segments in, 4 out)
+== the API gateway and the router
+  PASS  one API gateway pod took it: api-gateway-64bc7b94df-7b74q on k8s-ingress2 (10.22.1.137:9080), data from the Gateway's proxy at 10.22.1.36, sent on to the router pod router-76cf778fb6-bh7gc (10.22.1.250:4000); api-gateway-64bc7b94df-kjsww took none
+  PASS  the router pod router-76cf778fb6-bh7gc on k8s-ingress2 received it from api-gateway-64bc7b94df-7b74q and sent it to chat-b-server-0 (10.22.4.88:8080), chat's copy b on rail 6
+== the server and its workers on the rail
+  PASS  chat-b-server-0 on k8s-gpu2 received it on eth0 from router-76cf778fb6-bh7gc and answered (1 data segments in, 1 out)
+  PASS  chat-b-server-0's RPC on rail6 (10.21.6.100) to chat-b-worker0-0 at 10.21.6.101:50052, the table's rail 6: 472 data segments out, 161 back
+  PASS  chat-b-worker0-0 on k8s-gpu2 saw it on its own rail6 (472 data segments from 10.21.6.100)
+== rail-sw2: the rail switch of rail 6
+  PASS  ... and no frame of the RPC to chat-b-worker0-0 (10.21.6.101), beside its server on k8s-gpu2: macvlan's bridge mode keeps it inside the node
+== chat's other copies
+  PASS  copy a on rail 3 carried none of it: no data to chat-a-server-0, no RPC on rail3 at its server, its workers or rail-sw1's ports
+  PASS  copy c on rail 7 carried none of it: no data to chat-c-server-0, no RPC on rail7 at its server, its workers or rail-sw1's ports
+== the keys at the in-cluster hops (the captures' Authorization values replaced by their marks)
+  PASS  hop 1, the Gateway's proxy to api-gateway-64bc7b94df-7b74q: POST /models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions with Authorization <redacted hmac:efe716422df6>, the caller's chat key (batch.3915b3b1 sha256:afa4a482f152)
+  PASS  hop 2, api-gateway-64bc7b94df-7b74q to the router pod router-76cf778fb6-bh7gc: POST /engines/chat/chat/completions with Authorization <redacted hmac:b1c432715e9b>, the router's master key (sha256:69f1782fcc04), set in place of the caller's
+  PASS  ... and the caller's key nowhere on hop 2 (0 requests to the router carry its mark)
+  PASS  ... which router-76cf778fb6-bh7gc received with the same mark
+  PASS  hop 3, router-76cf778fb6-bh7gc to the server at 10.22.4.88: Authorization <redacted hmac:ca169146b0f4>, the backend key (sha256:d255557d22d3), neither the caller's nor the master key
+  PASS  every Authorization value in the keyed captures is a mark, none a value (4 requests with one, 4 keyed points)
+== the refusal: admin.ai.tarnwick.example sent to gw-users, which does not carry it
+  PASS  GET https://admin.ai.tarnwick.example/echo?msg=sfab-trace-refused from ent-client: HTTP 404 from the Gateway (server envoy)
+  PASS  k8s-ingress2: the client's SYN from port 42707 to 10.20.11.210:443
+  PASS  no API gateway pod saw it: no request for admin.ai.tarnwick.example at 2 API gateway pods, which received 1 request(s) in all, the keyed one
+== RESULT: 21 passed, 0 failed, 0 known platform limitation(s), 0 skipped

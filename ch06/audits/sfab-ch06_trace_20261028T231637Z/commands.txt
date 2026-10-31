@@ -1,0 +1,707 @@
+### 2026-10-28T23:16:42Z k8s-cp1 kubectl
++ kubectl -n inference get pods -o wide
+NAME                           READY   STATUS    RESTARTS   AGE    IP            NODE           NOMINATED NODE   READINESS GATES
+api-gateway-64bc7b94df-4nzm6   2/2     Running   0          148m   10.22.3.13    k8s-ingress2   <none>           <none>
+api-gateway-64bc7b94df-z4csg   2/2     Running   0          148m   10.22.4.241   k8s-ingress1   <none>           <none>
+router-76cf778fb6-gwr7f        1/1     Running   0          148m   10.22.4.84    k8s-ingress1   <none>           <none>
+router-76cf778fb6-n6nk4        1/1     Running   0          148m   10.22.3.114   k8s-ingress2   <none>           <none>
+
+### 2026-10-28T23:16:42Z k8s-cp1 kubectl
++ kubectl -n serving get pods -o wide
+NAME                READY   STATUS    RESTARTS   AGE    IP            NODE       NOMINATED NODE   READINESS GATES
+chat-a-server-0     1/1     Running   0          151m   10.22.1.33    k8s-gpu1   <none>           <none>
+chat-a-worker0-0    1/1     Running   0          151m   10.22.1.251   k8s-gpu1   <none>           <none>
+chat-b-server-0     1/1     Running   0          62m    10.22.2.174   k8s-gpu2   <none>           <none>
+chat-b-worker0-0    1/1     Running   0          62m    10.22.2.201   k8s-gpu2   <none>           <none>
+chat-c-server-0     1/1     Running   0          32m    10.22.1.35    k8s-gpu1   <none>           <none>
+chat-c-worker0-0    1/1     Running   0          151m   10.22.2.70    k8s-gpu2   <none>           <none>
+chat-c-worker1-0    1/1     Running   0          151m   10.22.1.100   k8s-gpu1   <none>           <none>
+staff-a-server-0    1/1     Running   0          151m   10.22.1.1     k8s-gpu1   <none>           <none>
+staff-a-worker0-0   1/1     Running   0          151m   10.22.1.229   k8s-gpu1   <none>           <none>
+staff-b-server-0    1/1     Running   0          151m   10.22.2.81    k8s-gpu2   <none>           <none>
+staff-b-worker0-0   1/1     Running   0          151m   10.22.2.211   k8s-gpu2   <none>           <none>
+
+### 2026-10-28T23:16:47Z ent-client container
++ curl -sS --max-time 120 -o /tmp/sfab-trace/warmup-body.json -D /tmp/sfab-trace/warmup-headers.txt -w %{http_code} %{local_port}\n -H @/tmp/sfab-trace/hdr-chat -H Content-Type: application/json --data @/tmp/sfab-trace/request.json https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions
+200 51148
+
+### 2026-10-28T23:16:49Z k8s-ingress2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.pcap /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.txt; exec timeout 300 tcpdump -i bond0 -nn -s 96 -U -w /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.pcap 'tcp port 443 and host 10.20.11.210' &
+
+
+### 2026-10-28T23:16:50Z k8s-ingress2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.pcap /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.txt; exec nsenter -t 3368 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.pcap 'tcp port 9080 or tcp port 4000' &
+
+
+### 2026-10-28T23:16:52Z k8s-ingress1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.pcap /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.txt; exec nsenter -t 3248 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.pcap 'tcp port 9080 or tcp port 4000' &
+
+
+### 2026-10-28T23:16:53Z k8s-ingress1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.pcap /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.txt; exec nsenter -t 3295 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.pcap 'tcp port 4000 or tcp port 8080' &
+
+
+### 2026-10-28T23:16:54Z k8s-ingress2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.pcap /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.txt; exec nsenter -t 3405 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.pcap 'tcp port 4000 or tcp port 8080' &
+
+
+### 2026-10-28T23:16:56Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.pcap /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.txt; exec nsenter -t 6249 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.pcap 'tcp port 8080' &
+
+
+### 2026-10-28T23:16:57Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.pcap /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.txt; exec nsenter -t 6249 -n timeout 300 tcpdump -i rail3 -nn -s 128 -U -w /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:16:58Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.pcap /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.txt; exec nsenter -t 5617 -n timeout 300 tcpdump -i rail3 -nn -s 128 -U -w /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:16:58Z rail-sw1 capture
++ nsenter -t 2953179 -n timeout 300 tcpdump -i eth2 -nn -s 128 -U -w captures/6-rail-sw1-Ethernet1.pcap 'tcp port 50052'
+
+### 2026-10-28T23:17:00Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.pcap /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.txt; exec nsenter -t 347108 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.pcap 'tcp port 8080' &
+
+
+### 2026-10-28T23:17:01Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.pcap /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.txt; exec nsenter -t 347108 -n timeout 300 tcpdump -i rail6 -nn -s 128 -U -w /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:17:02Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.pcap /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.txt; exec nsenter -t 346444 -n timeout 300 tcpdump -i rail6 -nn -s 128 -U -w /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:17:02Z rail-sw2 capture
++ nsenter -t 2953154 -n timeout 300 tcpdump -i eth7 -nn -s 128 -U -w captures/6-rail-sw2-Ethernet6.pcap 'tcp port 50052'
+
+### 2026-10-28T23:17:03Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.pcap /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.txt; exec nsenter -t 565805 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.pcap 'tcp port 8080' &
+
+
+### 2026-10-28T23:17:04Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.pcap /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.txt; exec nsenter -t 565805 -n timeout 300 tcpdump -i rail7 -nn -s 128 -U -w /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:17:05Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.pcap /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.txt; exec nsenter -t 5266 -n timeout 300 tcpdump -i rail7 -nn -s 128 -U -w /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:17:06Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.pcap /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.txt; exec nsenter -t 5648 -n timeout 300 tcpdump -i rail7 -nn -s 128 -U -w /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:17:06Z rail-sw1 capture
++ nsenter -t 2953179 -n timeout 300 tcpdump -i eth4 -nn -s 128 -U -w captures/6-rail-sw1-Ethernet3.pcap 'tcp port 50052'
+
+### 2026-10-28T23:17:06Z rail-sw1 capture
++ nsenter -t 2953179 -n timeout 300 tcpdump -i eth8 -nn -s 128 -U -w captures/6-rail-sw1-Ethernet7.pcap 'tcp port 50052'
+
+### 2026-10-28T23:17:29Z ent-client container
++ curl -sS --max-time 120 --local-port 42606 -o /tmp/sfab-trace/request-body.json -D /tmp/sfab-trace/request-headers.txt -w %{http_code} %{local_port}\n -H @/tmp/sfab-trace/hdr-chat -H Content-Type: application/json --data @/tmp/sfab-trace/request.json https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions
+200 42606
+
+### 2026-10-28T23:17:33Z k8s-ingress2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.pcap > /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.txt
+43
+
+### 2026-10-28T23:17:36Z k8s-ingress2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.pcap > /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.txt
+109
+
+### 2026-10-28T23:17:39Z k8s-ingress1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.pcap > /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.txt
+151
+
+### 2026-10-28T23:17:42Z k8s-ingress1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.pcap > /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.txt
+193
+
+### 2026-10-28T23:17:45Z k8s-ingress2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.pcap > /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.txt
+251
+
+### 2026-10-28T23:17:48Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.pcap > /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.txt
+1
+
+### 2026-10-28T23:17:51Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.pcap > /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.txt
+1
+
+### 2026-10-28T23:17:54Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.pcap > /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.txt 2>&1; wc -l < /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.txt
+1
+
+### 2026-10-28T23:17:58Z k8s-gpu2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.pcap > /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.txt
+21
+
+### 2026-10-28T23:18:02Z k8s-gpu2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.pcap > /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.txt
+2103
+
+### 2026-10-28T23:18:05Z k8s-gpu2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.pcap > /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.txt 2>&1; wc -l < /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.txt
+2103
+
+### 2026-10-28T23:18:08Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.pcap > /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.txt
+1
+
+### 2026-10-28T23:18:11Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.pcap > /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.txt
+1
+
+### 2026-10-28T23:18:14Z k8s-gpu2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.pcap > /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.txt 2>&1; wc -l < /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.txt
+1
+
+### 2026-10-28T23:18:18Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.pcap > /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.txt 2>&1; wc -l < /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.txt
+1
+
+### 2026-10-28T23:18:42Z k8s-ingress2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.pcap /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.txt; exec timeout 300 tcpdump -i bond0 -nn -s 96 -U -w /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.pcap 'tcp port 443 and host 10.20.11.210' &
+
+
+### 2026-10-28T23:18:43Z k8s-ingress2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.pcap /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.txt; exec nsenter -t 3368 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.pcap 'tcp port 9080 or tcp port 4000' &
+
+
+### 2026-10-28T23:18:44Z k8s-ingress1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.pcap /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.txt; exec nsenter -t 3248 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.pcap 'tcp port 9080 or tcp port 4000' &
+
+
+### 2026-10-28T23:18:45Z k8s-ingress1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.pcap /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.txt; exec nsenter -t 3295 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.pcap 'tcp port 4000 or tcp port 8080' &
+
+
+### 2026-10-28T23:18:46Z k8s-ingress2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.pcap /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.txt; exec nsenter -t 3405 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.pcap 'tcp port 4000 or tcp port 8080' &
+
+
+### 2026-10-28T23:18:48Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.pcap /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.txt; exec nsenter -t 6249 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.pcap 'tcp port 8080' &
+
+
+### 2026-10-28T23:18:49Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.pcap /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.txt; exec nsenter -t 6249 -n timeout 300 tcpdump -i rail3 -nn -s 128 -U -w /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:18:50Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.pcap /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.txt; exec nsenter -t 5617 -n timeout 300 tcpdump -i rail3 -nn -s 128 -U -w /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:18:50Z rail-sw1 capture
++ nsenter -t 2953179 -n timeout 300 tcpdump -i eth2 -nn -s 128 -U -w captures/6-rail-sw1-Ethernet1.pcap 'tcp port 50052'
+
+### 2026-10-28T23:18:52Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.pcap /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.txt; exec nsenter -t 347108 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.pcap 'tcp port 8080' &
+
+
+### 2026-10-28T23:18:53Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.pcap /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.txt; exec nsenter -t 347108 -n timeout 300 tcpdump -i rail6 -nn -s 128 -U -w /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:18:54Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.pcap /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.txt; exec nsenter -t 346444 -n timeout 300 tcpdump -i rail6 -nn -s 128 -U -w /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:18:54Z rail-sw2 capture
++ nsenter -t 2953154 -n timeout 300 tcpdump -i eth7 -nn -s 128 -U -w captures/6-rail-sw2-Ethernet6.pcap 'tcp port 50052'
+
+### 2026-10-28T23:18:55Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.pcap /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.txt; exec nsenter -t 565805 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.pcap 'tcp port 8080' &
+
+
+### 2026-10-28T23:18:56Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.pcap /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.txt; exec nsenter -t 565805 -n timeout 300 tcpdump -i rail7 -nn -s 128 -U -w /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:18:57Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.pcap /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.txt; exec nsenter -t 5266 -n timeout 300 tcpdump -i rail7 -nn -s 128 -U -w /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:18:58Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.pcap /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.txt; exec nsenter -t 5648 -n timeout 300 tcpdump -i rail7 -nn -s 128 -U -w /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:18:59Z rail-sw1 capture
++ nsenter -t 2953179 -n timeout 300 tcpdump -i eth4 -nn -s 128 -U -w captures/6-rail-sw1-Ethernet3.pcap 'tcp port 50052'
+
+### 2026-10-28T23:18:59Z rail-sw1 capture
++ nsenter -t 2953179 -n timeout 300 tcpdump -i eth8 -nn -s 128 -U -w captures/6-rail-sw1-Ethernet7.pcap 'tcp port 50052'
+
+### 2026-10-28T23:19:21Z ent-client container
++ curl -sS --max-time 120 --local-port 42607 -o /tmp/sfab-trace/request-body.json -D /tmp/sfab-trace/request-headers.txt -w %{http_code} %{local_port}\n -H @/tmp/sfab-trace/hdr-chat -H Content-Type: application/json --data @/tmp/sfab-trace/request.json https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions
+200 42607
+
+### 2026-10-28T23:19:26Z k8s-ingress2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.pcap > /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.txt
+35
+
+### 2026-10-28T23:19:29Z k8s-ingress2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.pcap > /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.txt
+143
+
+### 2026-10-28T23:19:32Z k8s-ingress1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.pcap > /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.txt
+109
+
+### 2026-10-28T23:19:35Z k8s-ingress1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.pcap > /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.txt
+293
+
+### 2026-10-28T23:19:38Z k8s-ingress2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.pcap > /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.txt
+251
+
+### 2026-10-28T23:19:41Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.pcap > /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.txt
+21
+
+### 2026-10-28T23:19:44Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.pcap > /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.txt
+1
+
+### 2026-10-28T23:19:47Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.pcap > /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.txt 2>&1; wc -l < /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.txt
+1
+
+### 2026-10-28T23:19:50Z k8s-gpu2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.pcap > /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.txt
+41
+
+### 2026-10-28T23:19:54Z k8s-gpu2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.pcap > /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.txt
+2109
+
+### 2026-10-28T23:19:57Z k8s-gpu2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.pcap > /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.txt 2>&1; wc -l < /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.txt
+2109
+
+### 2026-10-28T23:20:00Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.pcap > /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.txt
+1
+
+### 2026-10-28T23:20:04Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.pcap > /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.txt
+1
+
+### 2026-10-28T23:20:07Z k8s-gpu2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.pcap > /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.txt 2>&1; wc -l < /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.txt
+1
+
+### 2026-10-28T23:20:10Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.pcap > /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.txt 2>&1; wc -l < /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.txt
+1
+
+### 2026-10-28T23:20:34Z k8s-ingress2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.pcap /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.txt; exec timeout 300 tcpdump -i bond0 -nn -s 96 -U -w /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.pcap 'tcp port 443 and host 10.20.11.210' &
+
+
+### 2026-10-28T23:20:35Z k8s-ingress2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.pcap /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.txt; exec nsenter -t 3368 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.pcap 'tcp port 9080 or tcp port 4000' &
+
+
+### 2026-10-28T23:20:37Z k8s-ingress1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.pcap /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.txt; exec nsenter -t 3248 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.pcap 'tcp port 9080 or tcp port 4000' &
+
+
+### 2026-10-28T23:20:38Z k8s-ingress1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.pcap /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.txt; exec nsenter -t 3295 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.pcap 'tcp port 4000 or tcp port 8080' &
+
+
+### 2026-10-28T23:20:39Z k8s-ingress2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.pcap /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.txt; exec nsenter -t 3405 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.pcap 'tcp port 4000 or tcp port 8080' &
+
+
+### 2026-10-28T23:20:41Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.pcap /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.txt; exec nsenter -t 6249 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.pcap 'tcp port 8080' &
+
+
+### 2026-10-28T23:20:42Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.pcap /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.txt; exec nsenter -t 6249 -n timeout 300 tcpdump -i rail3 -nn -s 128 -U -w /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:20:43Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.pcap /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.txt; exec nsenter -t 5617 -n timeout 300 tcpdump -i rail3 -nn -s 128 -U -w /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:20:43Z rail-sw1 capture
++ nsenter -t 2953179 -n timeout 300 tcpdump -i eth2 -nn -s 128 -U -w captures/6-rail-sw1-Ethernet1.pcap 'tcp port 50052'
+
+### 2026-10-28T23:20:44Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.pcap /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.txt; exec nsenter -t 347108 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.pcap 'tcp port 8080' &
+
+
+### 2026-10-28T23:20:45Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.pcap /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.txt; exec nsenter -t 347108 -n timeout 300 tcpdump -i rail6 -nn -s 128 -U -w /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:20:47Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.pcap /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.txt; exec nsenter -t 346444 -n timeout 300 tcpdump -i rail6 -nn -s 128 -U -w /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:20:47Z rail-sw2 capture
++ nsenter -t 2953154 -n timeout 300 tcpdump -i eth7 -nn -s 128 -U -w captures/6-rail-sw2-Ethernet6.pcap 'tcp port 50052'
+
+### 2026-10-28T23:20:48Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.pcap /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.txt; exec nsenter -t 565805 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.pcap 'tcp port 8080' &
+
+
+### 2026-10-28T23:20:49Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.pcap /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.txt; exec nsenter -t 565805 -n timeout 300 tcpdump -i rail7 -nn -s 128 -U -w /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:20:50Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.pcap /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.txt; exec nsenter -t 5266 -n timeout 300 tcpdump -i rail7 -nn -s 128 -U -w /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:20:51Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.pcap /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.txt; exec nsenter -t 5648 -n timeout 300 tcpdump -i rail7 -nn -s 128 -U -w /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:20:51Z rail-sw1 capture
++ nsenter -t 2953179 -n timeout 300 tcpdump -i eth4 -nn -s 128 -U -w captures/6-rail-sw1-Ethernet3.pcap 'tcp port 50052'
+
+### 2026-10-28T23:20:51Z rail-sw1 capture
++ nsenter -t 2953179 -n timeout 300 tcpdump -i eth8 -nn -s 128 -U -w captures/6-rail-sw1-Ethernet7.pcap 'tcp port 50052'
+
+### 2026-10-28T23:21:14Z ent-client container
++ curl -sS --max-time 120 --local-port 42608 -o /tmp/sfab-trace/request-body.json -D /tmp/sfab-trace/request-headers.txt -w %{http_code} %{local_port}\n -H @/tmp/sfab-trace/hdr-chat -H Content-Type: application/json --data @/tmp/sfab-trace/request.json https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions
+200 42608
+
+### 2026-10-28T23:21:19Z k8s-ingress2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.pcap > /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.txt
+35
+
+### 2026-10-28T23:21:22Z k8s-ingress2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.pcap > /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.txt
+143
+
+### 2026-10-28T23:21:25Z k8s-ingress1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.pcap > /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.txt
+111
+
+### 2026-10-28T23:21:28Z k8s-ingress1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.pcap > /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.txt
+195
+
+### 2026-10-28T23:21:30Z k8s-ingress2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.pcap > /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.txt
+255
+
+### 2026-10-28T23:21:33Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.pcap > /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.txt
+21
+
+### 2026-10-28T23:21:36Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.pcap > /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.txt
+2103
+
+### 2026-10-28T23:21:40Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.pcap > /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.txt 2>&1; wc -l < /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.txt
+2103
+
+### 2026-10-28T23:21:43Z k8s-gpu2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.pcap > /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.txt
+1
+
+### 2026-10-28T23:21:46Z k8s-gpu2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.pcap > /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.txt
+1
+
+### 2026-10-28T23:21:49Z k8s-gpu2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.pcap > /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.txt 2>&1; wc -l < /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.txt
+1
+
+### 2026-10-28T23:21:52Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.pcap > /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.txt
+1
+
+### 2026-10-28T23:21:55Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.pcap > /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.txt
+1
+
+### 2026-10-28T23:21:58Z k8s-gpu2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.pcap > /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.txt 2>&1; wc -l < /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.txt
+1
+
+### 2026-10-28T23:22:02Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.pcap > /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.txt 2>&1; wc -l < /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.txt
+1
+
+### 2026-10-28T23:22:26Z k8s-ingress2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.pcap /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.txt; exec timeout 300 tcpdump -i bond0 -nn -s 96 -U -w /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.pcap 'tcp port 443 and host 10.20.11.210' &
+
+
+### 2026-10-28T23:22:27Z k8s-ingress2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.pcap /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.txt; exec nsenter -t 3368 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.pcap 'tcp port 9080 or tcp port 4000' &
+
+
+### 2026-10-28T23:22:29Z k8s-ingress1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.pcap /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.txt; exec nsenter -t 3248 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.pcap 'tcp port 9080 or tcp port 4000' &
+
+
+### 2026-10-28T23:22:30Z k8s-ingress1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.pcap /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.txt; exec nsenter -t 3295 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.pcap 'tcp port 4000 or tcp port 8080' &
+
+
+### 2026-10-28T23:22:31Z k8s-ingress2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.pcap /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.txt; exec nsenter -t 3405 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.pcap 'tcp port 4000 or tcp port 8080' &
+
+
+### 2026-10-28T23:22:32Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.pcap /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.txt; exec nsenter -t 6249 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.pcap 'tcp port 8080' &
+
+
+### 2026-10-28T23:22:33Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.pcap /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.txt; exec nsenter -t 6249 -n timeout 300 tcpdump -i rail3 -nn -s 128 -U -w /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:22:34Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.pcap /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.txt; exec nsenter -t 5617 -n timeout 300 tcpdump -i rail3 -nn -s 128 -U -w /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:22:34Z rail-sw1 capture
++ nsenter -t 2953179 -n timeout 300 tcpdump -i eth2 -nn -s 128 -U -w captures/6-rail-sw1-Ethernet1.pcap 'tcp port 50052'
+
+### 2026-10-28T23:22:36Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.pcap /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.txt; exec nsenter -t 347108 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.pcap 'tcp port 8080' &
+
+
+### 2026-10-28T23:22:37Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.pcap /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.txt; exec nsenter -t 347108 -n timeout 300 tcpdump -i rail6 -nn -s 128 -U -w /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:22:38Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.pcap /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.txt; exec nsenter -t 346444 -n timeout 300 tcpdump -i rail6 -nn -s 128 -U -w /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:22:38Z rail-sw2 capture
++ nsenter -t 2953154 -n timeout 300 tcpdump -i eth7 -nn -s 128 -U -w captures/6-rail-sw2-Ethernet6.pcap 'tcp port 50052'
+
+### 2026-10-28T23:22:40Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.pcap /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.txt; exec nsenter -t 565805 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.pcap 'tcp port 8080' &
+
+
+### 2026-10-28T23:22:41Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.pcap /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.txt; exec nsenter -t 565805 -n timeout 300 tcpdump -i rail7 -nn -s 128 -U -w /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:22:42Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.pcap /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.txt; exec nsenter -t 5266 -n timeout 300 tcpdump -i rail7 -nn -s 128 -U -w /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:22:43Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.pcap /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.txt; exec nsenter -t 5648 -n timeout 300 tcpdump -i rail7 -nn -s 128 -U -w /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:22:43Z rail-sw1 capture
++ nsenter -t 2953179 -n timeout 300 tcpdump -i eth4 -nn -s 128 -U -w captures/6-rail-sw1-Ethernet3.pcap 'tcp port 50052'
+
+### 2026-10-28T23:22:43Z rail-sw1 capture
++ nsenter -t 2953179 -n timeout 300 tcpdump -i eth8 -nn -s 128 -U -w captures/6-rail-sw1-Ethernet7.pcap 'tcp port 50052'
+
+### 2026-10-28T23:23:05Z ent-client container
++ curl -sS --max-time 120 --local-port 42609 -o /tmp/sfab-trace/request-body.json -D /tmp/sfab-trace/request-headers.txt -w %{http_code} %{local_port}\n -H @/tmp/sfab-trace/hdr-chat -H Content-Type: application/json --data @/tmp/sfab-trace/request.json https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions
+200 42609
+
+### 2026-10-28T23:23:10Z k8s-ingress2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.pcap > /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.txt
+35
+
+### 2026-10-28T23:23:13Z k8s-ingress2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.pcap > /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.txt
+115
+
+### 2026-10-28T23:23:16Z k8s-ingress1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.pcap > /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.txt
+151
+
+### 2026-10-28T23:23:19Z k8s-ingress1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.pcap > /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.txt
+193
+
+### 2026-10-28T23:23:22Z k8s-ingress2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.pcap > /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.txt
+257
+
+### 2026-10-28T23:23:25Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.pcap > /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.txt
+21
+
+### 2026-10-28T23:23:28Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.pcap > /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.txt
+2077
+
+### 2026-10-28T23:23:31Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.pcap > /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.txt 2>&1; wc -l < /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.txt
+2077
+
+### 2026-10-28T23:23:35Z k8s-gpu2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.pcap > /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.txt
+1
+
+### 2026-10-28T23:23:38Z k8s-gpu2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.pcap > /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.txt
+1
+
+### 2026-10-28T23:23:41Z k8s-gpu2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.pcap > /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.txt 2>&1; wc -l < /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.txt
+1
+
+### 2026-10-28T23:23:45Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.pcap > /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.txt
+1
+
+### 2026-10-28T23:23:48Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.pcap > /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.txt
+1
+
+### 2026-10-28T23:23:51Z k8s-gpu2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.pcap > /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.txt 2>&1; wc -l < /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.txt
+1
+
+### 2026-10-28T23:23:54Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.pcap > /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.txt 2>&1; wc -l < /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.txt
+1
+
+### 2026-10-28T23:24:18Z k8s-ingress2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.pcap /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.txt; exec timeout 300 tcpdump -i bond0 -nn -s 96 -U -w /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.pcap 'tcp port 443 and host 10.20.11.210' &
+
+
+### 2026-10-28T23:24:19Z k8s-ingress2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.pcap /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.txt; exec nsenter -t 3368 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.pcap 'tcp port 9080 or tcp port 4000' &
+
+
+### 2026-10-28T23:24:21Z k8s-ingress1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.pcap /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.txt; exec nsenter -t 3248 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.pcap 'tcp port 9080 or tcp port 4000' &
+
+
+### 2026-10-28T23:24:22Z k8s-ingress1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.pcap /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.txt; exec nsenter -t 3295 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.pcap 'tcp port 4000 or tcp port 8080' &
+
+
+### 2026-10-28T23:24:23Z k8s-ingress2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.pcap /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.txt; exec nsenter -t 3405 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.pcap 'tcp port 4000 or tcp port 8080' &
+
+
+### 2026-10-28T23:24:25Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.pcap /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.txt; exec nsenter -t 6249 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.pcap 'tcp port 8080' &
+
+
+### 2026-10-28T23:24:26Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.pcap /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.txt; exec nsenter -t 6249 -n timeout 300 tcpdump -i rail3 -nn -s 128 -U -w /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:24:27Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.pcap /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.txt; exec nsenter -t 5617 -n timeout 300 tcpdump -i rail3 -nn -s 128 -U -w /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:24:27Z rail-sw1 capture
++ nsenter -t 2953179 -n timeout 300 tcpdump -i eth2 -nn -s 128 -U -w captures/6-rail-sw1-Ethernet1.pcap 'tcp port 50052'
+
+### 2026-10-28T23:24:28Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.pcap /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.txt; exec nsenter -t 347108 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.pcap 'tcp port 8080' &
+
+
+### 2026-10-28T23:24:29Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.pcap /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.txt; exec nsenter -t 347108 -n timeout 300 tcpdump -i rail6 -nn -s 128 -U -w /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:24:30Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.pcap /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.txt; exec nsenter -t 346444 -n timeout 300 tcpdump -i rail6 -nn -s 128 -U -w /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:24:31Z rail-sw2 capture
++ nsenter -t 2953154 -n timeout 300 tcpdump -i eth7 -nn -s 128 -U -w captures/6-rail-sw2-Ethernet6.pcap 'tcp port 50052'
+
+### 2026-10-28T23:24:32Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.pcap /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.txt; exec nsenter -t 565805 -n timeout 300 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.pcap 'tcp port 8080' &
+
+
+### 2026-10-28T23:24:33Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.pcap /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.txt; exec nsenter -t 565805 -n timeout 300 tcpdump -i rail7 -nn -s 128 -U -w /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:24:34Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.pcap /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.txt; exec nsenter -t 5266 -n timeout 300 tcpdump -i rail7 -nn -s 128 -U -w /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:24:35Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.pcap /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.txt; exec nsenter -t 5648 -n timeout 300 tcpdump -i rail7 -nn -s 128 -U -w /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.pcap 'tcp port 50052' &
+
+
+### 2026-10-28T23:24:35Z rail-sw1 capture
++ nsenter -t 2953179 -n timeout 300 tcpdump -i eth4 -nn -s 128 -U -w captures/6-rail-sw1-Ethernet3.pcap 'tcp port 50052'
+
+### 2026-10-28T23:24:35Z rail-sw1 capture
++ nsenter -t 2953179 -n timeout 300 tcpdump -i eth8 -nn -s 128 -U -w captures/6-rail-sw1-Ethernet7.pcap 'tcp port 50052'
+
+### 2026-10-28T23:24:58Z ent-client container
++ curl -sS --max-time 120 --local-port 42610 -o /tmp/sfab-trace/request-body.json -D /tmp/sfab-trace/request-headers.txt -w %{http_code} %{local_port}\n -H @/tmp/sfab-trace/hdr-chat -H Content-Type: application/json --data @/tmp/sfab-trace/request.json https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions
+200 42610
+
+### 2026-10-28T23:25:03Z k8s-ingress2 guest
++ tcpdump -nn -tt -e -v -r /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.pcap > /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-1-k8s-ingress2-bond0.txt
+35
+
+### 2026-10-28T23:25:06Z k8s-ingress2 guest
++ tcpdump -nn -tt -e -v -r /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.pcap > /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-4nzm6-eth0.txt
+143
+
+### 2026-10-28T23:25:09Z k8s-ingress1 guest
++ tcpdump -nn -tt -e -v -r /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.pcap > /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-2-api-gateway-64bc7b94df-z4csg-eth0.txt
+121
+
+### 2026-10-28T23:25:12Z k8s-ingress1 guest
++ tcpdump -nn -tt -e -v -r /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.pcap > /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-3-router-76cf778fb6-gwr7f-eth0.txt
+247
+
+### 2026-10-28T23:25:15Z k8s-ingress2 guest
++ tcpdump -nn -tt -e -v -r /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.pcap > /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-3-router-76cf778fb6-n6nk4-eth0.txt
+231
+
+### 2026-10-28T23:25:18Z k8s-gpu1 guest
++ tcpdump -nn -tt -e -v -r /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.pcap > /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-a-server-0-eth0.txt
+1
+
+### 2026-10-28T23:25:21Z k8s-gpu1 guest
++ tcpdump -nn -tt -e -v -r /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.pcap > /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-a-server-0-rail3.txt
+1
+
+### 2026-10-28T23:25:24Z k8s-gpu1 guest
++ tcpdump -nn -tt -e -v -r /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.pcap > /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.txt 2>&1; wc -l < /tmp/sfab-rail-trace-5-chat-a-worker0-0-rail3.txt
+1
+
+### 2026-10-28T23:25:28Z k8s-gpu2 guest
++ tcpdump -nn -tt -e -v -r /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.pcap > /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-b-server-0-eth0.txt
+1
+
+### 2026-10-28T23:25:31Z k8s-gpu2 guest
++ tcpdump -nn -tt -e -v -r /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.pcap > /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-b-server-0-rail6.txt
+1
+
+### 2026-10-28T23:25:34Z k8s-gpu2 guest
++ tcpdump -nn -tt -e -v -r /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.pcap > /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.txt 2>&1; wc -l < /tmp/sfab-rail-trace-5-chat-b-worker0-0-rail6.txt
+1
+
+### 2026-10-28T23:25:37Z k8s-gpu1 guest
++ tcpdump -nn -tt -e -v -r /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.pcap > /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-c-server-0-eth0.txt
+21
+
+### 2026-10-28T23:25:40Z k8s-gpu1 guest
++ tcpdump -nn -tt -e -v -r /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.pcap > /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.txt 2>&1; wc -l < /tmp/sfab-rail-trace-4-chat-c-server-0-rail7.txt
+3527
+
+### 2026-10-28T23:25:44Z k8s-gpu2 guest
++ tcpdump -nn -tt -e -v -r /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.pcap > /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.txt 2>&1; wc -l < /tmp/sfab-rail-trace-5-chat-c-worker0-0-rail7.txt
+1295
+
+### 2026-10-28T23:25:47Z k8s-gpu1 guest
++ tcpdump -nn -tt -e -v -r /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.pcap > /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.txt 2>&1; wc -l < /tmp/sfab-rail-trace-5-chat-c-worker1-0-rail7.txt
+2281
+

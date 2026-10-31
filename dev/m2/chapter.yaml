@@ -1,0 +1,48 @@
+# Milestone M2 (FRAMEWORK.md 6.3, first row). Not a chapter.
+# Build A's one-tenant state with the cluster on and no serving: M1's switches, PA-VM and GPU nodes,
+# plus the control nodes, the bastion, the uplink side (router, registry, operator client), the
+# enterprise client and TrueNAS. The operator's public resolver (ops-dns) arrives with sfab/resolver.
+lab: sfab-m2
+profile: a
+state: one
+slice:
+  nodes: [fe, rail, oob, fw, k8s-gpu1, k8s-gpu2, k8s-cp1, k8s-cp2, k8s-cp3, bastion, inet-registry, uplink-rtr, ops-client, web-client, ent-client, truenas1]
+features: {k8s: true, serving: false, storage_setup: true}
+prints: []
+extends: null
+variants: {}
+# The first trace (dev/m2/trace.sh): the enterprise client to the users' VIP.
+#
+# A flow names its client, the Gateway whose VIP it reaches, the hostname under the org domain, the
+# port and path, the source port the recorded attempt pins (sport; the warm-up uses warm_sport), the
+# depth after which the TTL is one lower (ttl_drop_after: the firewall is the one routed hop), and
+# what the evidence must show (the reply's status, the firewall rule, its zones).
+#
+# A point is <depth>-<name>; node and eth name a container port (on the firewall ethN is
+# ethernet1/N). A point with at: lease-holder is found when the trace runs, from the ingress node
+# holding the Gateway Service's L2 announcement lease: side: pair gives the pair ports facing that
+# node's bond legs, iface: an interface inside the node (captured and decoded in the guest). vlan is
+# the 802.1Q tag the recorded SYN must carry there (none: untagged). A point in a group is one of
+# several legs: the SYN crosses exactly one of them. (The key is side, not on: YAML reads a bare on
+# as true.)
+trace:
+  flows:
+    - id: enterprise-users-vip
+      client: ent-client
+      gateway: gw-users
+      hostname: llm
+      port: 443
+      path: /echo?msg=sfab-m2-trace
+      sport: 41443
+      warm_sport: 41442
+      ttl_drop_after: 2
+      expect: {status: 200, rule: staff-to-users-gateway, from_zone: enterprise, to_zone: ingress}
+  points:
+    - {id: 1-ent-client-eth1, node: ent-client, eth: eth1, vlan: none}
+    - {id: 2-fw-ethernet1-4, node: fw, eth: eth4, vlan: none}
+    - {id: 3-fw-ae1-leg1, node: fw, eth: eth1, vlan: 110, group: ae1}
+    - {id: 3-fw-ae1-leg2, node: fw, eth: eth2, vlan: 110, group: ae1}
+    - {id: 4-fe-sw1-Ethernet2, node: fe-sw1, eth: eth3, vlan: 110, group: trunk}
+    - {id: 4-fe-sw2-Ethernet2, node: fe-sw2, eth: eth3, vlan: 110, group: trunk}
+    - {id: "5-{switch}-{native}", at: lease-holder, side: pair, vlan: 110, group: server}
+    - {id: "6-{holder}-bond0", at: lease-holder, iface: bond0, vlan: 110}

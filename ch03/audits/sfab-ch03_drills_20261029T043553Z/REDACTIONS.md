@@ -1,0 +1,28 @@
+# Redactions
+
+Some recorded text in this result set was replaced while the set was recorded, by `common/audit/redact.py`. Each replacement is the marker `[redacted: <class>]` on the line that held the text, so every line keeps its number and the rest of the line reads as recorded. This file names no replaced text.
+
+| Class | What it replaced |
+|---|---|
+| host-kernel | the lab host's kernel release, which a container prints as its own |
+
+| File | Line | Class |
+|---|---|---|
+| pass1/fw-leg/whole-after/bonds/bastion.bonding.txt | 1 | host-kernel |
+| pass1/fw-leg/whole-before/bonds/bastion.bonding.txt | 1 | host-kernel |
+| pass1/peer-link/whole-after/bonds/bastion.bonding.txt | 1 | host-kernel |
+| pass1/peer-link/whole-before/bonds/bastion.bonding.txt | 1 | host-kernel |
+| pass1/server-member/whole-after/bonds/bastion.bonding.txt | 1 | host-kernel |
+| pass1/server-member/whole-before/bonds/bastion.bonding.txt | 1 | host-kernel |
+| pass2/fw-leg/whole-after/bonds/bastion.bonding.txt | 1 | host-kernel |
+| pass2/fw-leg/whole-before/bonds/bastion.bonding.txt | 1 | host-kernel |
+| pass2/peer-link/whole-after/bonds/bastion.bonding.txt | 1 | host-kernel |
+| pass2/peer-link/whole-before/bonds/bastion.bonding.txt | 1 | host-kernel |
+| pass2/server-member/whole-after/bonds/bastion.bonding.txt | 1 | host-kernel |
+| pass2/server-member/whole-before/bonds/bastion.bonding.txt | 1 | host-kernel |
+| pass3/fw-leg/whole-after/bonds/bastion.bonding.txt | 1 | host-kernel |
+| pass3/fw-leg/whole-before/bonds/bastion.bonding.txt | 1 | host-kernel |
+| pass3/peer-link/whole-after/bonds/bastion.bonding.txt | 1 | host-kernel |
+| pass3/peer-link/whole-before/bonds/bastion.bonding.txt | 1 | host-kernel |
+| pass3/server-member/whole-after/bonds/bastion.bonding.txt | 1 | host-kernel |
+| pass3/server-member/whole-before/bonds/bastion.bonding.txt | 1 | host-kernel |

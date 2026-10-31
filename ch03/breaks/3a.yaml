@@ -1,0 +1,41 @@
+# break-3a (Chapter 3, exercise 4): the firewall's PortChannel allows VLAN 200 on one switch only.
+#
+# fe-sw2 drops VLAN 200 from PortChannel10's allowed list; fe-sw1 keeps it and holds TrueNAS's
+# single-attached management port (Ethernet11). Frames the firewall sends toward 10.20.2.31 on its
+# fe-sw2 leg are tagged 200 into a port that no longer carries VLAN 200, so which of the bastion's
+# connections to the storage management address fail depends on which leg the firewall hashes each
+# connection and its ARP onto, and on peer-link forwarding without isolation. The exercise names no
+# share: record: measures it in each of three passes, and expect_broken asks only that some
+# connects fail and some succeed. Whether SONiC flags the mismatch itself is not tested here; the
+# exercise does not depend on it, and show mclag brief is recorded so the run shows what it prints.
+#
+# The KLISH line as SONiC 4.6.0 took it (FRAMEWORK.md 4.7): the first run accepted the lines below,
+# so the fallback was not typed (audits/sfab-ch03_break-3a_20261029T061052Z/verdict.txt:2 and
+# taken.txt). fe-sw2 then printed "switchport trunk allowed Vlan 100,110,130-131,300" under
+# PortChannel10, and the heal's replay of the rendered "switchport trunk allowed Vlan
+# 100,110,130-131,200,300" put VLAN 200 back (audits/sfab-ch03_heal-3a_20261029T061553Z/verdict.txt:2,
+# :7). The fallback stays for a switch that refuses the lines.
+title: VLAN 200 allowed on the firewall PortChannel on fe-sw1 only
+exercise: 4
+since: 3
+break:
+  - klish:
+      node: fe-sw2
+      context: interface PortChannel 10
+      lines: [switchport trunk allowed Vlan remove 200]
+      fallback: [no switchport trunk allowed Vlan 200]
+record:
+  - show: {node: fe-sw1, lines: [show vlan, show running-configuration interface PortChannel 10, show mclag brief]}
+  - show: {node: fe-sw2, lines: [show vlan, show running-configuration interface PortChannel 10, show mclag brief]}
+  - probe_tcp: {id: bastion-stor-mgmt, from: bastion, to: truenas1, address: mgmt_if, port: 443, count: 60, interval_s: 0.5, timeout_s: 2, passes: 3}
+expect_broken:
+  - vlan_member: {node: fe-sw2, vlan: 200, port: PortChannel10, present: false}
+  - vlan_member: {node: fe-sw1, vlan: 200, port: PortChannel10, present: true, mode: T}
+  - probe_share: {probe: bastion-stor-mgmt, failing: some}
+heal:
+  - restore: fe-sw2
+expect_healed:
+  - vlan_member: {node: fe-sw2, vlan: 200, port: PortChannel10, present: true, mode: T}
+  - vlan_member: {node: fe-sw1, vlan: 200, port: PortChannel10, present: true, mode: T}
+  - parity: {node: fe-sw2}
+  - probe_share: {probe: bastion-stor-mgmt, failing: none}

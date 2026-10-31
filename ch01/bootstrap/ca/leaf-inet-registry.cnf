@@ -1,0 +1,25 @@
+# sfab-ch01 lab CA, the inet-registry leaf: rendered from spec/profile-a.yaml by render/ca.py; edit the spec and run make render
+# sfab-ca signs it on the lab host with the internet intermediate and writes the key, the
+# certificate and the chain (the leaf, then the intermediate) to state/tls/inet-registry/, which the
+# topology binds read-only at /sfab/tls in inet-registry only.
+[sfab]
+key = ec-p256
+days = 397
+renew_days = 30
+ca = internet
+node = inet-registry
+
+[req]
+prompt = no
+distinguished_name = dn
+
+[dn]
+CN = registry.upstream.example
+
+[ext]
+basicConstraints = critical,CA:FALSE
+keyUsage = critical,digitalSignature
+extendedKeyUsage = serverAuth
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always
+subjectAltName = DNS:registry.upstream.example,IP:192.0.2.6

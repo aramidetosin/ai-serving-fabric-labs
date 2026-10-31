@@ -1,0 +1,43 @@
+# break-3b (Chapter 3, exercise 5): one leg of TrueNAS's management bond unplugged.
+#
+# TrueNAS's management address, 10.20.2.31 in VLAN 200, is a bond with one leg on each pair switch:
+# eth5 on fe-sw1 Ethernet11 and eth6 on fe-sw2 Ethernet11, PortChannel32 on both, an MCLAG
+# interface of the domain (build A revision 2; before it the management port was single-attached on
+# fe-sw1, an orphan port the peer-link drill probed). The break shuts fe-sw1's member, as a pulled
+# cable would end it: fe-sw1's PortChannel32 has no member left and goes down, show mclag brief on
+# fe-sw1 reads it down/up and on fe-sw2 up/down, and the bond runs on its fe-sw2 leg alone. The
+# bastion's connections to the storage management address keep working: frames that reach fe-sw1
+# for it cross the peer link to fe-sw2's leg. A KLISH shutdown drops no carrier at TrueNAS's NIC
+# (L9 in the lab README's platform notes), so TrueNAS keeps sending on the shut leg until its LACP
+# partner times out (fast LACP, 3 s); the record starts after the settle and the two switches'
+# reads, by when the bond has dropped the leg.
+#
+# record: show mclag brief, show interface status and the PortChannel's running configuration on
+# both switches, then 60 connects from the bastion to 10.20.2.31:443 in each of three passes. The
+# heal types no shutdown on the member and checks parity; its record runs the connects once more.
+title: one leg of TrueNAS's management bond (fe-sw1 Ethernet11) shut, the bond on its fe-sw2 leg
+exercise: 5
+since: 3
+break:
+  - klish:
+      node: fe-sw1
+      context: interface Ethernet11
+      lines: [shutdown]
+record:
+  - show: {node: fe-sw1, lines: [show mclag brief, show interface status, show running-configuration interface PortChannel 32]}
+  - show: {node: fe-sw2, lines: [show mclag brief, show interface status, show running-configuration interface PortChannel 32]}
+  - probe_tcp: {id: bastion-stor-mgmt, from: bastion, to: truenas1, address: mgmt_if, port: 443, count: 60, interval_s: 0.5, timeout_s: 2, passes: 3}
+expect_broken:
+  - mclag_iface: {node: fe-sw1, portchannel: PortChannel32, local: down, remote: up}
+  - mclag_iface: {node: fe-sw2, portchannel: PortChannel32, local: up, remote: down}
+  - probe_share: {probe: bastion-stor-mgmt, failing: none}
+heal:
+  - klish:
+      node: fe-sw1
+      context: interface Ethernet11
+      lines: [no shutdown]
+expect_healed:
+  - mclag_iface: {node: fe-sw1, portchannel: PortChannel32, local: up, remote: up}
+  - mclag_iface: {node: fe-sw2, portchannel: PortChannel32, local: up, remote: up}
+  - parity: {node: fe-sw1}
+  - probe_share: {probe: bastion-stor-mgmt, failing: none}

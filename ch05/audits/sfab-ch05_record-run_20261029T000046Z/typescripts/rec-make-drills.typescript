@@ -1,0 +1,79 @@
+Script started on 2026-10-29 00:11:58+00:00 [COMMAND="make drills PASSES=3" TERM="tmux-256color" TTY="/dev/pts/9" COLUMNS="80" LINES="24"]
+/root/sfab/labs/ai-serving-fabric-labs/ch05/drills.sh  --passes 3
+repostate: 1 of 1483 files differ from the stamp; the tree is not the stamped one
+== pass 1, drill dark-switch: every port of rail-sw1 shut with interface range, held, then no shutdown
+drill: pass 1 dark-switch (every port of rail-sw1 shut with interface range, held, then no shutdown)
+  PASS  pass 1 dark-switch: the rails whole before the fault: every rail answers its same-rail ping and every rail switch's rendered ports are up (poll 2)
+  PASS  pass 1 dark-switch: KLISH interface range Ethernet0-7, shutdown accepted on rail-sw1: every port it uses (Ethernet0,Ethernet1,Ethernet2,Ethernet3,Ethernet4,Ethernet5,Ethernet6,Ethernet7)
+  PASS  pass 1 dark-switch: no shutdown accepted on rail-sw1 after 30 s
+  PASS  pass 1 dark-switch: the rails whole again after the drill: every rail answers its same-rail ping and every rail switch's rendered ports are up (poll 2)
+  PASS  pass 1 dark-switch: rail-sw1 after the restore: parity, 0 missing lines
+  PASS  pass 1 dark-switch: audit.sh --quick after the drill: RESULT: 178 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+pass 1 dark-switch: rail-sw1 dark (rails 1, 3, 5, 7); shut session 1.26 s, dark 28.67 s, restore session 1.22 s (host clock)
+row          expect       before      dark  arrived  replied   arp     after  return s  guest rx  unreach
+same-1       dark        45/45      0/127         0        0     6   86/86        4.98       142       20
+same-2       answered    45/45    138/138       138      138     -   99/99       0.035       299        0
+same-3       dark        45/45      0/68          0        0    17   83/83        5.62       139       60
+same-4       answered    45/45    138/138       138      138     -   98/98       0.051       298        0
+same-5       dark        45/45      0/110         0        0     9   87/87       5.556       143       30
+same-6       answered    45/45    138/138       138      138     -   98/98       0.035       298        0
+same-7       dark        45/45      0/87          0        0    13   79/79       5.245       135       50
+same-8       answered    45/45    138/138       138      138     -   98/98       0.035       298        0
+cross-2-1    dark        45/45      0/127         0        0     6   86/86        4.98       142        9
+cross-1-2    dark        45/45      0/137       137      137     0   82/99       4.795       138        0
+cross-2-4    answered    45/45    138/138       138      138     -   98/98       0.043       298        0
+
+before, dark, after: answered of the requests that left the source's container port (host clock; a reply over 1000 ms counts as lost); arrived, replied: dark requests seen at the far node's port and its replies leaving it; arp: ARP requests for the far address on the dead rail while dark (from the source on a dead request rail, from the far node on a dead reply rail); guest rx: replies the guest's ping counted; unreach: its Destination Host Unreachable lines
+  KNOWN pass 1 dark-switch: a KLISH shutdown drops no carrier at the GPU NICs, so the dark rail shows only as silence (rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP): L9
+== pass 2, drill dark-switch: every port of rail-sw1 shut with interface range, held, then no shutdown
+drill: pass 2 dark-switch (every port of rail-sw1 shut with interface range, held, then no shutdown)
+  PASS  pass 2 dark-switch: the rails whole before the fault: every rail answers its same-rail ping and every rail switch's rendered ports are up (poll 2)
+  PASS  pass 2 dark-switch: KLISH interface range Ethernet0-7, shutdown accepted on rail-sw1: every port it uses (Ethernet0,Ethernet1,Ethernet2,Ethernet3,Ethernet4,Ethernet5,Ethernet6,Ethernet7)
+  PASS  pass 2 dark-switch: no shutdown accepted on rail-sw1 after 30 s
+  PASS  pass 2 dark-switch: the rails whole again after the drill: every rail answers its same-rail ping and every rail switch's rendered ports are up (poll 2)
+  PASS  pass 2 dark-switch: rail-sw1 after the restore: parity, 0 missing lines
+  PASS  pass 2 dark-switch: audit.sh --quick after the drill: RESULT: 178 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+pass 2 dark-switch: rail-sw1 dark (rails 1, 3, 5, 7); shut session 1.21 s, dark 28.72 s, restore session 1.24 s (host clock)
+row          expect       before      dark  arrived  replied   arp     after  return s  guest rx  unreach
+same-1       dark        45/45      0/74          0        0    16   91/91       4.781       147       50
+same-2       answered    45/45    139/139       139      139     -   97/97       0.189       298        0
+same-3       dark        45/45      0/74          0        0    16   77/77       5.615       133       60
+same-4       answered    45/45    138/138       138      138     -   98/98       0.045       298        0
+same-5       dark        45/45      0/114         0        0     8   81/81       5.718       137       30
+same-6       answered    45/45    138/138       138      138     -   98/98       0.045       298        0
+same-7       dark        45/45      0/92          0        0    13   75/75       6.079       131       50
+same-8       answered    45/45    138/138       138      138     -   98/98       0.045       298        0
+cross-2-1    dark        45/45      0/74          0        0    16   93/93       4.781       149       18
+cross-1-2    dark        45/45      0/139       139       96    12   85/98       3.942       142        0
+cross-2-4    answered    45/45    139/139       139      139     -   97/97        0.19       298        0
+
+before, dark, after: answered of the requests that left the source's container port (host clock; a reply over 1000 ms counts as lost); arrived, replied: dark requests seen at the far node's port and its replies leaving it; arp: ARP requests for the far address on the dead rail while dark (from the source on a dead request rail, from the far node on a dead reply rail); guest rx: replies the guest's ping counted; unreach: its Destination Host Unreachable lines
+  KNOWN pass 2 dark-switch: a KLISH shutdown drops no carrier at the GPU NICs, so the dark rail shows only as silence (rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP): L9
+== pass 3, drill dark-switch: every port of rail-sw1 shut with interface range, held, then no shutdown
+drill: pass 3 dark-switch (every port of rail-sw1 shut with interface range, held, then no shutdown)
+  PASS  pass 3 dark-switch: the rails whole before the fault: every rail answers its same-rail ping and every rail switch's rendered ports are up (poll 2)
+  PASS  pass 3 dark-switch: KLISH interface range Ethernet0-7, shutdown accepted on rail-sw1: every port it uses (Ethernet0,Ethernet1,Ethernet2,Ethernet3,Ethernet4,Ethernet5,Ethernet6,Ethernet7)
+  PASS  pass 3 dark-switch: no shutdown accepted on rail-sw1 after 30 s
+  PASS  pass 3 dark-switch: the rails whole again after the drill: every rail answers its same-rail ping and every rail switch's rendered ports are up (poll 2)
+  PASS  pass 3 dark-switch: rail-sw1 after the restore: parity, 0 missing lines
+  PASS  pass 3 dark-switch: audit.sh --quick after the drill: RESULT: 178 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+pass 3 dark-switch: rail-sw1 dark (rails 1, 3, 5, 7); shut session 1.29 s, dark 28.64 s, restore session 1.24 s (host clock)
+row          expect       before      dark  arrived  replied   arp     after  return s  guest rx  unreach
+same-1       dark        45/45      0/77          0        0    15   90/90       5.163       146       50
+same-2       answered    45/45    138/138       138      138     -   98/98       0.203       299        0
+same-3       dark        45/45      0/77          0        0    16   90/90       5.227       146       50
+same-4       answered    45/45    137/137       137      137     -   99/99       0.035       299        0
+same-5       dark        45/45      0/94          0        0    12   86/86       4.843       142       40
+same-6       answered    45/45    137/137       137      137     -   98/98       0.043       298        0
+same-7       dark        45/45      0/77          0        0    15   89/89       5.419       145       50
+same-8       answered    45/45    137/137       137      137     -   98/98       0.043       298        0
+cross-2-1    dark        45/45      0/77          0        0    15   90/90       5.163       146       18
+cross-1-2    dark        45/45      0/138       138       98    11   84/98       4.363       140        0
+cross-2-4    answered    45/45    138/138       138      138     -   98/98       0.203       299        0
+
+before, dark, after: answered of the requests that left the source's container port (host clock; a reply over 1000 ms counts as lost); arrived, replied: dark requests seen at the far node's port and its replies leaving it; arp: ARP requests for the far address on the dead rail while dark (from the source on a dead request rail, from the far node on a dead reply rail); guest rx: replies the guest's ping counted; unreach: its Destination Host Unreachable lines
+  KNOWN pass 3 dark-switch: a KLISH shutdown drops no carrier at the GPU NICs, so the dark rail shows only as silence (rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP): L9
+== RESULT: 154 passed, 0 failed, 3 known platform limitation(s), 0 skipped
+== result set: ch05/audits/sfab-ch05_drills_20261029T001158Z
+
+Script done on 2026-10-29 00:17:54+00:00 [COMMAND_EXIT_CODE="0"]

@@ -1,0 +1,257 @@
+<config version="12.1.0" urldb="paloaltonetworks" detail-version="12.1.2">
+  <devices>
+    <entry name="localhost.localdomain">
+      <deviceconfig>
+        <system>
+          <hostname>fw</hostname>
+          <timezone>UTC</timezone>
+        </system>
+        <setting>
+          <management>
+            <idle-timeout>0</idle-timeout>
+          </management>
+          <auto-mac-detect>yes</auto-mac-detect>
+          <jumbo-frame>
+            <mtu>9216</mtu>
+          </jumbo-frame>
+        </setting>
+      </deviceconfig>
+      <network>
+        <profiles>
+          <interface-management-profile>
+            <entry name="ping-only">
+              <ping>yes</ping>
+            </entry>
+          </interface-management-profile>
+        </profiles>
+        <interface>
+          <ethernet>
+            <entry name="ethernet1/1">
+              <aggregate-group>ae1</aggregate-group>
+            </entry>
+            <entry name="ethernet1/2">
+              <aggregate-group>ae1</aggregate-group>
+            </entry>
+            <entry name="ethernet1/3">
+              <layer3>
+                <ip>
+                  <entry name="10.20.9.254/24"/>
+                </ip>
+                <interface-management-profile>ping-only</interface-management-profile>
+              </layer3>
+            </entry>
+          </ethernet>
+          <aggregate-ethernet>
+            <entry name="ae1">
+              <layer3>
+                <mtu>9216</mtu>
+                <lacp>
+                  <enable>yes</enable>
+                  <mode>active</mode>
+                  <transmission-rate>fast</transmission-rate>
+                </lacp>
+                <units>
+                  <entry name="ae1.100">
+                    <tag>100</tag>
+                    <ip>
+                      <entry name="10.20.1.1/24"/>
+                    </ip>
+                    <mtu>9216</mtu>
+                    <interface-management-profile>ping-only</interface-management-profile>
+                  </entry>
+                  <entry name="ae1.200">
+                    <tag>200</tag>
+                    <ip>
+                      <entry name="10.20.2.1/24"/>
+                    </ip>
+                    <mtu>9216</mtu>
+                    <interface-management-profile>ping-only</interface-management-profile>
+                  </entry>
+                  <entry name="ae1.300">
+                    <tag>300</tag>
+                    <ip>
+                      <entry name="10.20.3.1/24"/>
+                    </ip>
+                    <mtu>9216</mtu>
+                    <interface-management-profile>ping-only</interface-management-profile>
+                  </entry>
+                </units>
+              </layer3>
+            </entry>
+          </aggregate-ethernet>
+        </interface>
+        <virtual-router>
+          <entry name="core">
+            <interface>
+              <member>ae1.100</member>
+              <member>ae1.200</member>
+              <member>ae1.300</member>
+              <member>ethernet1/3</member>
+            </interface>
+          </entry>
+        </virtual-router>
+      </network>
+      <vsys>
+        <entry name="vsys1">
+          <import>
+            <network>
+              <interface>
+                <member>ae1.100</member>
+                <member>ae1.200</member>
+                <member>ae1.300</member>
+                <member>ethernet1/3</member>
+              </interface>
+            </network>
+          </import>
+          <zone>
+            <entry name="data">
+              <network>
+                <layer3>
+                  <member>ae1.100</member>
+                </layer3>
+              </network>
+            </entry>
+            <entry name="stor-mgmt">
+              <network>
+                <layer3>
+                  <member>ae1.200</member>
+                </layer3>
+              </network>
+            </entry>
+            <entry name="bastion">
+              <network>
+                <layer3>
+                  <member>ae1.300</member>
+                </layer3>
+              </network>
+            </entry>
+            <entry name="oob">
+              <network>
+                <layer3>
+                  <member>ethernet1/3</member>
+                </layer3>
+              </network>
+            </entry>
+          </zone>
+          <rulebase>
+            <security>
+              <rules>
+                <entry name="data-intrazone">
+                  <from>
+                    <member>data</member>
+                  </from>
+                  <to>
+                    <member>data</member>
+                  </to>
+                  <source>
+                    <member>any</member>
+                  </source>
+                  <destination>
+                    <member>any</member>
+                  </destination>
+                  <application>
+                    <member>any</member>
+                  </application>
+                  <service>
+                    <member>any</member>
+                  </service>
+                  <action>allow</action>
+                  <log-end>yes</log-end>
+                </entry>
+                <entry name="stor-mgmt-intrazone">
+                  <from>
+                    <member>stor-mgmt</member>
+                  </from>
+                  <to>
+                    <member>stor-mgmt</member>
+                  </to>
+                  <source>
+                    <member>any</member>
+                  </source>
+                  <destination>
+                    <member>any</member>
+                  </destination>
+                  <application>
+                    <member>any</member>
+                  </application>
+                  <service>
+                    <member>any</member>
+                  </service>
+                  <action>allow</action>
+                  <log-end>yes</log-end>
+                </entry>
+                <entry name="bastion-intrazone">
+                  <from>
+                    <member>bastion</member>
+                  </from>
+                  <to>
+                    <member>bastion</member>
+                  </to>
+                  <source>
+                    <member>any</member>
+                  </source>
+                  <destination>
+                    <member>any</member>
+                  </destination>
+                  <application>
+                    <member>any</member>
+                  </application>
+                  <service>
+                    <member>any</member>
+                  </service>
+                  <action>allow</action>
+                  <log-end>yes</log-end>
+                </entry>
+                <entry name="oob-intrazone">
+                  <from>
+                    <member>oob</member>
+                  </from>
+                  <to>
+                    <member>oob</member>
+                  </to>
+                  <source>
+                    <member>any</member>
+                  </source>
+                  <destination>
+                    <member>any</member>
+                  </destination>
+                  <application>
+                    <member>any</member>
+                  </application>
+                  <service>
+                    <member>any</member>
+                  </service>
+                  <action>allow</action>
+                  <log-end>yes</log-end>
+                </entry>
+                <entry name="deny-all-log">
+                  <from>
+                    <member>any</member>
+                  </from>
+                  <to>
+                    <member>any</member>
+                  </to>
+                  <source>
+                    <member>any</member>
+                  </source>
+                  <destination>
+                    <member>any</member>
+                  </destination>
+                  <application>
+                    <member>any</member>
+                  </application>
+                  <service>
+                    <member>any</member>
+                  </service>
+                  <action>deny</action>
+                  <log-end>yes</log-end>
+                  <description>dec-policy-deny-all-log</description>
+                </entry>
+              </rules>
+            </security>
+          </rulebase>
+        </entry>
+      </vsys>
+    </entry>
+  </devices>
+</config>

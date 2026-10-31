@@ -1,0 +1,58 @@
+Last login: Fri Oct 30 08:45:15 2026 from 172.21.40.1
+set cli pager off
+show counter global filter delta yes severity drop
+show running nat-policy
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show counter 
+admin@fw> show counter global 
+admin@fw> show counter global filter 
+admin@fw> show counter global filter delta 
+admin@fw> show counter global filter delta yes 
+admin@fw> show counter global filter delta yes severity 
+admin@fw> show counter global filter delta yes severity drop
+
+Global counters:
+Elapsed time since last sampling: 17.986 seconds
+
+name                                   value     rate severity  category  aspect    description
+--------------------------------------------------------------------------------
+flow_policy_nat_land                      10        0 drop      flow      session   Session setup: source NAT IP allocation result in LAND attack
+flow_fwd_notopology                        1        0 drop      flow      forward   Packets dropped: no forwarding configured on interface
+--------------------------------------------------------------------------------
+Total counters shown: 2
+--------------------------------------------------------------------------------
+
+admin@fw> show 
+admin@fw> show running 
+admin@fw> show running nat-policy
+
+Nat policy configured on vsys1:
+"internet-snat; index: 1" {
+        nat-type ipv4;
+        from [ k8s-nodes services ];
+        source any;
+        source-region none;
+        to uplink;
+        to-interface  ;
+        destination any;
+        destination-region none;
+        service 0:any/any/any;
+        translate-to "src: ethernet1/5 198.51.100.2 (dynamic-ip-and-port) (pool idx: 1)";
+        terminal no;
+}
+
+
+
+admin@fw> exit

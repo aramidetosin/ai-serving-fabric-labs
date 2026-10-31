@@ -1,0 +1,138 @@
+# Chapter 6: Rail-Aware Model Placement
+
+Lab `sfab-ch06`, the companion lab of the book's Chapter 6, "Rail-Aware Model Placement". It runs build A's one-tenant state, Tarnwick (the platform's names under `ai.tarnwick.example`), with serving on: two models, chat in three copies and staff in two, each copy's llama.cpp server and RPC workers on one rail, placed by a table the render writes and every check reads back. A request reaches a model through a Gateway, the API gateway, the model router and the model's Service. The lab audits the pods against the table, traces one request from the users' Gateway to the spanning copy's server and its workers over the table's rail, runs three drills (chapter 5's dark rail switch and the spanning copy's worker port, each under a steady Gateway probe with the Services' endpoints read every second, and one worker's rail moved in the table), and ships break-6a and break-6b.
+
+| Selection | Value |
+|---|---|
+| Profile, state | `a` (Tarnwick), `one` |
+| Slice | `[fe, rail, oob, fw, k8s-gpu1, k8s-gpu2, k8s-cp1, k8s-cp2, k8s-cp3, bastion, inet-registry, uplink-rtr, ops-client, ent-client]`: chapter 4's, without TrueNAS and the web client; its closure adds the ingress nodes, the DNS and time servers, ent-dns and ops-gw |
+| Features | `{k8s: true, serving: true, storage_setup: false}` |
+| Prints | none: the chapter prints a pod manifest and its Services, not a device's configuration |
+| Extends | `ch04`: the same deploy, without storage, with the serving recipe and the API gateway and router after the cluster |
+| Containers | `sfab-ch06-<node>` (25); containerlab directory `clab-sfab-ch06/` |
+
+Status: recorded under build A revision 2. One deployment from wiped disks on 2026-10-28 ran `make up`, `make audit`, `make trace`, three passes of the drills, break-6a and its heal, `make attach`, break-6b and its heal, and `make record`, every set green (`RESULTS.md`; `audits/INDEX.md` maps the chapter's exhibits to their files and lines). The keys are per caller, not per model: chapter 7's README states the change (callers, the identity provider, multi-auth, the refusal message, network policy, the ingress nodes, Secrets at rest and WireGuard); this lab renders the same layer. Revision 1's sets (Qwen2.5-0.5B baked into the serving image, two copies a model each spanning both GPU nodes, bare Pods) are superseded and out of the repository.
+
+## What the spec renders for this chapter
+
+**The placement table** (`spec/profile-a.yaml` `models:`, rendered by `render/k8s.py` into `bootstrap/k8s/serving.env`; `python3 ../serving-layer/serving.py render --env bootstrap/k8s/serving.env --out DIR` prints it as `DIR/placement.txt`) is the contract: one row per pod, with its model, copy, role, node, rail, attachment, rail address and rail MAC. Each row is a StatefulSet of one pod, `<row>-0`. A copy that fits one node sits inside it: chat's copies a (k8s-gpu1, rail 3) and b (k8s-gpu2, rail 6) and staff's a (k8s-gpu1, rail 4) and b (k8s-gpu2, rail 5) each hold their server and their worker on one node, so their RPC runs through the rail NIC's macvlan bridge and reaches no rail switch. A model's node-local copies sit on different nodes and on rails of different parity, so the loss of one GPU node or of either rail switch leaves a copy of each model (the spec's check, `sfab check`, refuses a table that would not). chat's copy c spans both nodes on rail 7 (`spans: true`), labeled as the stand-in for a model too large for one node: its server and worker1 on k8s-gpu1, its worker0 on k8s-gpu2, each worker holding half the layers, so its RPC to worker0 crosses rail-sw1, the one serving flow the chapter's captures can see on a rail switch.
+
+| Pod | Model | Copy | Role | Node | Rail | Address | MAC |
+|---|---|---|---|---|---|---|---|
+| `chat-a-server-0` | chat | a | server | k8s-gpu1 | 3 | 10.21.3.100 | 02:5a:fe:03:00:64 |
+| `chat-a-worker0-0` | chat | a | worker | k8s-gpu1 | 3 | 10.21.3.101 | 02:5a:fe:03:00:65 |
+| `chat-b-server-0` | chat | b | server | k8s-gpu2 | 6 | 10.21.6.100 | 02:5a:fe:06:00:64 |
+| `chat-b-worker0-0` | chat | b | worker | k8s-gpu2 | 6 | 10.21.6.101 | 02:5a:fe:06:00:65 |
+| `chat-c-server-0` | chat | c | server | k8s-gpu1 | 7 | 10.21.7.100 | 02:5a:fe:07:00:64 |
+| `chat-c-worker0-0` | chat | c | worker | k8s-gpu2 | 7 | 10.21.7.101 | 02:5a:fe:07:00:65 |
+| `chat-c-worker1-0` | chat | c | worker | k8s-gpu1 | 7 | 10.21.7.102 | 02:5a:fe:07:00:66 |
+| `staff-a-server-0` | staff | a | server | k8s-gpu1 | 4 | 10.21.4.100 | 02:5a:fe:04:00:64 |
+| `staff-a-worker0-0` | staff | a | worker | k8s-gpu1 | 4 | 10.21.4.101 | 02:5a:fe:04:00:65 |
+| `staff-b-server-0` | staff | b | server | k8s-gpu2 | 5 | 10.21.5.100 | 02:5a:fe:05:00:64 |
+| `staff-b-worker0-0` | staff | b | worker | k8s-gpu2 | 5 | 10.21.5.101 | 02:5a:fe:05:00:65 |
+
+Each pod's rail address comes from its rail's pod range (`k8s.rail_pod_range`, .100 to .199, clear of the nodes' .11 and .12), in table order, and its MAC from that address (the guests' prefix, `fe`, the rail, `00`, the address's last octet), so a pod made again comes back with the same address and the same MAC, and each rail switch's expected MAC table (`gen/expect/<switch>.json`, `known_macs`) holds every pod's MAC at the port facing the pod's node on the pod's rail. A GPU node runs one copy of each model and half of chat's copy c: in this lab the GPU nodes are 42 GiB and 12 vCPUs (`serving: {mem_gib, vcpus}` of their spec entries, which only a lab with serving on uses; every other lab keeps 16 GiB and 8 vCPUs).
+
+**The models** are files on the lab host (`images/models`, `serving-layer/README.md`, "The models"), bound read-only into both GPU nodes' containers, exported to each guest over virtio-9p and mounted at `/srv/models` before kubelet starts; the recipe makes a local PersistentVolume of that path on each node and mounts it in every server at `/models`, read-only. The image holds no model.
+
+**The serving recipe** (`serving-layer/`, `serving-layer/README.md`) turns the table into manifests: one macvlan NetworkAttachmentDefinition per rail the table uses, the rail NIC as master, bridge mode, MTU 9000, the CNI static IPAM plugin and no route; the two models volumes; one StatefulSet of one pod per row, updating on delete, pinned to its node with `nodeSelector`, its rail attachment, address and MAC asked for in its networks annotation; a worker runs `ggml-rpc-server` bound to its rail address; a server runs `llama-server` bound to its own pod address (`--host $(POD_IP)`), with `--rpc` naming its workers' rail addresses (`--tensor-split 1,1` for copy c's two) and an RPC-aware readiness probe (`sfab-ready server`, every 2 s, out after 2 failures, each probe up to 2 s: llama-server answering its health check, and for every worker an established RPC session that is not retransmitting and the worker's kernel refusing a closed port over the rail; a filter on a rail must therefore reject that port with a reset, never drop it); one Service per model and one per copy; and the recipe's own route on the internal Gateway (`serve.ai.tarnwick.example`, `/<model>` and `/<model>-<copy>`), the operator's direct path.
+
+**The Gateways' attached namespaces.** With serving on, each Gateway's listener admits HTTPRoutes only from the namespaces labelled for it (`routes.tarnwick.example/<gateway>: "true"`, the spec's `k8s.allowed_routes`), and the render labels exactly the namespaces it attaches routes from: `echo`, `inference` and `serving` for the internal Gateway, `echo` and `inference` for the users' (chapter 7's lab audits them).
+
+**The API gateway and the router** (`render/inference.py`, `bootstrap/k8s/60-inference-base.yaml`, `61-inference-keys.yaml` and `62-inference.yaml`, in the namespace `inference`): chapter 7's README describes them as revision 2 renders them (callers, the identity provider, multi-auth). Their timeouts come from the speeds measured on the lab host on 2026-10-28 for these models (`spec/profile-a.yaml`, `inference.route`): a server slot holds 512 tokens, and staff, the slower model, needs up to a few minutes to fill one when several requests share its copy, so each router attempt may take 280 s (60 s of silence in a stream), with one retry, inside the API gateway's read of 600 s, inside the routes' backendRequest and request of 620 s; a non-streamed attempt stays below Envoy's 300 s stream idle timeout.
+
+## Requirements
+
+The images `vrnetlab/dell_sonic:4.6.0` and `vrnetlab/paloalto_pa-vm:12.1.2` (`images/VENDOR-IMAGES.md`) and the `sfab/*` images from `make -C images all`, the in-lab registry seeded with the serving and key images and the API gateway's, the router's and Multus's (`make -C images registry-seed`; preflight checks the seed lists the images `serving.env` names). The two models in `images/models` at their pinned sizes (`make -C images models-fetch`; preflight checks them). Memory: the inventory's budget is 162.5 GiB, and preflight wants MemAvailable to cover it plus the 16 GiB floor, 178.5 GiB in all; 62 vCPUs within twice the host's CPU count; 55 GiB of growth under `state/` and 56 GiB of container layers. The host tick at 10000 (read and recorded, never refused on), containerlab 0.82.0, and no other `sfab-` lab running.
+
+## Running it
+
+```
+cd ch06
+make render          # topo.clab.yml, bootstrap/ and gen/ (serving.env, the inference files, trace.json, drills.json, breaks.json)
+make up              # preflight, up, boot, finish (the cluster, the serving recipe, the API gateway and router), audit (Example 6-1)
+make audit           # audits/sfab-ch06_audit_<UTC>/ (Example 6-2)
+make trace           # audits/sfab-ch06_trace_<UTC>/ with TRACE.md (Example 6-5)
+make drills          # audits/sfab-ch06_drills_<UTC>/ with DRILLS.md, three passes (Examples 6-7, 6-8, 6-10 and 6-11)
+make record          # after the drills: audit, trace, then the gate on both sets (Example 6-9)
+make break-6a        # audits/sfab-ch06_break-6a_<UTC>/ (Exercise 4)
+make heal-6a         # audits/sfab-ch06_heal-6a_<UTC>/, then the chapter audit
+make attach          # audits/sfab-ch06_attach_<UTC>/: chat-c-server-0's two networks, read-only
+make break-6b        # audits/sfab-ch06_break-6b_<UTC>/: chat-c-server-0's rail attachment with a route to the pod network
+make heal-6b         # audits/sfab-ch06_heal-6b_<UTC>/, then the chapter audit
+make serve           # the serving recipe again with bootstrap/k8s/serving.env (it acts only on what changed)
+make load USERS=10 SECONDS=60   # concurrent streaming clients from the operator's client, through the IPsec tunnel to the internal Gateway
+make down            # keeps state/ disks; make wipe removes them
+```
+
+`make drills DRILLS=worker-port PASSES=1` runs one drill once. `make up BG=1` runs the deploy as the transient unit `sfab-ch06-up`.
+
+Once the lab is up, `ssh admin@sfab-ch06-<node>` from the lab host logs in to `bastion`, `k8s-cp1` to `k8s-cp3`, `k8s-ingress1`, `k8s-ingress2`, `k8s-gpu1`, `k8s-gpu2`, `uplink-rtr` and `ops-gw` with the lab's key or your own (`../README.md`, "Default logins"), and the containerlab VS Code extension's Connect (SSH) runs the same command. The switches and the firewall keep their kinds' default logins, and the clients, the DNS and time servers and `inet-registry` run no SSH server: the extension's Attach shell opens a shell in each.
+
+## The audit
+
+`audit.sh` runs chapter 4's audit as chapter 4's lab runs it (the shared checks, chapter 2's forwarding-only reads, the pair, its roles, ICCP session and backup keepalive, every bond's legs, the Layer 2 hygiene, the rest of M2's build A audit with the cluster's security, the firewall edge), chapter 5's `rail-backend` group on both rail switches and both GPU nodes, and adds the group `placement` (`common/audit/lib-audit.sh` `audit_placement`, which saves its reads under the set's `placement/`, then `common/audit/judge.py placement`, in `common/audit/placement.py`), every pod read back against the table:
+
+- **the table**: the recipe's own rules (every pod of a copy on one rail, one server and at least one worker a copy, every rail address inside its rail's prefix and given once, every MAC once, every row a StatefulSet's pod 0), and the failure domains: each model keeps a copy through the loss of either rail switch and of any one GPU node;
+- **each row**: its pod Running and Ready on the row's node, owned by the row's StatefulSet, its network-status annotation naming the row's attachment with the row's address and MAC, its labels naming the row's model, copy, role and rail;
+- **the StatefulSets**: one a row, one replica, updating on delete, and none other;
+- **each server and worker**: the server's `--rpc` naming its workers' rail addresses, llama-server bound to its pod address (`--host $(POD_IP)`) and listening there alone (`ss -Hltn` in the pod's network namespace), its model read from its node's models volume, read-only, its readiness probe the RPC-aware one with the table's timers; the worker bound to its own rail address and listening there alone, so ggml-rpc answers on the rail and nowhere else;
+- **the models volumes**: for each node that runs a server, its claim Bound to a local PersistentVolume of `/srv/models` on that node, read-only many;
+- **the attachments**: one macvlan attachment per rail the table uses, as above, and none other;
+- **the Services**: one per model and one per copy, each with exactly its servers' pod addresses as ready endpoints;
+- **the routes inside each pod**, read in the pod's own network namespace on its node (the pod's sandbox found with `crictl`, then `nsenter`): the default route on `eth0`, and on the rail attachment only the rail's connected prefix (`placement/pod-<pod>-route.txt` as `ip route` prints it, Example 6-4);
+- **the Gateways**: one chat completion a model through each model route a client of the lab reaches, with the model's key (the first key of the first application caller that may call the model): the users' Gateway from the enterprise client, the internal Gateway from the operator's client through the IPsec tunnel; each wants HTTP 200 from the router's deployment for that model. Only the status and the response headers are saved, never the request's.
+
+Beside what it judges, the group saves the pods, StatefulSets, volumes, EndpointSlices and Services as kubectl prints them, each pod's addresses as `ip addr` prints them (`placement/pod-<pod>-addr.txt`) and its listening sockets (`placement/pod-<pod>-listen.txt`) and the recipe's render of the table it judges (`placement/rendered/`, from `serving.py render`, no cluster read): the pod manifests and Services as rendered, beside what the cluster runs.
+
+`audit.sh --quick` reads the switches, the firewall, the container links the MAC tables need, and the placement group, and is not recorded. `audit.sh --table FILE` judges the placement group against another table than the rendered one (the rail-move drill's).
+
+## The trace
+
+`trace.sh` (`common/trace/lib-servetrace.sh`, `common/trace/servetrace.py`, the plan in `gen/trace.json`) sends one chat completion to `chat` from the enterprise client through the users' Gateway, with the key of chat's application caller and its source port pinned (42606), after a warm-up request. The plan pins the request to copy c, the copy that spans both nodes (`copy: c`): the router picks the copy, so the trace sends the request again, its source port one higher each time and the captures of a miss stopped and discarded, until chat-c's server took it (its llama-server log holds one more launched slot than before the try), at most 12 tries, 20 s apart so the router's and the API gateway's kept connections have closed; `request/attempts.txt` names each try. It reads both namespaces' pods and the lease of the users' VIP first, then captures, for that request alone:
+
+- the ingress node holding the users' VIP's lease, on `bond0` (port 443 to the VIP, tagged 110);
+- every API gateway pod and every router pod on its cluster interface, and chat's three servers on their cluster interface, each inside the pod's own network namespace at 66 bytes a frame, so no capture holds an HTTP header and with it a key;
+- chat's servers and workers on their rail attachments (port 50052), and the rail switch ports facing each copy's nodes on its rail (in the switch containers, on the lab host).
+
+The judge follows the request by the addresses each hop sends to and the segments that carry data: the client's SYN at the lease holder; the one API gateway pod that received it and sent it to a router pod; that router pod sending it to chat-c's server, the copy the plan pins; that server receiving it and answering; its RPC on its rail attachment to both its workers, at the addresses the table names; the rail switch ports facing both nodes carrying the RPC to the worker on the other node, and no frame of the RPC to the worker beside its server (macvlan's bridge mode keeps that inside the node); and chat's other copies carrying none of it. `TRACE.md` holds the path hop by hop with the decode line of each hop's first data, and the frames at every point.
+
+## The drills
+
+`drills.sh` (`common/drill/lib-servedrill.sh`, `common/drill/servedrill.py`, `common/drill/probe_gateway.py`) runs three drills a pass (`PASSES=3` by default). Under both faults, the gateway probe sends one chat completion every 2 s to chat and one every 30 s to staff (`every: {staff: 15}`: staff, the dense model, takes tens of seconds a request on the CPUs of the host this lab was recorded on, so a request every 2 s would queue on its two copies until the Gateway gave up), each waiting up to 400 s, through the users' Gateway from the enterprise client, each request on its own so a slow answer never holds the next one back, and the serving Services' EndpointSlices are read from the bastion every second, every read and every request stamped on the lab host's clock:
+
+| Step | What happens |
+|---|---|
+| Whole | every pod of the table Ready, every Service holding its servers, every rail switch's rendered ports up, in two consecutive polls 5 s apart |
+| Probes | the endpoints probe and the gateway probe, running 20 s before the fault |
+| Fault | one KLISH session on rail-sw1, its restore pushed first: `dark-switch`, `interface range Ethernet0-7` and `shutdown` (chapter 5's drill: rails 1, 3, 5 and 7 dark, so chat-c loses its worker on the other node; chat-a and staff-b, node-local on rails 3 and 5, keep their RPC inside their nodes); `worker-port`, `interface Ethernet7` and `shutdown`, the port facing chat-c's worker0 on k8s-gpu2 on rail 7 (chat-c alone) |
+| Down | at 20 s, `show interface status` on the switch, the pods and the Services' endpoints as kubectl prints them, and both nodes' rail NICs as their kernels see them |
+| Restore | at 40 s, `no shutdown`; then until every Service holds all its servers again (600 s at most), then 30 s more |
+| After | the probes stopped and their records fetched; the serving and inference namespaces' Warning events saved and cleared (the readiness failures are the drill's evidence); the serving layer whole again; parity on rail-sw1; `audit.sh --quick`; `servedrill.py analyze` |
+
+The analysis times, for each Service, when each server the fault takes out left its ready endpoints (the first read after the shut's session began that no longer lists it, bracketed by the read before it) and when it came back after the restore, against the readiness bound (a probe every 2 s, out after 2 failures, each up to 2 s, then the removal's propagation), and checks that no server the fault leaves alone ever left. Under `dark-switch` the node-local copies on rail-sw1's rails stay in their Services: a KLISH shutdown drops no carrier at the rail NICs, so their in-node RPC never notices, and the analysis says so on a KNOWN L9 line. On hardware the NICs would lose carrier and those copies would leave too, and each model's copies on rail-sw2's rails would answer: the placement keeps a copy of each model either way. For each model it counts the gateway probe's requests by when they were sent and how they ended (the criterion: no failed request), and names the answers the router tried again for, with how long the slowest took. The third drill, `rail-move`, changes nothing in the cluster: it moves chat-a's worker0 to rail 5 in a copy of the table (at 10.21.5.102), renders the manifests from it with the recipe (which refuses the table), runs `audit.sh --quick` against it (the placement group fails, naming the worker and the copy's rule), then `audit.sh --quick` against the table as rendered (green). Each pass writes `pass<N>/<drill>/`; `DRILLS.md` closes the set.
+
+## break-6a
+
+`breaks/6a.yaml`, rendered to `gen/breaks.json`: chat-b's worker0 made again through its StatefulSet by the recipe (`serving.py move`) on rail 8 instead of the table's rail 6, at 10.21.8.100 with that address's MAC, and with a rail 8 attachment, which the table does not use; its labels still name the table's rail. chat-b's server, beside it on k8s-gpu2, no longer reaches a worker at 10.21.6.101, so its readiness probe fails and it leaves both its Services: `make break-6a` records the namespace's pods, the Services' endpoints, every pod's network-status annotation and the Warning events, and sends 20 requests to chat and 2 to staff (on every 15th interval, as in the drills) through the users' Gateway. It passes when the worker's network-status names rail 8, chat-b holds no ready endpoint, chat holds two (chat-a's and chat-c's), staff holds two, and every request answers. `make heal-6a` removes chat-b's server (its session to the old worker cannot come back), runs the recipe (`serving.py serve`: the moved worker's stamp differs from the rendered template's, so it is made again on rail 6, the server is made again, and the rail 8 attachment is removed), checks the worker back on rail 6, every Service whole and every request answering, and waits until rail-sw2's MAC table has aged out the MAC the moved worker had on rail 8 (660 s at most), so the chapter audit that follows finds every learned MAC where the table places it.
+
+## attach
+
+`attach.sh` (through `common/reads/attach.sh`, read-only) follows one server pod, `chat-c-server-0` (k8s-gpu1, rail 7, 10.21.7.100, MAC 02:5a:fe:07:00:64), the server of the copy that spans the nodes, across its two networks: its network-status annotation (eth0, the default, at the pod's IP, and `rail7` at the table's address and MAC), its route table read on k8s-gpu1 in the network namespace whose eth0 holds the pod's IP (the default route on eth0, on `rail7` only the rail's own prefix), the EndpointSlices of the Services that select it (each holds the eth0 address, and no slice holds 10.21.7.100), the cluster DNS answer for the first of those Services, asked by its client, a router pod, with python3's resolver for `<service>.serving.svc.cluster.local.` (the serving namespace's network policy gives a server no egress, cluster DNS included; the final dot keeps the name out of the search list), and rail-sw1's MAC table: each rail 7 pod whose copy has a peer on the other node learned in Vlan107 on the port facing its node. A pod whose peers all share its node (chat-c's worker1, beside its server on k8s-gpu1) talks to them inside the node, so the switch may hold no entry for it; that row is a SKIP when it is absent and a FAIL only when it is on another port.
+
+## break-6b
+
+`breaks/6b.yaml`, rendered to `gen/breaks.json`: `chat-c-server-0` made again through its StatefulSet at its own address and MAC, but through `rail7-route`, a copy of `rail7` whose static IPAM adds a route to the pod network (10.22.0.0/16) via 10.21.7.101, chat-c's worker0 on k8s-gpu2 (`serving.py reroute`). Its replies to the router, whose requests arrive on eth0, then leave on the rail, toward a worker that is no router. `make break-6b` records the namespace (`k8s_show`), the server's route table and k8s-gpu1's `rail7` captured while a router pod connects to chat-c's HTTP port (`pod_net`: the serving namespace's network policy admits only the router and the Gateways' Envoy to a server), and 20 requests to chat and 2 to staff through the users' Gateway, whose failing share it records without judging it (where the router sends them decides it); the check `reply_path` reads the route and the replies on the rail sourced from the pod's eth0 address, and chat-c stays in its Services, since its readiness probe runs inside the pod over the rail. `make heal-6b` runs `make serve` after removing chat-c's server, which its StatefulSet makes again through `rail7`, and serve removes `rail7-route`; the heal checks the route and the rail replies gone and the attachment removed. Revision 1 recorded the break on chat-a's server, then a copy that spanned the nodes.
+
+## Platform notes for this lab
+
+M1's, chapter 4's and chapter 5's notes hold here (`dev/m1/README.md`, `ch04/README.md`, `ch05/README.md`). The recorded deployment adds these; A, AT, B, R and T are the short names of `audits/INDEX.md`.
+
+- **The serving pods resolve no name.** The serving namespace's network policy admits the router and the Gateways' Envoy to a server and gives a server no egress, cluster DNS included; the servers reach their workers by rail address. `make attach` therefore asks for a Service's name in a router pod, the Service's own client (AT/dns/2-resolve.txt:1, :2).
+- **macvlan honours the `mac` capability through Multus thick.** Every pod's network-status MAC is the table's (A/verdict.txt:563 to :573), and the rail switches learn those MACs at the ports facing the pods' nodes (A/rail-sw1/12_mac_table.txt:8 to :19, A/rail-sw2/12_mac_table.txt:8 to :14). A node-local copy's MACs then age out, since its RPC never crosses the switch (AT/switch/1-mac-table.txt:5 to :14).
+- **The pod's default route carries Cilium's MTU with WireGuard**, `mtu 8855`, while `eth0` and the rail attachment read 9000 (A/placement/pod-chat-c-server-0-route.txt:1, pod-chat-c-server-0-addr.txt:7, :13).
+- **`kubectl get endpointslices -o wide` lists not-ready endpoints too**, so its ENDPOINTS column still shows a server that has left its Service (B/record/broken-endpointslices.txt:3 against B/record/broken-pods.txt:4, `0/1`). Read a Service's servers from the ready condition, or from the server pod's READY column.
+- **A KLISH shutdown drops no carrier at the GPU NICs**, as in chapter 5: both nodes read every rail NIC `UP` while rail-sw1's ports read `down admin-down` (R/pass1/dark-switch/links-during-k8s-gpu1.txt:1 to :8, klish/during-rail-sw1.txt:12 to :19), so readiness over the rail is the only detector, and the node-local copies on rail-sw1's rails keep their in-node RPC and stay in their Services (KNOWN L9).
+- **A request sent to a cut-off copy before readiness removed it stalls rather than fails.** In pass 1 of the dark switch, chat's request 15, sent 2 s after the shut began, was answered 54.9 s later with no router retry (R/pass1/dark-switch/records-chat.jsonl:41), once the restored rail carried chat c's RPC again.
+- **The router reads each model's list from its Service now and then** (a `GET /v1/models` from every router pod at once, on a timer that starts with the pod), so a serving trace can see a request to a copy that did not serve the traced one; the trace sets such a connection aside when all its data falls outside the traced request's life at the router (`RESULTS.md`, "What the deploy found", 4).
+- **tcpdump names the protocol it recognises on port 8080** after a payload's length (`length 743: HTTP`, T/captures/3-router-76cf778fb6-gwr7f-eth0.txt:167); the trace's judge reads the length after the TCP flags.

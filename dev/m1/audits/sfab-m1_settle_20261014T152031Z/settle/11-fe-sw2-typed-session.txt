@@ -1,0 +1,325 @@
+2026-10-14 15:08:29,282: launch     	INFO typing KLISH startup config /config/startup-config.cfg
+2026-10-14 15:08:29,282: vrnetlab   	DEBUG writing to serial console: ''
+2026-10-14 15:08:29,282: vrnetlab   	INFO waiting for 'login:' on serial console
+logout
+
+
+
+Debian GNU/Linux 12 fe-sw2 ttyS0
+
+fe-sw2 login: 2026-10-14 15:08:30,731: vrnetlab   	INFO read from serial console: 'logout
+
+
+
+Debian GNU/Linux 12 fe-sw2 ttyS0
+
+fe-sw2 login: '
+2026-10-14 15:08:30,731: vrnetlab   	DEBUG writing to serial console: 'admin'
+2026-10-14 15:08:30,731: vrnetlab   	INFO waiting for 'Password:' on serial console
+admin
+Password: 2026-10-14 15:08:30,775: vrnetlab   	INFO read from serial console: 'admin
+Password: '
+2026-10-14 15:08:30,775: vrnetlab   	DEBUG writing to serial console: 'admin'
+2026-10-14 15:08:30,775: vrnetlab   	INFO waiting for '$' on serial console
+
+Linux fe-sw2 6.1.0-48-2-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.172-1 (2026-05-15) x86_64
+You are on
+  ____   ___  _   _ _  ____
+ / ___| / _ \| \ | (_)/ ___|
+ \___ \| | | |  \| | | |
+  ___) | |_| | |\  | | |___
+ |____/ \___/|_| \_|_|\____|
+
+-- Software for Open Networking in the Cloud --
+
+Unauthorized access and/or use are prohibited.
+All access and/or use are subject to monitoring.
+
+Help:   https://sonic-net.github.io/SONiC/
+
+Last login: Wed Oct 14 15:06:11 UTC 2026 on ttyS0
+admin@fe-sw2:~$ 2026-10-14 15:08:30,969: vrnetlab   	INFO read from serial console: '
+Linux fe-sw2 6.1.0-48-2-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.172-1 (2026-05-15) x86_64
+You are on
+  ____   ___  _   _ _  ____
+ / ___| / _ \| \ | (_)/ ___|
+ \___ \| | | |  \| | | |
+  ___) | |_| | |\  | | |___
+ |____/ \___/|_| \_|_|\____|
+
+-- Software for Open Networking in the Cloud --
+
+Unauthorized access and/or use are prohibited.
+All access and/or use are subject to monitoring.
+
+Help:   https://sonic-net.github.io/SONiC/
+
+Last login: Wed Oct 14 15:06:11 UTC 2026 on ttyS0
+admin@fe-sw2:~$ '
+2026-10-14 15:08:30,969: vrnetlab   	DEBUG writing to serial console: 'sonic-cli'
+2026-10-14 15:08:30,969: vrnetlab   	INFO waiting for '#' on serial console
+sonic-cli
+fe-sw2# 2026-10-14 15:08:32,186: vrnetlab   	INFO read from serial console: 'sonic-cli
+fe-sw2# '
+2026-10-14 15:08:32,186: vrnetlab   	DEBUG writing to serial console: 'terminal length 0'
+2026-10-14 15:08:32,186: vrnetlab   	DEBUG writing to serial console: 'configure terminal'
+2026-10-14 15:08:32,486: vrnetlab   	DEBUG writing to serial console: 'ip vrf mgmt'
+2026-10-14 15:08:32,786: vrnetlab   	DEBUG writing to serial console: 'end'
+2026-10-14 15:08:33,087: vrnetlab   	DEBUG writing to serial console: 'configure terminal'
+2026-10-14 15:08:33,387: vrnetlab   	DEBUG writing to serial console: 'interface Vlan 100'
+2026-10-14 15:08:33,687: vrnetlab   	DEBUG writing to serial console: 'exit'
+2026-10-14 15:08:33,988: vrnetlab   	DEBUG writing to serial console: 'interface Vlan 200'
+2026-10-14 15:08:34,288: vrnetlab   	DEBUG writing to serial console: 'exit'
+2026-10-14 15:08:34,588: vrnetlab   	DEBUG writing to serial console: 'interface Vlan 300'
+2026-10-14 15:08:34,888: vrnetlab   	DEBUG writing to serial console: 'exit'
+2026-10-14 15:08:35,189: vrnetlab   	DEBUG writing to serial console: 'interface PortChannel 1'
+2026-10-14 15:08:35,489: vrnetlab   	DEBUG writing to serial console: 'description peer-link'
+2026-10-14 15:08:35,789: vrnetlab   	DEBUG writing to serial console: 'fast_rate'
+2026-10-14 15:08:36,089: vrnetlab   	DEBUG writing to serial console: 'switchport trunk allowed Vlan 100,200,300'
+2026-10-14 15:08:36,390: vrnetlab   	DEBUG writing to serial console: 'no shutdown'
+2026-10-14 15:08:36,690: vrnetlab   	DEBUG writing to serial console: 'exit'
+2026-10-14 15:08:36,990: vrnetlab   	DEBUG writing to serial console: 'interface Ethernet0'
+2026-10-14 15:08:37,290: vrnetlab   	DEBUG writing to serial console: 'description peer-link-1'
+2026-10-14 15:08:37,591: vrnetlab   	DEBUG writing to serial console: 'channel-group 1'
+2026-10-14 15:08:37,891: vrnetlab   	DEBUG writing to serial console: 'no shutdown'
+2026-10-14 15:08:38,191: vrnetlab   	DEBUG writing to serial console: 'exit'
+2026-10-14 15:08:38,491: vrnetlab   	DEBUG writing to serial console: 'interface Ethernet1'
+2026-10-14 15:08:38,792: vrnetlab   	DEBUG writing to serial console: 'description peer-link-2'
+2026-10-14 15:08:39,092: vrnetlab   	DEBUG writing to serial console: 'channel-group 1'
+2026-10-14 15:08:39,392: vrnetlab   	DEBUG writing to serial console: 'no shutdown'
+2026-10-14 15:08:39,692: vrnetlab   	DEBUG writing to serial console: 'exit'
+2026-10-14 15:08:39,992: vrnetlab   	DEBUG writing to serial console: 'mclag domain 1'
+2026-10-14 15:08:40,293: vrnetlab   	DEBUG writing to serial console: 'source-ip 172.21.40.12'
+2026-10-14 15:08:40,593: vrnetlab   	DEBUG writing to serial console: 'peer-ip 172.21.40.11'
+2026-10-14 15:08:40,893: vrnetlab   	DEBUG writing to serial console: 'peer-link PortChannel 1'
+2026-10-14 15:08:41,193: vrnetlab   	DEBUG writing to serial console: 'mclag-system-mac 02:5a:00:00:00:01'
+2026-10-14 15:08:41,494: vrnetlab   	DEBUG writing to serial console: 'session-vrf mgmt'
+2026-10-14 15:08:41,794: vrnetlab   	DEBUG writing to serial console: 'exit'
+2026-10-14 15:08:42,094: vrnetlab   	DEBUG writing to serial console: 'interface PortChannel 10'
+2026-10-14 15:08:42,394: vrnetlab   	DEBUG writing to serial console: 'description fw-ae1'
+2026-10-14 15:08:42,694: vrnetlab   	DEBUG writing to serial console: 'mtu 9216'
+2026-10-14 15:08:42,995: vrnetlab   	DEBUG writing to serial console: 'fast_rate'
+2026-10-14 15:08:43,295: vrnetlab   	DEBUG writing to serial console: 'mclag 1'
+2026-10-14 15:08:43,595: vrnetlab   	DEBUG writing to serial console: 'switchport trunk allowed Vlan 100,200,300'
+2026-10-14 15:08:43,895: vrnetlab   	DEBUG writing to serial console: 'no shutdown'
+2026-10-14 15:08:44,195: vrnetlab   	DEBUG writing to serial console: 'exit'
+2026-10-14 15:08:44,496: vrnetlab   	DEBUG writing to serial console: 'interface Ethernet2'
+2026-10-14 15:08:44,796: vrnetlab   	DEBUG writing to serial console: 'description fw-eth2'
+2026-10-14 15:08:45,096: vrnetlab   	DEBUG writing to serial console: 'mtu 9216'
+2026-10-14 15:08:45,396: vrnetlab   	DEBUG writing to serial console: 'channel-group 10'
+2026-10-14 15:08:45,696: vrnetlab   	DEBUG writing to serial console: 'no shutdown'
+2026-10-14 15:08:45,997: vrnetlab   	DEBUG writing to serial console: 'exit'
+2026-10-14 15:08:46,297: vrnetlab   	DEBUG writing to serial console: 'interface PortChannel 21'
+2026-10-14 15:08:46,597: vrnetlab   	DEBUG writing to serial console: 'description gpu1-bond'
+2026-10-14 15:08:46,897: vrnetlab   	DEBUG writing to serial console: 'fast_rate'
+2026-10-14 15:08:47,197: vrnetlab   	DEBUG writing to serial console: 'mclag 1'
+2026-10-14 15:08:47,498: vrnetlab   	DEBUG writing to serial console: 'switchport access Vlan 100'
+2026-10-14 15:08:47,798: vrnetlab   	DEBUG writing to serial console: 'no shutdown'
+2026-10-14 15:08:48,098: vrnetlab   	DEBUG writing to serial console: 'exit'
+2026-10-14 15:08:48,398: vrnetlab   	DEBUG writing to serial console: 'interface Ethernet6'
+2026-10-14 15:08:48,699: vrnetlab   	DEBUG writing to serial console: 'description gpu1-eth2'
+2026-10-14 15:08:48,999: vrnetlab   	DEBUG writing to serial console: 'channel-group 21'
+2026-10-14 15:08:49,299: vrnetlab   	DEBUG writing to serial console: 'no shutdown'
+2026-10-14 15:08:49,599: vrnetlab   	DEBUG writing to serial console: 'exit'
+2026-10-14 15:08:49,899: vrnetlab   	DEBUG writing to serial console: 'interface PortChannel 22'
+2026-10-14 15:08:50,200: vrnetlab   	DEBUG writing to serial console: 'description gpu2-bond'
+2026-10-14 15:08:50,500: vrnetlab   	DEBUG writing to serial console: 'fast_rate'
+2026-10-14 15:08:50,800: vrnetlab   	DEBUG writing to serial console: 'mclag 1'
+2026-10-14 15:08:51,100: vrnetlab   	DEBUG writing to serial console: 'switchport access Vlan 100'
+2026-10-14 15:08:51,400: vrnetlab   	DEBUG writing to serial console: 'no shutdown'
+2026-10-14 15:08:51,701: vrnetlab   	DEBUG writing to serial console: 'exit'
+2026-10-14 15:08:52,001: vrnetlab   	DEBUG writing to serial console: 'interface Ethernet7'
+2026-10-14 15:08:52,301: vrnetlab   	DEBUG writing to serial console: 'description gpu2-eth2'
+2026-10-14 15:08:52,601: vrnetlab   	DEBUG writing to serial console: 'channel-group 22'
+2026-10-14 15:08:52,901: vrnetlab   	DEBUG writing to serial console: 'no shutdown'
+2026-10-14 15:08:53,201: vrnetlab   	DEBUG writing to serial console: 'exit'
+2026-10-14 15:08:53,502: vrnetlab   	DEBUG writing to serial console: 'end'
+2026-10-14 15:08:53,802: vrnetlab   	DEBUG writing to serial console: 'end'
+2026-10-14 15:08:53,802: vrnetlab   	INFO waiting for '#' on serial console
+terminal length 0
+fe-sw2# configure terminal
+fe-sw2(config)# ip vrf mgmt
+end
+configure terminal
+interface Vlan 100
+exit
+interface Vlan 200
+fe-sw2(config)# end
+fe-sw2# configure terminal
+fe-sw2(config)# interface Vlan 100
+exit
+fe-sw2(config-if-Vlan100)# exit
+fe-sw2(config)# interface Vlan 200
+interface Vlan 300
+fe-sw2(config-if-Vlan200)# exit
+fe-sw2(config)# interface Vlan 300
+exit
+fe-sw2(config-if-Vlan300)# exit
+fe-sw2(config)# interface PortChannel 1
+fe-sw2(config-if-po1)# description peer-link
+fe-sw2(config-if-po1)# fast_rate
+fe-sw2(config-if-po1)# switchport trunk allowed Vlan 100,200,300
+fe-sw2(config-if-po1)# no shutdown
+fe-sw2(config-if-po1)# exit
+fe-sw2(config)# interface Ethernet0
+fe-sw2(config-if-Ethernet0)# description peer-link-1
+fe-sw2(config-if-Ethernet0)# channel-group 1
+fe-sw2(config-if-Ethernet0)# no shutdown
+fe-sw2(config-if-Ethernet0)# exit
+fe-sw2(config)# interface Ethernet1
+fe-sw2(config-if-Ethernet1)# description peer-link-2
+fe-sw2(config-if-Ethernet1)# channel-group 1
+fe-sw2(config-if-Ethernet1)# no shutdown
+fe-sw2(config-if-Ethernet1)# exit
+fe-sw2(config)# mclag domain 1
+fe-sw2(config-mclag-domain-1)# source-ip 172.21.40.12
+fe-sw2(config-mclag-domain-1)# peer-ip 172.21.40.11
+fe-sw2(config-mclag-domain-1)# peer-link PortChannel 1
+fe-sw2(config-mclag-domain-1)# mclag-system-mac 02:5a:00:00:00:01
+fe-sw2(config-mclag-domain-1)# session-vrf mgmt
+fe-sw2(config-mclag-domain-1)# exit
+fe-sw2(config)# interface PortChannel 10
+fe-sw2(config-if-po10)# description fw-ae1
+fe-sw2(config-if-po10)# mtu 9216
+fe-sw2(config-if-po10)# fast_rate
+fe-sw2(config-if-po10)# mclag 1
+fe-sw2(config-if-po10)# switchport trunk allowed Vlan 100,200,300
+fe-sw2(config-if-po10)# no shutdown
+fe-sw2(config-if-po10)# exit
+fe-sw2(config)# interface Ethernet2
+fe-sw2(config-if-Ethernet2)# description fw-eth2
+fe-sw2(config-if-Ethernet2)# mtu 9216
+fe-sw2(config-if-Ethernet2)# channel-group 10
+fe-sw2(config-if-Ethernet2)# no shutdown
+fe-sw2(config-if-Ethernet2)# exit
+fe-sw2(config)# interface PortChannel 21
+fe-sw2(config-if-po21)# description gpu1-bond
+fe-sw2(config-if-po21)# fast_rate
+fe-sw2(config-if-po21)# mclag 1
+fe-sw2(config-if-po21)# switchport access Vlan 100
+fe-sw2(config-if-po21)# no shutdown
+fe-sw2(config-if-po21)# exit
+fe-sw2(config)# interface Ethernet6
+fe-sw2(config-if-Ethernet6)# description gpu1-eth2
+fe-sw2(config-if-Ethernet6)# channel-group 21
+fe-sw2(config-if-Ethernet6)# no shutdown
+fe-sw2(config-if-Ethernet6)# exit
+fe-sw2(config)# interface PortChannel 22
+fe-sw2(config-if-po22)# description gpu2-bond
+fe-sw2(config-if-po22)# fast_rate
+fe-sw2(config-if-po22)# mclag 1
+fe-sw2(config-if-po22)# switchport access Vlan 100
+fe-sw2(config-if-po22)# no shutdown
+fe-sw2(config-if-po22)# exit
+fe-sw2(config)# interface Ethernet7
+fe-sw2(config-if-Ethernet7)# description gpu2-eth2
+fe-sw2(config-if-Ethernet7)# channel-group 22
+fe-sw2(config-if-Ethernet7)# no shutdown
+fe-sw2(config-if-Ethernet7)# exit
+fe-sw2(config)# end
+fe-sw2# 2026-10-14 15:08:53,802: vrnetlab   	INFO read from serial console: 'terminal length 0
+fe-sw2# configure terminal
+fe-sw2(config)# ip vrf mgmt
+end
+configure terminal
+interface Vlan 100
+exit
+interface Vlan 200
+fe-sw2(config)# end
+fe-sw2# configure terminal
+fe-sw2(config)# interface Vlan 100
+exit
+fe-sw2(config-if-Vlan100)# exit
+fe-sw2(config)# interface Vlan 200
+interface Vlan 300
+fe-sw2(config-if-Vlan200)# exit
+fe-sw2(config)# interface Vlan 300
+exit
+fe-sw2(config-if-Vlan300)# exit
+fe-sw2(config)# interface PortChannel 1
+fe-sw2(config-if-po1)# description peer-link
+fe-sw2(config-if-po1)# fast_rate
+fe-sw2(config-if-po1)# switchport trunk allowed Vlan 100,200,300
+fe-sw2(config-if-po1)# no shutdown
+fe-sw2(config-if-po1)# exit
+fe-sw2(config)# interface Ethernet0
+fe-sw2(config-if-Ethernet0)# description peer-link-1
+fe-sw2(config-if-Ethernet0)# channel-group 1
+fe-sw2(config-if-Ethernet0)# no shutdown
+fe-sw2(config-if-Ethernet0)# exit
+fe-sw2(config)# interface Ethernet1
+fe-sw2(config-if-Ethernet1)# description peer-link-2
+fe-sw2(config-if-Ethernet1)# channel-group 1
+fe-sw2(config-if-Ethernet1)# no shutdown
+fe-sw2(config-if-Ethernet1)# exit
+fe-sw2(config)# mclag domain 1
+fe-sw2(config-mclag-domain-1)# source-ip 172.21.40.12
+fe-sw2(config-mclag-domain-1)# peer-ip 172.21.40.11
+fe-sw2(config-mclag-domain-1)# peer-link PortChannel 1
+fe-sw2(config-mclag-domain-1)# mclag-system-mac 02:5a:00:00:00:01
+fe-sw2(config-mclag-domain-1)# session-vrf mgmt
+fe-sw2(config-mclag-domain-1)# exit
+fe-sw2(config)# interface PortChannel 10
+fe-sw2(config-if-po10)# description fw-ae1
+fe-sw2(config-if-po10)# mtu 9216
+fe-sw2(config-if-po10)# fast_rate
+fe-sw2(config-if-po10)# mclag 1
+fe-sw2(config-if-po10)# switchport trunk allowed Vlan 100,200,300
+fe-sw2(config-if-po10)# no shutdown
+fe-sw2(config-if-po10)# exit
+fe-sw2(config)# interface Ethernet2
+fe-sw2(config-if-Ethernet2)# description fw-eth2
+fe-sw2(config-if-Ethernet2)# mtu 9216
+fe-sw2(config-if-Ethernet2)# channel-group 10
+fe-sw2(config-if-Ethernet2)# no shutdown
+fe-sw2(config-if-Ethernet2)# exit
+fe-sw2(config)# interface PortChannel 21
+fe-sw2(config-if-po21)# description gpu1-bond
+fe-sw2(config-if-po21)# fast_rate
+fe-sw2(config-if-po21)# mclag 1
+fe-sw2(config-if-po21)# switchport access Vlan 100
+fe-sw2(config-if-po21)# no shutdown
+fe-sw2(config-if-po21)# exit
+fe-sw2(config)# interface Ethernet6
+fe-sw2(config-if-Ethernet6)# description gpu1-eth2
+fe-sw2(config-if-Ethernet6)# channel-group 21
+fe-sw2(config-if-Ethernet6)# no shutdown
+fe-sw2(config-if-Ethernet6)# exit
+fe-sw2(config)# interface PortChannel 22
+fe-sw2(config-if-po22)# description gpu2-bond
+fe-sw2(config-if-po22)# fast_rate
+fe-sw2(config-if-po22)# mclag 1
+fe-sw2(config-if-po22)# switchport access Vlan 100
+fe-sw2(config-if-po22)# no shutdown
+fe-sw2(config-if-po22)# exit
+fe-sw2(config)# interface Ethernet7
+fe-sw2(config-if-Ethernet7)# description gpu2-eth2
+fe-sw2(config-if-Ethernet7)# channel-group 22
+fe-sw2(config-if-Ethernet7)# no shutdown
+fe-sw2(config-if-Ethernet7)# exit
+fe-sw2(config)# end
+fe-sw2# '
+2026-10-14 15:08:53,802: vrnetlab   	DEBUG writing to serial console: 'write memory'
+2026-10-14 15:08:53,802: vrnetlab   	INFO waiting for '#' on serial console
+end
+         ^
+% Error: Invalid input detected at "^" marker.
+fe-sw2# write memory
+2026-10-14 15:08:53,851: vrnetlab   	INFO read from serial console: 'end
+         ^
+% Error: Invalid input detected at "^" marker.
+fe-sw2# write memory
+'
+2026-10-14 15:08:53,851: vrnetlab   	DEBUG writing to serial console: 'exit'
+2026-10-14 15:08:53,851: vrnetlab   	INFO waiting for '$' on serial console
+exit
+
+Oct 14 15:08:53.003590 System is ready 
+fe-sw2# exit
+admin@fe-sw2:~$ 2026-10-14 15:08:54,277: vrnetlab   	INFO read from serial console: 'exit
+
+Oct 14 15:08:53.003590 System is ready 
+fe-sw2# exit
+admin@fe-sw2:~$ '
+2026-10-14 15:08:54,278: vrnetlab   	DEBUG writing to serial console: 'logout'
+2026-10-14 15:08:54,278: launch     	INFO KLISH startup config applied

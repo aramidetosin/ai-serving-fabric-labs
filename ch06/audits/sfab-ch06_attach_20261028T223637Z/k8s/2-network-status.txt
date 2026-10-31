@@ -1,0 +1,22 @@
+root@k8s-cp1:~# kubectl -n serving get pod chat-c-server-0 -o 'jsonpath={.metadata.annotations.k8s\.v1\.cni\.cncf\.io/network-status}'
+[{
+    "name": "cilium",
+    "interface": "eth0",
+    "ips": [
+        "10.22.1.122"
+    ],
+    "mac": "0a:f5:b3:d4:b0:4a",
+    "default": true,
+    "dns": {},
+    "gateway": [
+        "10.22.1.227"
+    ]
+},{
+    "name": "serving/rail7",
+    "interface": "rail7",
+    "ips": [
+        "10.21.7.100"
+    ],
+    "mac": "02:5a:fe:07:00:64",
+    "dns": {}
+}]

@@ -1,0 +1,35 @@
+== state/ca/proof/internet-outside-1.verify.txt
+CN = proof internet-outside-1
+error 47 at 0 depth lookup: permitted subtree violation
+error /root/sfab/labs/ai-serving-fabric-labs/ch07/state/ca/proof.new/internet-outside-1.crt: verification failed
+# the spec's ca.intermediates.internet.proof.outside; expect reject
+== state/ca/proof/internet-outside-2.verify.txt
+CN = proof internet-outside-2
+error 47 at 0 depth lookup: permitted subtree violation
+error /root/sfab/labs/ai-serving-fabric-labs/ch07/state/ca/proof.new/internet-outside-2.crt: verification failed
+# the spec's ca.intermediates.internet.proof.outside; expect reject
+== state/ca/proof/internet-outside-public.verify.txt
+CN = proof internet-outside-public
+error 47 at 0 depth lookup: permitted subtree violation
+error /root/sfab/labs/ai-serving-fabric-labs/ch07/state/ca/proof.new/internet-outside-public.crt: verification failed
+# the firewall's public address, which no lab certificate may name; expect reject
+== state/ca/proof/kubernetes-outside-1.verify.txt
+CN = proof kubernetes-outside-1
+error 47 at 0 depth lookup: permitted subtree violation
+error /root/sfab/labs/ai-serving-fabric-labs/ch07/state/ca/proof.new/kubernetes-outside-1.crt: verification failed
+# the spec's ca.proof.outside; expect reject
+== state/ca/proof/kubernetes-outside-public.verify.txt
+CN = proof kubernetes-outside-public
+error 47 at 0 depth lookup: permitted subtree violation
+error /root/sfab/labs/ai-serving-fabric-labs/ch07/state/ca/proof.new/kubernetes-outside-public.crt: verification failed
+# the firewall's public address, which no lab certificate may name; expect reject
+== state/ca/proof/platform-outside-1.verify.txt
+CN = proof platform-outside-1
+error 47 at 0 depth lookup: permitted subtree violation
+error /root/sfab/labs/ai-serving-fabric-labs/ch07/state/ca/proof.new/platform-outside-1.crt: verification failed
+# the spec's ca.proof.outside; expect reject
+== state/ca/proof/platform-outside-public.verify.txt
+CN = proof platform-outside-public
+error 47 at 0 depth lookup: permitted subtree violation
+error /root/sfab/labs/ai-serving-fabric-labs/ch07/state/ca/proof.new/platform-outside-public.crt: verification failed
+# the firewall's public address, which no lab certificate may name; expect reject

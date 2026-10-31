@@ -1,0 +1,56 @@
+boot: every container running with its links
+== switches up
+  PASS  fe-sw1: healthy, KLISH startup config applied, show version over SSH
+  PASS  fe-sw2: healthy, KLISH startup config applied, show version over SSH
+  PASS  oob-sw: healthy, KLISH startup config applied, show version over SSH
+  PASS  rail-sw1: healthy, KLISH startup config applied, show version over SSH
+  PASS  rail-sw2: healthy, KLISH startup config applied, show version over SSH
+  step    boot.switches done in 332s
+== parity
+  PASS  fe-sw1: parity, 0 missing lines
+  PASS  fe-sw2: parity, 0 missing lines
+  PASS  oob-sw: parity, 0 missing lines
+  PASS  rail-sw1: parity, 0 missing lines
+  PASS  rail-sw2: parity, 0 missing lines
+  step    boot.parity done in 12s
+== GRO off
+  PASS  fe-sw1: GRO, rx-gro-hw and LRO off on all 12 data NICs
+  PASS  fe-sw2: GRO, rx-gro-hw and LRO off on all 11 data NICs
+  PASS  oob-sw: GRO, rx-gro-hw and LRO off on all 7 data NICs
+  PASS  rail-sw1: GRO, rx-gro-hw and LRO off on all 8 data NICs
+  PASS  rail-sw2: GRO, rx-gro-hw and LRO off on all 8 data NICs
+  step    boot.gro done in 3s
+== firewall fw
+  PASS  fw: healthy
+  PASS  fw: delivered /config/startup-config.cfg matches the render byte for byte
+  PASS  fw: startup configuration committed (marker present)
+  PASS  fw: every enforced.txt line in the set-format running configuration (try 1)
+  step    boot.fw done in 353s
+== lab CA
+  PASS  sfab-ca init in bastion
+  PASS  the lab's kubeadm join token in state/shared/cluster/kubeadm.env (0600, from state/secrets.env)
+  step    boot.ca done in 2s
+== fabric
+  PASS  pair session, roles, peer link and PortChannels as rendered, the PortChannels facing the held guests set aside until their release, the storage bonds set aside until finish's storage setup in 2 consecutive polls 15s apart (poll 2)
+  step    boot.fabric done in 23s
+== guests
+  PASS  guests released (state/shared/hold-guests removed)
+  PASS  ctrl1: SSH answers and sfab-netsetup.service ran in this boot
+  PASS  ctrl2: SSH answers and sfab-netsetup.service ran in this boot
+  PASS  ctrl3: SSH answers and sfab-netsetup.service ran in this boot
+  PASS  gpu1: SSH answers and sfab-netsetup.service ran in this boot
+  PASS  gpu2: SSH answers and sfab-netsetup.service ran in this boot
+  step    boot.guests done in 72s
+== guest bonds
+  PASS  pair session, roles and every PortChannel as rendered, the guest bonds included, the storage bonds set aside until finish's storage setup in 2 consecutive polls 15s apart (poll 2)
+  step    boot.bonds done in 22s
+== node sync
+ctrl1 IN-SYNC (23 files)
+ctrl2 IN-SYNC (20 files)
+ctrl3 IN-SYNC (20 files)
+gpu1 IN-SYNC (27 files)
+gpu2 IN-SYNC (27 files)
+node-sync: 5/5 guests match the render
+  PASS  guests' boot-time files match the repo
+  step    boot.node-sync done in 2s
+== RESULT: 30 passed, 0 failed, 0 known platform limitation(s), 0 skipped

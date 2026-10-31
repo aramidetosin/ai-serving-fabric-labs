@@ -1,0 +1,414 @@
+#!/usr/bin/env bash
+# sfab-ca: the lab CA, on the lab host and outside every node (FRAMEWORK.md sections 2.2, 3.2 and 5;
+# render/ca.py).
+#
+#   sfab-ca [-C LABDIR] init                make or check the CA, sign the node leaves, publish
+#                                           them, then prove it (make ca, and the up stage before
+#                                           every deploy); safe to run again: a CA that is current
+#                                           changes nothing
+#   sfab-ca [-C LABDIR] proof               sign the proof leaves and verify each against the root
+#   sfab-ca [-C LABDIR] status              subjects, validity, fingerprints and constraints (no keys)
+#   sfab-ca [-C LABDIR] verify [FILE]       verify a PEM certificate (leaf first, any chain after it)
+#                                           from FILE or stdin against the lab root, with the lab's
+#                                           intermediates as the untrusted chain
+#   sfab-ca [-C LABDIR] retract             remove the private keys kubeadm's control nodes take from
+#                                           state/shared once the cluster no longer needs them there
+#                                           (every control node joined, the finish stage): the
+#                                           kubeadm intermediate's key and the init node's shared
+#                                           control-plane keys (cluster/pki/*.key)
+#   sfab-ca [-C LABDIR] k8s-secret CA NS/NAME   print a kubernetes.io/tls Secret holding intermediate
+#                                           CA's key pair (tls.crt is the chain to the root, ca.crt
+#                                           the root) for a cert-manager CA issuer, on a pipe only:
+#                                           it refuses a terminal; the finish stage pipes it to the
+#                                           harness's kubectl on the init node and nothing prints it
+#
+# LABDIR is the lab's render directory (the lab, or its variant's directory), the current directory
+# by default. What it reads: the render at LABDIR/bootstrap/ca (root.cnf, one <intermediate>.cnf
+# each, one leaf-<leaf>.cnf per node leaf, and proof.json). What it keeps: LABDIR/state/ca, mode
+# 0700, which the topology binds into no node: every key (0600), every certificate,
+# issued/<name>-<UTC>.crt for each signing, and proof/ for the last proof (the proof leaves'
+# certificates and openssl's verdicts; their keys are thrown away).
+#
+# The rules:
+#   - The root is made once, from root.cnf, and never again: a root that exists is kept, and a
+#     changed root.cnf only warns (make wipe starts a new CA). Its key signs the intermediates and
+#     nothing else.
+#   - An intermediate, and a node leaf, is signed again only when its certificate is missing, does
+#     not match its key, does not chain to the root, expires within its renew_days, or was signed
+#     from another .cnf (a new subject, new names or new name constraints); FORCE=1 signs them
+#     regardless. Its key is kept, so certificates it signed before still verify.
+#   - Published to LABDIR/state/shared: ca/root.crt, which the clients and nodes trust,
+#     ca/<intermediate>.crt, and, when proof.json says the lab runs kubeadm, for the intermediate
+#     whose role is kubeadm, cluster/ca/ca.crt, ca.key (0600), root.crt and chain.crt (ca.crt then
+#     root.crt), which the init node's kubeadm signs the cluster with. Each node leaf is published
+#     to LABDIR/state/tls/<node>/ (tls.key 0600, tls.crt, chain.crt: the leaf then its
+#     intermediate, ca.crt: the root), which the topology binds read-only into that node only. Only
+#     changed files are rewritten. retract removes cluster/ca/ca.key again, with the keys the init
+#     node publishes in cluster/pki/ for the joining control nodes; init puts the CA key back when it
+#     runs, the init node its own keys when its bootstrap runs.
+#   - The proof: every leaf in proof.json is signed by its intermediate with the SANs given and
+#     verified with openssl against the root. An inside leaf must verify; an outside leaf must
+#     fail with a name-constraint error; every published node leaf must verify and match its key.
+#     Any other outcome fails the proof, and init with it.
+#
+# Nothing is installed into the lab host's own trust store. Output lines use the harness vocabulary
+# (PASS, FAIL, RESULT). Exit 0 when everything held. SFAB_CA_CONF, SFAB_CA_STATE, SFAB_SHARED and
+# SFAB_TLS_DIR move the directories (the tests).
+set -euo pipefail
+
+LAB=.
+if [ "${1:-}" = "-C" ]; then LAB=${2:?usage: sfab-ca -C LABDIR COMMAND}; shift 2; fi
+CONF=${SFAB_CA_CONF:-$LAB/bootstrap/ca}
+STATE=${SFAB_CA_STATE:-$LAB/state/ca}
+SHARED=${SFAB_SHARED:-$LAB/state/shared}
+TLS=${SFAB_TLS_DIR:-$LAB/state/tls}
+FORCE=${FORCE:-0}
+umask 077
+
+log() { printf '[sfab-ca] %s\n' "$*"; }
+die() { printf '[sfab-ca] FAIL: %s\n' "$*"; exit 1; }
+utc() { date -u +%Y%m%dT%H%M%SZ; }
+
+# cnf_get FILE KEY: KEY from the [sfab] section of a rendered .cnf.
+cnf_get() {
+  awk -v k="$2" '
+    /^\[/ { s = ($0 == "[sfab]"); next }
+    s { split($0, a, "="); key = a[1]; gsub(/[ \t]/, "", key)
+        if (key == k) { v = substr($0, index($0, "=") + 1); gsub(/^[ \t]+|[ \t]+$/, "", v); print v; exit } }
+  ' "$1"
+}
+# The configuration that matters when signing: everything but the comments.
+cnf_sum() { grep -v '^#' "$1" | sha256sum | cut -c1-64; }
+pub_key() { openssl pkey -in "$1" -pubout 2>/dev/null; }
+pub_crt() { openssl x509 -in "$1" -noout -pubkey 2>/dev/null; }
+subject() { openssl x509 -in "$1" -noout -subject -nameopt RFC2253 | sed 's/^subject=//'; }
+issuer() { openssl x509 -in "$1" -noout -issuer -nameopt RFC2253 | sed 's/^issuer=//'; }
+enddate() { openssl x509 -in "$1" -noout -enddate | sed 's/^notAfter=//'; }
+serial_hex() { openssl rand -hex "$1"; }
+
+# ossl WHAT ARGS...: run openssl; on failure stop with openssl's own first error line.
+ossl() {
+  local what=$1 err
+  shift
+  err=$(mktemp)
+  if ! openssl "$@" 2>"$err"; then
+    local first
+    first=$(grep -v '^$' "$err" | head -n 1)
+    rm -f "$err"
+    die "$what: openssl ${1:-}: ${first:-failed}"
+  fi
+  rm -f "$err"
+}
+
+key_new() {  # key_new TYPE OUT
+  case $1 in
+    ec-p256) ossl "key $2" genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out "$2" ;;
+    ec-p384) ossl "key $2" genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-384 -out "$2" ;;
+    rsa-2048|rsa-3072|rsa-4096) ossl "key $2" genpkey -algorithm RSA -pkeyopt "rsa_keygen_bits:${1#rsa-}" -out "$2" ;;
+    *) die "unknown key type '$1'" ;;
+  esac
+  chmod 0600 "$2"
+}
+
+proof_json() {
+  [ -f "$CONF/proof.json" ] || die "no $CONF/proof.json (run make render; the CA renders when the lab has one)"
+  printf '%s\n' "$CONF/proof.json"
+}
+intermediates() { jq -r '.intermediates[]' "$(proof_json)"; }
+# node_leaves: "<leaf> <node>" per node leaf of the lab
+node_leaves() { jq -r '(.node_leaves // [])[] | "\(.id) \(.node)"' "$(proof_json)"; }
+runs_kubeadm() { [ "$(jq -r 'if .kubeadm == null then true else .kubeadm end' "$(proof_json)")" = true ]; }
+
+lock() {
+  mkdir -p "$STATE"
+  chmod 0700 "$STATE"
+  command -v flock >/dev/null 2>&1 || return 0
+  exec 9>"$STATE/.lock"
+  flock -w 120 9 || die "another sfab-ca holds $STATE/.lock"
+}
+
+put() {  # put MODE SRC DST: replace DST only when it differs
+  local mode=$1 src=$2 dst=$3
+  if ! cmp -s "$src" "$dst" 2>/dev/null; then
+    cp "$src" "$dst.tmp"
+    chmod "$mode" "$dst.tmp"
+    mv -f "$dst.tmp" "$dst"
+    return 0
+  fi
+  chmod "$mode" "$dst"
+}
+
+# ------------------------------------------------------------------------------------------
+root() {
+  local k=$STATE/root.key c=$STATE/root.crt cnf=$CONF/root.cnf days
+  [ -f "$cnf" ] || die "no $cnf (run make render; the CA renders when the lab has one)"
+  if [ -s "$c" ]; then
+    [ -s "$k" ] || die "root.crt without root.key in $STATE; make wipe starts a new CA"
+    [ "$(pub_key "$k")" = "$(pub_crt "$c")" ] || die "root.key does not match root.crt in $STATE; make wipe starts a new CA"
+    if [ "$(cnf_sum "$cnf")" != "$(cat "$STATE/root.cnf.sha256" 2>/dev/null || true)" ]; then
+      log "WARNING: root.cnf changed since the root was made; the root is kept (make wipe starts a new CA)"
+    fi
+    log "root: kept, $(subject "$c"), until $(enddate "$c")"
+    return 0
+  fi
+  if [ ! -s "$k" ]; then key_new "$(cnf_get "$cnf" key)" "$k"; fi
+  days=$(cnf_get "$cnf" days)
+  ossl "the root" req -x509 -new -key "$k" -config "$cnf" -extensions ext -days "${days:-3650}" -sha256 \
+    -set_serial "0x$(serial_hex 16)" -out "$c.tmp"
+  chmod 0644 "$c.tmp"
+  mv -f "$c.tmp" "$c"
+  cp "$c" "$STATE/issued/root-$(utc).crt"
+  cnf_sum "$cnf" > "$STATE/root.cnf.sha256"
+  log "root: made, $(subject "$c"), until $(enddate "$c")"
+}
+
+# sign NAME CNF KEY CRT CA_CRT CA_KEY DEFAULT_DAYS: sign CRT for KEY from CNF with the CA, when it is
+# due (the rules above); NAME in the log and the issued/ copy. The .cnf it was signed from is
+# recorded beside the certificate (CRT.cnf.sha256).
+sign() {
+  local name=$1 cnf=$2 k=$3 c=$4 cacrt=$5 cakey=$6 ddays=$7 why="" days renew csr chain
+  days=$(cnf_get "$cnf" days)
+  renew=$(cnf_get "$cnf" renew_days)
+  if [ ! -s "$k" ]; then key_new "$(cnf_get "$cnf" key)" "$k"; log "$name: key made ($(cnf_get "$cnf" key))"; fi
+  chain=$cacrt
+  [ "$cacrt" = "$STATE/root.crt" ] && chain=""
+  if [ "$FORCE" = 1 ]; then why="FORCE=1"
+  elif [ ! -s "$c" ]; then why="no certificate yet"
+  elif [ "$(pub_key "$k")" != "$(pub_crt "$c")" ]; then why="the certificate does not match the key"
+  elif ! openssl verify -CAfile "$STATE/root.crt" ${chain:+-untrusted "$chain"} "$c" >/dev/null 2>&1; then why="the certificate does not chain to the root"
+  elif ! openssl x509 -in "$c" -noout -checkend "$(( ${renew:-90} * 86400 ))" >/dev/null; then why="it expires within ${renew:-90} days"
+  elif [ "$(cnf_sum "$cnf")" != "$(cat "$c.cnf.sha256" 2>/dev/null || true)" ]; then why="$(basename "$cnf") changed (subject, names or constraints)"
+  fi
+  if [ -z "$why" ]; then
+    log "$name: kept, $(subject "$c"), until $(enddate "$c")"
+    return 0
+  fi
+  csr=$(mktemp)
+  ossl "the $name request" req -new -key "$k" -config "$cnf" -out "$csr"
+  ossl "signing $name" x509 -req -in "$csr" -CA "$cacrt" -CAkey "$cakey" -set_serial "0x$(serial_hex 16)" \
+    -days "${days:-$ddays}" -sha256 -extfile "$cnf" -extensions ext -out "$c.tmp"
+  rm -f "$csr"
+  chmod 0644 "$c.tmp"
+  mv -f "$c.tmp" "$c"
+  cp "$c" "$STATE/issued/$name-$(utc).crt"
+  cnf_sum "$cnf" > "$c.cnf.sha256"
+  log "$name: signed ($why), $(subject "$c"), until $(enddate "$c")"
+}
+
+intermediate() {
+  local ca=$1
+  [ -f "$CONF/$ca.cnf" ] || die "no $CONF/$ca.cnf (run make render)"
+  sign "$ca" "$CONF/$ca.cnf" "$STATE/$ca.key" "$STATE/$ca.crt" "$STATE/root.crt" "$STATE/root.key" 1826
+}
+
+leaf() {
+  local id=$1 cnf=$CONF/leaf-$1.cnf ca
+  [ -f "$cnf" ] || die "no $cnf (run make render)"
+  ca=$(cnf_get "$cnf" ca)
+  [ -s "$STATE/$ca.crt" ] && [ -s "$STATE/$ca.key" ] || die "leaf $id: no $ca intermediate in $STATE"
+  mkdir -p "$STATE/leaves"
+  sign "leaf-$id" "$cnf" "$STATE/leaves/$id.key" "$STATE/leaves/$id.crt" "$STATE/$ca.crt" "$STATE/$ca.key" 397
+}
+
+publish() {
+  local ca role chain id node d
+  mkdir -p "$SHARED/ca"
+  chmod 0755 "$SHARED" "$SHARED/ca"
+  put 0644 "$STATE/root.crt" "$SHARED/ca/root.crt"
+  for ca in $(intermediates); do
+    put 0644 "$STATE/$ca.crt" "$SHARED/ca/$ca.crt"
+    role=$(cnf_get "$CONF/$ca.cnf" role)
+    if [ "$role" = kubeadm ] && runs_kubeadm; then
+      mkdir -p "$SHARED/cluster/ca"
+      chmod 0755 "$SHARED/cluster" "$SHARED/cluster/ca"
+      chain=$(mktemp)
+      cat "$STATE/$ca.crt" "$STATE/root.crt" > "$chain"
+      put 0644 "$STATE/$ca.crt" "$SHARED/cluster/ca/ca.crt"
+      put 0600 "$STATE/$ca.key" "$SHARED/cluster/ca/ca.key"
+      put 0644 "$STATE/root.crt" "$SHARED/cluster/ca/root.crt"
+      put 0644 "$chain" "$SHARED/cluster/ca/chain.crt"
+      rm -f "$chain"
+      log "$ca: published for kubeadm in $SHARED/cluster/ca (ca.crt, ca.key 0600, root.crt, chain.crt)"
+    fi
+  done
+  while read -r id node; do
+    [ -n "$id" ] || continue
+    d=$TLS/$node
+    mkdir -p "$d"
+    chmod 0755 "$TLS" "$d"
+    ca=$(cnf_get "$CONF/leaf-$id.cnf" ca)
+    chain=$(mktemp)
+    cat "$STATE/leaves/$id.crt" "$STATE/$ca.crt" > "$chain"
+    put 0600 "$STATE/leaves/$id.key" "$d/tls.key"
+    put 0644 "$STATE/leaves/$id.crt" "$d/tls.crt"
+    put 0644 "$chain" "$d/chain.crt"
+    put 0644 "$STATE/root.crt" "$d/ca.crt"
+    rm -f "$chain"
+    log "leaf $id: published for $node in $d (tls.key 0600, tls.crt, chain.crt, ca.crt)"
+  done < <(node_leaves)
+  log "root published at $SHARED/ca/root.crt"
+}
+
+retract() {
+  local k gone=()
+  for k in "$SHARED/cluster/ca/ca.key" "$SHARED"/cluster/pki/*.key; do
+    [ -e "$k" ] || continue
+    rm -f "$k"
+    gone+=("${k#"$SHARED"/}")
+  done
+  if [ "${#gone[@]}" -gt 0 ]; then
+    log "retracted ${#gone[@]} key file(s) from $SHARED: ${gone[*]} (sfab-ca init puts the CA key back, the init node's bootstrap its shared keys)"
+  else
+    log "nothing to retract: no kubeadm key under $SHARED/cluster"
+  fi
+}
+
+# ------------------------------------------------------------------------------------------
+proof() {
+  local p out=$STATE/proof w id ca expect sans source v rc pass=0 fail=0 why err node d
+  p=$(proof_json)
+  [ -s "$STATE/root.crt" ] || die "no root yet: run sfab-ca init"
+  w=$(mktemp -d)
+  rm -rf "$out.new"
+  mkdir -p "$out.new"
+  printf '== lab CA proof (%s)\n' "$p"
+  while IFS=$'\t' read -r id ca expect sans source; do
+    [ -n "$id" ] || continue
+    if [ ! -s "$STATE/$ca.crt" ] || [ ! -s "$STATE/$ca.key" ]; then
+      printf '  FAIL  %s: %s -> no %s intermediate yet\n' "$ca" "$sans" "$ca"; fail=$((fail + 1)); continue
+    fi
+    openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out "$w/$id.key" 2>/dev/null
+    openssl req -new -key "$w/$id.key" -subj "/CN=proof $id" -out "$w/$id.csr" 2>/dev/null
+    printf 'basicConstraints = CA:FALSE\nkeyUsage = critical,digitalSignature\nextendedKeyUsage = serverAuth\nsubjectAltName = %s\n' \
+      "$sans" > "$w/$id.ext"
+    if ! openssl x509 -req -in "$w/$id.csr" -CA "$STATE/$ca.crt" -CAkey "$STATE/$ca.key" -set_serial "0x$(serial_hex 8)" \
+         -days 1 -sha256 -extfile "$w/$id.ext" -out "$out.new/$id.crt" 2>"$w/$id.err"; then
+      err=$(grep -v '^$' "$w/$id.err" | head -n 1)
+      printf '  FAIL  %s: %s -> could not sign the leaf: %s\n' "$ca" "$sans" "$err"; fail=$((fail + 1)); continue
+    fi
+    rc=0
+    v=$(openssl verify -CAfile "$STATE/root.crt" -untrusted "$STATE/$ca.crt" "$out.new/$id.crt" 2>&1) || rc=$?
+    printf '%s\n# %s; expect %s\n' "$v" "$source" "$expect" > "$out.new/$id.verify.txt"
+    why=$(printf '%s\n' "$v" | grep -m 1 -E '^error [0-9]+ at' | sed -E 's/^error [0-9]+ at [0-9]+ depth lookup: //' || true)
+    if [ "$expect" = verify ]; then
+      if [ "$rc" -eq 0 ] && grep -q ': OK$' <<<"$v"; then
+        printf '  PASS  %s: %s verifies\n' "$ca" "$sans"; pass=$((pass + 1))
+      else
+        printf '  FAIL  %s: %s verifies -> %s\n' "$ca" "$sans" "${why:-$v}"; fail=$((fail + 1))
+      fi
+    else
+      if [ "$rc" -ne 0 ] && grep -qiE 'subtree violation|name constraint' <<<"$v"; then
+        printf '  PASS  %s: %s refused (%s)\n' "$ca" "$sans" "$why"; pass=$((pass + 1))
+      else
+        printf '  FAIL  %s: %s refused -> %s\n' "$ca" "$sans" "${why:-verified}"; fail=$((fail + 1))
+      fi
+    fi
+  done < <(jq -r '.leaves[] | [.id, .ca, .expect, (.san | join(",")), .source] | @tsv' "$p")
+  # every published node leaf verifies against the root through its intermediate, with its key
+  while read -r id node; do
+    [ -n "$id" ] || continue
+    d=$TLS/$node
+    rc=0
+    v=$(openssl verify -CAfile "$STATE/root.crt" -untrusted "$d/chain.crt" "$d/tls.crt" 2>&1) || rc=$?
+    if [ "$rc" -eq 0 ] && [ "$(pub_key "$d/tls.key")" = "$(pub_crt "$d/tls.crt")" ]; then
+      printf '  PASS  leaf %s: %s, published for %s, verifies and matches its key\n' "$id" "$(subject "$d/tls.crt")" "$node"; pass=$((pass + 1))
+    else
+      printf '  FAIL  leaf %s: published for %s -> %s\n' "$id" "$node" "$(printf '%s\n' "$v" | grep -m 1 -E '^error' || echo 'the key does not match the certificate')"; fail=$((fail + 1))
+    fi
+  done < <(node_leaves)
+  rm -rf "$w" "$out"
+  mv "$out.new" "$out"
+  printf '== RESULT: %d passed, %d failed, 0 known platform limitation(s), 0 skipped\n' "$pass" "$fail"
+  [ "$fail" -eq 0 ]
+}
+
+verify_cert() {
+  local f=${1:--} w ca rc=0 v
+  [ -s "$STATE/root.crt" ] || die "no root yet: run sfab-ca init"
+  w=$(mktemp -d)
+  if [ "$f" = - ]; then cat > "$w/in.pem"; else [ -r "$f" ] || die "cannot read $f"; cp "$f" "$w/in.pem"; fi
+  awk -v d="$w" '/-----BEGIN CERTIFICATE-----/ { n++ } n { print > (d "/cert" n ".pem") }' "$w/in.pem"
+  [ -s "$w/cert1.pem" ] || { rm -rf "$w"; die "no PEM certificate in the input"; }
+  : > "$w/untrusted.pem"
+  for v in "$w"/cert*.pem; do [ "$v" = "$w/cert1.pem" ] || cat "$v" >> "$w/untrusted.pem"; done
+  for ca in $(intermediates); do [ -s "$STATE/$ca.crt" ] && cat "$STATE/$ca.crt" >> "$w/untrusted.pem"; done
+  printf 'subject  %s\nissuer   %s\nuntil    %s\n' "$(subject "$w/cert1.pem")" "$(issuer "$w/cert1.pem")" "$(enddate "$w/cert1.pem")"
+  v=$(openssl verify -CAfile "$STATE/root.crt" -untrusted "$w/untrusted.pem" "$w/cert1.pem" 2>&1) || rc=$?
+  rm -rf "$w"
+  if [ "$rc" -eq 0 ]; then printf 'verify   OK against the lab root\n'; return 0; fi
+  printf 'verify   FAIL: %s\n' "$(printf '%s\n' "$v" | grep -m 1 -E '^error' || printf '%s' "$v")"
+  return 1
+}
+
+init() {
+  local ca id node
+  lock
+  mkdir -p "$STATE/issued"
+  root
+  for ca in $(intermediates); do intermediate "$ca"; done
+  while read -r id node; do [ -n "$id" ] && leaf "$id"; done < <(node_leaves)
+  publish
+  proof
+}
+
+status() {
+  local ca c id node
+  for ca in root $(intermediates); do
+    c=$STATE/$ca.crt
+    if [ ! -s "$c" ]; then printf '%s: none yet\n' "$ca"; continue; fi
+    printf '%s: %s\n' "$ca" "$(subject "$c")"
+    printf '  issuer   %s\n' "$(issuer "$c")"
+    printf '  until    %s\n' "$(enddate "$c")"
+    printf '  sha256   %s\n' "$(openssl x509 -in "$c" -noout -fingerprint -sha256 | sed 's/^.*=//')"
+    if [ "$ca" != root ]; then
+      printf '  role     %s\n' "$(cnf_get "$CONF/$ca.cnf" role 2>/dev/null || echo unknown)"
+      printf '  chains   %s\n' "$(openssl verify -CAfile "$STATE/root.crt" "$c" >/dev/null 2>&1 && echo yes || echo no)"
+      openssl x509 -in "$c" -noout -ext nameConstraints 2>/dev/null | sed -n '2,$p' | sed 's/^ */  /'
+    fi
+  done
+  while read -r id node; do
+    [ -n "$id" ] || continue
+    c=$STATE/leaves/$id.crt
+    if [ ! -s "$c" ]; then printf 'leaf %s: none yet\n' "$id"; continue; fi
+    printf 'leaf %s (%s): %s\n' "$id" "$node" "$(subject "$c")"
+    printf '  issuer   %s\n' "$(issuer "$c")"
+    printf '  until    %s\n' "$(enddate "$c")"
+    printf '  names    %s\n' "$(openssl x509 -in "$c" -noout -ext subjectAltName 2>/dev/null | sed -n '2p' | sed 's/^ *//')"
+  done < <(node_leaves)
+  if [ -e "$SHARED/cluster/ca/ca.key" ]; then
+    printf 'kubeadm key: published at %s\n' "$SHARED/cluster/ca/ca.key"
+  else
+    printf 'kubeadm key: not under %s\n' "$SHARED"
+  fi
+}
+
+b64() { base64 < "$1" | tr -d '\n'; }
+
+k8s_secret() {
+  local ca=${1:-} target=${2:-} ns name w
+  if [ -z "$ca" ] || [ -z "$target" ] || [ "${target#*/}" = "$target" ]; then
+    die "usage: sfab-ca k8s-secret CA NAMESPACE/NAME"
+  fi
+  if [ -t 1 ]; then die "k8s-secret writes a private key: pipe it to kubectl apply -f -, never to a terminal"; fi
+  ns=${target%%/*}
+  name=${target#*/}
+  if [ ! -s "$STATE/$ca.key" ] || [ ! -s "$STATE/$ca.crt" ]; then
+    die "no $ca intermediate in $STATE: run sfab-ca init"
+  fi
+  w=$(mktemp -d)
+  cat "$STATE/$ca.crt" "$STATE/root.crt" > "$w/chain.crt"
+  printf 'apiVersion: v1\nkind: Secret\nmetadata:\n  name: %s\n  namespace: %s\ntype: kubernetes.io/tls\ndata:\n  tls.crt: %s\n  tls.key: %s\n  ca.crt: %s\n' \
+    "$name" "$ns" "$(b64 "$w/chain.crt")" "$(b64 "$STATE/$ca.key")" "$(b64 "$STATE/root.crt")"
+  rm -rf "$w"
+  log "secret $ns/$name: the $ca intermediate's key pair (tls.crt the chain to the root, ca.crt the root), written to the pipe" >&2
+}
+
+case ${1:-} in
+  init) init ;;
+  proof) proof ;;
+  status) status ;;
+  verify) shift; verify_cert "${1:--}" ;;
+  retract) lock; retract ;;
+  k8s-secret) shift; k8s_secret "$@" ;;
+  *) printf 'usage: sfab-ca [-C LABDIR] init | proof | status | verify [FILE] | retract | k8s-secret CA NAMESPACE/NAME\n' >&2; exit 2 ;;
+esac

@@ -1,0 +1,12 @@
+fe-sw2# show running-configuration mclag
+!
+mclag domain 1
+ source-ip 172.21.40.12
+ peer-ip 172.21.40.11
+ session-vrf mgmt
+ peer-link PortChannel1
+ mclag-system-mac 02:5a:00:00:00:01
+ keepalive-interval 1
+ session-timeout 30
+ delay-restore 300
+ backup-keepalive interval 30

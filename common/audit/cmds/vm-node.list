@@ -1,0 +1,15 @@
+# Every Linux VM guest (control and GPU nodes): SLUG SURFACE COMMAND (see README.md).
++netsetup_unit       guest       systemctl show -p Result -p ExecMainStatus -p ExecMainExitTimestampMonotonic -p ActiveState sfab-netsetup.service
++bonding             guest       cat /proc/net/bonding/{bond.name}
+ip_addr              guest-json  ip -j addr show
+ip_rule              guest       ip rule show
++table_mgmt          guest       ip route show table {inv.guest.tables.mgmt}
+table_oob            guest       ip route show table {inv.guest.tables.oob}
++tx_guest            guest       for i in {guest_data_ifs}; do printf '%s ' "$i"; ethtool -k "$i" | grep '^tx-checksumming:' || echo 'tx-checksumming: missing'; done
++tx_container        host        container_offloads
+container_links      host-json   container_links
++ping_gw             guest       ping -c 3 -W 2 {gateway}
+gw_one_hop           guest       ping -c 2 -W 2 -t 1 {gateway}
++ping_oob_gw         guest       sudo ip netns exec {oob.netns} ping -c 3 -W 2 {oob.gateway}
+bmc_addr            guest-json  sudo ip -n {oob.netns} -j addr show
+bmc_listen          guest       sudo ip netns exec {oob.netns} ss -ltnH

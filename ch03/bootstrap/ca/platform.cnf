@@ -1,0 +1,24 @@
+# sfab-ch03 lab CA, the platform intermediate: rendered from spec/profile-a.yaml by render/ca.py; edit the spec and run make render
+# sfab-ca signs it with the root. Its name constraints are the only names and
+# addresses any certificate under it can verify for.
+# Role gateways: cert-manager's CA issuer signs the Gateway certificates with it.
+[sfab]
+key = ec-p256
+days = 1826
+renew_days = 90
+role = gateways
+
+[req]
+prompt = no
+distinguished_name = dn
+
+[dn]
+O = Tarnwick
+CN = Tarnwick Platform CA
+
+[ext]
+basicConstraints = critical,CA:TRUE,pathlen:0
+keyUsage = critical,keyCertSign,cRLSign,digitalSignature
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always
+nameConstraints = critical,permitted;DNS:ai.tarnwick.example,permitted;IP:10.20.0.0/255.252.0.0,permitted;IP:10.24.10.0/255.255.255.0

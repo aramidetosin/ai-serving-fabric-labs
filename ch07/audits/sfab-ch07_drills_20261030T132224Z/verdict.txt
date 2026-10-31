@@ -1,0 +1,88 @@
+== pass 1, drill key-lifecycle: one key for chat from mint to revoke under the gateway probe, at every API gateway pod and through the users' VIP
+  PASS  pass 1 key-lifecycle: the gateway layer whole before the drill: every API gateway and router pod Ready, both Gateways Programmed, the test backend ready (poll 2)
+  PASS  pass 1 key-lifecycle: the gateway layer whole again after the drill: every API gateway and router pod Ready, both Gateways Programmed, the test backend ready (poll 2)
+  PASS  pass 1 key-lifecycle: audit.sh --quick after the drill: RESULT: 337 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+  PASS  pass 1 key-lifecycle: the key Job minted batch.fd000001 into the key Secret (sha256:06cc6f9a0318), on the host clock at 1793366575.0265658
+  PASS  pass 1 key-lifecycle: every API gateway pod accepted it, each on its own schedule: api-gateway-64bc7b94df-7b74q 69.7 s, api-gateway-64bc7b94df-hm4sq 48.5 s after the Secret's write; the last pod's acceptance 69.7 s
+  PASS  pass 1 key-lifecycle: the first 200 through llm.ai.tarnwick.example came 52.1 s after the write, once a pod held the key (the first pod 48.5 s), and 5 of the VIP's requests were refused 401 between it and the last pod's acceptance: a first 200 shows one pod holds a key, the last pod's acceptance that all do
+  PASS  pass 1 key-lifecycle: the new chat key on staff's route: 401 at every API gateway pod (api-gateway-64bc7b94df-7b74q 401, api-gateway-64bc7b94df-hm4sq 401) and through the VIP (HTTP 401)
+  PASS  pass 1 key-lifecycle: the key Job revoked batch.fd000001 (sha256:06cc6f9a0318), on the host clock at 1793366669.632314
+  PASS  pass 1 key-lifecycle: after the revoke every API gateway pod refused it: api-gateway-64bc7b94df-7b74q 57.4 s, api-gateway-64bc7b94df-hm4sq 45.3 s; the last pod's refusal 57.4 s after the revoke
+  PASS  pass 1 key-lifecycle: through the VIP the last 200 with it came 54.4 s after the revoke, and every request after the last pod's refusal was refused (8 requests)
+  PASS  pass 1 key-lifecycle: chat through gw-users: 0 of 90 requests failed
+  PASS  pass 1 key-lifecycle: staff through gw-users: 0 of 6 requests failed
+  PASS  pass 1 key-lifecycle: the key Secret holds the same fields and fingerprints after the drill as before (2 fields)
+== pass 1, drill rejected-code: staff's route without its rejected code, a chat key answered with the plugin's default, then the rendered 401
+  PASS  pass 1 rejected-code: the gateway layer whole before the drill: every API gateway and router pod Ready, both Gateways Programmed, the test backend ready (poll 2)
+  PASS  pass 1 rejected-code: the gateway layer whole again after the drill: every API gateway and router pod Ready, both Gateways Programmed, the test backend ready (poll 2)
+  PASS  pass 1 rejected-code: audit.sh --quick after the drill: RESULT: 337 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+  PASS  pass 1 rejected-code: staff's route without rejected_code: a chat key answered HTTP 403 at every API gateway pod (api-gateway-64bc7b94df-7b74q 56.4 s, api-gateway-64bc7b94df-hm4sq 51.4 s after the change), the plugin's own message: The consumer_group_id is forbidden.
+  PASS  pass 1 rejected-code: ... and through the VIP: HTTP 403
+  PASS  pass 1 rejected-code: the rendered routes back: HTTP 401 at every pod again, with the unknown key's message (Authorization Failed)
+  PASS  pass 1 rejected-code: ... through the VIP HTTP 401, and staff's own key there HTTP 200
+  PASS  pass 1 rejected-code: chat through gw-users: 0 of 103 requests failed
+  PASS  pass 1 rejected-code: staff through gw-users: 0 of 7 requests failed
+  PASS  pass 1 rejected-code: the routes ConfigMap is the render's again
+== pass 1, drill idle-timeout: the test backend silent past Envoy's stream idle timeout through the users' Gateway, then the corrected chain
+  PASS  pass 1 idle-timeout: the gateway layer whole before the drill: every API gateway and router pod Ready, both Gateways Programmed, the test backend ready (poll 2)
+  PASS  pass 1 idle-timeout: Cilium upgraded with the corrected values from the in-lab registry, its operator, agents and Envoy rolled out
+  PASS  pass 1 idle-timeout: the listener's stream idle timeout 600s, both Gateways Programmed, the route answering (corrected, 4 s)
+  PASS  pass 1 idle-timeout: Cilium upgraded with the rendered values from the in-lab registry, its operator, agents and Envoy rolled out
+  PASS  pass 1 idle-timeout: the listener's stream idle timeout 300s, both Gateways Programmed, the route answering (restored, 4 s)
+  PASS  pass 1 idle-timeout: the gateway layer whole again after the drill: every API gateway and router pod Ready, both Gateways Programmed, the test backend ready (poll 2)
+  PASS  pass 1 idle-timeout: audit.sh --quick after the drill: RESULT: 337 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+  PASS  pass 1 idle-timeout, as rendered (the listener's stream idle timeout 300s): the request silent for 330 s ended HTTP 504 after 300.015558 s, answered by envoy: the Gateway ended it, the backend having sent 0 bytes' segments before it was continued
+  PASS  pass 1 idle-timeout, as rendered: the Gateway's proxy closed its connection to the test backend 300.0 s after the request was sent (10.22.0.47:34147)
+  PASS  pass 1 idle-timeout, corrected (the listener's stream idle timeout 600s, the route's request 420 s and backendRequest 400 s): the same silence answered HTTP 200 after 330.948217 s
+  PASS  pass 1 idle-timeout: the rendered chain back: idle 300s (before the drill 300s), the same; route timeouts none; helm values rendered
+== pass 2, drill key-lifecycle: one key for chat from mint to revoke under the gateway probe, at every API gateway pod and through the users' VIP
+  PASS  pass 2 key-lifecycle: the gateway layer whole before the drill: every API gateway and router pod Ready, both Gateways Programmed, the test backend ready (poll 2)
+  PASS  pass 2 key-lifecycle: the gateway layer whole again after the drill: every API gateway and router pod Ready, both Gateways Programmed, the test backend ready (poll 2)
+  PASS  pass 2 key-lifecycle: audit.sh --quick after the drill: RESULT: 337 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+  PASS  pass 2 key-lifecycle: the key Job minted batch.fd000002 into the key Secret (sha256:ec8f5df23969), on the host clock at 1793368592.7735677
+  PASS  pass 2 key-lifecycle: every API gateway pod accepted it, each on its own schedule: api-gateway-64bc7b94df-7b74q 32.4 s, api-gateway-64bc7b94df-hm4sq 71.7 s after the Secret's write; the last pod's acceptance 71.7 s
+  PASS  pass 2 key-lifecycle: the first 200 through llm.ai.tarnwick.example came 34.2 s after the write, once a pod held the key (the first pod 32.4 s), and 9 of the VIP's requests were refused 401 between it and the last pod's acceptance: a first 200 shows one pod holds a key, the last pod's acceptance that all do
+  PASS  pass 2 key-lifecycle: the new chat key on staff's route: 401 at every API gateway pod (api-gateway-64bc7b94df-7b74q 401, api-gateway-64bc7b94df-hm4sq 401) and through the VIP (HTTP 401)
+  PASS  pass 2 key-lifecycle: the key Job revoked batch.fd000002 (sha256:ec8f5df23969), on the host clock at 1793368689.9912577
+  PASS  pass 2 key-lifecycle: after the revoke every API gateway pod refused it: api-gateway-64bc7b94df-7b74q 78.9 s, api-gateway-64bc7b94df-hm4sq 65.3 s; the last pod's refusal 78.9 s after the revoke
+  PASS  pass 2 key-lifecycle: through the VIP the last 200 with it came 75.5 s after the revoke, and every request after the last pod's refusal was refused (7 requests)
+  PASS  pass 2 key-lifecycle: chat through gw-users: 0 of 101 requests failed
+  PASS  pass 2 key-lifecycle: staff through gw-users: 0 of 7 requests failed
+  PASS  pass 2 key-lifecycle: the key Secret holds the same fields and fingerprints after the drill as before (2 fields)
+== pass 2, drill rejected-code: staff's route without its rejected code, a chat key answered with the plugin's default, then the rendered 401
+  PASS  pass 2 rejected-code: the gateway layer whole before the drill: every API gateway and router pod Ready, both Gateways Programmed, the test backend ready (poll 2)
+  PASS  pass 2 rejected-code: the gateway layer whole again after the drill: every API gateway and router pod Ready, both Gateways Programmed, the test backend ready (poll 2)
+  PASS  pass 2 rejected-code: audit.sh --quick after the drill: RESULT: 337 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+  PASS  pass 2 rejected-code: staff's route without rejected_code: a chat key answered HTTP 403 at every API gateway pod (api-gateway-64bc7b94df-7b74q 26.4 s, api-gateway-64bc7b94df-hm4sq 32.4 s after the change), the plugin's own message: The consumer_group_id is forbidden.
+  PASS  pass 2 rejected-code: ... and through the VIP: HTTP 403
+  PASS  pass 2 rejected-code: the rendered routes back: HTTP 401 at every pod again, with the unknown key's message (Authorization Failed)
+  PASS  pass 2 rejected-code: ... through the VIP HTTP 401, and staff's own key there HTTP 200
+  PASS  pass 2 rejected-code: chat through gw-users: 0 of 88 requests failed
+  PASS  pass 2 rejected-code: staff through gw-users: 0 of 6 requests failed
+  PASS  pass 2 rejected-code: the routes ConfigMap is the render's again
+== pass 3, drill key-lifecycle: one key for chat from mint to revoke under the gateway probe, at every API gateway pod and through the users' VIP
+  PASS  pass 3 key-lifecycle: the gateway layer whole before the drill: every API gateway and router pod Ready, both Gateways Programmed, the test backend ready (poll 2)
+  PASS  pass 3 key-lifecycle: the gateway layer whole again after the drill: every API gateway and router pod Ready, both Gateways Programmed, the test backend ready (poll 2)
+  PASS  pass 3 key-lifecycle: audit.sh --quick after the drill: RESULT: 337 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+  PASS  pass 3 key-lifecycle: the key Job minted batch.fd000003 into the key Secret (sha256:ce91c8b1eda2), on the host clock at 1793369424.227345
+  PASS  pass 3 key-lifecycle: every API gateway pod accepted it, each on its own schedule: api-gateway-64bc7b94df-7b74q 23.4 s, api-gateway-64bc7b94df-hm4sq 58.4 s after the Secret's write; the last pod's acceptance 58.4 s
+  PASS  pass 3 key-lifecycle: the first 200 through llm.ai.tarnwick.example came 26.2 s after the write, once a pod held the key (the first pod 23.4 s), and 9 of the VIP's requests were refused 401 between it and the last pod's acceptance: a first 200 shows one pod holds a key, the last pod's acceptance that all do
+  PASS  pass 3 key-lifecycle: the new chat key on staff's route: 401 at every API gateway pod (api-gateway-64bc7b94df-7b74q 401, api-gateway-64bc7b94df-hm4sq 401) and through the VIP (HTTP 401)
+  PASS  pass 3 key-lifecycle: the key Job revoked batch.fd000003 (sha256:ce91c8b1eda2), on the host clock at 1793369505.9298298
+  PASS  pass 3 key-lifecycle: after the revoke every API gateway pod refused it: api-gateway-64bc7b94df-7b74q 15.1 s, api-gateway-64bc7b94df-hm4sq 44.8 s; the last pod's refusal 44.8 s after the revoke
+  PASS  pass 3 key-lifecycle: through the VIP the last 200 with it came 43.2 s after the revoke, and every request after the last pod's refusal was refused (8 requests)
+  PASS  pass 3 key-lifecycle: chat through gw-users: 0 of 77 requests failed
+  PASS  pass 3 key-lifecycle: staff through gw-users: 0 of 6 requests failed
+  PASS  pass 3 key-lifecycle: the key Secret holds the same fields and fingerprints after the drill as before (2 fields)
+== pass 3, drill rejected-code: staff's route without its rejected code, a chat key answered with the plugin's default, then the rendered 401
+  PASS  pass 3 rejected-code: the gateway layer whole before the drill: every API gateway and router pod Ready, both Gateways Programmed, the test backend ready (poll 2)
+  PASS  pass 3 rejected-code: the gateway layer whole again after the drill: every API gateway and router pod Ready, both Gateways Programmed, the test backend ready (poll 2)
+  PASS  pass 3 rejected-code: audit.sh --quick after the drill: RESULT: 337 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+  PASS  pass 3 rejected-code: staff's route without rejected_code: a chat key answered HTTP 403 at every API gateway pod (api-gateway-64bc7b94df-7b74q 25.4 s, api-gateway-64bc7b94df-hm4sq 34.4 s after the change), the plugin's own message: The consumer_group_id is forbidden.
+  PASS  pass 3 rejected-code: ... and through the VIP: HTTP 403
+  PASS  pass 3 rejected-code: the rendered routes back: HTTP 401 at every pod again, with the unknown key's message (Authorization Failed)
+  PASS  pass 3 rejected-code: ... through the VIP HTTP 401, and staff's own key there HTTP 200
+  PASS  pass 3 rejected-code: chat through gw-users: 0 of 82 requests failed
+  PASS  pass 3 rejected-code: staff through gw-users: 0 of 6 requests failed
+  PASS  pass 3 rejected-code: the routes ConfigMap is the render's again
+== RESULT: 80 passed, 0 failed, 0 known platform limitation(s), 0 skipped

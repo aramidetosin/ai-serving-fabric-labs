@@ -1,0 +1,6 @@
+# The platform's authoritative servers (dns-auth1 the primary, dns-auth2 its secondary): SLUG SURFACE COMMAND.
+# judge.py's services group judges these files. zonestatus names, per view, the zone's type (primary
+# or secondary) and serial: the secondary's serial equals the primary's, and both the render's.
++zonestatus          exec        for v in {dns_views}; do echo "== $v"; rndc -k /run/named/rndc.key zonestatus {zone} IN "$v" 2>&1; done
+local_users          exec        dig +norec +time=3 +tries=1 +short @127.0.0.1 {users_fqdn}
+recursion            exec        dig +time=3 +tries=1 @127.0.0.1 www.example.org A | grep -E 'status:|flags:' || echo 'no answer'

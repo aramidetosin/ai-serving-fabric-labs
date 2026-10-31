@@ -1,0 +1,25 @@
+admin@fw> show interface all
+
+total configured hardware interfaces: 4
+
+name                    id    speed/duplex/state            mac address
+--------------------------------------------------------------------------------
+ethernet1/1             16    10000/full/up                 ba:db:ee:fb:ad:f0
+ethernet1/2             17    10000/full/up                 ba:db:ee:fb:ad:f0
+ethernet1/3             18    10000/full/up                 aa:c1:ab:c9:1b:e6
+ae1                     240   [n/a]/[n/a]/up                ba:db:ee:fb:ad:f0
+
+aggregation groups: 1
+ae1 members:
+  ethernet1/1 ethernet1/2
+
+
+total configured logical interfaces: 5
+
+name                      id    vsys zone             forwarding               tag    address
+------------------------- ----- ---- ---------------- ------------------------ ------ ------------------
+ethernet1/3               18    1    oob              vr:core                  0      10.20.9.254/24
+ae1                       240   1                     N/A                      0      N/A
+ae1.100                   256   1    data             vr:core                  100    10.20.1.1/24
+ae1.200                   257   1    stor-mgmt        vr:core                  200    10.20.2.1/24
+ae1.300                   258   1    bastion          vr:core                  300    10.20.3.1/24

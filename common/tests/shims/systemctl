@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# test stand-in: no unit is ever active
+printf '%s\n' "systemctl $*" >>"$SHIM_LOG"
+case "${1:-}" in is-active) exit 3 ;; esac
+exit 0

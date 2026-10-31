@@ -1,0 +1,136 @@
+admin@fw> show running security-policy
+
+"data-intrazone; index: 1" {
+        from data;
+        source any;
+        source-region none;
+        to data;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"stor-mgmt-intrazone; index: 2" {
+        from stor-mgmt;
+        source any;
+        source-region none;
+        to stor-mgmt;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-intrazone; index: 3" {
+        from bastion;
+        source any;
+        source-region none;
+        to bastion;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"oob-intrazone; index: 4" {
+        from oob;
+        source any;
+        source-region none;
+        to oob;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"deny-all-log; index: 5" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal no;
+}
+
+"intrazone-default; index: 6" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+        type intrazone;
+}
+
+"interzone-default; index: 7" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal yes;
+        type interzone;
+}
+
+dynamic url: no

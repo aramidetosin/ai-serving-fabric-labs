@@ -1,0 +1,10 @@
+# M1's disk check read on the lab host with the new rule (pf_disk in library mode; nothing written)
++ cd /root/sfab/labs/dev/m1 && bash -c '. ../../common/lib.sh; sfab_init x; SFAB_PF_LIB=1 . ../../common/stages/preflight.sh; pf_tools; pf_disk'
+  PASS  docker 29.5.2 answers
+  PASS  containerlab at the pinned 0.81.1
+  PASS  python3 3.12 (3.10 or later)
+  PASS  tools: sshpass tcpdump nsenter ethtool openssl and the rest present
+  PASS  disk: 285.3 GiB free covers 24.7 GiB under state/ (budget 25.0 GiB, 0.3 GiB of it already there) and 56.0 GiB of container layers under /var/lib/docker for the nodes not yet running, one filesystem (80.7 GiB)
++ du -sk state/nodes/*
+151072	state/nodes/gpu1
+178336	state/nodes/gpu2

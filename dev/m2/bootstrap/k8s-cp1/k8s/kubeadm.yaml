@@ -1,0 +1,62 @@
+# sfab-m2 k8s-cp1 kubeadm init: rendered from spec/profile-a.yaml by render/k8s.py; edit the spec and run make render
+# kubeadm init --config, on the init node. No token or certificate key: cluster-bootstrap.sh
+# creates the lab's join token after init, and the control nodes take the shared keys from
+# /shared/cluster/pki. The CA is the lab's Kubernetes intermediate (/shared/cluster/ca, from sfab-ca),
+# placed before init; the API server's certificate is made first and the intermediate appended to it,
+# so a client that trusts only the lab root can build the chain. The KubeletConfiguration is the
+# cluster's: kubeadm uploads it and every joining node uses it.
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: "10.20.1.11"
+  bindPort: 6443
+nodeRegistration:
+  name: k8s-cp1
+  criSocket: unix:///run/containerd/containerd.sock
+  kubeletExtraArgs:
+  - name: node-ip
+    value: "10.20.1.11"
+  - name: node-labels
+    value: node-role.tarnwick.example/control=
+timeouts:
+  controlPlaneComponentHealthCheck: "10m0s"
+  kubeletHealthCheck: "10m0s"
+  discovery: "10m0s"
+  tlsBootstrap: "10m0s"
+---
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: ClusterConfiguration
+clusterName: sfab-m2
+kubernetesVersion: v1.35.8
+imageRepository: registry.k8s.io
+controlPlaneEndpoint: k8s.ai.tarnwick.example:6443
+networking:
+  dnsDomain: cluster.local
+  podSubnet: "10.22.0.0/16"
+  serviceSubnet: "10.23.0.0/16"
+apiServer:
+  certSANs:
+  - k8s.ai.tarnwick.example
+  - "10.20.1.10"
+  extraArgs:
+  - name: encryption-provider-config
+    value: /etc/kubernetes/enc/config.yaml
+  extraVolumes:
+  - name: encryption
+    hostPath: /etc/kubernetes/enc
+    mountPath: /etc/kubernetes/enc
+    readOnly: true
+    pathType: DirectoryOrCreate
+proxy:
+  disabled: true
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+cgroupDriver: systemd
+resolvConf: /etc/resolv.conf
+evictionHard:
+  imagefs.available: "4Gi"
+  imagefs.inodesFree: "5%"
+  memory.available: "256Mi"
+  nodefs.available: "4Gi"
+  nodefs.inodesFree: "5%"

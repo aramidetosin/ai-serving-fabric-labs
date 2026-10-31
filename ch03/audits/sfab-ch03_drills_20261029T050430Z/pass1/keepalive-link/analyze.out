@@ -1,0 +1,65 @@
+drill keepalive-link, pass 1: the dedicated keepalive link shut on fe-sw1 with the peer link and the backup keepalive up
+  target switch fe-sw1; every time on the lab host's clock, relative to the cut (T0)
+  the fault's session took 3.82 s (T0 is when it started)
+  placement: ping: requests leave fe-sw1, fe-sw2
+  the standby (fe-sw2) as the monitor saw it (reads every few seconds; each is an event, not a measured gap):
+    T0   +40.1 s  the active's iccpd no longer reports the keepalive OK
+    T0   +74.5 s  the standby's own MCLAG PortChannels read down or traffic-disabled, the standby still answering
+    T0   +74.5 s  every bond toward the pair on one leg
+    T0   +74.5 s  the keepalive OK on both switches
+    T0  +377.8 s  every MCLAG PortChannel up on the standby
+    T0  +377.8 s  every bond toward the pair back on two legs: the return
+    T0  +387.3 s  the firewall's ae1 on both legs
+    T0  +422.9 s  the drill's own polls: the pair whole and every bond on its legs again
+    not seen: the peer link up on the active
+  ping 3102, 3103, 3106, 3107 cross fe-sw1; 3100, 3101, 3104, 3105 do not
+  ping id 3100 (via fe-sw2): sent 1595, answered 1576, round trips lost 19
+    19 lost elsewhere
+    first lost sent at +32.74 s, last at +65.29 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 3.95 s, from +32.44 s to +36.39 s
+    the guest's ping: 1595 transmitted, 1576 received; the two witnesses agree on every round trip both saw
+  ping id 3101 (via fe-sw2): sent 1595, answered 1576, round trips lost 19
+    19 lost elsewhere
+    first lost sent at +32.74 s, last at +65.29 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 3.95 s, from +32.44 s to +36.39 s
+    the guest's ping: 1595 transmitted, 1576 received; the two witnesses agree on every round trip both saw
+  ping id 3102 (via fe-sw1): sent 1595, answered 1595, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +20.11 s to +20.45 s
+    the guest's ping: 1595 transmitted, 1595 received; the two witnesses agree on every round trip both saw
+  ping id 3103 (via fe-sw1): sent 1595, answered 1595, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.36 s, from -0.36 s to +0.00 s
+    the guest's ping: 1595 transmitted, 1595 received; the two witnesses agree on every round trip both saw
+  ping id 3104 (via fe-sw2): sent 1595, answered 1576, round trips lost 19
+    19 lost elsewhere
+    first lost sent at +32.75 s, last at +65.31 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 3.95 s, from +32.45 s to +36.40 s
+    the guest's ping: 1595 transmitted, 1576 received; the two witnesses agree on every round trip both saw
+  ping id 3105 (via fe-sw2): sent 1595, answered 1576, round trips lost 19
+    19 lost elsewhere
+    first lost sent at +32.77 s, last at +65.33 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 3.95 s, from +32.47 s to +36.41 s
+    the guest's ping: 1595 transmitted, 1576 received; the two witnesses agree on every round trip both saw
+  ping id 3106 (via fe-sw1): sent 1595, answered 1595, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +261.16 s to +261.50 s
+    1 duplicate replies
+    the guest's ping: 1595 transmitted, 1595 received; the two witnesses agree on every round trip both saw
+  ping id 3107 (via fe-sw1): sent 1595, answered 1595, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.35 s, from -0.35 s to +0.00 s
+    the guest's ping: 1595 transmitted, 1595 received; the two witnesses agree on every round trip both saw
+  tcp connects to the users' VIP: 1528 attempts, 30 failed (0 at the cut, 0 at the restore, 30 elsewhere)
+    attempts in the cut window by the firewall leg their SYN took: {'fe-sw1': 26, 'fe-sw2': 25}
+    failed run: last ok 32.501, first failed +32.80 s, first ok after 34.804, 2 failed, SYN legs {'fe-sw1': 1, 'fe-sw2': 1}
+    failed run: last ok 34.804, first failed +35.10 s, first ok after 36.105, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 36.105, first failed +36.41 s, first ok after 41.41, 5 failed, SYN legs {'fe-sw2': 3, 'fe-sw1': 2}
+    failed run: last ok 41.41, first failed +41.71 s, first ok after 44.713, 3 failed, SYN legs {'fe-sw2': 2, 'fe-sw1': 1}
+    failed run: last ok 44.713, first failed +45.01 s, first ok after 46.014, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 46.014, first failed +46.31 s, first ok after 47.316, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 47.316, first failed +47.62 s, first ok after 48.616, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 48.616, first failed +48.92 s, first ok after 53.922, 5 failed, SYN legs {'fe-sw2': 3, 'fe-sw1': 2}
+    failed run: last ok 53.922, first failed +54.22 s, first ok after 59.228, 5 failed, SYN legs {'fe-sw2': 3, 'fe-sw1': 2}
+    failed run: last ok 59.228, first failed +59.53 s, first ok after 62.532, 3 failed, SYN legs {'fe-sw2': 2, 'fe-sw1': 1}
+    failed run: last ok 62.832, first failed +63.13 s, first ok after 66.136, 3 failed, SYN legs {'fe-sw1': 2, 'fe-sw2': 1}

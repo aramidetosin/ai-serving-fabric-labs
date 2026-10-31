@@ -1,0 +1,57 @@
+# sfab-ch03 PKI: rendered from spec/profile-a.yaml by render/k8s.py; edit the spec and run make render
+# cert-manager's CA ClusterIssuer lab-ca signs with the lab's platform intermediate: its key pair is
+# the Secret cert-manager/lab-ca, which the bastion writes with sfab-ca k8s-secret (ca-secrets.list),
+# its tls.crt the chain to the lab root. The Gateways' listener certificates come from it, each with its own key.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: lab-ca
+spec:
+  ca:
+    secretName: lab-ca
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: gw-internal
+  namespace: gateways
+spec:
+  secretName: gw-internal-tls
+  dnsNames:
+  - "*.ai.tarnwick.example"
+  duration: "2160h"
+  renewBefore: "360h"
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+    rotationPolicy: Always
+  usages:
+  - "digital signature"
+  - "server auth"
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: lab-ca
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: gw-users
+  namespace: gateways
+spec:
+  secretName: gw-users-tls
+  dnsNames:
+  - "*.ai.tarnwick.example"
+  duration: "2160h"
+  renewBefore: "360h"
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+    rotationPolicy: Always
+  usages:
+  - "digital signature"
+  - "server auth"
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: lab-ca

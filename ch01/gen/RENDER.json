@@ -1,0 +1,554 @@
+{
+  "chapter": {
+    "path": "ch01/chapter.yaml",
+    "sha256": "89c1e1845f8973849fe042f315f1fdec36730275a8979d35f9d5cdd64026513a"
+  },
+  "files": {
+    "bootstrap/bastion/init.env": "6ef4b33a05eced14fa1e300d30c49a641a1f9b9ceb616ef079c05f598e40fc28",
+    "bootstrap/ca/internet.cnf": "22412a331aab1b846db410eb56b0784a159990568559a9b2530c0ba78cf3395d",
+    "bootstrap/ca/kubernetes.cnf": "f235f8bbdae30b2355824c1fc6b3d8f6b48f0a75945b3be85a5d9da84561b487",
+    "bootstrap/ca/leaf-inet-ntp.cnf": "69107686369612e95e561c20e56f1474783b2c2267fd5443355a3f684f2aa972",
+    "bootstrap/ca/leaf-inet-registry.cnf": "e8fc358af31b63cf2fe0a8b4e2b1fd83138704cc50e5fa11103ec2b24c5375bd",
+    "bootstrap/ca/platform.cnf": "59c474eb4c6ddefe8224a24f72d02e5931de0c8d585bbc0ccb5fcf7c08529526",
+    "bootstrap/ca/proof.json": "98a80b7baeb54c8db2f6c226ee2caf03bd80165defdc9984766a6fb02fb6bcf2",
+    "bootstrap/ca/root.cnf": "965a3976fbac1a008876eb653fd7bac7b555bec3f8d7d77acf68e8607a42feba",
+    "bootstrap/dns-auth1/init.env": "4a1982ea9ef23d642fee28f9b1fd9d4006174ab2b7f3b4b05833bd3910eaa807",
+    "bootstrap/dns-auth1/named.conf": "d9b38845de4ecc75f3189c6e924081735e2c7551147dd586e74a84a5428a0cd2",
+    "bootstrap/dns-auth1/zones/db.enterprise.ai.tarnwick.example": "7b3858b41ff6ad8a74527f4f75f0af41da8832adb941533afe7ea3728ade0aa7",
+    "bootstrap/dns-auth1/zones/db.internal.1.20.10.in-addr.arpa": "39c7dba1e1d4b4abc6201348b21229562e60ecd63ce26fc36894bb0496b55228",
+    "bootstrap/dns-auth1/zones/db.internal.11.20.10.in-addr.arpa": "cc24b5ffcd009e651193f47e0b54a04a09fff9752f8ae5ef01a533b056163b6a",
+    "bootstrap/dns-auth1/zones/db.internal.12.20.10.in-addr.arpa": "10f7f268e95ef3b985573e036ef00bc117225f4ce7bb8b72cc014f9c4028a09c",
+    "bootstrap/dns-auth1/zones/db.internal.13.20.10.in-addr.arpa": "142adf6b30a5f08801eac0f469d07a357fdb200e5697a307c62be460f6e90c36",
+    "bootstrap/dns-auth1/zones/db.internal.14.20.10.in-addr.arpa": "7e640c116c9147df51905bab23b88fa528ccf3a07bf5c01d7d5001da4403e85b",
+    "bootstrap/dns-auth1/zones/db.internal.2.20.10.in-addr.arpa": "b22b2dda8b95b8566576ea9a61c4ec28283bb4190bac4b3db16e5f338eadaa8d",
+    "bootstrap/dns-auth1/zones/db.internal.3.20.10.in-addr.arpa": "47d6a1796334b5b8e700b616d3d8d9eca2faaa66633ca1c050b2082d199434f5",
+    "bootstrap/dns-auth1/zones/db.internal.ai.tarnwick.example": "6361157c4161863e7fce21ee0e5574754314312fc51f9d32d204ca39d188da49",
+    "bootstrap/dns-auth2/init.env": "dcaa556c1dc7ce0be5f2a49633196c4960b31444ad72b31196897f05d4211eac",
+    "bootstrap/dns-auth2/named.conf": "e1844c26a4f2cd1cfaf40ba543b271b3db678769f1c58d048c5899dc818b5021",
+    "bootstrap/dns-res1/chrony.conf": "cc1623f49d0d9bfd70b5266de0e33b0469fa857ea23da1fb11f505b27d98c8ae",
+    "bootstrap/dns-res1/init.env": "f8e04e1675fbd487e843f26681875847f8dbcfd0e96c33f2309a3aa22fd04e17",
+    "bootstrap/dns-res1/named.conf": "145e432371283c4f0e4501306f0f85dd2f8bec438ef90591070b84554b034724",
+    "bootstrap/dns-res1/zones/db.dns-res1.root": "706d34c732d15d1b917378439bd51a6744c9271485de654fd51f1bb8dac42e8a",
+    "bootstrap/dns-res2/chrony.conf": "e0bb298e21cb7f324c97e91c807581860264f307983e60cbb0d8aeb3e5cc0fc9",
+    "bootstrap/dns-res2/init.env": "ead4bcc391d51468b51e5a72866073401d780e3367b69617c881cb5a7e3d3f89",
+    "bootstrap/dns-res2/named.conf": "289e6c81d60886d79be009392c578ba1083aa39d2d6723e1bd48c5dfbdd66fc0",
+    "bootstrap/dns-res2/zones/db.dns-res2.root": "e0a5dc8b7cc2e60e2aff3e5decfec3445e94bc8c75fcf9c58fcd12a4c13d8c34",
+    "bootstrap/ent-client/init.env": "e0118e5e54438d17ac9bb936151b74c55a41722b463f562697793c31403f305f",
+    "bootstrap/ent-dns/dnsmasq.conf": "a49155bf1211313f33fd73496694324c5e8b3ee9412fb204436333c4076244a7",
+    "bootstrap/ent-dns/init.env": "e9cdf78660f849475206669dc1b59016b7464c32c2a77ed3ef868f1c98e70c3d",
+    "bootstrap/fe-sw1/startup-config.cfg": "b1ef33c8370078c1ba20bf3ac9bfa0ee44c0775c1cc6d68186a0b6a2e4b87d80",
+    "bootstrap/fe-sw2/startup-config.cfg": "b47c28f35aba6f5989ac2a2f6628116b4c151f66c128c436e73812ea4e6109eb",
+    "bootstrap/fw/enforced.txt": "4ac133f630cb84c397548d848a75f9c7fe93fac9afceacf0c0d86d5d1ebe93e5",
+    "bootstrap/fw/startup-config.xml": "79d4c0db9ba624697b511e965383bd6d2cc7ec1dec8ba1ad5d87f695d0158fd1",
+    "bootstrap/fw/vpn.json": "56738b0efacd4e7edb0c054137d0ef7e14b6cd6301809e2c1b1ed6249ce00f88",
+    "bootstrap/inet-ntp/chrony.conf": "f258ae9152492d441a1c55b866ab09ea664ef7b732e74676fa2117bbca4c3bd4",
+    "bootstrap/inet-ntp/init.env": "0e8a09a54678f3133839cc2ce1db9c31d8fcdc56e52cc9a74578b8d713f26427",
+    "bootstrap/inet-registry/init.env": "18cb403e93f87c90dbbdafb6bb9b6a2153a4ae5aa8f8f06d125a7f3a34142d82",
+    "bootstrap/k8s-cp1/containerd/192.0.2.6:5000/hosts.toml": "20526b56118b672b142c35c27b88b1122c6f23c3771644a40eedb972dd373e2e",
+    "bootstrap/k8s-cp1/containerd/docker.io/hosts.toml": "95afeaf3b06125cd5d4f3057cd3c8874d98ec65f59d21a0884be19ef54a7ccdf",
+    "bootstrap/k8s-cp1/containerd/ghcr.io/hosts.toml": "2050756ae665fc5881f273281c657f88fac19c97684330c776f2489e5ce4870a",
+    "bootstrap/k8s-cp1/containerd/quay.io/hosts.toml": "daed1acd734bae0633781b2e2bce26f14d6031008fa61e3aa411cea0d3c4d83b",
+    "bootstrap/k8s-cp1/containerd/registry.k8s.io/hosts.toml": "57cff273205ac0c46cc516b21081f7f7bb07f6cd0501fc1c5ff1d150b9e0c84e",
+    "bootstrap/k8s-cp1/k8s/10-gateway-api-crds.yaml": "333004941406d6950dcd4167d7cbe4684a4394079e746139098e20b55f669954",
+    "bootstrap/k8s-cp1/k8s/20-cilium-values.yaml": "e34dbf3029e2cb6922f669545d6e63b836848071b503c0f73189704948de6e73",
+    "bootstrap/k8s-cp1/k8s/cluster.env": "64559e2ea1076841103a8e500f1f59fcba4e26ceb258d86f115150b803bf1f1d",
+    "bootstrap/k8s-cp1/k8s/kube-vip-init.yaml": "097cd2ff7ffd87ee94e78bbe33e566ac62711a66407da433b25fb91786357f59",
+    "bootstrap/k8s-cp1/k8s/kube-vip.yaml": "eb607290f583e07a879b848b0d6ec25cf6b0155190d3167b94e9b87195b29124",
+    "bootstrap/k8s-cp1/k8s/kubeadm-user.yaml": "470aa38ace081bf65fdfd9356b903c23a64da6e4e8a1b4c7e391706ea147791d",
+    "bootstrap/k8s-cp1/k8s/kubeadm.yaml": "f78aa69f15caaaa2d0d5f59eea29f07fc4a99eb1472ab1c093ef34abfe35e49b",
+    "bootstrap/k8s-cp1/node.env": "776f7abaa2d3887e07dd8c69a5f445beeb775c9b97de134cdefd4c0be08f5afe",
+    "bootstrap/k8s-cp2/containerd/192.0.2.6:5000/hosts.toml": "20526b56118b672b142c35c27b88b1122c6f23c3771644a40eedb972dd373e2e",
+    "bootstrap/k8s-cp2/containerd/docker.io/hosts.toml": "95afeaf3b06125cd5d4f3057cd3c8874d98ec65f59d21a0884be19ef54a7ccdf",
+    "bootstrap/k8s-cp2/containerd/ghcr.io/hosts.toml": "2050756ae665fc5881f273281c657f88fac19c97684330c776f2489e5ce4870a",
+    "bootstrap/k8s-cp2/containerd/quay.io/hosts.toml": "daed1acd734bae0633781b2e2bce26f14d6031008fa61e3aa411cea0d3c4d83b",
+    "bootstrap/k8s-cp2/containerd/registry.k8s.io/hosts.toml": "57cff273205ac0c46cc516b21081f7f7bb07f6cd0501fc1c5ff1d150b9e0c84e",
+    "bootstrap/k8s-cp2/k8s/cluster.env": "61c426fcd2ab861d8cc359a1b03e7bc08615b89574820ec45003cf7165217cee",
+    "bootstrap/k8s-cp2/k8s/kube-vip.yaml": "a3098201989c484beb626fe13ba6e98143db2a345510c3fc6995de4f8f5aa928",
+    "bootstrap/k8s-cp2/k8s/kubeadm.yaml": "8ea79347dcd7a719222953656522db2e1b93d97c4d87d9d171b2f59944dbc5f2",
+    "bootstrap/k8s-cp2/node.env": "023fbccf3069ac6fc90656cbedda412c42a5d83e85e6c2d6e1262900b64b52f4",
+    "bootstrap/k8s-cp3/containerd/192.0.2.6:5000/hosts.toml": "20526b56118b672b142c35c27b88b1122c6f23c3771644a40eedb972dd373e2e",
+    "bootstrap/k8s-cp3/containerd/docker.io/hosts.toml": "95afeaf3b06125cd5d4f3057cd3c8874d98ec65f59d21a0884be19ef54a7ccdf",
+    "bootstrap/k8s-cp3/containerd/ghcr.io/hosts.toml": "2050756ae665fc5881f273281c657f88fac19c97684330c776f2489e5ce4870a",
+    "bootstrap/k8s-cp3/containerd/quay.io/hosts.toml": "daed1acd734bae0633781b2e2bce26f14d6031008fa61e3aa411cea0d3c4d83b",
+    "bootstrap/k8s-cp3/containerd/registry.k8s.io/hosts.toml": "57cff273205ac0c46cc516b21081f7f7bb07f6cd0501fc1c5ff1d150b9e0c84e",
+    "bootstrap/k8s-cp3/k8s/cluster.env": "1365c0a15f3b7861883eff1a0aecdbe62d53e5ba88672a1cce8d65f34359edfd",
+    "bootstrap/k8s-cp3/k8s/kube-vip.yaml": "ef6b0e92b94f307986fecca885abe71b32d6aa6dba553bd3c39361fe91c4c677",
+    "bootstrap/k8s-cp3/k8s/kubeadm.yaml": "7cb559f8b14df8bec54cdbea5253b0eb34e10abb5e0389cd4e099070fc27aeb4",
+    "bootstrap/k8s-cp3/node.env": "7b5847dd1e469fa13059439ae76d25aa47aa2a7d46c6bf8db551046caacbbd9b",
+    "bootstrap/k8s-gpu1/containerd/192.0.2.6:5000/hosts.toml": "20526b56118b672b142c35c27b88b1122c6f23c3771644a40eedb972dd373e2e",
+    "bootstrap/k8s-gpu1/containerd/docker.io/hosts.toml": "95afeaf3b06125cd5d4f3057cd3c8874d98ec65f59d21a0884be19ef54a7ccdf",
+    "bootstrap/k8s-gpu1/containerd/ghcr.io/hosts.toml": "2050756ae665fc5881f273281c657f88fac19c97684330c776f2489e5ce4870a",
+    "bootstrap/k8s-gpu1/containerd/quay.io/hosts.toml": "daed1acd734bae0633781b2e2bce26f14d6031008fa61e3aa411cea0d3c4d83b",
+    "bootstrap/k8s-gpu1/containerd/registry.k8s.io/hosts.toml": "57cff273205ac0c46cc516b21081f7f7bb07f6cd0501fc1c5ff1d150b9e0c84e",
+    "bootstrap/k8s-gpu1/k8s/cluster.env": "77f4de131172c50adc7a147cc38876c3ceb1bfc5c7cd29c2e80995a376e8fb96",
+    "bootstrap/k8s-gpu1/k8s/kubeadm.yaml": "1a4231a19e2916e681524574cc805df25c47518e4128806f63cf313774c44636",
+    "bootstrap/k8s-gpu1/node.env": "e414b2ff3247ec8549e902d0f09a3ff33886b00bd0dbbd2d4507c8aee0cb50fd",
+    "bootstrap/k8s-gpu2/containerd/192.0.2.6:5000/hosts.toml": "20526b56118b672b142c35c27b88b1122c6f23c3771644a40eedb972dd373e2e",
+    "bootstrap/k8s-gpu2/containerd/docker.io/hosts.toml": "95afeaf3b06125cd5d4f3057cd3c8874d98ec65f59d21a0884be19ef54a7ccdf",
+    "bootstrap/k8s-gpu2/containerd/ghcr.io/hosts.toml": "2050756ae665fc5881f273281c657f88fac19c97684330c776f2489e5ce4870a",
+    "bootstrap/k8s-gpu2/containerd/quay.io/hosts.toml": "daed1acd734bae0633781b2e2bce26f14d6031008fa61e3aa411cea0d3c4d83b",
+    "bootstrap/k8s-gpu2/containerd/registry.k8s.io/hosts.toml": "57cff273205ac0c46cc516b21081f7f7bb07f6cd0501fc1c5ff1d150b9e0c84e",
+    "bootstrap/k8s-gpu2/k8s/cluster.env": "89b8f0c1d02b2af134b14e023fe325aeb5361d88d66f146730fe1fe73128215f",
+    "bootstrap/k8s-gpu2/k8s/kubeadm.yaml": "18ac5025e788f028222bb7a282b53057214f1014312f34b1c50aff67dab786cc",
+    "bootstrap/k8s-gpu2/node.env": "f1e71344d33225056ae452281fbee306cfbacfef2862002fe8337b5138e15542",
+    "bootstrap/k8s-ingress1/containerd/192.0.2.6:5000/hosts.toml": "20526b56118b672b142c35c27b88b1122c6f23c3771644a40eedb972dd373e2e",
+    "bootstrap/k8s-ingress1/containerd/docker.io/hosts.toml": "95afeaf3b06125cd5d4f3057cd3c8874d98ec65f59d21a0884be19ef54a7ccdf",
+    "bootstrap/k8s-ingress1/containerd/ghcr.io/hosts.toml": "2050756ae665fc5881f273281c657f88fac19c97684330c776f2489e5ce4870a",
+    "bootstrap/k8s-ingress1/containerd/quay.io/hosts.toml": "daed1acd734bae0633781b2e2bce26f14d6031008fa61e3aa411cea0d3c4d83b",
+    "bootstrap/k8s-ingress1/containerd/registry.k8s.io/hosts.toml": "57cff273205ac0c46cc516b21081f7f7bb07f6cd0501fc1c5ff1d150b9e0c84e",
+    "bootstrap/k8s-ingress1/k8s/cluster.env": "28be6e245aa765bc5c048fdfc8e672a17bc576e8f8b87f1797f06e6a0e05e570",
+    "bootstrap/k8s-ingress1/k8s/kubeadm.yaml": "e831bfc9c14f2cadd1bfc16750a94d409c53f6d06a17d75d758909bdbbedc91b",
+    "bootstrap/k8s-ingress1/node.env": "c033d9080376a6c76bebd2b5eea4de094cd25c12991760623e50fc09b55d3cf7",
+    "bootstrap/k8s-ingress2/containerd/192.0.2.6:5000/hosts.toml": "20526b56118b672b142c35c27b88b1122c6f23c3771644a40eedb972dd373e2e",
+    "bootstrap/k8s-ingress2/containerd/docker.io/hosts.toml": "95afeaf3b06125cd5d4f3057cd3c8874d98ec65f59d21a0884be19ef54a7ccdf",
+    "bootstrap/k8s-ingress2/containerd/ghcr.io/hosts.toml": "2050756ae665fc5881f273281c657f88fac19c97684330c776f2489e5ce4870a",
+    "bootstrap/k8s-ingress2/containerd/quay.io/hosts.toml": "daed1acd734bae0633781b2e2bce26f14d6031008fa61e3aa411cea0d3c4d83b",
+    "bootstrap/k8s-ingress2/containerd/registry.k8s.io/hosts.toml": "57cff273205ac0c46cc516b21081f7f7bb07f6cd0501fc1c5ff1d150b9e0c84e",
+    "bootstrap/k8s-ingress2/k8s/cluster.env": "30913f0f27516b83a7726bea43d47099531cc441df38cb462a1def492fb87569",
+    "bootstrap/k8s-ingress2/k8s/kubeadm.yaml": "b5efe107e9d2519ae81dd2a3396ae0d747740db1f94b2521ee4b606aa608f329",
+    "bootstrap/k8s-ingress2/node.env": "a410589b5ed9a074340dd3c8860a69bcf42fa641787fd9935121000c6b7c695e",
+    "bootstrap/k8s/05-namespaces.yaml": "541b9ea276a97439b04f233532c792075b6c45f3c5302bee00c6f3a3bb2535d3",
+    "bootstrap/k8s/07-operators.yaml": "3208c39f7369bfeba11a43f390cbdd8047d031cbbaf3ab3d286aa5929031ebfe",
+    "bootstrap/k8s/10-gateway-api-crds.yaml": "333004941406d6950dcd4167d7cbe4684a4394079e746139098e20b55f669954",
+    "bootstrap/k8s/12-multus-daemonset-thick.yaml": "535ca3d2f6f57aef6aa49f1094bfdef102d5da7d60a8b0937df4b495e10c9c86",
+    "bootstrap/k8s/20-cilium-values.yaml": "e34dbf3029e2cb6922f669545d6e63b836848071b503c0f73189704948de6e73",
+    "bootstrap/k8s/21-cert-manager-values.yaml": "0723903addfd08d38c497975aa231f669a60a5cab65a914a95a8230b269807bd",
+    "bootstrap/k8s/30-lb-pools.yaml": "77d8866d9e33ea7a1474c71924bb3d3cc6852b59eeecaa7034a398c208de657c",
+    "bootstrap/k8s/31-l2-announcement.yaml": "461bba9968089cd642be0991a859b6a0acf9b73bca53f8ba1461669b5e19b82f",
+    "bootstrap/k8s/40-pki.yaml": "3e02823aee800ad6f38d5c4b524298e61bf5bca9d5058a9635f0b55e51695db8",
+    "bootstrap/k8s/50-gateways.yaml": "157a9e589c3fc5ad01ab5ded3037c47bc3338a1bf94e44a14a6c8f84ed433c71",
+    "bootstrap/k8s/55-test-backend.yaml": "d922f99c2bb4ff2f039913e0f05b792483cb433cb7d9a54833339ca83db44135",
+    "bootstrap/k8s/57-identity.yaml": "a36d8742eb6c1532a0611057c0b4d686bc9847554201ac7c29ccbd03909b8f8e",
+    "bootstrap/k8s/58-network-policy.yaml": "56a0098379c510b48f0ed73dd711e8faf5c5f43b2f010e5bd24d5ae52bd1a771",
+    "bootstrap/k8s/60-democratic-csi-nfs.yaml": "b79e2c0b8e24556897320b7254f1211126742ca0dc5fddf2a3f38cba0972174c",
+    "bootstrap/k8s/60-democratic-csi-nvmeof.yaml": "eed211d05fb2b652742c2a5e74892a22acada917a7a9f9dac3bc74e2334f7749",
+    "bootstrap/k8s/60-inference-base.yaml": "f4bb8620dd9c5d68cc5ac00dc8c83ea750372b473316b3e1626b4c62531cbd01",
+    "bootstrap/k8s/61-inference-keys.yaml": "bcf245e47898601b654ca645eb07e3e8369f60c4f9bca1f88a8cba00a79b7965",
+    "bootstrap/k8s/62-inference.yaml": "d1b5c8e454a66105095418fd87def5adb1b2f203573f155519e8e62b7761b421",
+    "bootstrap/k8s/63-inference-policy.yaml": "6ce2ff322568d75425919f080a36dae834d460b802bd6ab2ae51925a298e84d4",
+    "bootstrap/k8s/apply.list": "2f454d31728e2dfc67555fdd4ccaa8a4c680ba246c1ccaa6a67c9c514afb6779",
+    "bootstrap/k8s/ca-secrets.list": "fb4b8e6c808f04a0d0b8564f02468750927186df7f47c0f197d81a5ebd28dfcc",
+    "bootstrap/k8s/charts.list": "cd31024c627e973bfea19d6e22af86470461ed1af70087d6037e7e95191bb2c0",
+    "bootstrap/k8s/serving.env": "9195926a331def1866b614d80a8c5da63b8d2615628cd9ed922235d87ba4d69a",
+    "bootstrap/oob-sw/startup-config.cfg": "0cefd1ac8e92f5bca9f429bc896040d948577e40718fce9d488b7042252b24d8",
+    "bootstrap/ops-client/init.env": "ac4080863ea6cada67ce8829c930d73bc657b7959ad7da3488e2d31cdc7819a2",
+    "bootstrap/ops-dns/init.env": "217c8f4887a1464c7d33a0a850ee8d1186647cf5a50bc23738bc1e0836b17bc8",
+    "bootstrap/ops-dns/named.conf": "557f094c7bc8ec83a380219a9360d19c02a4c5d06012482dd61230d8c1aca4f7",
+    "bootstrap/ops-dns/zones/db.public-operator.ai.tarnwick.example": "71434201825f2b4adc9314f2f50d10b3a1824849278e1262d1b1c9c824afa522",
+    "bootstrap/ops-gw/init.env": "987e9121b5ff0f96df5280dff6f8cb2987a24ecc1580c085e0b74c2f3b3759f2",
+    "bootstrap/ops-gw/swanctl.conf": "d6ac646c5313e05dddc6b07af2e7d488fade400ac4f26f972d59a520740cee23",
+    "bootstrap/rail-sw1/startup-config.cfg": "f84ac6998ed07de0371fcbc5cbb83c6360a05b27bd5baae9c0e0326444403c10",
+    "bootstrap/rail-sw2/startup-config.cfg": "63102f30c1f0da7b30aa84a25f0a566f31eac357645acad3f14b73712a402ab9",
+    "bootstrap/truenas1/setup.json": "d14e35d11287135a6f3c9494ba8919b908ae90360109ae55d33514ed3faac592",
+    "bootstrap/uplink-rtr/daemons": "c86cdaf61276693d711d96ec9c08357ebd21c2d2e0e1de6a6538943000a0957f",
+    "bootstrap/uplink-rtr/frr.conf": "95b8ed324a7d6bd4bddd9f198a1765954e94bb9087b8b19b59b5817502a32c33",
+    "bootstrap/uplink-rtr/init.env": "42a104e5c780982a1a318f2291de2a25cb48f35685900763b304ae8dad979748",
+    "bootstrap/uplink-rtr/vtysh.conf": "3344440cac2c193b88400c7a723a733e842d2e1a21ae9508be1a4a9fe9cf9929",
+    "bootstrap/web-client/init.env": "d3f1116da745c2477cabc175b3cd81792e077ee37579173b07a91d3d4c8270f9",
+    "bootstrap/web-client/listen.py": "bad82043437de8b0cb5778ca944b74b9a3d2edacabc9306491f3b4673a2646c4",
+    "gen/breaks.json": "3e96af4fa2d0937eabd9069db8a35c96680358f93e6d6dea6139cdbbf7657ea0",
+    "gen/clab-state.json": "3fc13281fb8d6ae1b471eb99c4f0ff19a70e87c537608db3275d957f63106e8d",
+    "gen/expect/fe-sw1.json": "836a85f010720a6a981f6acba9ec3bd9f026a28ad0f465042f8ba524355aaf94",
+    "gen/expect/fe-sw2.json": "4c1baa4f7be82864657570a1f5167005e237321321a3e3a70ed718849e9f6908",
+    "gen/expect/oob-sw.json": "32bf30be05ac1081b0491c6972695482ea9da8d7422563ed4683169197e18968",
+    "gen/expect/rail-sw1.json": "0748d915bc78e6108dccc03ff77fcb6ea1c2f39d2b4db3d68bba0c293a9d5e29",
+    "gen/expect/rail-sw2.json": "ce6af6a579cf7a1a1af1e72ebd4fd6a7ffa82b12720ebda66791883cfcd76cf3",
+    "gen/inventory.json": "15bc40e5a1d5da6fe3620d6c4be9b3a5e852f002fe6ada2d2918c9204781c222",
+    "gen/k8s.json": "cf10af7d0f19499d5feb2c1c7792eba19474c35ddf5b84e0e314a71a9adddcac",
+    "gen/klish-normalize.json": "49ff4f1b9d9fdcb27cea6e6bc726bb440a3062859e0dc46b6cebe23ea273f81b",
+    "gen/trace.json": "f17011b42f35fb587267034c912cdaca3ba90ed99b4f1d8637d6854686e7514d",
+    "topo.clab.yml": "1e7590b84dc9a8231719a266d5d08f441ae02241be0e5d0097a3b84895a6202d"
+  },
+  "generator": {
+    "renderers": {
+      "present": [
+        "clab",
+        "klish",
+        "expect",
+        "panos",
+        "host",
+        "frr",
+        "storage",
+        "dns",
+        "ca",
+        "k8s",
+        "trace",
+        "drills",
+        "decisions",
+        "inventory"
+      ],
+      "skipped": []
+    },
+    "sha256": "085143f7c0705b2caea81c5e59f44136fb6a69d31857c70315060b564245a77a",
+    "version": 1
+  },
+  "lab": "sfab-ch01",
+  "profile": "a",
+  "spec": {
+    "files": {
+      "spec/common.yaml": "77938efe58fb3f4843a158b5850240e2c892e68b298e25627e9d9fca959009fa",
+      "spec/klish-normalize.yaml": "f2bf4b5c65d964879423e6fb67898c50ec0f7a3b093d7bb3c38295371f781e0b",
+      "spec/known.yaml": "a9947568609db78fe4d082e33e925dbe16d4ad9088f78b105b9419590fa817a7",
+      "spec/profile-a.yaml": "bcb6cdc7a9f806d5c06d9dc1ac935842f65ec32cda3cebe22bd35a28e85d5abc",
+      "spec/versions.yaml": "ca1b33c5c022132d95ece025ac5aecfaab63346d181d595b976838fdbda50adc"
+    },
+    "sha256": "b0a19e32e0f05d4fc0a071f174c7009bd98fd8148ec54a80b2fc5ba186543dd6"
+  },
+  "state": "one",
+  "step": 7,
+  "variant": null,
+  "versions": {
+    "images": {
+      "bastion": {
+        "base": "ubuntu_base",
+        "pulled": false,
+        "ref": "sfab/bastion:4",
+        "source": "images/bastion"
+      },
+      "client": {
+        "pulled": false,
+        "ref": "sfab/client:2",
+        "source": "images/client"
+      },
+      "dell_sonic": {
+        "digest": null,
+        "pulled": false,
+        "ref": "vrnetlab/dell_sonic:4.6.0",
+        "source": "platform/dell-sonic-4.6.0",
+        "vrnetlab": {
+          "blobs": {
+            "common/healthcheck.py": "49053b63729fe3c67113b8c5649e96a4097bfa4e",
+            "common/vrnetlab.py": "0b6bbf45df659e2785659708a78a6ef090e13887",
+            "dell/dell_sonic/docker/launch.py": "055afa9f5a2cd5336395abc2774ad549b3c3ad6e"
+          },
+          "commit": "3a34fa63d73843c871f248e2df2ffa5c038183ce",
+          "repository": "https://github.com/srl-labs/vrnetlab"
+        }
+      },
+      "frr": {
+        "base": "frr_upstream",
+        "pulled": false,
+        "ref": "sfab/frr:10.5.4-3",
+        "source": "images/frr"
+      },
+      "pa_vm": {
+        "digest": null,
+        "pulled": false,
+        "ref": "vrnetlab/paloalto_pa-vm:12.1.2",
+        "source": "platform/paloalto-pa-vm-12.1.2",
+        "vrnetlab": {
+          "blobs": {
+            "common/healthcheck.py": "49053b63729fe3c67113b8c5649e96a4097bfa4e",
+            "common/vrnetlab.py": "7eab1072d3183cefa00ed2a97aa547883e4af9f0",
+            "paloalto/pan/docker/launch.py": "817ca9f79ba29cd71275796cde006c67671c7e02"
+          },
+          "commit": "fd759f10587de4dd131815c8b7066ce3f957c749",
+          "repository": "https://github.com/srl-labs/vrnetlab"
+        }
+      },
+      "registry": {
+        "base": "registry_upstream",
+        "pulled": false,
+        "ref": "sfab/registry:3",
+        "source": "images/registry"
+      },
+      "resolver": {
+        "base": "alpine_base",
+        "packages": {
+          "bind": "9.18.49-r0",
+          "chrony": "4.5-r0",
+          "dnsmasq": "2.90-r3"
+        },
+        "pulled": false,
+        "ref": "sfab/resolver:3",
+        "source": "images/resolver"
+      },
+      "truenas": {
+        "digest": null,
+        "pulled": false,
+        "ref": "vrnetlab/truenas_truenas:27.0.0-RC.1",
+        "source": "vrnetlab truenas/truenas",
+        "vrnetlab": {
+          "blobs": {
+            "common/healthcheck.py": "49053b63729fe3c67113b8c5649e96a4097bfa4e",
+            "common/test_vrnetlab.py": "173f903e2f19ee76edd25a590ed8f82a42de68a4",
+            "common/vrnetlab.py": "73aeb0be3d694ed08bd7011566ed0c545dc5f16d",
+            "truenas/truenas/docker/launch.py": "31c976daca8d56431c861e90c0cbed666a57c356",
+            "truenas/truenas/docker/tnrpc.py": "2c299a20e77f689aaf48343810eb70972ca3f56a"
+          },
+          "commit": "c89aa5e8cdb3805fbc94b04f120d68847e2d377b",
+          "common_commit": "da55d7cf48c1674422100a3bec2612f375dc1f4f",
+          "repository": "https://github.com/srl-labs/vrnetlab"
+        }
+      },
+      "vm_node": {
+        "pulled": false,
+        "ref": "sfab/vm-node:6-k8s1.35.8",
+        "source": "images/vm-node"
+      },
+      "vpngw": {
+        "base": "client",
+        "packages": {
+          "gmp": "6.3.0-r1",
+          "openssh_server": "9.7_p1-r5",
+          "strongswan": "5.9.13-r2",
+          "sudo": "1.9.15_p5-r0"
+        },
+        "pulled": false,
+        "ref": "sfab/vpngw:3",
+        "sha256": {
+          "gmp": "dfc94acb8d7e33d3505b583b010932a3a49ea0388c2ba145ff6edafa7bf1104f",
+          "openssh_server": "6642fe02ce9fadc27477c2e3472acc9dbbad64a62592ac451a0e505e13837250",
+          "openssh_server_common": "c7755d7534b95fbdeb5b0800dc4932d9fa37c4309dd0aec261f53413395d7269",
+          "strongswan": "36a5e5284ba652f57d3f2a88323ecad536014d96600717aa9d6e546f960b3f47",
+          "sudo": "eb1748b6bec6f198b6add1a7bdabe4e72eebcefbffa5c3580858f0f48d5c8b66"
+        },
+        "source": "images/vpngw"
+      }
+    },
+    "kubernetes": {
+      "apisix": {
+        "image": {
+          "digest": "sha256:48ce16399e68a5f31c8b49d802f1e71ec93aea44d8c8ae311dc170e8564d5c4e",
+          "platform_digest": "sha256:57a4001b6fb865d844c5f099069423c98b469f876bfba7ae88bbafc6ddd3748b",
+          "platforms": "one",
+          "ref": "docker.io/apache/apisix:3.9.1-debian"
+        },
+        "status": "final",
+        "version": "3.9.1"
+      },
+      "cert_manager": {
+        "chart": {
+          "name": "cert-manager",
+          "repo": "https://charts.jetstack.io",
+          "sha256": "73a56e1728edd6c99f1f31082618c3259d279a76b7ebd3d4bdc5475c2442d34a",
+          "version": "v1.21.2"
+        },
+        "images": {
+          "acmesolver": {
+            "digest": "sha256:699b40d622211ab7accad8a21b04c5fbaa1841ef7a12621e8de492dbe27b2503",
+            "ref": "quay.io/jetstack/cert-manager-acmesolver:v1.21.2",
+            "used": false
+          },
+          "cainjector": {
+            "digest": "sha256:c85268c64f2e0e76684bf5fe8906caff34b82523561c6affe0fae3546bd87562",
+            "ref": "quay.io/jetstack/cert-manager-cainjector:v1.21.2"
+          },
+          "controller": {
+            "digest": "sha256:70f532fd9cfde0b09d55687200942399d89838bc2d5d5b45152eb799a15912b8",
+            "ref": "quay.io/jetstack/cert-manager-controller:v1.21.2"
+          },
+          "startupapicheck": {
+            "digest": "sha256:46e75b6866359ffb5d82624f41e3ed1c70b2994982702ced547ce5edb418a8f5",
+            "ref": "quay.io/jetstack/cert-manager-startupapicheck:v1.21.2"
+          },
+          "webhook": {
+            "digest": "sha256:a60e2dac46dbb8a7f3df95c54ce941012f54c2fe022f0ee55aaa1ab40ed957ae",
+            "ref": "quay.io/jetstack/cert-manager-webhook:v1.21.2"
+          }
+        },
+        "status": "final",
+        "version": "v1.21.2"
+      },
+      "cilium": {
+        "chart": {
+          "name": "cilium",
+          "repo": "https://helm.cilium.io",
+          "sha256": "af6aeba999b438b897e71452051aab2c014bb89369ab34ca46a33003eb0d017e",
+          "version": "1.19.7"
+        },
+        "images": {
+          "agent": {
+            "digest": "sha256:1b58bcb81c723cf130a0dd2fb2e1132c57f8fbc2ef7bdb85519cfcc36111c77e",
+            "ref": "quay.io/cilium/cilium:v1.19.7"
+          },
+          "envoy": {
+            "digest": "sha256:beccdf3c119f299cf696885188584bbd0531d74bca08096113207999aff95e87",
+            "ref": "quay.io/cilium/cilium-envoy:v1.36.9-1786864149-07e8503ff34b9190d7bbe4e57d4e185c4ef8b1de"
+          },
+          "operator": {
+            "digest": "sha256:61e773bfc25a448f1ad3ead605af94b3ef176ba2925cf4bd1b11e09794b72bed",
+            "ref": "quay.io/cilium/operator-generic:v1.19.7"
+          }
+        },
+        "status": "final",
+        "version": "1.19.7"
+      },
+      "cilium_cli": {
+        "sha256": "cd15e0983bf0acc7946cd05d453d1e58376ea92dec2642e745212df2b07d8852",
+        "status": "final",
+        "version": "v0.19.7"
+      },
+      "control_plane": {
+        "images": {
+          "coredns": {
+            "digest": "sha256:9b9128672209474da07c91439bf15ed704ae05ad918dd6454e5b6ae14e35fee6",
+            "ref": "registry.k8s.io/coredns/coredns:v1.13.1"
+          },
+          "etcd": {
+            "digest": "sha256:60a30b5d81b2217555e2cfb9537f655b7ba97220b99c39ee2e162a7127225890",
+            "ref": "registry.k8s.io/etcd:3.6.6-0"
+          },
+          "kube_apiserver": {
+            "digest": "sha256:6a7b73e718540d2c097cbcdc84c0f2cffad7a51ebccaf7f0b8cceb464715e1d9",
+            "ref": "registry.k8s.io/kube-apiserver:v1.35.8"
+          },
+          "kube_controller_manager": {
+            "digest": "sha256:b27c0bf88a81437747b257a1e6d019a921ec3a97b724e67dfc180efe3125998b",
+            "ref": "registry.k8s.io/kube-controller-manager:v1.35.8"
+          },
+          "kube_scheduler": {
+            "digest": "sha256:f4334826c53876b700f73cd06a69c405c6f882a4116c5813786e046ee6eca1ac",
+            "ref": "registry.k8s.io/kube-scheduler:v1.35.8"
+          },
+          "pause": {
+            "digest": "sha256:278fb9dbcca9518083ad1e11276933a2e96f23de604a3a08cc3c80002767d24c",
+            "ref": "registry.k8s.io/pause:3.10.1"
+          }
+        },
+        "status": "final"
+      },
+      "democratic_csi": {
+        "chart": {
+          "name": "democratic-csi",
+          "repo": "https://democratic-csi.github.io/charts",
+          "sha256": "3d87e129cea46d49d810e9e5085b61d06c01a313bcf92160e3d106adc30426ed",
+          "version": "0.15.1"
+        },
+        "images": {
+          "attacher": {
+            "digest": "sha256:dbded4ebe299973e31d0ef55815eb07a990fc67872b14900a8e69232acae4f2d",
+            "ref": "registry.k8s.io/sig-storage/csi-attacher:v4.4.0"
+          },
+          "cleanup": {
+            "digest": "sha256:bdf57e528e45e4433820e045b29b4597825a1c9e38353532d90a01445013f82e",
+            "ref": "docker.io/library/busybox:1.37.0",
+            "used": false
+          },
+          "csi_proxy": {
+            "digest": "sha256:0240d0fba3cedd598036766b1865e88aa2eac9c16822df03d5d912a81128ebb6",
+            "ref": "ghcr.io/democratic-csi/csi-grpc-proxy:v0.5.7"
+          },
+          "driver": {
+            "digest": "sha256:c6d74146e10b8ea2e0efd1f688779b6db529a71b83887ca3de953e5226d374b7",
+            "ref": "ghcr.io/democratic-csi/democratic-csi:next"
+          },
+          "node_driver_registrar": {
+            "digest": "sha256:cd21e19cd8bbd5bc56f1b4f1398a436e7897da2995d6d036c9729be3f4e456e6",
+            "ref": "registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.9.0"
+          },
+          "provisioner": {
+            "digest": "sha256:6de50bacfd72627ffe4209e3db8ad7391d04ea6fb741bf51feab6c5dcfd80002",
+            "ref": "registry.k8s.io/sig-storage/csi-provisioner:v3.6.0"
+          },
+          "resizer": {
+            "digest": "sha256:f1f352df97874442624fcef23eab04aa038f66cb0e361212f6ec09e92998184d",
+            "ref": "registry.k8s.io/sig-storage/csi-resizer:v1.9.0"
+          },
+          "snapshotter": {
+            "digest": "sha256:5f4bb469fec51147ce157329dab598c758da1b018bad6dad26f0ff469326d769",
+            "ref": "registry.k8s.io/sig-storage/csi-snapshotter:v8.2.1",
+            "used": false
+          }
+        },
+        "status": "final"
+      },
+      "dex": {
+        "image": {
+          "digest": "sha256:933fcd3f523338c847b88ef84a7145fb2fcb7b9917f08418612afeaaa2001777",
+          "platform_digest": "sha256:fd4ab5d117005b927433133f1d7db7cc30fbb537c377912b75b349edff47df01",
+          "platforms": "one",
+          "ref": "docker.io/dexidp/dex:v2.46.0"
+        },
+        "status": "final",
+        "version": "v2.46.0"
+      },
+      "gateway_api": {
+        "channel": "standard",
+        "manifest": {
+          "file": "common/sfab/render/upstream/gateway-api-v1.4.1-standard-install.yaml",
+          "sha256": "73b91b77f6be023a8c92c969fc664e5bd3b1a28aea59eac9ebc904607354dad2",
+          "url": "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.1/standard-install.yaml"
+        },
+        "status": "final",
+        "version": "v1.4.1"
+      },
+      "helm": {
+        "sha256": "1e4ab49e429626cf6c6958d914248b78c9730803c2751b87627e171dc800e7bb",
+        "status": "final",
+        "version": "v3.22.0"
+      },
+      "kube_vip": {
+        "image": {
+          "digest": "sha256:840305b94ef2a89abb3b7fd2b09edfbde690d90052020da4dff90679fe892da2",
+          "ref": "ghcr.io/kube-vip/kube-vip:v1.1.2"
+        },
+        "status": "final",
+        "version": "v1.1.2"
+      },
+      "kubectl": {
+        "sha256": "874d5e72dbb819f43cff16bcd1e4f8bac5b7f2361fe1e55049b0a6c676fb0cbf",
+        "version": "v1.35.8"
+      },
+      "litellm": {
+        "image": {
+          "digest": "sha256:625981c83410a3ea68eb0697590a57ec1d764d634514d54fa5db0591077ee839",
+          "platform_digest": "sha256:5ce1ebf7f26ed82501b598e0ebecd4fe63d0e61817178427d4df86f2a16729ec",
+          "platforms": "one",
+          "ref": "ghcr.io/berriai/litellm:v1.104.0"
+        },
+        "status": "final",
+        "version": "v1.104.0"
+      },
+      "multus": {
+        "image": {
+          "digest": "sha256:2b9671447f3ea4e7e56730843dbf59445b9307246f393b61386b896d56ae51c9",
+          "platform_digest": "sha256:84873accf7adac86589558e97038b846f6a748e82dc163620cc4fe63fd175a8c",
+          "platforms": "one",
+          "ref": "ghcr.io/k8snetworkplumbingwg/multus-cni:v4.3.0-thick"
+        },
+        "manifest": {
+          "file": "common/sfab/render/upstream/multus-v4.3.0-daemonset-thick.yml",
+          "sha256": "2d622f697809644a12704497bbf5c3256adc1e7f5b5504655e4993743651b585",
+          "url": "https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/v4.3.0/deployments/multus-daemonset-thick.yml"
+        },
+        "status": "final",
+        "version": "v4.3.0"
+      },
+      "node_helm": {
+        "image": {
+          "digest": "sha256:70ed3f7b02ab2eee12aa520ad6870305db8a82516b07aff62f5656c657a26e2a",
+          "platform_digest": "sha256:e29ba4b553fa9648d0a35a9e29c8744c597a3e400d5574daf0f20a4c3854b852",
+          "ref": "docker.io/alpine/helm:3.22.0"
+        },
+        "status": "final",
+        "version": "v3.22.0"
+      },
+      "packages": {
+        "cri_tools": "1.35.0-1.1",
+        "kubeadm": "1.35.8-1.1",
+        "kubernetes_cni": "1.8.0-1.1"
+      },
+      "test_backend": {
+        "image": {
+          "digest": "sha256:10ed98804c877e505e17bced991682b6fd50ab1da9cddcd19935b48d645da40a",
+          "ref": "registry.k8s.io/e2e-test-images/agnhost:2.59"
+        },
+        "status": "final"
+      },
+      "trident": {
+        "status": "open",
+        "version": null
+      },
+      "version": "v1.35.8",
+      "whereabouts": {
+        "status": "not used",
+        "version": null
+      }
+    },
+    "tools": {
+      "containerlab": "0.82.0",
+      "python": "3.10"
+    }
+  }
+}

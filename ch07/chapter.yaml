@@ -1,0 +1,84 @@
+# Chapter 7, "Inference Gateways with the Kubernetes Gateway API" (FRAMEWORK.md 6.3, fifth row),
+# lab sfab-ch07.
+#
+# Build A's one-tenant state with serving on, as chapter 6's lab: every switch, the firewall, the
+# cluster (k8s-cp1 to k8s-cp3, the ingress nodes k8s-ingress1 and k8s-ingress2, and both GPU nodes),
+# the bastion, the platform's DNS and time servers, the registry, the uplink router, the operator's
+# site router and both clients; TrueNAS is left out (storage_setup off). Chapter 7 adds the
+# operator's resolver, ops-dns (sfab/resolver, BIND authoritative on the uplink side), the public
+# zone, which in state one publishes no platform name: the operator reaches the internal Gateway
+# through the IPsec tunnel, and its requests name the VIP. The chapter teaches the chain from the
+# firewall to the model: the Gateways (class cilium, internal and users', their VIPs in VLAN 110
+# announced by the ingress nodes that hold their leases, each listener admitting routes only from
+# the namespaces labelled for it), the hostname and path rules (the internal Gateway the bare
+# /models prefix and the admin hostnames, the users' Gateway one rule a model), the DNS views on the
+# platform's authoritative pair, each Gateway's own certificate for *.ai.tarnwick.example from the
+# lab's name-constrained intermediate, the API gateway's callers (applications by key, people by a
+# token from the identity provider), the router, and the timeout chain. make up builds the Gateway
+# layer from empty namespaces on the running build A (finish applies the rendered layer, then the
+# serving recipe, then the API gateway, the router and the identity provider). The chapter prints no
+# device configuration. It extends chapter 6's lab.
+lab: sfab-ch07
+profile: a
+state: one
+slice:
+  nodes: [fe, rail, oob, fw, k8s-gpu1, k8s-gpu2, k8s-cp1, k8s-cp2, k8s-cp3, bastion, inet-registry, uplink-rtr, ops-client, ops-dns, ent-client]
+features: {k8s: true, serving: true, storage_setup: false}
+prints: []
+extends: ch06
+variants: {}
+
+# The keyed trace (trace.sh, common/trace/lib-servetrace.sh; rendered to gen/trace.json): chapter
+# 6's request from the enterprise client to chat through the users' Gateway, with the API gateway's
+# and the router's cluster interfaces captured whole, so the judge reads the Authorization header
+# each in-cluster hop carried: the caller's key (batch's) from the Gateway to the API gateway, the
+# router's master key from the API gateway to the router, the backend key from the router to the
+# server. Every value is replaced by its keyed mark before the pcap or its decode is written; only
+# the marks reach the set. Then one request from the same client to the admin hostname, which the
+# users' Gateway does not carry: its 404, which no API gateway pod sees.
+trace:
+  serving:
+    client: ent-client
+    gateway: gw-users
+    model: chat
+    max_tokens: 16
+    sport: 42706
+    keys: true
+    refuse: {hostname: admin, path: /echo, sport: 42707}
+
+# The drills (drills.sh, common/drill/lib-gwdrill.sh; rendered to gen/drills.json). The gateway
+# probe sends one chat completion every 2 s to each model through the users' Gateway with each
+# model's key (the first key of the first application caller that may call it), each request on its
+# own; under both key drills it must lose nothing. Staff, the dense model, takes tens of seconds a
+# request on the CPUs of the host this lab was recorded on, so, as in chapter 6, it gets one
+# request every 15th interval (every 30 s), which keeps its two copies inside their capacity.
+#
+#   key-lifecycle  one new key for chat's caller minted into the key Secret, then the per-pod probe (every
+#                  API gateway pod by its address) and requests through the users' VIP with it until
+#                  every pod accepts it, the same key refused on staff's route, then revoked, until
+#                  every pod refuses it again
+#   rejected-code  staff's route made again without the consumer restriction's rejected code and
+#                  message, so a chat key there meets the plugin's own default status; then the
+#                  rendered route back and its 401, at every API gateway pod
+#   idle-timeout   the test backend's processes stopped (SIGSTOP in their nodes) for silent_s while
+#                  one request through the users' Gateway waits: the status, the time and the hop
+#                  that ended it as Cilium is rendered; then the corrected chain (Envoy's stream idle
+#                  timeout and the route's timeouts outlasting the silence) applied, the same silence
+#                  answered, and the rendered chain put back
+drills:
+  probes:
+    gateway: {from: ent-client, gateway: gw-users, models: [chat, staff], every: {staff: 15}, interval_s: 2, timeout_s: 400, max_tokens: 8}
+  timing: {lead_s: 10, tail_s: 10, accept_max_s: 300, settle_max_s: 900, whole_polls: 30}
+  list:
+    - id: key-lifecycle
+      title: one key for chat from mint to revoke under the gateway probe, at every API gateway pod and through the users' VIP
+      key_lifecycle: {model: chat, cross: staff, id_base: fd000000}
+      probes: [gateway]
+    - id: rejected-code
+      title: staff's route without its rejected code, a chat key answered with the plugin's default, then the rendered 401
+      rejected_code: {model: staff, key: chat}
+      probes: [gateway]
+    - id: idle-timeout
+      title: the test backend silent past Envoy's stream idle timeout through the users' Gateway, then the corrected chain
+      idle_timeout: {from: ent-client, gateway: gw-users, silent_s: 330, corrected: {stream_idle_s: 600, request_s: 420, backend_request_s: 400}}
+      max_passes: 1

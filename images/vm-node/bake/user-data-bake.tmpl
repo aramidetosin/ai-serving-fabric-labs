@@ -1,0 +1,16 @@
+#cloud-config
+# The bake guest's first and only boot (bake.sh fills ${PROVISION_B64} and ${PROVISION_ENV_B64}
+# with envsubst). No user, no password and no key: the guest is reached only through its serial
+# console log, and provision.sh powers it off when it is done.
+users: []
+ssh_pwauth: false
+disable_root: true
+package_update: false
+package_upgrade: false
+growpart: {mode: auto, devices: ["/"]}
+resize_rootfs: true
+write_files:
+  - {path: /root/sfab-provision.sh, permissions: "0700", encoding: b64, content: "${PROVISION_B64}"}
+  - {path: /root/sfab-provision.env, permissions: "0600", encoding: b64, content: "${PROVISION_ENV_B64}"}
+runcmd:
+  - [bash, /root/sfab-provision.sh]

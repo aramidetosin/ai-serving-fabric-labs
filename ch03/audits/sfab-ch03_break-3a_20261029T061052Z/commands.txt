@@ -1,0 +1,505 @@
+### 2026-10-29T06:10:56Z fe-sw2 klish
+terminal length 0
+configure terminal
+interface PortChannel 10
+switchport trunk allowed Vlan remove 200
+end
+exit
+terminal length 0
+configure terminal
+interface PortChannel 10
+switchport trunk allowed Vlan remove 200
+end
+exit
+fe-sw2# terminal length 0
+fe-sw2# configure terminal
+fe-sw2(config)# interface PortChannel 10
+fe-sw2(config-if-po10)# switchport trunk allowed Vlan remove 200
+fe-sw2(config-if-po10)# end
+fe-sw2# exit
+
+### 2026-10-29T06:11:06Z fe-sw1 klish
+terminal length 0
+show vlan
+show running-configuration interface PortChannel 10
+show mclag brief
+exit
+terminal length 0
+show vlan
+show running-configuration interface PortChannel 10
+show mclag brief
+exit
+fe-sw1# terminal length 0
+fe-sw1# show vlanVlan
+Q: A - Access (Untagged), T - Tagged
+NUM        Status      Q Ports            Autostate   Dynamic     
+100        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel11                No         
+                       A  PortChannel12                No         
+                       A  PortChannel13                No         
+                       A  PortChannel14                No         
+                       A  PortChannel15                No         
+                       A  PortChannel21                No         
+                       A  PortChannel22                No         
+110        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       T  PortChannel14                No         
+                       T  PortChannel15                No         
+120        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel21                No         
+                       T  PortChannel22                No         
+                       A  PortChannel31                No         
+130        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel41                No         
+                       A  PortChannel42                No         
+131        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel43                No         
+                       A  PortChannel44                No         
+200        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel32                No         
+300        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel30                No         
+3966       Active      T  PortChannel1     Enable      No         
+fe-sw1# show running-configuration interface PortChannel 10
+!
+interface PortChannel10
+ description fw-ae1
+ switchport trunk allowed Vlan 100,110,130-131,200,300
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+fe-sw1# show mclag brief
+ 
+Domain ID            : 1
+Role                 : active
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.0
+Peer Address         : 10.20.255.1
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:7a:3a:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.4
+Peer Address         : 10.20.255.5
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw1# exit
+
+### 2026-10-29T06:11:10Z fe-sw2 klish
+terminal length 0
+show vlan
+show running-configuration interface PortChannel 10
+show mclag brief
+exit
+terminal length 0
+show vlan
+show running-configuration interface PortChannel 10
+show mclag brief
+exit
+fe-sw2# terminal length 0
+fe-sw2# show vlanVlan
+Q: A - Access (Untagged), T - Tagged
+NUM        Status      Q Ports            Autostate   Dynamic     
+100        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel11                No         
+                       A  PortChannel12                No         
+                       A  PortChannel13                No         
+                       A  PortChannel14                No         
+                       A  PortChannel15                No         
+                       A  PortChannel21                No         
+                       A  PortChannel22                No         
+110        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       T  PortChannel14                No         
+                       T  PortChannel15                No         
+120        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel21                No         
+                       T  PortChannel22                No         
+                       A  PortChannel31                No         
+130        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel41                No         
+                       A  PortChannel42                No         
+131        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel43                No         
+                       A  PortChannel44                No         
+200        Active      T  PortChannel1     Enable      No         
+                       A  PortChannel32                No         
+300        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel30                No         
+3966       Active      T  PortChannel1     Enable      No         
+fe-sw2# show running-configuration interface PortChannel 10
+!
+interface PortChannel10
+ description fw-ae1
+ switchport trunk allowed Vlan 100,110,130-131,300
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+fe-sw2# show mclag brief
+ 
+Domain ID            : 1
+Role                 : standby
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.1
+Peer Address         : 10.20.255.0
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:7a:3a:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.5
+Peer Address         : 10.20.255.4
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw2# exit
+
+### 2026-10-29T06:12:44Z bastion container
++ bash -c for i in $(seq 0 59); do t=$(date +%s.%N); if timeout 2 bash -c 'exec 3<>/dev/tcp/10.20.2.31/443' 2>/dev/null; then ok=1; else ok=0; fi; echo "$t $i $ok"; sleep 0.5; done
+1793254271.599043096 0 0
+1793254274.106178514 1 0
+1793254276.612754146 2 1
+1793254277.126137699 3 0
+1793254279.633181333 4 1
+1793254280.146104469 5 0
+1793254282.653461582 6 1
+1793254283.166064071 7 1
+1793254283.678554765 8 0
+1793254286.185413865 9 0
+1793254288.693490469 10 1
+1793254289.216704430 11 0
+1793254291.723332082 12 1
+1793254292.235673032 13 1
+1793254292.746936719 14 0
+1793254295.254981044 15 1
+1793254295.767173939 16 0
+1793254298.274971621 17 1
+1793254298.785728386 18 0
+1793254301.292386404 19 0
+1793254303.799687332 20 1
+1793254304.309904282 21 0
+1793254306.817553503 22 1
+1793254307.329645647 23 1
+1793254307.841800668 24 0
+1793254310.348863885 25 0
+1793254312.855989651 26 0
+1793254315.362632442 27 1
+1793254315.889685101 28 1
+1793254316.402959978 29 0
+1793254318.909793321 30 0
+1793254321.417136064 31 1
+1793254321.928601670 32 1
+1793254322.441733590 33 0
+1793254324.949161969 34 0
+1793254327.457262906 35 1
+1793254327.968846214 36 1
+1793254328.480622388 37 0
+1793254330.987717962 38 1
+1793254331.500437205 39 0
+1793254334.007484081 40 1
+1793254334.519470257 41 1
+1793254335.030803646 42 0
+1793254337.537507737 43 1
+1793254338.049296663 44 0
+1793254340.555830627 45 0
+1793254343.062365593 46 1
+1793254343.573340296 47 1
+1793254344.084844532 48 0
+1793254346.591818486 49 0
+1793254349.099117145 50 1
+1793254349.612095166 51 0
+1793254352.118818332 52 0
+1793254354.626462945 53 1
+1793254355.139763530 54 0
+1793254357.647815903 55 1
+1793254358.160730690 56 1
+1793254358.671627620 57 0
+1793254361.179125881 58 0
+1793254363.686022563 59 1
+
+### 2026-10-29T06:14:17Z bastion container
++ bash -c for i in $(seq 0 59); do t=$(date +%s.%N); if timeout 2 bash -c 'exec 3<>/dev/tcp/10.20.2.31/443' 2>/dev/null; then ok=1; else ok=0; fi; echo "$t $i $ok"; sleep 0.5; done
+1793254364.463382631 0 1
+1793254364.974269795 1 0
+1793254367.481975486 2 0
+1793254369.989647985 3 1
+1793254370.500913194 4 0
+1793254373.008277694 5 1
+1793254373.521038569 6 0
+1793254376.028641052 7 1
+1793254376.540404789 8 1
+1793254377.057323894 9 0
+1793254379.564248731 10 1
+1793254380.077384897 11 0
+1793254382.584451258 12 1
+1793254383.096830999 13 0
+1793254385.604180759 14 0
+1793254388.111218729 15 1
+1793254388.623750316 16 0
+1793254391.130648272 17 1
+1793254391.679127983 18 1
+1793254392.191057732 19 0
+1793254394.697580563 20 1
+1793254395.210247493 21 0
+1793254397.716791989 22 1
+1793254398.229273871 23 0
+1793254400.736003768 24 0
+1793254403.243947679 25 1
+1793254403.757030355 26 0
+1793254406.264756428 27 1
+1793254406.776979858 28 1
+1793254407.296855730 29 0
+1793254409.803711983 30 1
+1793254410.315500756 31 0
+1793254412.823520184 32 1
+1793254413.335957756 33 0
+1793254415.842998946 34 0
+1793254418.350628248 35 1
+1793254418.862660565 36 1
+1793254419.374413313 37 0
+1793254421.882097352 38 1
+1793254422.394120573 39 0
+1793254424.901228452 40 1
+1793254425.411296893 41 0
+1793254427.918381574 42 0
+1793254430.425477618 43 1
+1793254430.937177263 44 1
+1793254431.449062233 45 0
+1793254433.955842778 46 0
+1793254436.463123818 47 0
+1793254438.970936096 48 1
+1793254439.483119492 49 0
+1793254441.990374470 50 1
+1793254442.503362000 51 0
+1793254445.010703174 52 1
+1793254445.523008591 53 1
+1793254446.035093913 54 0
+1793254448.542049684 55 0
+1793254451.049418117 56 1
+1793254451.562675253 57 0
+1793254454.070081193 58 1
+1793254454.582152542 59 0
+
+### 2026-10-29T06:15:46Z bastion container
++ bash -c for i in $(seq 0 59); do t=$(date +%s.%N); if timeout 2 bash -c 'exec 3<>/dev/tcp/10.20.2.31/443' 2>/dev/null; then ok=1; else ok=0; fi; echo "$t $i $ok"; sleep 0.5; done
+1793254457.390590396 0 1
+1793254457.902345400 1 1
+1793254458.415680308 2 0
+1793254460.922589611 3 1
+1793254461.434297719 4 0
+1793254463.940813810 5 1
+1793254464.452208018 6 0
+1793254466.958947707 7 1
+1793254467.470704027 8 0
+1793254469.977805566 9 1
+1793254470.487500280 10 0
+1793254472.995071710 11 1
+1793254473.524274164 12 0
+1793254476.031735643 13 0
+1793254478.539681159 14 1
+1793254479.052294812 15 0
+1793254481.559597400 16 1
+1793254482.070661009 17 1
+1793254482.583605505 18 0
+1793254485.090050701 19 1
+1793254485.600070751 20 0
+1793254488.108025332 21 0
+1793254490.616249167 22 1
+1793254491.131600449 23 1
+1793254491.644182967 24 0
+1793254494.152078093 25 1
+1793254494.666959998 26 0
+1793254497.174560064 27 1
+1793254497.685334921 28 0
+1793254500.192836366 29 0
+1793254502.700970532 30 1
+1793254503.213095604 31 1
+1793254503.724439987 32 0
+1793254506.231714697 33 1
+1793254506.744792290 34 0
+1793254509.252606884 35 1
+1793254509.764697661 36 1
+1793254510.277798553 37 0
+1793254512.785276241 38 0
+1793254515.292129212 39 1
+1793254515.803410435 40 1
+1793254516.316726807 41 0
+1793254518.823426896 42 1
+1793254519.335474149 43 0
+1793254521.842483642 44 1
+1793254522.355617342 45 0
+1793254524.863926090 46 1
+1793254525.376830414 47 0
+1793254527.884417159 48 0
+1793254530.391739591 49 1
+1793254530.902814815 50 0
+1793254533.410030613 51 1
+1793254533.921454501 52 0
+1793254536.429250602 53 1
+1793254536.942079679 54 0
+1793254539.449033834 55 1
+1793254539.961911563 56 0
+1793254542.469852383 57 1
+1793254542.994597398 58 0
+1793254545.501909123 59 1
+
+### 2026-10-29T06:15:49Z fe-sw2 klish
+terminal length 0
+show vlan
+exit
+terminal length 0
+show vlan
+exit
+fe-sw2# terminal length 0
+fe-sw2# show vlanVlan
+Q: A - Access (Untagged), T - Tagged
+NUM        Status      Q Ports            Autostate   Dynamic     
+100        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel11                No         
+                       A  PortChannel12                No         
+                       A  PortChannel13                No         
+                       A  PortChannel14                No         
+                       A  PortChannel15                No         
+                       A  PortChannel21                No         
+                       A  PortChannel22                No         
+110        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       T  PortChannel14                No         
+                       T  PortChannel15                No         
+120        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel21                No         
+                       T  PortChannel22                No         
+                       A  PortChannel31                No         
+130        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel41                No         
+                       A  PortChannel42                No         
+131        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel43                No         
+                       A  PortChannel44                No         
+200        Active      T  PortChannel1     Enable      No         
+                       A  PortChannel32                No         
+300        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel30                No         
+3966       Active      T  PortChannel1     Enable      No         
+fe-sw2# exit
+
+### 2026-10-29T06:15:52Z fe-sw1 klish
+terminal length 0
+show vlan
+exit
+terminal length 0
+show vlan
+exit
+fe-sw1# terminal length 0
+fe-sw1# show vlanVlan
+Q: A - Access (Untagged), T - Tagged
+NUM        Status      Q Ports            Autostate   Dynamic     
+100        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel11                No         
+                       A  PortChannel12                No         
+                       A  PortChannel13                No         
+                       A  PortChannel14                No         
+                       A  PortChannel15                No         
+                       A  PortChannel21                No         
+                       A  PortChannel22                No         
+110        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       T  PortChannel14                No         
+                       T  PortChannel15                No         
+120        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel21                No         
+                       T  PortChannel22                No         
+                       A  PortChannel31                No         
+130        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel41                No         
+                       A  PortChannel42                No         
+131        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel43                No         
+                       A  PortChannel44                No         
+200        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel32                No         
+300        Active      T  PortChannel1     Enable      No         
+                       T  PortChannel10                No         
+                       A  PortChannel30                No         
+3966       Active      T  PortChannel1     Enable      No         
+fe-sw1# exit
+

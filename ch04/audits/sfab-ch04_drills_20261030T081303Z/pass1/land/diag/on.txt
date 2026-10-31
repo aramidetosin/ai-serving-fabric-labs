@@ -1,0 +1,117 @@
+Last login: Fri Oct 30 08:14:36 2026 from 172.21.40.1
+set cli pager off
+debug dataplane packet-diag clear all
+debug dataplane packet-diag set filter match source 10.20.1.12 destination 198.51.100.2
+debug dataplane packet-diag set filter on
+debug dataplane packet-diag set capture stage receive file sfab-land-receive.pcap
+debug dataplane packet-diag set capture stage drop file sfab-land-drop.pcap
+debug dataplane packet-diag set capture on
+debug dataplane packet-diag show setting
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> debug 
+admin@fw> debug dataplane 
+admin@fw> debug dataplane packet-diag 
+admin@fw> debug dataplane packet-diag clear 
+admin@fw> debug dataplane packet-diag clear all
+
+Packet diagnosis setting set to default.
+admin@fw> debug 
+admin@fw> debug dataplane 
+admin@fw> debug dataplane packet-diag 
+admin@fw> debug dataplane packet-diag set 
+admin@fw> debug dataplane packet-diag set filter 
+admin@fw> debug dataplane packet-diag set filter match 
+admin@fw> debug dataplane packet-diag set filter match source 
+admin@fw> debug dataplane packet-diag set filter match source 10.20.1.12 
+admin@fw> debug dataplane packet-diag set filter match source 10.20.1.12 destination 
+admin@fw> debug dataplane packet-diag set filter match source 10.20.1.12 destination 198.51.100.2
+
+admin@fw> debug 
+admin@fw> debug dataplane 
+admin@fw> debug dataplane packet-diag 
+admin@fw> debug dataplane packet-diag set 
+admin@fw> debug dataplane packet-diag set filter 
+admin@fw> debug dataplane packet-diag set filter on
+
+debug packet filter: on
+admin@fw> debug 
+admin@fw> debug dataplane 
+admin@fw> debug dataplane packet-diag 
+admin@fw> debug dataplane packet-diag set 
+admin@fw> debug dataplane packet-diag set capture 
+admin@fw> debug dataplane packet-diag set capture stage 
+admin@fw> debug dataplane packet-diag set capture stage receive 
+admin@fw> debug dataplane packet-diag set capture stage receive file 
+admin@fw> debug dataplane packet-diag set capture stage receive file sfab-land-receive.pcap
+
+admin@fw> debug 
+admin@fw> debug dataplane 
+admin@fw> debug dataplane packet-diag 
+admin@fw> debug dataplane packet-diag set 
+admin@fw> debug dataplane packet-diag set capture 
+admin@fw> debug dataplane packet-diag set capture stage 
+admin@fw> debug dataplane packet-diag set capture stage drop 
+admin@fw> debug dataplane packet-diag set capture stage drop file 
+admin@fw> debug dataplane packet-diag set capture stage drop file sfab-land-drop.pcap
+
+admin@fw> debug 
+admin@fw> debug dataplane 
+admin@fw> debug dataplane packet-diag 
+admin@fw> debug dataplane packet-diag set 
+admin@fw> debug dataplane packet-diag set capture 
+admin@fw> debug dataplane packet-diag set capture on
+
+Packet capture is enabled
+admin@fw> debug 
+admin@fw> debug dataplane 
+admin@fw> debug dataplane packet-diag 
+admin@fw> debug dataplane packet-diag show 
+admin@fw> debug dataplane packet-diag show setting
+
+--------------------------------------------------------------------------------
+Packet diagnosis setting:
+--------------------------------------------------------------------------------
+Packet filter
+  Enabled:                   yes
+  Match pre-parsed packet:   no
+  Filter offload:            yes            
+  Index 1: 10.20.1.12/32[0]->198.51.100.2/32[0], proto 0
+           ingress-interface any, egress-interface any, exclude non-IP
+--------------------------------------------------------------------------------
+Logging
+  Enabled:                   no
+  Log-throttle:              no
+  Sync-log-by-ticks:         yes            
+  Features:
+  Counters:
+  Timeout duration:          60 seconds
+  Buffer threshold:          80%
+  CPU threshold:             80%
+--------------------------------------------------------------------------------
+Packet capture
+  Enabled:                   yes
+  Snaplen:                   0
+  Username:                              
+  throttle-rate:             10 Mbps(Default)
+  Stage receive           :  file sfab-land-receive.pcap
+    Captured:     packets - 0          bytes - 0           
+    Rate Limited: packets - 0          bytes - 0           
+    Maximum:      packets - 0          bytes - 0           
+  Stage drop              :  file sfab-land-drop.pcap
+    Captured:     packets - 0          bytes - 0           
+    Rate Limited: packets - 0          bytes - 0           
+    Maximum:      packets - 0          bytes - 0           
+--------------------------------------------------------------------------------
+
+admin@fw> exit

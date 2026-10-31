@@ -1,0 +1,51 @@
+# break-5a (Chapter 5, exercises 1 and 4): the source pin of one relay route removed on one node.
+#
+# In k8s-gpu1's namespace gpu1 every relay route carries the namespace's own rail 1 address as its
+# source (10.21.1.11). The break replaces the route to rail 2 (10.21.2.0/24 via 10.21.250.2 dev
+# relay) without it. A ping from that namespace to k8s-gpu2's rail 2 address then leaves with the
+# address the kernel picks for the relay device, k8s-gpu1's relay address 10.21.250.1; k8s-gpu1's
+# namespace gpu2 forwards it onto rail 2 as before, k8s-gpu2 receives it there, and answers
+# 10.21.250.1. On k8s-gpu2 that address is its own namespace gpu1's, on its own relay bridge, so the
+# reply never leaves k8s-gpu2. Rail 1 to rail 3 keeps its pin and works, a ping from k8s-gpu2 toward
+# k8s-gpu1's rail 2 address carries k8s-gpu2's own pinned source and works, and the same rail works
+# everywhere. The switches are untouched: the break is one route inside one node, and parity on both
+# rail switches says so.
+#
+# record: reads the namespace's routes and route get for k8s-gpu2's rail 2 and rail 3 addresses,
+# then pings from k8s-gpu1's namespace gpu1 to k8s-gpu2's rail 2 address in three passes, each with
+# k8s-gpu2's rail 2 NIC and relay bridge captured in the guest (exercise 1: what the far node's
+# capture shows), and the controls once each. The heal puts the rendered route back, with its source
+# pin. A guest reboot also heals it: sfab-netsetup puts every rendered route back at boot.
+title: the source pin of k8s-gpu1's relay route from rail 1 to rail 2 removed
+exercise: 4
+since: 5
+break:
+  - relay_route: {node: k8s-gpu1, rail: 1, to_rail: 2, src: none}
+record:
+  - ns_show: {node: k8s-gpu1, rail: 1, to: k8s-gpu2, get: [2, 3]}
+  - probe_rail: {id: rail1-to-rail2, from: k8s-gpu1, to: k8s-gpu2, rail: 1, to_rail: 2, count: 10, interval_s: 0.2, timeout_s: 1, passes: 3, capture: true}
+  - probe_rail: {id: rail1-to-rail3, from: k8s-gpu1, to: k8s-gpu2, rail: 1, to_rail: 3, count: 10, interval_s: 0.2, timeout_s: 1, passes: 1}
+  - probe_rail: {id: k8s-gpu2-rail1-to-rail2, from: k8s-gpu2, to: k8s-gpu1, rail: 1, to_rail: 2, count: 10, interval_s: 0.2, timeout_s: 1, passes: 1}
+  - probe_rail: {id: same-rail-k8s-gpu1, from: k8s-gpu1, to: k8s-gpu2, rail: all, count: 3, interval_s: 0.2, timeout_s: 1, passes: 1}
+  - probe_rail: {id: same-rail-k8s-gpu2, from: k8s-gpu2, to: k8s-gpu1, rail: all, count: 3, interval_s: 0.2, timeout_s: 1, passes: 1}
+expect_broken:
+  - route_src: {node: k8s-gpu1, rail: 1, to_rail: 2, pinned: false}
+  - route_src: {node: k8s-gpu1, rail: 1, to_rail: 3, pinned: true}
+  - probe_share: {probe: rail1-to-rail2, failing: all}
+  - far_capture: {probe: rail1-to-rail2, src: relay}
+  - probe_share: {probe: rail1-to-rail3, failing: none}
+  - probe_share: {probe: k8s-gpu2-rail1-to-rail2, failing: none}
+  - probe_share: {probe: same-rail-k8s-gpu1, failing: none}
+  - probe_share: {probe: same-rail-k8s-gpu2, failing: none}
+  - parity: {node: rail-sw1}
+  - parity: {node: rail-sw2}
+heal:
+  - relay_route: {node: k8s-gpu1, rail: 1, to_rail: 2, src: rendered}
+expect_healed:
+  - route_src: {node: k8s-gpu1, rail: 1, to_rail: 2, pinned: true}
+  - probe_share: {probe: rail1-to-rail2, failing: none}
+  - far_capture: {probe: rail1-to-rail2, src: rail}
+  - probe_share: {probe: rail1-to-rail3, failing: none}
+  - probe_share: {probe: same-rail-k8s-gpu1, failing: none}
+  - parity: {node: rail-sw1}
+  - parity: {node: rail-sw2}

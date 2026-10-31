@@ -1,0 +1,582 @@
+Script started on 2026-10-29 04:35:53+00:00 [COMMAND="make drills DRILLS='fw-leg server-member peer-link' PASSES=3" TERM="tmux-256color" TTY="/dev/pts/0" COLUMNS="80" LINES="24"]
+/root/sfab/labs/ai-serving-fabric-labs/ch03/drills.sh --drills "fw-leg server-member peer-link" --passes 3
+repostate: 5 of 1483 files differ from the stamp; the tree is not the stamped one
+== pass 1, drill fw-leg: the firewall bundle's leg on fe-sw1 shut from the switch side
+drill: pass 1 fw-leg (the firewall bundle's leg on fe-sw1 shut from the switch side)
+  PASS  pass 1 fw-leg: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 1 fw-leg: probes located before the fault as the drill needs them (try 1): tcp: 5 connects leave the firewall toward fe-sw1, 6 toward the other switch
+  PASS  pass 1 fw-leg: KLISH shutdown of Ethernet2 (PortChannel10) on fe-sw1 accepted
+  PASS  pass 1 fw-leg: no shutdown accepted on fe-sw1 after 30 s
+  PASS  pass 1 fw-leg: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+drills: 0 Warning event(s) archived in pass1/fw-leg/events and cleared
+  PASS  pass 1 fw-leg: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+drill fw-leg, pass 1: the firewall bundle's leg on fe-sw1 shut from the switch side
+  target switch fe-sw1; every time on the lab host's clock, relative to the cut (T0)
+  the fault's session took 3.92 s (T0 is when it started)
+  placement: tcp: 5 connects leave the firewall toward fe-sw1, 6 toward the other switch
+  ping 3102, 3103, 3106, 3107 cross fe-sw1; 3100, 3101, 3104, 3105 do not
+  ping id 3100 (via fe-sw2): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +24.52 s to +24.86 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3101 (via fe-sw2): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +24.52 s to +24.86 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3102 (via fe-sw1): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +52.20 s to +52.53 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3103 (via fe-sw1): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +62.44 s to +62.78 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3104 (via fe-sw2): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +24.52 s to +24.86 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3105 (via fe-sw2): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +14.29 s to +14.62 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3106 (via fe-sw1): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +41.98 s to +42.32 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3107 (via fe-sw1): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +1.06 s to +1.41 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  tcp connects to the users' VIP: 289 attempts, 3 failed (3 at the cut, 0 at the restore, 0 elsewhere)
+    attempts in the cut window by the firewall leg their SYN took: {'fe-sw1': 10, 'fe-sw2': 35}
+    failed run: last ok 3.585, first failed +3.88 s, first ok after 4.887, 1 failed, SYN legs {'fe-sw1': 1}
+    failed run: last ok 4.887, first failed +5.19 s, first ok after 6.188, 1 failed, SYN legs {'fe-sw1': 1}
+    failed run: last ok 6.188, first failed +6.49 s, first ok after 7.49, 1 failed, SYN legs {'fe-sw1': 1}
+  peer link, packets per second from the host-side counters of its member ports:
+    before fe-sw1: tx 2.8 rx 3.0 over 3.61 s
+    before fe-sw2: tx 3.6 rx 3.6 over 3.6 s
+    during fe-sw1: tx 6.5 rx 4.5 over 19.96 s
+    during fe-sw2: tx 4.5 rx 6.6 over 19.99 s
+    after  fe-sw1: tx 3.2 rx 3.0 over 10.62 s
+    after  fe-sw2: tx 3.1 rx 3.4 over 10.63 s
+  KNOWN pass 1 fw-leg: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+== pass 1, drill server-member: k8s-gpu1's member on fe-sw1 shut from the switch side
+drill: pass 1 server-member (k8s-gpu1's member on fe-sw1 shut from the switch side)
+  PASS  pass 1 server-member: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 1 server-member: probes located before the fault as the drill needs them (try 1): ping: 4 of 8 ids cross fe-sw1, 4 do not
+  PASS  pass 1 server-member: KLISH shutdown of Ethernet6 (PortChannel21) on fe-sw1 accepted
+  PASS  pass 1 server-member: no shutdown accepted on fe-sw1 after 30 s
+  PASS  pass 1 server-member: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+drills: 0 Warning event(s) archived in pass1/server-member/events and cleared
+  PASS  pass 1 server-member: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+drill server-member, pass 1: k8s-gpu1's member on fe-sw1 shut from the switch side
+  target switch fe-sw1; every time on the lab host's clock, relative to the cut (T0)
+  the fault's session took 3.35 s (T0 is when it started)
+  placement: ping: 4 of 8 ids cross fe-sw1, 4 do not
+  ping 3102, 3103, 3106, 3107 cross fe-sw1; 3100, 3101, 3104, 3105 do not
+  ping id 3100 (via fe-sw2): sent 295, answered 295, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from -5.89 s to -5.57 s
+    the guest's ping: 295 transmitted, 295 received; the two witnesses agree on every round trip both saw
+  ping id 3101 (via fe-sw2): sent 295, answered 295, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +32.94 s to +33.28 s
+    the guest's ping: 295 transmitted, 295 received; the two witnesses agree on every round trip both saw
+  ping id 3102 (via fe-sw1): sent 295, answered 285, round trips lost 10
+    10 lost at the cut
+    first lost sent at +3.13 s, last at +5.87 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 3.34 s, from +2.83 s to +6.17 s
+    the guest's ping: 295 transmitted, 285 received; the two witnesses agree on every round trip both saw
+  ping id 3103 (via fe-sw1): sent 295, answered 285, round trips lost 10
+    10 lost at the cut
+    first lost sent at +3.13 s, last at +5.87 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 3.34 s, from +2.83 s to +6.17 s
+    the guest's ping: 295 transmitted, 285 received; the two witnesses agree on every round trip both saw
+  ping id 3104 (via fe-sw2): sent 295, answered 295, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +32.95 s to +33.28 s
+    the guest's ping: 295 transmitted, 295 received; the two witnesses agree on every round trip both saw
+  ping id 3105 (via fe-sw2): sent 295, answered 295, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +32.94 s to +33.28 s
+    the guest's ping: 295 transmitted, 295 received; the two witnesses agree on every round trip both saw
+  ping id 3106 (via fe-sw1): sent 295, answered 286, round trips lost 9
+    9 lost at the cut
+    first lost sent at +3.15 s, last at +5.59 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 3.04 s, from +2.86 s to +5.90 s
+    the guest's ping: 295 transmitted, 286 received; the two witnesses agree on every round trip both saw
+  ping id 3107 (via fe-sw1): sent 295, answered 286, round trips lost 9
+    9 lost at the cut
+    first lost sent at +3.16 s, last at +5.59 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 3.04 s, from +2.86 s to +5.90 s
+    the guest's ping: 295 transmitted, 286 received; the two witnesses agree on every round trip both saw
+  tcp connects to the users' VIP: 295 attempts, 0 failed (0 at the cut, 0 at the restore, 0 elsewhere)
+    attempts in the cut window by the firewall leg their SYN took: {'fe-sw1': 26, 'fe-sw2': 26}
+  peer link, packets per second from the host-side counters of its member ports:
+    before fe-sw1: tx 3.0 rx 2.8 over 3.62 s
+    before fe-sw2: tx 3.3 rx 3.8 over 3.64 s
+    during fe-sw1: tx 21.5 rx 3.6 over 20.0 s
+    during fe-sw2: tx 3.6 rx 21.7 over 20.01 s
+    after  fe-sw1: tx 3.6 rx 3.0 over 10.66 s
+    after  fe-sw2: tx 2.8 rx 3.2 over 10.66 s
+  KNOWN pass 1 server-member: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+== pass 1, drill peer-link: the peer link shut on fe-sw1 with the keepalive link up
+drill: pass 1 peer-link (the peer link shut on fe-sw1 with the keepalive link up)
+  PASS  pass 1 peer-link: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 1 peer-link: probes located before the fault as the drill needs them (try 1): ping: requests leave fe-sw1, fe-sw2
+  PASS  pass 1 peer-link: KLISH shutdown of Ethernet0,Ethernet1 (PortChannel1) on fe-sw1 accepted
+  PASS  pass 1 peer-link: no shutdown accepted on fe-sw1 after 30 s
+  PASS  pass 1 peer-link: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+drills: 0 Warning event(s) archived in pass1/peer-link/events and cleared
+  PASS  pass 1 peer-link: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+drill peer-link, pass 1: the peer link shut on fe-sw1 with the keepalive link up
+  target switch fe-sw1; every time on the lab host's clock, relative to the cut (T0)
+  the fault's session took 3.49 s (T0 is when it started)
+  placement: ping: requests leave fe-sw1, fe-sw2
+  ping 3102, 3103, 3106, 3107 cross fe-sw1; 3100, 3101, 3104, 3105 do not
+  ping id 3100 (via fe-sw2): sent 250, answered 250, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +16.08 s to +16.41 s
+    the guest's ping: 250 transmitted, 250 received; the two witnesses agree on every round trip both saw
+  ping id 3101 (via fe-sw2): sent 250, answered 250, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +16.07 s to +16.41 s
+    the guest's ping: 250 transmitted, 250 received; the two witnesses agree on every round trip both saw
+  ping id 3102 (via fe-sw1): sent 250, answered 250, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.31 s, from +42.85 s to +43.16 s
+    the guest's ping: 250 transmitted, 250 received; the two witnesses agree on every round trip both saw
+  ping id 3103 (via fe-sw1): sent 250, answered 250, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +31.42 s to +31.76 s
+    the guest's ping: 250 transmitted, 250 received; the two witnesses agree on every round trip both saw
+  ping id 3104 (via fe-sw2): sent 250, answered 250, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +16.08 s to +16.41 s
+    the guest's ping: 250 transmitted, 250 received; the two witnesses agree on every round trip both saw
+  ping id 3105 (via fe-sw2): sent 250, answered 250, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.31 s, from +36.55 s to +36.86 s
+    the guest's ping: 250 transmitted, 250 received; the two witnesses agree on every round trip both saw
+  ping id 3106 (via fe-sw1): sent 250, answered 250, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +31.42 s to +31.76 s
+    the guest's ping: 250 transmitted, 250 received; the two witnesses agree on every round trip both saw
+  ping id 3107 (via fe-sw1): sent 250, answered 250, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +41.67 s to +42.00 s
+    the guest's ping: 250 transmitted, 250 received; the two witnesses agree on every round trip both saw
+  tcp connects to the users' VIP: 249 attempts, 0 failed (0 at the cut, 0 at the restore, 0 elsewhere)
+    attempts in the cut window by the firewall leg their SYN took: {'fe-sw2': 25, 'fe-sw1': 26}
+  KNOWN pass 1 peer-link: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+== pass 2, drill fw-leg: the firewall bundle's leg on fe-sw1 shut from the switch side
+drill: pass 2 fw-leg (the firewall bundle's leg on fe-sw1 shut from the switch side)
+  PASS  pass 2 fw-leg: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 2 fw-leg: probes located before the fault as the drill needs them (try 1): tcp: 5 connects leave the firewall toward fe-sw1, 6 toward the other switch
+  PASS  pass 2 fw-leg: KLISH shutdown of Ethernet2 (PortChannel10) on fe-sw1 accepted
+  PASS  pass 2 fw-leg: no shutdown accepted on fe-sw1 after 30 s
+  PASS  pass 2 fw-leg: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+drills: 0 Warning event(s) archived in pass2/fw-leg/events and cleared
+  PASS  pass 2 fw-leg: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+drill fw-leg, pass 2: the firewall bundle's leg on fe-sw1 shut from the switch side
+  target switch fe-sw1; every time on the lab host's clock, relative to the cut (T0)
+  the fault's session took 3.50 s (T0 is when it started)
+  placement: tcp: 5 connects leave the firewall toward fe-sw1, 6 toward the other switch
+  ping 3102, 3103, 3106, 3107 cross fe-sw1; 3100, 3101, 3104, 3105 do not
+  ping id 3100 (via fe-sw2): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from -2.53 s to -2.19 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3101 (via fe-sw2): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from -2.53 s to -2.19 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3102 (via fe-sw1): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +72.11 s to +72.44 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3103 (via fe-sw1): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +72.11 s to +72.44 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3104 (via fe-sw2): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from -2.52 s to -2.19 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3105 (via fe-sw2): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from -2.52 s to -2.19 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3106 (via fe-sw1): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.31 s, from -9.73 s to -9.42 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  ping id 3107 (via fe-sw1): sent 297, answered 297, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +72.11 s to +72.44 s
+    the guest's ping: 297 transmitted, 297 received; the two witnesses agree on every round trip both saw
+  tcp connects to the users' VIP: 289 attempts, 3 failed (3 at the cut, 0 at the restore, 0 elsewhere)
+    attempts in the cut window by the firewall leg their SYN took: {'fe-sw1': 9, 'fe-sw2': 35}
+    failed run: last ok 2.998, first failed +3.30 s, first ok after 4.299, 1 failed, SYN legs {'fe-sw1': 1}
+    failed run: last ok 4.299, first failed +4.60 s, first ok after 5.6, 1 failed, SYN legs {'fe-sw1': 1}
+    failed run: last ok 5.6, first failed +5.90 s, first ok after 6.901, 1 failed, SYN legs {'fe-sw1': 1}
+  peer link, packets per second from the host-side counters of its member ports:
+    before fe-sw1: tx 2.8 rx 2.8 over 3.6 s
+    before fe-sw2: tx 3.3 rx 3.1 over 3.59 s
+    during fe-sw1: tx 7.5 rx 4.3 over 19.99 s
+    during fe-sw2: tx 4.3 rx 7.5 over 19.97 s
+    after  fe-sw1: tx 3.5 rx 3.0 over 10.65 s
+    after  fe-sw2: tx 2.9 rx 3.5 over 10.66 s
+  KNOWN pass 2 fw-leg: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+== pass 2, drill server-member: k8s-gpu1's member on fe-sw1 shut from the switch side
+drill: pass 2 server-member (k8s-gpu1's member on fe-sw1 shut from the switch side)
+  PASS  pass 2 server-member: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 2 server-member: probes located before the fault as the drill needs them (try 1): ping: 4 of 8 ids cross fe-sw1, 4 do not
+  PASS  pass 2 server-member: KLISH shutdown of Ethernet6 (PortChannel21) on fe-sw1 accepted
+  PASS  pass 2 server-member: no shutdown accepted on fe-sw1 after 30 s
+  PASS  pass 2 server-member: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+drills: 0 Warning event(s) archived in pass2/server-member/events and cleared
+  PASS  pass 2 server-member: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+drill server-member, pass 2: k8s-gpu1's member on fe-sw1 shut from the switch side
+  target switch fe-sw1; every time on the lab host's clock, relative to the cut (T0)
+  the fault's session took 3.46 s (T0 is when it started)
+  placement: ping: 4 of 8 ids cross fe-sw1, 4 do not
+  ping 3102, 3103, 3106, 3107 cross fe-sw1; 3100, 3101, 3104, 3105 do not
+  ping id 3100 (via fe-sw2): sent 301, answered 301, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from -16.72 s to -16.39 s
+    the guest's ping: 301 transmitted, 301 received; the two witnesses agree on every round trip both saw
+  ping id 3101 (via fe-sw2): sent 301, answered 301, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.32 s, from -16.71 s to -16.39 s
+    the guest's ping: 301 transmitted, 301 received; the two witnesses agree on every round trip both saw
+  ping id 3102 (via fe-sw1): sent 301, answered 293, round trips lost 8
+    8 lost at the cut
+    first lost sent at +3.46 s, last at +5.59 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 2.73 s, from +3.16 s to +5.90 s
+    2 duplicate replies
+    the guest's ping: 301 transmitted, 293 received; the two witnesses agree on every round trip both saw
+  ping id 3103 (via fe-sw1): sent 301, answered 293, round trips lost 8
+    8 lost at the cut
+    first lost sent at +3.46 s, last at +5.59 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 2.73 s, from +3.16 s to +5.90 s
+    9 duplicate replies
+    the guest's ping: 301 transmitted, 293 received; the two witnesses agree on every round trip both saw
+  ping id 3104 (via fe-sw2): sent 301, answered 301, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +67.28 s to +67.61 s
+    the guest's ping: 301 transmitted, 301 received; the two witnesses agree on every round trip both saw
+  ping id 3105 (via fe-sw2): sent 301, answered 301, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.32 s, from +14.01 s to +14.33 s
+    the guest's ping: 301 transmitted, 301 received; the two witnesses agree on every round trip both saw
+  ping id 3106 (via fe-sw1): sent 301, answered 293, round trips lost 8
+    8 lost at the cut
+    first lost sent at +3.48 s, last at +5.61 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 2.74 s, from +3.18 s to +5.91 s
+    the guest's ping: 301 transmitted, 293 received; the two witnesses agree on every round trip both saw
+  ping id 3107 (via fe-sw1): sent 301, answered 293, round trips lost 8
+    8 lost at the cut
+    first lost sent at +3.48 s, last at +5.61 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 2.73 s, from +3.18 s to +5.91 s
+    the guest's ping: 301 transmitted, 293 received; the two witnesses agree on every round trip both saw
+  tcp connects to the users' VIP: 300 attempts, 0 failed (0 at the cut, 0 at the restore, 0 elsewhere)
+    attempts in the cut window by the firewall leg their SYN took: {'fe-sw1': 27, 'fe-sw2': 25}
+  peer link, packets per second from the host-side counters of its member ports:
+    before fe-sw1: tx 3.6 rx 3.6 over 3.62 s
+    before fe-sw2: tx 3.3 rx 3.6 over 3.63 s
+    during fe-sw1: tx 21.0 rx 3.4 over 20.01 s
+    during fe-sw2: tx 3.4 rx 21.2 over 20.01 s
+    after  fe-sw1: tx 3.5 rx 3.1 over 10.64 s
+    after  fe-sw2: tx 2.9 rx 3.4 over 10.64 s
+  KNOWN pass 2 server-member: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+  KNOWN pass 2 server-member: 11 duplicate ping replies (peer-link isolation is not enforced): L1
+== pass 2, drill peer-link: the peer link shut on fe-sw1 with the keepalive link up
+drill: pass 2 peer-link (the peer link shut on fe-sw1 with the keepalive link up)
+  PASS  pass 2 peer-link: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 2 peer-link: probes located before the fault as the drill needs them (try 1): ping: requests leave fe-sw1, fe-sw2
+  PASS  pass 2 peer-link: KLISH shutdown of Ethernet0,Ethernet1 (PortChannel1) on fe-sw1 accepted
+  PASS  pass 2 peer-link: no shutdown accepted on fe-sw1 after 30 s
+  PASS  pass 2 peer-link: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+drills: 0 Warning event(s) archived in pass2/peer-link/events and cleared
+  PASS  pass 2 peer-link: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+drill peer-link, pass 2: the peer link shut on fe-sw1 with the keepalive link up
+  target switch fe-sw1; every time on the lab host's clock, relative to the cut (T0)
+  the fault's session took 3.68 s (T0 is when it started)
+  placement: ping: requests leave fe-sw1, fe-sw2
+  ping 3102, 3103, 3106, 3107 cross fe-sw1; 3100, 3101, 3104, 3105 do not
+  ping id 3100 (via fe-sw2): sent 251, answered 251, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +5.58 s to +5.91 s
+    the guest's ping: 251 transmitted, 251 received; the two witnesses agree on every round trip both saw
+  ping id 3101 (via fe-sw2): sent 251, answered 251, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +5.58 s to +5.91 s
+    the guest's ping: 251 transmitted, 251 received; the two witnesses agree on every round trip both saw
+  ping id 3102 (via fe-sw1): sent 251, answered 251, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.31 s, from +20.63 s to +20.94 s
+    the guest's ping: 251 transmitted, 251 received; the two witnesses agree on every round trip both saw
+  ping id 3103 (via fe-sw1): sent 251, answered 251, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.31 s, from +0.17 s to +0.48 s
+    the guest's ping: 251 transmitted, 251 received; the two witnesses agree on every round trip both saw
+  ping id 3104 (via fe-sw2): sent 251, answered 251, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.32 s, from +5.59 s to +5.91 s
+    the guest's ping: 251 transmitted, 251 received; the two witnesses agree on every round trip both saw
+  ping id 3105 (via fe-sw2): sent 251, answered 251, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +56.74 s to +57.07 s
+    the guest's ping: 251 transmitted, 251 received; the two witnesses agree on every round trip both saw
+  ping id 3106 (via fe-sw1): sent 251, answered 251, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from -10.05 s to -9.71 s
+    the guest's ping: 251 transmitted, 251 received; the two witnesses agree on every round trip both saw
+  ping id 3107 (via fe-sw1): sent 251, answered 251, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +10.41 s to +10.75 s
+    the guest's ping: 251 transmitted, 251 received; the two witnesses agree on every round trip both saw
+  tcp connects to the users' VIP: 250 attempts, 0 failed (0 at the cut, 0 at the restore, 0 elsewhere)
+    attempts in the cut window by the firewall leg their SYN took: {'fe-sw2': 26, 'fe-sw1': 25}
+  KNOWN pass 2 peer-link: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+== pass 3, drill fw-leg: the firewall bundle's leg on fe-sw1 shut from the switch side
+drill: pass 3 fw-leg (the firewall bundle's leg on fe-sw1 shut from the switch side)
+  PASS  pass 3 fw-leg: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 3 fw-leg: probes located before the fault as the drill needs them (try 1): tcp: 5 connects leave the firewall toward fe-sw1, 5 toward the other switch
+  PASS  pass 3 fw-leg: KLISH shutdown of Ethernet2 (PortChannel10) on fe-sw1 accepted
+  PASS  pass 3 fw-leg: no shutdown accepted on fe-sw1 after 30 s
+  PASS  pass 3 fw-leg: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+drills: 0 Warning event(s) archived in pass3/fw-leg/events and cleared
+  PASS  pass 3 fw-leg: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+drill fw-leg, pass 3: the firewall bundle's leg on fe-sw1 shut from the switch side
+  target switch fe-sw1; every time on the lab host's clock, relative to the cut (T0)
+  the fault's session took 3.48 s (T0 is when it started)
+  placement: tcp: 5 connects leave the firewall toward fe-sw1, 5 toward the other switch
+  ping 3102, 3103, 3106, 3107 cross fe-sw1; 3100, 3101, 3104, 3105 do not
+  ping id 3100 (via fe-sw2): sent 302, answered 302, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +21.51 s to +21.84 s
+    the guest's ping: 302 transmitted, 302 received; the two witnesses agree on every round trip both saw
+  ping id 3101 (via fe-sw2): sent 302, answered 302, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +72.66 s to +73.00 s
+    the guest's ping: 302 transmitted, 302 received; the two witnesses agree on every round trip both saw
+  ping id 3102 (via fe-sw1): sent 302, answered 302, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +42.27 s to +42.62 s
+    the guest's ping: 302 transmitted, 302 received; the two witnesses agree on every round trip both saw
+  ping id 3103 (via fe-sw1): sent 302, answered 302, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.35 s, from +42.27 s to +42.62 s
+    the guest's ping: 302 transmitted, 302 received; the two witnesses agree on every round trip both saw
+  ping id 3104 (via fe-sw2): sent 302, answered 302, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.32 s, from +72.68 s to +73.00 s
+    the guest's ping: 302 transmitted, 302 received; the two witnesses agree on every round trip both saw
+  ping id 3105 (via fe-sw2): sent 302, answered 302, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +21.51 s to +21.84 s
+    the guest's ping: 302 transmitted, 302 received; the two witnesses agree on every round trip both saw
+  ping id 3106 (via fe-sw1): sent 302, answered 302, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +42.28 s to +42.62 s
+    the guest's ping: 302 transmitted, 302 received; the two witnesses agree on every round trip both saw
+  ping id 3107 (via fe-sw1): sent 302, answered 302, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +42.28 s to +42.62 s
+    the guest's ping: 302 transmitted, 302 received; the two witnesses agree on every round trip both saw
+  tcp connects to the users' VIP: 296 attempts, 2 failed (2 at the cut, 0 at the restore, 0 elsewhere)
+    attempts in the cut window by the firewall leg their SYN took: {'fe-sw2': 39, 'fe-sw1': 8}
+    failed run: last ok 3.307, first failed +3.61 s, first ok after 4.608, 1 failed, SYN legs {'fe-sw1': 1}
+    failed run: last ok 4.608, first failed +4.91 s, first ok after 5.909, 1 failed, SYN legs {'fe-sw1': 1}
+  peer link, packets per second from the host-side counters of its member ports:
+    before fe-sw1: tx 3.3 rx 3.0 over 3.62 s
+    before fe-sw2: tx 2.8 rx 3.3 over 3.63 s
+    during fe-sw1: tx 7.1 rx 4.4 over 20.0 s
+    during fe-sw2: tx 4.5 rx 7.2 over 20.0 s
+    after  fe-sw1: tx 3.4 rx 2.9 over 10.66 s
+    after  fe-sw2: tx 3.1 rx 3.4 over 10.65 s
+  KNOWN pass 3 fw-leg: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+== pass 3, drill server-member: k8s-gpu1's member on fe-sw1 shut from the switch side
+drill: pass 3 server-member (k8s-gpu1's member on fe-sw1 shut from the switch side)
+  PASS  pass 3 server-member: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 3 server-member: probes located before the fault as the drill needs them (try 1): ping: 4 of 8 ids cross fe-sw1, 4 do not
+  PASS  pass 3 server-member: KLISH shutdown of Ethernet6 (PortChannel21) on fe-sw1 accepted
+  PASS  pass 3 server-member: no shutdown accepted on fe-sw1 after 30 s
+  PASS  pass 3 server-member: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+drills: 0 Warning event(s) archived in pass3/server-member/events and cleared
+  PASS  pass 3 server-member: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+drill server-member, pass 3: k8s-gpu1's member on fe-sw1 shut from the switch side
+  target switch fe-sw1; every time on the lab host's clock, relative to the cut (T0)
+  the fault's session took 3.49 s (T0 is when it started)
+  placement: ping: 4 of 8 ids cross fe-sw1, 4 do not
+  ping 3102, 3103, 3106, 3107 cross fe-sw1; 3100, 3101, 3104, 3105 do not
+  ping id 3100 (via fe-sw2): sent 300, answered 300, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.32 s, from +58.28 s to +58.60 s
+    the guest's ping: 300 transmitted, 300 received; the two witnesses agree on every round trip both saw
+  ping id 3101 (via fe-sw2): sent 300, answered 300, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.32 s, from +58.28 s to +58.60 s
+    the guest's ping: 300 transmitted, 300 received; the two witnesses agree on every round trip both saw
+  ping id 3102 (via fe-sw1): sent 299, answered 292, round trips lost 7
+    7 lost at the cut
+    first lost sent at +3.51 s, last at +5.34 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 2.43 s, from +3.21 s to +5.64 s
+    the guest's ping: 299 transmitted, 292 received; the two witnesses agree on every round trip both saw
+  ping id 3103 (via fe-sw1): sent 299, answered 292, round trips lost 7
+    7 lost at the cut
+    first lost sent at +3.52 s, last at +5.34 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 2.43 s, from +3.22 s to +5.64 s
+    18 duplicate replies
+    the guest's ping: 299 transmitted, 292 received; the two witnesses agree on every round trip both saw
+  ping id 3104 (via fe-sw2): sent 300, answered 300, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.32 s, from +68.52 s to +68.83 s
+    the guest's ping: 300 transmitted, 300 received; the two witnesses agree on every round trip both saw
+  ping id 3105 (via fe-sw2): sent 299, answered 299, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.35 s, from +15.26 s to +15.61 s
+    the guest's ping: 299 transmitted, 299 received; the two witnesses agree on every round trip both saw
+  ping id 3106 (via fe-sw1): sent 299, answered 292, round trips lost 7
+    7 lost at the cut
+    first lost sent at +3.52 s, last at +5.35 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 2.43 s, from +3.23 s to +5.65 s
+    34 duplicate replies
+    the guest's ping: 299 transmitted, 292 received; the two witnesses agree on every round trip both saw
+  ping id 3107 (via fe-sw1): sent 299, answered 292, round trips lost 7
+    7 lost at the cut
+    first lost sent at +3.53 s, last at +5.35 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 2.43 s, from +3.23 s to +5.66 s
+    2 duplicate replies
+    the guest's ping: 299 transmitted, 292 received; the two witnesses agree on every round trip both saw
+  tcp connects to the users' VIP: 299 attempts, 0 failed (0 at the cut, 0 at the restore, 0 elsewhere)
+    attempts in the cut window by the firewall leg their SYN took: {'fe-sw1': 26, 'fe-sw2': 25}
+  peer link, packets per second from the host-side counters of its member ports:
+    before fe-sw1: tx 3.1 rx 3.3 over 3.59 s
+    before fe-sw2: tx 3.3 rx 3.0 over 3.62 s
+    during fe-sw1: tx 22.2 rx 4.4 over 19.97 s
+    during fe-sw2: tx 4.5 rx 22.4 over 19.98 s
+    after  fe-sw1: tx 3.4 rx 3.1 over 10.67 s
+    after  fe-sw2: tx 3.1 rx 3.2 over 10.63 s
+  KNOWN pass 3 server-member: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+  KNOWN pass 3 server-member: 54 duplicate ping replies (peer-link isolation is not enforced): L1
+== pass 3, drill peer-link: the peer link shut on fe-sw1 with the keepalive link up
+drill: pass 3 peer-link (the peer link shut on fe-sw1 with the keepalive link up)
+  PASS  pass 3 peer-link: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 3 peer-link: probes located before the fault as the drill needs them (try 1): ping: requests leave fe-sw1, fe-sw2
+  PASS  pass 3 peer-link: KLISH shutdown of Ethernet0,Ethernet1 (PortChannel1) on fe-sw1 accepted
+  PASS  pass 3 peer-link: no shutdown accepted on fe-sw1 after 30 s
+  PASS  pass 3 peer-link: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+drills: 0 Warning event(s) archived in pass3/peer-link/events and cleared
+  PASS  pass 3 peer-link: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+drill peer-link, pass 3: the peer link shut on fe-sw1 with the keepalive link up
+  target switch fe-sw1; every time on the lab host's clock, relative to the cut (T0)
+  the fault's session took 3.44 s (T0 is when it started)
+  placement: ping: requests leave fe-sw1, fe-sw2
+  ping 3102, 3103, 3106, 3107 cross fe-sw1; 3100, 3101, 3104, 3105 do not
+  ping id 3100 (via fe-sw2): sent 252, answered 252, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +46.23 s to +46.56 s
+    the guest's ping: 252 transmitted, 252 received; the two witnesses agree on every round trip both saw
+  ping id 3101 (via fe-sw2): sent 252, answered 252, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.32 s, from +46.24 s to +46.56 s
+    the guest's ping: 252 transmitted, 252 received; the two witnesses agree on every round trip both saw
+  ping id 3102 (via fe-sw1): sent 252, answered 252, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from -4.63 s to -4.29 s
+    the guest's ping: 252 transmitted, 252 received; the two witnesses agree on every round trip both saw
+  ping id 3103 (via fe-sw1): sent 252, answered 252, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from -4.62 s to -4.29 s
+    the guest's ping: 252 transmitted, 252 received; the two witnesses agree on every round trip both saw
+  ping id 3104 (via fe-sw2): sent 252, answered 252, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.33 s, from +46.23 s to +46.56 s
+    the guest's ping: 252 transmitted, 252 received; the two witnesses agree on every round trip both saw
+  ping id 3105 (via fe-sw2): sent 252, answered 252, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.32 s, from +46.24 s to +46.56 s
+    the guest's ping: 252 transmitted, 252 received; the two witnesses agree on every round trip both saw
+  ping id 3106 (via fe-sw1): sent 252, answered 252, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.32 s, from +48.65 s to +48.96 s
+    the guest's ping: 252 transmitted, 252 received; the two witnesses agree on every round trip both saw
+  ping id 3107 (via fe-sw1): sent 252, answered 252, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +15.85 s to +16.20 s
+    the guest's ping: 252 transmitted, 252 received; the two witnesses agree on every round trip both saw
+  tcp connects to the users' VIP: 251 attempts, 0 failed (0 at the cut, 0 at the restore, 0 elsewhere)
+    attempts in the cut window by the firewall leg their SYN took: {'fe-sw1': 26, 'fe-sw2': 26}
+  KNOWN pass 3 peer-link: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+drills: 0 Warning event(s) archived in events-after and cleared
+== the passes compared
+Passes compared: pass1, pass2, pass3 in sfab-ch03_drills_20261029T043553Z
+
+## fw-leg
+
+| measure | across every pass and probe | agrees? |
+|---|---|---|
+| placed before the fault | pass 1 yes, pass 2 yes, pass 3 yes | yes |
+| ping round trips lost, ids crossing fe-sw1 | 0 | yes |
+|   of them at the cut | 0 | yes |
+|   of them at the restore | 0 | yes |
+| ping round trips lost, ids not crossing fe-sw1 | 0 | yes |
+| longest stretch with no reply at the cut, ids crossing fe-sw1 (s) | 0.31 to 0.34 | - |
+| ping ids crossing the target, per pass | pass 1 4 of 8, pass 2 4 of 8, pass 3 4 of 8 | - |
+| TCP connects failed at the cut | 2 to 3 | yes |
+| TCP connects failed at the restore | 0 | yes |
+| TCP connects failed elsewhere | 0 | yes |
+| peer link tx packets per second on fe-sw1, before | 2.8 to 3.3 | - |
+| peer link tx packets per second on fe-sw2, before | 2.8 to 3.6 | - |
+| peer link tx packets per second on fe-sw1, during | 6.5 to 7.5 | - |
+| peer link tx packets per second on fe-sw2, during | 4.3 to 4.5 | - |
+| peer link tx packets per second on fe-sw1, after | 3.2 to 3.5 | - |
+| peer link tx packets per second on fe-sw2, after | 2.9 to 3.1 | - |
+
+## server-member
+
+| measure | across every pass and probe | agrees? |
+|---|---|---|
+| placed before the fault | pass 1 yes, pass 2 yes, pass 3 yes | yes |
+| ping round trips lost, ids crossing fe-sw1 | 7 to 10 | yes |
+|   of them at the cut | 7 to 10 | yes |
+|   of them at the restore | 0 | yes |
+| ping round trips lost, ids not crossing fe-sw1 | 0 | yes |
+| longest stretch with no reply at the cut, ids crossing fe-sw1 (s) | 2.43 to 3.34 | - |
+| ping ids crossing the target, per pass | pass 1 4 of 8, pass 2 4 of 8, pass 3 4 of 8 | - |
+| TCP connects failed at the cut | 0 | yes |
+| TCP connects failed at the restore | 0 | yes |
+| TCP connects failed elsewhere | 0 | yes |
+| peer link tx packets per second on fe-sw1, before | 3 to 3.6 | - |
+| peer link tx packets per second on fe-sw2, before | 3.3 | - |
+| peer link tx packets per second on fe-sw1, during | 21 to 22.2 | - |
+| peer link tx packets per second on fe-sw2, during | 3.4 to 4.5 | - |
+| peer link tx packets per second on fe-sw1, after | 3.4 to 3.6 | - |
+| peer link tx packets per second on fe-sw2, after | 2.8 to 3.1 | - |
+
+## peer-link
+
+| measure | across every pass and probe | agrees? |
+|---|---|---|
+| placed before the fault | pass 1 yes, pass 2 yes, pass 3 yes | yes |
+| ping round trips lost, ids crossing fe-sw1 | 0 | yes |
+|   of them at the cut | 0 | yes |
+|   of them at the restore | 0 | yes |
+| ping round trips lost, ids not crossing fe-sw1 | 0 | yes |
+| longest stretch with no reply at the cut, ids crossing fe-sw1 (s) | 0.30 to 0.34 | - |
+| ping ids crossing the target, per pass | pass 1 4 of 8, pass 2 4 of 8, pass 3 4 of 8 | - |
+| TCP connects failed at the cut | 0 | yes |
+| TCP connects failed at the restore | 0 | yes |
+| TCP connects failed elsewhere | 0 | yes |
+
+Ranges span every probe instance of every pass. A ping lost is a round trip lost, on either leg.
+
+no disagreement between the passes
+  PASS  compare_passes.py: no disagreement between the passes
+== RESULT: 55 passed, 0 failed, 11 known platform limitation(s), 0 skipped
+== result set: ch03/audits/sfab-ch03_drills_20261029T043553Z
+
+Script done on 2026-10-29 05:04:29+00:00 [COMMAND_EXIT_CODE="0"]

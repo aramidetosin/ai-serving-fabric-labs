@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# sfab: run the lab generator (python3 -m sfab) from any directory.
+# Usage: common/bin/sfab render|check|lint|show <labdir> [options]
+set -euo pipefail
+
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+common="$(dirname "$here")"
+
+export PYTHONDONTWRITEBYTECODE=1
+export PYTHONPATH="${common}${PYTHONPATH:+:${PYTHONPATH}}"
+exec python3 -m sfab "$@"

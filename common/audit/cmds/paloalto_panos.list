@@ -1,0 +1,18 @@
+# The PA-VM: SLUG SURFACE COMMAND (see README.md). No line prints a credential or an API key.
++commit_marker       host        fw_commit_marker
++delivered_config    host-xml    fw_delivered_config
++container_links     host-json   container_links
+system_info          cli         show system info
++interface_all       cli         show interface all
++lacp                cli         show lacp aggregate-ethernet all
++iface_{subif}       cli         show interface {subif}
+routing_route        cli         show routing route
+running_security     cli         show running security-policy
+running_nat          cli         show running nat-policy
++config_set          cli-set     show
++vpn_ike_sa          cli         show vpn ike-sa
++vpn_ipsec_sa        cli         show vpn ipsec-sa
+interface_all_xml    xml         <show><interface>all</interface></show>
+# Chapter 4's edge checks (judge.py fw-edge): the firewall's own NTP, synched to the bastion through
+# its service route. Its counters, sessions and log reads around a probe are audit_fw_edge's.
+ntp                  cli         show ntp

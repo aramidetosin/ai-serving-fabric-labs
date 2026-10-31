@@ -1,0 +1,15 @@
+pass 3 dark-switch: rail-sw1 dark (rails 1, 3, 5, 7); shut session 1.29 s, dark 28.64 s, restore session 1.24 s (host clock)
+row          expect       before      dark  arrived  replied   arp     after  return s  guest rx  unreach
+same-1       dark        45/45      0/77          0        0    15   90/90       5.163       146       50
+same-2       answered    45/45    138/138       138      138     -   98/98       0.203       299        0
+same-3       dark        45/45      0/77          0        0    16   90/90       5.227       146       50
+same-4       answered    45/45    137/137       137      137     -   99/99       0.035       299        0
+same-5       dark        45/45      0/94          0        0    12   86/86       4.843       142       40
+same-6       answered    45/45    137/137       137      137     -   98/98       0.043       298        0
+same-7       dark        45/45      0/77          0        0    15   89/89       5.419       145       50
+same-8       answered    45/45    137/137       137      137     -   98/98       0.043       298        0
+cross-2-1    dark        45/45      0/77          0        0    15   90/90       5.163       146       18
+cross-1-2    dark        45/45      0/138       138       98    11   84/98       4.363       140        0
+cross-2-4    answered    45/45    138/138       138      138     -   98/98       0.203       299        0
+
+before, dark, after: answered of the requests that left the source's container port (host clock; a reply over 1000 ms counts as lost); arrived, replied: dark requests seen at the far node's port and its replies leaving it; arp: ARP requests for the far address on the dead rail while dark (from the source on a dead request rail, from the far node on a dead reply rail); guest rx: replies the guest's ping counted; unreach: its Destination Host Unreachable lines

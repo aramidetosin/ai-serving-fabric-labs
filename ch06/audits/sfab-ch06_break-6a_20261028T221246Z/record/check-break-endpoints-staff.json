@@ -1,0 +1,85 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "addressType": "IPv4",
+            "apiVersion": "discovery.k8s.io/v1",
+            "endpoints": [
+                {
+                    "addresses": [
+                        "10.22.1.1"
+                    ],
+                    "conditions": {
+                        "ready": true,
+                        "serving": true,
+                        "terminating": false
+                    },
+                    "nodeName": "k8s-gpu1",
+                    "targetRef": {
+                        "kind": "Pod",
+                        "name": "staff-a-server-0",
+                        "namespace": "serving",
+                        "uid": "20f110a3-3195-4fb5-bd9a-00439e595ee4"
+                    }
+                },
+                {
+                    "addresses": [
+                        "10.22.2.81"
+                    ],
+                    "conditions": {
+                        "ready": true,
+                        "serving": true,
+                        "terminating": false
+                    },
+                    "nodeName": "k8s-gpu2",
+                    "targetRef": {
+                        "kind": "Pod",
+                        "name": "staff-b-server-0",
+                        "namespace": "serving",
+                        "uid": "99e7bf20-4db8-48c8-835d-d862512f35b6"
+                    }
+                }
+            ],
+            "kind": "EndpointSlice",
+            "metadata": {
+                "annotations": {
+                    "endpoints.kubernetes.io/last-change-trigger-time": "2026-10-28T20:48:09Z"
+                },
+                "creationTimestamp": "2026-10-28T20:48:09Z",
+                "generateName": "staff-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/name": "serving",
+                    "endpointslice.kubernetes.io/managed-by": "endpointslice-controller.k8s.io",
+                    "kubernetes.io/service-name": "staff",
+                    "tarnwick.example/model": "staff"
+                },
+                "name": "staff-pklsm",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Service",
+                        "name": "staff",
+                        "uid": "80f4101e-e5b8-4088-9a17-6479b8e34812"
+                    }
+                ],
+                "resourceVersion": "3986",
+                "uid": "2909d256-5168-42d0-b130-f45883d4ca64"
+            },
+            "ports": [
+                {
+                    "name": "http",
+                    "port": 8080,
+                    "protocol": "TCP"
+                }
+            ]
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

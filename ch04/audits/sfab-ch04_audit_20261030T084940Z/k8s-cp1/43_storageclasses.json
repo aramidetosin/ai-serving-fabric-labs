@@ -1,0 +1,68 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "allowVolumeExpansion": true,
+            "apiVersion": "storage.k8s.io/v1",
+            "kind": "StorageClass",
+            "metadata": {
+                "annotations": {
+                    "meta.helm.sh/release-name": "truenas-nfs",
+                    "meta.helm.sh/release-namespace": "democratic-csi"
+                },
+                "creationTimestamp": "2026-10-30T07:36:12Z",
+                "labels": {
+                    "app.kubernetes.io/instance": "truenas-nfs",
+                    "app.kubernetes.io/managed-by": "Helm",
+                    "app.kubernetes.io/name": "democratic-csi",
+                    "decision.tarnwick.example/id": "dec-storage-data-address",
+                    "helm.sh/chart": "democratic-csi-0.15.1"
+                },
+                "name": "truenas-nfs",
+                "resourceVersion": "4069",
+                "uid": "88642097-98be-4345-a2b2-924875b4b6cf"
+            },
+            "parameters": {
+                "detachedVolumesFromSnapshots": "false",
+                "fsType": "nfs"
+            },
+            "provisioner": "org.democratic-csi.nfs",
+            "reclaimPolicy": "Delete",
+            "volumeBindingMode": "Immediate"
+        },
+        {
+            "allowVolumeExpansion": true,
+            "apiVersion": "storage.k8s.io/v1",
+            "kind": "StorageClass",
+            "metadata": {
+                "annotations": {
+                    "meta.helm.sh/release-name": "truenas-nvmeof",
+                    "meta.helm.sh/release-namespace": "democratic-csi",
+                    "storageclass.kubernetes.io/is-default-class": "true"
+                },
+                "creationTimestamp": "2026-10-30T07:35:16Z",
+                "labels": {
+                    "app.kubernetes.io/instance": "truenas-nvmeof",
+                    "app.kubernetes.io/managed-by": "Helm",
+                    "app.kubernetes.io/name": "democratic-csi",
+                    "decision.tarnwick.example/id": "dec-storage-data-address",
+                    "helm.sh/chart": "democratic-csi-0.15.1"
+                },
+                "name": "truenas-nvmeof",
+                "resourceVersion": "3570",
+                "uid": "5f89ffd1-a22a-48f0-9831-0d890dc81f1a"
+            },
+            "parameters": {
+                "detachedVolumesFromSnapshots": "false",
+                "fsType": "ext4"
+            },
+            "provisioner": "org.democratic-csi.nvmeof",
+            "reclaimPolicy": "Delete",
+            "volumeBindingMode": "Immediate"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

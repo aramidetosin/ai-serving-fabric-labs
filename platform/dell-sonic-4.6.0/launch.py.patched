@@ -1,0 +1,244 @@
+#!/usr/bin/env python3
+# From vrnetlab, https://github.com/srl-labs/vrnetlab: dell/dell_sonic/docker/launch.py at commit
+# 3a34fa63d73843c871f248e2df2ffa5c038183ce (the file is unchanged there since commit fd759f10587d).
+# Copyright (c) 2016 Kristian Larsson. MIT License: the full notice is in LICENSE.vrnetlab, beside
+# this file. README.md, beside it too, says how this copy differs from vrnetlab's (Building it).
+
+import datetime
+import logging
+import os
+import re
+import signal
+import subprocess
+import sys
+import time
+
+import vrnetlab
+
+CONFIG_FILE = "/config/config_db.json"
+DEFAULT_USER = "admin"
+# The image's factory-default login, as given in the knowledge base article 000218783, "Dell
+# Networking SONiC: Secure Shell based login". bootstrap_spin logs in with it at the console's first
+# login prompt, and bootstrap_config then sets the password containerlab passes (--password).
+DEFAULT_PASSWORD = "YourPaSsWoRd"
+
+
+def handle_SIGCHLD(_signal, _frame):
+    os.waitpid(-1, os.WNOHANG)
+
+
+def handle_SIGTERM(_signal, _frame):
+    sys.exit(0)
+
+
+signal.signal(signal.SIGINT, handle_SIGTERM)
+signal.signal(signal.SIGTERM, handle_SIGTERM)
+signal.signal(signal.SIGCHLD, handle_SIGCHLD)
+
+TRACE_LEVEL_NUM = 9
+logging.addLevelName(TRACE_LEVEL_NUM, "TRACE")
+
+
+def trace(self, message, *args, **kws):
+    # Yes, logger takes its '*args' as 'args'.
+    if self.isEnabledFor(TRACE_LEVEL_NUM):
+        self._log(TRACE_LEVEL_NUM, message, args, **kws)
+
+
+logging.Logger.trace = trace
+
+
+class Dell_Sonic_VM(vrnetlab.VM):
+    def __init__(self, hostname, username, password, conn_mode):
+        disk_image = "/"
+        for e in os.listdir("/"):
+            if re.search(".qcow2$", e):
+                disk_image = "/" + e
+                break
+        super(Dell_Sonic_VM, self).__init__(
+            username, password, disk_image=disk_image, ram=4096, smp="2"
+        )
+        self.nic_type = "virtio-net-pci"
+        self.conn_mode = conn_mode
+        # sfab: the data NIC count is set per node (NUM_NICS); Dell warns that fewer adapters than the emulated platform has ports can make syncd fail
+        self.num_nics = int(os.getenv("NUM_NICS", "10"))
+        self.hostname = hostname
+
+    def bootstrap_spin(self):
+        """This function should be called periodically to do work."""
+
+        if self.spins > 3000:
+            # too many spins with no result ->  give up
+            self.stop()
+            self.start()
+            return
+
+        ridx, match, res = self.tn.expect([b"login:"], 1)
+        if match and ridx == 0:  # login
+            self.logger.info("VM started")
+
+            # Login
+            self.wait_write("\r", None)
+            self.wait_write(DEFAULT_USER, wait="login:")
+            self.wait_write(DEFAULT_PASSWORD, wait="Password:")
+            self.wait_write("", wait="%s@" % (self.username))
+            self.logger.info("Login completed")
+
+            # run main config!
+            self.bootstrap_config()
+            self.startup_config()
+            # close telnet connection
+            self.tn.close()
+            # startup time?
+            startup_time = datetime.datetime.now() - self.start_time
+            self.logger.info(f"Startup complete in: {startup_time}")
+            # mark as running
+            self.running = True
+            return
+
+        # no match, if we saw some output from the router it's probably
+        # booting, so let's give it some more time
+        if res != b"":
+            self.logger.trace("OUTPUT: %s" % res.decode())
+            # reset spins if we saw some output
+            self.spins = 0
+
+        self.spins += 1
+
+        return
+
+    def bootstrap_config(self):
+        """sfab bootstrap for SONiC 4.6.0 under containerlab.
+
+        1. Set the containerlab password.
+        2. Clear the first-boot deadlock: the ntpsec-ntpdate if-up hook starts ntpsec, which waits for
+           networking, which waits for ifup, which waits for the hook. Until it clears, interfaces-config
+           never finishes, hostcfgd never starts, eth0 stays down and sshd listens on IPv6 only.
+        3. Wait until systemd reports the system running (or degraded).
+        4. Configure the management interface (slirp: 10.0.0.15/24, gateway 10.0.0.2) and the hostname
+           through sonic-cli (KLISH), then write memory.
+        """
+        self.logger.info("applying bootstrap configuration")
+        self.wait_write("sudo -i", "$")
+        self.wait_write("passwd -q %s" % (self.username), "#")
+        self.wait_write(self.password, "New password:")
+        self.wait_write(self.password, "password:")
+        self.wait_write("sleep 1", "#")
+        clear = ("chmod -x /etc/network/if-up.d/ntpsec-ntpdate; "
+                 "pkill -f /etc/network/if-up.d/ntpsec-ntpdate; "
+                 "pkill -f 'invoke-rc.d --quiet ntpsec start'; "
+                 "systemctl mask --now fstrim.timer >/dev/null 2>&1; systemctl stop fstrim.service >/dev/null 2>&1; "
+                 "pkill -f 'smartctl -a' ; echo SFAB_HOOK_CLEARED")
+        self.wait_write(clear, "#")
+        gro_unit = "W1VuaXRdCkRlc2NyaXB0aW9uPXNmYWI6IEdSTyBhbmQgTFJPIG9mZiBvbiB0aGUgZGF0YSBOSUNzICh2cyBTQUkgY2Fubm90IHRha2UgbWVyZ2VkIGZyYW1lcyBvdmVyIDE2Mzg0IGJ5dGVzKQpBZnRlcj1uZXR3b3JrLnRhcmdldAoKW1NlcnZpY2VdClR5cGU9b25lc2hvdApFeGVjU3RhcnQ9L2Jpbi9zaCAtYyAnZm9yIGkgaW4gJCQobHMgL3N5cy9jbGFzcy9uZXQgfCBncmVwIC1FICJeZXRoWzEtOV1bMC05XSokJCIpOyBkbyAvdXNyL3NiaW4vZXRodG9vbCAtSyAkJGkgZ3JvIG9mZiByeC1ncm8taHcgb2ZmIGxybyBvZmY7IGRvbmU7IHRydWUnClJlbWFpbkFmdGVyRXhpdD15ZXMKCltJbnN0YWxsXQpXYW50ZWRCeT1tdWx0aS11c2VyLnRhcmdldAo="
+        self.wait_write("echo %s | base64 -d > /etc/systemd/system/sfab-gro-off.service && systemctl daemon-reload && systemctl enable --now sfab-gro-off.service >/dev/null 2>&1; echo SFAB_GRO_OFF" % gro_unit, "#")
+        # ZTP otherwise keeps discovering, rewrites port-group speeds and floods the console.
+        # It reloads services; the next '#' prompt only appears once it has finished.
+        self.wait_write("ztp disable -y", "#")
+        self.wait_write("echo SFAB_ZTP_DONE", "#")
+        ready = False
+        attempt = 0
+        for attempt in range(90):
+            # never wait on a prompt inside this loop: expect() may consume it, and a later wait would block
+            self.wait_write('echo "SFAB_STATE=$(systemctl is-system-running)"', None)
+            ridx, match, res = self.tn.expect(
+                [rb"SFAB_STATE=(running|degraded)", rb"SFAB_STATE=(starting|initializing|maintenance|stopping|offline|unknown)"], 30)
+            if match and ridx == 0:
+                ready = True
+                break
+            time.sleep(10)
+        self.logger.info("system ready: %s after %d checks" % (ready, attempt + 1))
+        self.wait_write("", None)
+        self.tn.read_until(b"#", 30)
+        self.wait_write("exit", None)
+        self.wait_write("sonic-cli", "$")
+        self.wait_write("terminal length 0", "#")
+        self.wait_write("configure terminal", "#")
+        self.wait_write("interface Management 0", "(config)#")
+        self.wait_write("ip address %s gwaddr %s" % (self.mgmt_address_ipv4, self.mgmt_gw_ipv4), "(config-if-Management0)#")
+        self.wait_write("no shutdown", "(config-if-Management0)#")
+        self.wait_write("exit", "(config-if-Management0)#")
+        self.wait_write("hostname %s" % self.hostname, "(config)#")
+        self.wait_write("end", "(config)#")
+        self.wait_write("write memory", "#")
+        self.wait_write("exit", "#")
+        self.wait_write("logout", "$")
+        self.logger.info("completed bootstrap configuration")
+
+    def startup_config(self):
+        """Apply a startup configuration if one is mounted.
+
+        /config/startup-config.cfg: KLISH lines, typed into sonic-cli on the serial console, then write memory.
+        /config/config_db.json: the upstream path (backup.sh restore).
+        """
+        klish = "/config/startup-config.cfg"
+        if os.path.exists(klish):
+            self.logger.info("typing KLISH startup config %s" % klish)
+            self.wait_write("\r", None)
+            self.wait_write(self.username, "login:")
+            self.wait_write(self.password, "Password:")
+            self.wait_write("sonic-cli", "$")
+            self.wait_write("terminal length 0", "#")
+            with open(klish) as f:
+                for line in f:
+                    line = line.rstrip("\n")
+                    if not line.strip() or line.lstrip().startswith("!"):
+                        continue
+                    self.wait_write(line, None)
+                    time.sleep(0.3)
+            self.wait_write("end", None)
+            self.wait_write("write memory", "#")
+            self.wait_write("exit", "#")
+            self.wait_write("logout", "$")
+            self.logger.info("KLISH startup config applied")
+            return
+        if not os.path.exists(CONFIG_FILE):
+            self.logger.trace(f"Startup config file {CONFIG_FILE} is not provided, nothing to do")
+            return
+        self.logger.trace(f"Startup config file {CONFIG_FILE} found, copying it to the VM")
+        subprocess.run(f"/backup.sh -u {self.username} -p {self.password} restore", check=True, shell=True)
+
+
+class Dell_SONiC(vrnetlab.VR):
+    def __init__(self, hostname, username, password, conn_mode):
+        super().__init__(username, password)
+        self.vms = [Dell_Sonic_VM(hostname, username, password, conn_mode)]
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="")
+    parser.add_argument(
+        "--trace", action="store_true", help="enable trace level logging"
+    )
+    parser.add_argument("--hostname", default="sonic", help="SONiC hostname")
+    parser.add_argument("--username", default="admin", help="Username")
+    parser.add_argument("--password", default="admin", help="Password")
+    parser.add_argument(
+        "--connection-mode", default="tc", help="Connection mode to use in the datapath"
+    )
+    args = parser.parse_args()
+
+    LOG_FORMAT = "%(asctime)s: %(module)-10s %(levelname)-8s %(message)s"
+    logging.basicConfig(format=LOG_FORMAT)
+    logger = logging.getLogger()
+
+    logger.setLevel(logging.DEBUG)
+    if args.trace:
+        logger.setLevel(1)
+
+    for _f in ['/proc/sys/net/ipv6/conf/default/disable_ipv6'] + sorted(
+            '/proc/sys/net/ipv6/conf/%s/disable_ipv6' % _n for _n in os.listdir('/proc/sys/net/ipv6/conf')
+            if re.match(r'^eth[1-9][0-9]*$', _n)):
+        try:
+            open(_f, 'w').write('1')
+        except OSError:
+            pass
+    vr = Dell_SONiC(
+        args.hostname,
+        args.username,
+        args.password,
+        conn_mode=args.connection_mode,
+    )
+    vr.start()

@@ -1,0 +1,252 @@
+{
+  "access": {
+    "Ethernet0": {
+      "desc": "k8s-gpu1-eth3",
+      "eth": "eth1",
+      "kind": "oob",
+      "peer": "k8s-gpu1:eth3",
+      "rail": null,
+      "vlan": 90
+    },
+    "Ethernet1": {
+      "desc": "k8s-gpu2-eth3",
+      "eth": "eth2",
+      "kind": "oob",
+      "peer": "k8s-gpu2:eth3",
+      "rail": null,
+      "vlan": 90
+    },
+    "Ethernet2": {
+      "desc": "fw-eth3",
+      "eth": "eth3",
+      "kind": "oob",
+      "peer": "fw:eth3",
+      "rail": null,
+      "vlan": 90
+    },
+    "Ethernet3": {
+      "desc": "k8s-cp1-eth3",
+      "eth": "eth4",
+      "kind": "oob",
+      "peer": "k8s-cp1:eth3",
+      "rail": null,
+      "vlan": 90
+    },
+    "Ethernet4": {
+      "desc": "k8s-cp2-eth3",
+      "eth": "eth5",
+      "kind": "oob",
+      "peer": "k8s-cp2:eth3",
+      "rail": null,
+      "vlan": 90
+    },
+    "Ethernet5": {
+      "desc": "k8s-cp3-eth3",
+      "eth": "eth6",
+      "kind": "oob",
+      "peer": "k8s-cp3:eth3",
+      "rail": null,
+      "vlan": 90
+    },
+    "Ethernet6": {
+      "desc": "k8s-ingress1-eth3",
+      "eth": "eth7",
+      "kind": "oob",
+      "peer": "k8s-ingress1:eth3",
+      "rail": null,
+      "vlan": 90
+    },
+    "Ethernet7": {
+      "desc": "k8s-ingress2-eth3",
+      "eth": "eth8",
+      "kind": "oob",
+      "peer": "k8s-ingress2:eth3",
+      "rail": null,
+      "vlan": 90
+    }
+  },
+  "addresses": {
+    "data": [],
+    "ip_interfaces": [
+      {
+        "address": "10.0.0.15/24",
+        "gateway": "10.0.0.2",
+        "interface": "Management0",
+        "source": "slirp",
+        "vrf": "mgmt"
+      }
+    ]
+  },
+  "bgp": null,
+  "container": "sfab-ch03-oob-sw",
+  "es": null,
+  "evpn": null,
+  "keepalive": null,
+  "known_macs": {
+    "02:5a:65:00:00:03": {
+      "node": "k8s-cp1",
+      "source": "nic",
+      "via": "Ethernet3",
+      "vlan": 90
+    },
+    "02:5a:66:00:00:03": {
+      "node": "k8s-cp2",
+      "source": "nic",
+      "via": "Ethernet4",
+      "vlan": 90
+    },
+    "02:5a:67:00:00:03": {
+      "node": "k8s-cp3",
+      "source": "nic",
+      "via": "Ethernet5",
+      "vlan": 90
+    },
+    "02:5a:68:00:00:03": {
+      "node": "k8s-ingress1",
+      "source": "nic",
+      "via": "Ethernet6",
+      "vlan": 90
+    },
+    "02:5a:69:00:00:03": {
+      "node": "k8s-ingress2",
+      "source": "nic",
+      "via": "Ethernet7",
+      "vlan": 90
+    },
+    "02:5a:6f:00:00:03": {
+      "node": "k8s-gpu1",
+      "source": "nic",
+      "via": "Ethernet0",
+      "vlan": 90
+    },
+    "02:5a:70:00:00:03": {
+      "node": "k8s-gpu2",
+      "source": "nic",
+      "via": "Ethernet1",
+      "vlan": 90
+    }
+  },
+  "lab": "sfab-ch03",
+  "mclag": null,
+  "mgmt": "172.21.40.31",
+  "mgmt_vrf": "mgmt",
+  "num_nics": 8,
+  "passthrough": false,
+  "portchannels": {},
+  "ports": {
+    "Ethernet0": {
+      "admin": "up",
+      "desc": "k8s-gpu1-eth3",
+      "eth": "eth1",
+      "mtu": 9100,
+      "peer": "k8s-gpu1:eth3",
+      "portchannel": null,
+      "role": "oob"
+    },
+    "Ethernet1": {
+      "admin": "up",
+      "desc": "k8s-gpu2-eth3",
+      "eth": "eth2",
+      "mtu": 9100,
+      "peer": "k8s-gpu2:eth3",
+      "portchannel": null,
+      "role": "oob"
+    },
+    "Ethernet2": {
+      "admin": "up",
+      "desc": "fw-eth3",
+      "eth": "eth3",
+      "mtu": 9100,
+      "peer": "fw:eth3",
+      "portchannel": null,
+      "role": "oob"
+    },
+    "Ethernet3": {
+      "admin": "up",
+      "desc": "k8s-cp1-eth3",
+      "eth": "eth4",
+      "mtu": 9100,
+      "peer": "k8s-cp1:eth3",
+      "portchannel": null,
+      "role": "oob"
+    },
+    "Ethernet4": {
+      "admin": "up",
+      "desc": "k8s-cp2-eth3",
+      "eth": "eth5",
+      "mtu": 9100,
+      "peer": "k8s-cp2:eth3",
+      "portchannel": null,
+      "role": "oob"
+    },
+    "Ethernet5": {
+      "admin": "up",
+      "desc": "k8s-cp3-eth3",
+      "eth": "eth6",
+      "mtu": 9100,
+      "peer": "k8s-cp3:eth3",
+      "portchannel": null,
+      "role": "oob"
+    },
+    "Ethernet6": {
+      "admin": "up",
+      "desc": "k8s-ingress1-eth3",
+      "eth": "eth7",
+      "mtu": 9100,
+      "peer": "k8s-ingress1:eth3",
+      "portchannel": null,
+      "role": "oob"
+    },
+    "Ethernet7": {
+      "admin": "up",
+      "desc": "k8s-ingress2-eth3",
+      "eth": "eth8",
+      "mtu": 9100,
+      "peer": "k8s-ingress2:eth3",
+      "portchannel": null,
+      "role": "oob"
+    }
+  },
+  "role": "oob_access",
+  "router": false,
+  "routes": {
+    "default": []
+  },
+  "schema": 1,
+  "switch": "oob-sw",
+  "used_ports": [
+    "Ethernet0",
+    "Ethernet1",
+    "Ethernet2",
+    "Ethernet3",
+    "Ethernet4",
+    "Ethernet5",
+    "Ethernet6",
+    "Ethernet7"
+  ],
+  "vlans": {
+    "90": {
+      "tagged": [],
+      "untagged": [
+        "Ethernet0",
+        "Ethernet1",
+        "Ethernet2",
+        "Ethernet3",
+        "Ethernet4",
+        "Ethernet5",
+        "Ethernet6",
+        "Ethernet7"
+      ]
+    }
+  },
+  "vm_data_nics": [
+    "eth1",
+    "eth2",
+    "eth3",
+    "eth4",
+    "eth5",
+    "eth6",
+    "eth7",
+    "eth8"
+  ]
+}

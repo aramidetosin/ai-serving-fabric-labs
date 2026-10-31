@@ -1,0 +1,83 @@
+{
+    "apiVersion": "gateway.networking.k8s.io/v1",
+    "kind": "HTTPRoute",
+    "metadata": {
+        "creationTimestamp": "2026-10-30T12:34:07Z",
+        "generation": 3,
+        "labels": {
+            "decision.tarnwick.example/id": "dec-routeset-enterprise",
+            "tarnwick.example/audience": "enterprise"
+        },
+        "name": "echo-gw-users",
+        "namespace": "echo",
+        "resourceVersion": "28638",
+        "uid": "9cd0a96b-00e7-4aa3-8865-d31d32bf9808"
+    },
+    "spec": {
+        "hostnames": [
+            "llm.ai.tarnwick.example"
+        ],
+        "parentRefs": [
+            {
+                "group": "gateway.networking.k8s.io",
+                "kind": "Gateway",
+                "name": "gw-users",
+                "namespace": "gateways",
+                "sectionName": "https"
+            }
+        ],
+        "rules": [
+            {
+                "backendRefs": [
+                    {
+                        "group": "",
+                        "kind": "Service",
+                        "name": "echo",
+                        "port": 8080,
+                        "weight": 1
+                    }
+                ],
+                "matches": [
+                    {
+                        "path": {
+                            "type": "PathPrefix",
+                            "value": "/echo"
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    "status": {
+        "parents": [
+            {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-30T13:52:28Z",
+                        "message": "Accepted HTTPRoute",
+                        "observedGeneration": 3,
+                        "reason": "Accepted",
+                        "status": "True",
+                        "type": "Accepted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-30T13:52:28Z",
+                        "message": "Service reference is valid",
+                        "observedGeneration": 3,
+                        "reason": "ResolvedRefs",
+                        "status": "True",
+                        "type": "ResolvedRefs"
+                    }
+                ],
+                "controllerName": "io.cilium/gateway-controller",
+                "parentRef": {
+                    "group": "gateway.networking.k8s.io",
+                    "kind": "Gateway",
+                    "name": "gw-users",
+                    "namespace": "gateways",
+                    "sectionName": "https"
+                }
+            }
+        ]
+    }
+}

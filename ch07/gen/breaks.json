@@ -1,0 +1,204 @@
+{
+  "breaks": {
+    "7a": {
+      "break": [
+        {
+          "api_gateway": {
+            "container": "apisix",
+            "hold": "/standalone/hold",
+            "name": "api-gateway",
+            "port": 9080,
+            "selector": "app.kubernetes.io/name=api-gateway",
+            "sidecar": "keys"
+          },
+          "index": 1,
+          "keys": {
+            "image": "192.0.2.6:5000/sfab/keys:3",
+            "prefix": "sk-tw",
+            "sa": "inference-keys",
+            "secret": "api-keys"
+          },
+          "kind": "key_hold",
+          "namespace": "inference"
+        },
+        {
+          "api_gateway": {
+            "container": "apisix",
+            "hold": "/standalone/hold",
+            "name": "api-gateway",
+            "port": 9080,
+            "selector": "app.kubernetes.io/name=api-gateway",
+            "sidecar": "keys"
+          },
+          "field": "batch.fa000001",
+          "id": "fa000001",
+          "keys": {
+            "image": "192.0.2.6:5000/sfab/keys:3",
+            "prefix": "sk-tw",
+            "sa": "inference-keys",
+            "secret": "api-keys"
+          },
+          "kind": "key_mint",
+          "model": "chat",
+          "namespace": "inference"
+        }
+      ],
+      "cleanup": [
+        {
+          "api_gateway": {
+            "container": "apisix",
+            "hold": "/standalone/hold",
+            "name": "api-gateway",
+            "port": 9080,
+            "selector": "app.kubernetes.io/name=api-gateway",
+            "sidecar": "keys"
+          },
+          "field": "batch.fa000001",
+          "id": "fa000001",
+          "keys": {
+            "image": "192.0.2.6:5000/sfab/keys:3",
+            "prefix": "sk-tw",
+            "sa": "inference-keys",
+            "secret": "api-keys"
+          },
+          "kind": "key_revoke",
+          "model": "chat",
+          "namespace": "inference"
+        }
+      ],
+      "exercise": 4,
+      "expect_broken": [
+        {
+          "kind": "key_pods",
+          "probe": "pods",
+          "refusing": "held"
+        },
+        {
+          "failing": "some",
+          "kind": "probe_share",
+          "probe": "users"
+        }
+      ],
+      "expect_healed": [
+        {
+          "kind": "key_pods",
+          "probe": "pods",
+          "refusing": "none"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "users"
+        }
+      ],
+      "heal": [
+        {
+          "api_gateway": {
+            "container": "apisix",
+            "hold": "/standalone/hold",
+            "name": "api-gateway",
+            "port": 9080,
+            "selector": "app.kubernetes.io/name=api-gateway",
+            "sidecar": "keys"
+          },
+          "deployment": "api-gateway",
+          "keys": {
+            "image": "192.0.2.6:5000/sfab/keys:3",
+            "prefix": "sk-tw",
+            "sa": "inference-keys",
+            "secret": "api-keys"
+          },
+          "kind": "gateway_restart",
+          "namespace": "inference",
+          "pod": "held"
+        }
+      ],
+      "id": "7a",
+      "note": null,
+      "record": [
+        {
+          "api_gateway": {
+            "container": "apisix",
+            "hold": "/standalone/hold",
+            "name": "api-gateway",
+            "port": 9080,
+            "selector": "app.kubernetes.io/name=api-gateway",
+            "sidecar": "keys"
+          },
+          "expect": 200,
+          "field": "batch.fa000001",
+          "id": "pods",
+          "key": "fa000001",
+          "keys": {
+            "image": "192.0.2.6:5000/sfab/keys:3",
+            "prefix": "sk-tw",
+            "sa": "inference-keys",
+            "secret": "api-keys"
+          },
+          "kind": "key_probe",
+          "model": "chat",
+          "namespace": "inference",
+          "path": "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions",
+          "probe": {
+            "image": "192.0.2.6:5000/sfab/keys:3",
+            "name": "key-probe",
+            "sa": "key-probe"
+          },
+          "prompt": "Say yes.",
+          "route": "chat",
+          "wait_s": 240
+        },
+        {
+          "client": "ent-client",
+          "client_addr": "10.24.10.10",
+          "count": 20,
+          "gateway": "gw-users",
+          "hostname": "llm.ai.tarnwick.example",
+          "id": "users",
+          "interval_s": 1,
+          "key": "batch.fa000001",
+          "keys": {
+            "namespace": "inference",
+            "secret": "api-keys"
+          },
+          "kind": "probe_gateway",
+          "max_tokens": 8,
+          "models": [
+            {
+              "model": "chat",
+              "model_name": "openai/chat",
+              "route_id": "a48b3df9-3b7f-58f0-9c52-c6f3004f05f7",
+              "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+            }
+          ],
+          "node": "ent-client",
+          "passes": 1,
+          "resolve": null,
+          "timeout_s": 400,
+          "vip": "10.20.11.210"
+        },
+        {
+          "api_gateway": {
+            "container": "apisix",
+            "hold": "/standalone/hold",
+            "name": "api-gateway",
+            "port": 9080,
+            "selector": "app.kubernetes.io/name=api-gateway",
+            "sidecar": "keys"
+          },
+          "keys": {
+            "image": "192.0.2.6:5000/sfab/keys:3",
+            "prefix": "sk-tw",
+            "sa": "inference-keys",
+            "secret": "api-keys"
+          },
+          "kind": "key_show",
+          "namespace": "inference"
+        }
+      ],
+      "title": "a new key for chat loaded by every API gateway pod but one"
+    }
+  },
+  "lab": "sfab-ch07",
+  "schema": 1
+}
