@@ -502,8 +502,8 @@ class TestPanosStates(unittest.TestCase):
 
     def test_many_step_10_publishes_the_firewalls_own_isp_address(self):
         # the DNAT from isp to isp on 198.51.100.10 tcp/443 to gw-inet's VIP, first in the NAT
-        # rulebase; the security rule on the pre-NAT address and the post-NAT zone as rule 24, then
-        # deny-all-log as rule 25
+        # rulebase; the security rule on the pre-NAT address and the post-NAT zone as the 24th rule, then
+        # deny-all-log as the 25th rule
         text = render_fw({"lab": "sfab-ch10", "profile": "a", "state": "many"})["bootstrap/fw/enforced.txt"]
         sec = list(dict.fromkeys(re.findall(r"^set rulebase security rules (\S+) ", text, re.M)))
         nat = list(dict.fromkeys(re.findall(r"^set rulebase nat rules (\S+) ", text, re.M)))

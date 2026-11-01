@@ -10,7 +10,7 @@ rules they need.
   interface, zone and route with no rule and no NAT; the uplink side's server still publishes no
   platform name.
 - Chapter 10: the destination NAT from isp to isp on the firewall's own isp address, first of the
-  NAT rulebase, and the rule on the pre-NAT address, rule 24 before deny-all-log.
+  NAT rulebase, and the rule on the pre-NAT address, the 24th rule before deny-all-log.
 - Chapter 11: the 60-cell matrix with its counts, each forbidden cell's isolation depth, and each
   model cell's own caller per population; chapter 2's matrix renders as before.
 - Breaks 8a to 11a and their new actions (k8s_patch, k8s_read, dnsmasq_pin, probe_lookup,

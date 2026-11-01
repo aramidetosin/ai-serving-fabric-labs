@@ -18,7 +18,7 @@ Status: recorded under build A revision 2 on 2026-10-31 on the first lab host, o
 Everything chapter 9's lab renders (`ch09/README.md`), and from step 10 on the firewall (`bootstrap/fw/startup-config.xml`, `enforced.txt`):
 
 - **NAT `dnat-internet-gateway`**, first of the NAT rulebase: from `isp` to `isp`, source any, destination 198.51.100.10 (the firewall's own isp address, the published address), service `tcp-443`, destination translated to 10.20.11.220, the internet Gateway's VIP. The route lookup for 198.51.100.10 finds the firewall's own interface, so the pre-NAT destination zone is `isp`; the second lookup for 10.20.11.220 finds ae1.110, zone `ingress`. Then `no-nat-public` and `internet-snat`, as chapter 4 recorded.
-- **Security rule `isp-to-internet-gateway`**, rule 24: from `isp` to `ingress`, source any, destination 198.51.100.10 (the pre-NAT address with the post-NAT zone, as PAN-OS matches a rule after a destination NAT), application `ssl`, service application-default, profile group `bp-default`, log at session end; `deny-all-log` is rule 25. Nothing else is opened from `isp`, and no inbound source NAT is written, so the internet client's address reaches the Gateway and the API gateway's log.
+- **Security rule `isp-to-internet-gateway`**, the 24th rule: from `isp` to `ingress`, source any, destination 198.51.100.10 (the pre-NAT address with the post-NAT zone, as PAN-OS matches a rule after a destination NAT), application `ssl`, service application-default, profile group `bp-default`, log at session end; `deny-all-log` is the 25th rule. Nothing else is opened from `isp`, and no inbound source NAT is written, so the internet client's address reaches the Gateway and the API gateway's log.
 
 ## Requirements
 
