@@ -1,0 +1,109 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "cert-manager.io/v1",
+            "kind": "Certificate",
+            "metadata": {
+                "creationTimestamp": "2026-11-01T06:43:46Z",
+                "generation": 1,
+                "name": "gw-internal",
+                "namespace": "gateways",
+                "resourceVersion": "3341",
+                "uid": "9bd55bb0-e662-4e6b-a35f-d843ef0d7b65"
+            },
+            "spec": {
+                "dnsNames": [
+                    "*.ai.tarnwick.example"
+                ],
+                "duration": "2160h",
+                "issuerRef": {
+                    "group": "cert-manager.io",
+                    "kind": "ClusterIssuer",
+                    "name": "lab-ca"
+                },
+                "privateKey": {
+                    "algorithm": "ECDSA",
+                    "rotationPolicy": "Always",
+                    "size": 256
+                },
+                "renewBefore": "360h",
+                "secretName": "gw-internal-tls",
+                "usages": [
+                    "digital signature",
+                    "server auth"
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T06:43:46Z",
+                        "message": "Certificate is up to date and has not expired",
+                        "observedGeneration": 1,
+                        "reason": "Ready",
+                        "status": "True",
+                        "type": "Ready"
+                    }
+                ],
+                "notAfter": "2027-01-30T06:43:46Z",
+                "notBefore": "2026-11-01T06:43:46Z",
+                "renewalTime": "2027-01-15T06:43:46Z",
+                "revision": 1
+            }
+        },
+        {
+            "apiVersion": "cert-manager.io/v1",
+            "kind": "Certificate",
+            "metadata": {
+                "creationTimestamp": "2026-11-01T06:43:46Z",
+                "generation": 1,
+                "name": "gw-users",
+                "namespace": "gateways",
+                "resourceVersion": "3338",
+                "uid": "f7ff0f87-119a-471f-88f4-c5b8e8eb0e32"
+            },
+            "spec": {
+                "dnsNames": [
+                    "*.ai.tarnwick.example"
+                ],
+                "duration": "2160h",
+                "issuerRef": {
+                    "group": "cert-manager.io",
+                    "kind": "ClusterIssuer",
+                    "name": "lab-ca"
+                },
+                "privateKey": {
+                    "algorithm": "ECDSA",
+                    "rotationPolicy": "Always",
+                    "size": 256
+                },
+                "renewBefore": "360h",
+                "secretName": "gw-users-tls",
+                "usages": [
+                    "digital signature",
+                    "server auth"
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T06:43:46Z",
+                        "message": "Certificate is up to date and has not expired",
+                        "observedGeneration": 1,
+                        "reason": "Ready",
+                        "status": "True",
+                        "type": "Ready"
+                    }
+                ],
+                "notAfter": "2027-01-30T06:43:46Z",
+                "notBefore": "2026-11-01T06:43:46Z",
+                "renewalTime": "2027-01-15T06:43:46Z",
+                "revision": 1
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

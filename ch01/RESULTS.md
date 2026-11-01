@@ -1,8 +1,10 @@
 # Chapter 1 results
 
-What lab `sfab-ch01` proved on its recorded deployment under build A revision 2, the verdict lines that prove each part, the RESULT line of every set, and how to reproduce them. `audits/INDEX.md` maps the book's exhibits to the same sets and lines.
+What lab `sfab-ch01` proved on its two recorded deployments under build A revision 2, the verdict lines that prove each part, the RESULT line of every set, and how to reproduce them. `audits/INDEX.md` maps the book's exhibits to the same sets and lines.
 
-The deployment ran on 2026-10-29 from wiped disks, at host tick 10000 on containerlab 0.82.0, with the images `vrnetlab/dell_sonic:4.6.0` (c0214f532277), `vrnetlab/paloalto_pa-vm:12.1.2` (d1ca9a0f1687), `vrnetlab/truenas_truenas:27.0.0-RC.1` (d0b0a42ff2d3), `sfab/vm-node:6-k8s1.35.8` (f3c5c06ad669), `sfab/bastion:4` (0e82fde37b3d), `sfab/resolver:3` (d0fabd25e229), `sfab/vpngw:3` (d5db2071ca65) and `sfab/frr:10.5.4-3` (234239dc64b1) among the ten its `RUN.json` files name, and in the cluster the serving image `sfab/serving:b11382-2` with the models LFM2.5-24B-A2B (chat) and Qwen3.8-27B (staff). Every command ran in tmux under `script`, so each journal shows the command exactly as typed: `make down` and `make wipe` from 13:56:15, `make up` from 13:59:21 to 14:55:23, `make audit`, `make trace`, `make break-1a`, `make heal-1a`, `make record` from 15:39:19 to 16:01:05 and `make down` to 16:04:46 (UTC, the lab host's clock). No container restarted between the end of `make up` and the end of `make record`.
+The earlier deployment ran on 2026-10-29 from wiped disks, at host tick 10000 on containerlab 0.82.0, with the images `vrnetlab/dell_sonic:4.6.0` (c0214f532277), `vrnetlab/paloalto_pa-vm:12.1.2` (d1ca9a0f1687), `vrnetlab/truenas_truenas:27.0.0-RC.1` (d0b0a42ff2d3), `sfab/vm-node:6-k8s1.35.8` (f3c5c06ad669), `sfab/bastion:4` (0e82fde37b3d), `sfab/resolver:3` (d0fabd25e229), `sfab/vpngw:3` (d5db2071ca65) and `sfab/frr:10.5.4-3` (234239dc64b1) among the ten its `RUN.json` files name, and in the cluster the serving image `sfab/serving:b11382-2` with the models LFM2.5-24B-A2B (chat) and Qwen3.8-27B (staff). Every command ran in tmux under `script`, so each journal shows the command exactly as typed: `make down` and `make wipe` from 13:56:15, `make up` from 13:59:21 to 14:55:23, `make audit`, `make trace`, `make break-1a`, `make heal-1a`, `make record` from 15:39:19 to 16:01:05 and `make down` to 16:04:46 (UTC, the lab host's clock). No container restarted between the end of `make up` and the end of `make record`.
+
+The deployment from the public repository ran on 2026-11-01 from wiped disks, from a clone of https://github.com/aramidetosin/ai-serving-fabric-labs at commit `5d6ebc2b81474e149260a60a795e13116a9b688a` with no tracked file changed (every `RUN.json` of its sets reads that commit, `dirty: false`), at host tick 10000 on containerlab 0.82.0, with the same images at the same IDs and the same two models. Its chain began with the reader's `git clone` of that URL, recorded under `script` (`audits/sfab-ch01_record-run_20261101T061721Z/rec-git-clone.txt`), then `make down`, `make wipe`, `make up`, `make audit`, `make trace`, `make break-1a`, `make heal-1a`, `make record` and `make down`, every step 0 failed. It carries the book's launch, launch audit and closing exhibits (Examples 1-1, 1-2, 1-9 and 1-10); the earlier deployment carries the others. Its short names start with C (`audits/INDEX.md`, "The deployment from the public repository"): CN `audits/sfab-ch01_record-run_20261101T061721Z/`, CU `audits/sfab-ch01_audit_20261101T070137Z/`, CA `audits/sfab-ch01_audit_20261101T071917Z/`, CT `audits/sfab-ch01_trace_20261101T073637Z/`, CB `audits/sfab-ch01_break-1a_20261101T074048Z/`, CH `audits/sfab-ch01_heal-1a_20261101T074341Z/`, CHA `audits/sfab-ch01_audit_20261101T074525Z/`, CRA and CRT `audits/sfab-ch01_audit_20261101T080314Z/` and `audits/sfab-ch01_trace_20261101T082044Z/`.
 
 The short names are the index's: N is `audits/sfab-ch01_record-run_20261029T135614Z/`, U `audits/sfab-ch01_audit_20261029T143747Z/` (the audit `make up` ran), A `audits/sfab-ch01_audit_20261029T145533Z/`, T `audits/sfab-ch01_trace_20261029T151312Z/`, B `audits/sfab-ch01_break-1a_20261029T151716Z/`, H `audits/sfab-ch01_heal-1a_20261029T152005Z/`, HA `audits/sfab-ch01_audit_20261029T152145Z/` (the chapter audit H ran), RA and RT `audits/sfab-ch01_audit_20261029T153920Z/` and `audits/sfab-ch01_trace_20261029T155702Z/` (the audit and trace `make record` ran).
 
@@ -54,6 +56,16 @@ Revision 1's sets (one deployment on 2026-10-27) are superseded and out of the r
 | RT, `sfab-ch01_trace_20261029T155702Z` (the trace `make record` ran) | `== RESULT: 57 passed, 0 failed, 0 known platform limitation(s), 0 skipped` |
 | the gate `make record` ran on RA, RT and the repository | `== RESULT: 12 passed, 0 failed, 0 known platform limitation(s), 5 skipped` (N/rec-make-record.txt:1279) |
 | the gate on U, A, T, B, H and HA | `== RESULT: 36 passed, 0 failed, 0 known platform limitation(s), 13 skipped` (N/gate-sets.txt:57) |
+| CU, `sfab-ch01_audit_20261101T070137Z` (the audit `make up` ran, from the public repository) | `== RESULT: 1036 passed, 0 failed, 0 known platform limitation(s), 3 skipped` |
+| CA, `sfab-ch01_audit_20261101T071917Z` (`make audit`) | `== RESULT: 1036 passed, 0 failed, 0 known platform limitation(s), 3 skipped` |
+| CT, `sfab-ch01_trace_20261101T073637Z` (`make trace`, chat's copy b) | `== RESULT: 57 passed, 0 failed, 0 known platform limitation(s), 0 skipped` |
+| CB, `sfab-ch01_break-1a_20261101T074048Z` (`make break-1a`) | `== RESULT: 8 passed, 0 failed, 0 known platform limitation(s), 0 skipped` |
+| CH, `sfab-ch01_heal-1a_20261101T074341Z` (`make heal-1a`) | `== RESULT: 9 passed, 0 failed, 0 known platform limitation(s), 0 skipped` |
+| CHA, `sfab-ch01_audit_20261101T074525Z` (the chapter audit heal-1a ran) | `== RESULT: 1036 passed, 0 failed, 0 known platform limitation(s), 3 skipped` |
+| CRA, `sfab-ch01_audit_20261101T080314Z` (the audit `make record` ran) | `== RESULT: 1036 passed, 0 failed, 0 known platform limitation(s), 3 skipped` |
+| CRT, `sfab-ch01_trace_20261101T082044Z` (the trace `make record` ran, chat's copy b) | `== RESULT: 57 passed, 0 failed, 0 known platform limitation(s), 0 skipped` |
+| the gate `make record` ran on CRA, CRT and the repository | `== RESULT: 12 passed, 0 failed, 0 known platform limitation(s), 5 skipped` (CN/rec-make-record.txt:1275) |
+| the gate on CU, CA, CT, CB, CH and CHA | `== RESULT: 36 passed, 0 failed, 0 known platform limitation(s), 13 skipped` (CN/gate-sets.txt:57) |
 
 The three SKIPs in every audit are TrueNAS's own LACP view, which is not collected, the LAND counter, which this lab has no drills plan for, and namecheck, which the lab host runs without the author's scrub list; the gates' SKIPs are namecheck and the literal scan for the same reason. A run with the scrub and literals lists, over every committed set, found nothing (`audits/INDEX.md`).
 
@@ -79,7 +91,8 @@ Facts the recordings show and a reader should know:
 On a Linux host with KVM, Docker, containerlab 0.82.0, the host tick at 10000, the images `vrnetlab/dell_sonic:4.6.0`, `vrnetlab/paloalto_pa-vm:12.1.2`, `vrnetlab/truenas_truenas:27.0.0-RC.1` and the `sfab/*` images with the in-lab registry seeded, the two models in `images/models`, 195 GiB of MemAvailable and no other `sfab-` lab running:
 
 ```
-cd ch01
+git clone https://github.com/aramidetosin/ai-serving-fabric-labs.git
+cd ai-serving-fabric-labs/ch01
 make up
 make audit
 make trace
@@ -95,10 +108,10 @@ make down
 
 - **A GPU.** The models run on CPU, split over RPC workers for the one spanning copy; nothing here measures a GPU or publishes a throughput figure.
 - **A key in clear.** Every key is made in the cluster and every capture that could hold one is scrubbed before it is written.
-- **A `git clone` line.** No recording ran `git clone`: the clone line is the repository README's (`../README.md`, "Clone, build, deploy"); Example 1-1 opens at `cd ch01`.
+- **A `git clone` line in the earlier deployment.** Its chain began at `make down`; the recorded clone is the deployment from the public repository's (CN/rec-git-clone.txt), which made a clone of its own in an empty directory and deployed from a clone of the same commit and tree (CN/clone-check.txt:2 to :7).
 - **ent-dns's own query to the authoritative pair.** The trace captures the client's lookup and its answer, not the forwarded query; the forwarding is the render's (`bootstrap/ent-dns/dnsmasq.conf`) and the audit's (A/verdict.txt:907).
 - **The setting behind the MSS rewrite.** The captures show the firewall changing 1460 to 1360; no recorded read names the option that does it.
-- **A public commit in `RUN.json`.** Each `RUN.json` names, from the copy's stamp, a commit of the pre-release history, which is not in this repository, with `dirty: true`; the runs used that commit plus the uncommitted changes `audits/INDEX.md` names, and the repository's first public commit holds that code with the later changes the same page names.
+- **A public commit in the earlier deployment's `RUN.json`.** Each of its `RUN.json` files names, from the copy's stamp, a commit of the pre-release history, which is not in this repository, with `dirty: true`; the runs used that commit plus the uncommitted changes `audits/INDEX.md` names, and the repository's first public commit holds that code with the later changes the same page names. The deployment from the public repository's `RUN.json` files name the public commit `5d6ebc2b`, `dirty: false`.
 - **A `make up` on kept disks.** The recorded deployment came from wiped disks.
 - **The many-tenant state.** This lab is build A with one tenant; the other audiences and their isolation come with chapters 8 to 11.
 - **The VM nodes' tc redirect.** The lab host's kernel accepted `group_fwd_mask 0x4004`, so every data NIC of every VM node took its bridge. No recorded run exercised the redirect path a stock kernel takes (`../README.md`, "The host").

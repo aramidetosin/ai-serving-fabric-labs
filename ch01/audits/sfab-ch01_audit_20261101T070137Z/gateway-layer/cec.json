@@ -1,0 +1,1145 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "cilium.io/v2",
+            "kind": "CiliumEnvoyConfig",
+            "metadata": {
+                "annotations": {
+                    "cec.cilium.io/use-original-source-address": "false",
+                    "io.cilium/lb-ipam-ips": "10.20.11.200"
+                },
+                "creationTimestamp": "2026-11-01T06:43:46Z",
+                "generation": 3,
+                "labels": {
+                    "gateway.networking.k8s.io/gateway-name": "gw-internal",
+                    "tarnwick.example/audience": "internal",
+                    "tarnwick.example/lb-pool": "gw-internal"
+                },
+                "name": "cilium-gateway-gw-internal",
+                "namespace": "gateways",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "gateway.networking.k8s.io/v1",
+                        "controller": true,
+                        "kind": "Gateway",
+                        "name": "gw-internal",
+                        "uid": "4bc2c516-1d54-4da6-a858-2593175a6d1c"
+                    }
+                ],
+                "resourceVersion": "6873",
+                "uid": "40def2e3-4c20-4e7c-9b97-f256e8ebbb6c"
+            },
+            "spec": {
+                "backendServices": [
+                    {
+                        "name": "echo",
+                        "namespace": "echo",
+                        "number": [
+                            "8080"
+                        ]
+                    },
+                    {
+                        "name": "idp",
+                        "namespace": "identity",
+                        "number": [
+                            "5556"
+                        ]
+                    },
+                    {
+                        "name": "api-gateway",
+                        "namespace": "inference",
+                        "number": [
+                            "9080"
+                        ]
+                    },
+                    {
+                        "name": "chat",
+                        "namespace": "serving",
+                        "number": [
+                            "8080"
+                        ]
+                    },
+                    {
+                        "name": "chat-a",
+                        "namespace": "serving",
+                        "number": [
+                            "8080"
+                        ]
+                    },
+                    {
+                        "name": "chat-b",
+                        "namespace": "serving",
+                        "number": [
+                            "8080"
+                        ]
+                    },
+                    {
+                        "name": "chat-c",
+                        "namespace": "serving",
+                        "number": [
+                            "8080"
+                        ]
+                    },
+                    {
+                        "name": "staff",
+                        "namespace": "serving",
+                        "number": [
+                            "8080"
+                        ]
+                    },
+                    {
+                        "name": "staff-a",
+                        "namespace": "serving",
+                        "number": [
+                            "8080"
+                        ]
+                    },
+                    {
+                        "name": "staff-b",
+                        "namespace": "serving",
+                        "number": [
+                            "8080"
+                        ]
+                    }
+                ],
+                "resources": [
+                    {
+                        "@type": "type.googleapis.com/envoy.config.listener.v3.Listener",
+                        "filterChains": [
+                            {
+                                "filterChainMatch": {
+                                    "transportProtocol": "raw_buffer"
+                                },
+                                "filters": [
+                                    {
+                                        "name": "envoy.filters.network.http_connection_manager",
+                                        "typedConfig": {
+                                            "@type": "type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager",
+                                            "commonHttpProtocolOptions": {
+                                                "maxStreamDuration": "0s"
+                                            },
+                                            "httpFilters": [
+                                                {
+                                                    "name": "envoy.filters.http.grpc_web",
+                                                    "typedConfig": {
+                                                        "@type": "type.googleapis.com/envoy.extensions.filters.http.grpc_web.v3.GrpcWeb"
+                                                    }
+                                                },
+                                                {
+                                                    "name": "envoy.filters.http.grpc_stats",
+                                                    "typedConfig": {
+                                                        "@type": "type.googleapis.com/envoy.extensions.filters.http.grpc_stats.v3.FilterConfig",
+                                                        "emitFilterState": true,
+                                                        "enableUpstreamStats": true
+                                                    }
+                                                },
+                                                {
+                                                    "name": "envoy.filters.http.router",
+                                                    "typedConfig": {
+                                                        "@type": "type.googleapis.com/envoy.extensions.filters.http.router.v3.Router"
+                                                    }
+                                                }
+                                            ],
+                                            "internalAddressConfig": {
+                                                "cidrRanges": [
+                                                    {
+                                                        "addressPrefix": "10.0.0.0",
+                                                        "prefixLen": 8
+                                                    },
+                                                    {
+                                                        "addressPrefix": "172.16.0.0",
+                                                        "prefixLen": 12
+                                                    },
+                                                    {
+                                                        "addressPrefix": "192.168.0.0",
+                                                        "prefixLen": 16
+                                                    },
+                                                    {
+                                                        "addressPrefix": "127.0.0.1",
+                                                        "prefixLen": 32
+                                                    }
+                                                ]
+                                            },
+                                            "rds": {
+                                                "routeConfigName": "listener-insecure"
+                                            },
+                                            "statPrefix": "listener-insecure",
+                                            "streamIdleTimeout": "300s",
+                                            "upgradeConfigs": [
+                                                {
+                                                    "upgradeType": "websocket"
+                                                }
+                                            ],
+                                            "useRemoteAddress": true
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "filterChainMatch": {
+                                    "serverNames": [
+                                        "*.ai.tarnwick.example"
+                                    ],
+                                    "transportProtocol": "tls"
+                                },
+                                "filters": [
+                                    {
+                                        "name": "envoy.filters.network.http_connection_manager",
+                                        "typedConfig": {
+                                            "@type": "type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager",
+                                            "commonHttpProtocolOptions": {
+                                                "maxStreamDuration": "0s"
+                                            },
+                                            "httpFilters": [
+                                                {
+                                                    "name": "envoy.filters.http.grpc_web",
+                                                    "typedConfig": {
+                                                        "@type": "type.googleapis.com/envoy.extensions.filters.http.grpc_web.v3.GrpcWeb"
+                                                    }
+                                                },
+                                                {
+                                                    "name": "envoy.filters.http.grpc_stats",
+                                                    "typedConfig": {
+                                                        "@type": "type.googleapis.com/envoy.extensions.filters.http.grpc_stats.v3.FilterConfig",
+                                                        "emitFilterState": true,
+                                                        "enableUpstreamStats": true
+                                                    }
+                                                },
+                                                {
+                                                    "name": "envoy.filters.http.router",
+                                                    "typedConfig": {
+                                                        "@type": "type.googleapis.com/envoy.extensions.filters.http.router.v3.Router"
+                                                    }
+                                                }
+                                            ],
+                                            "internalAddressConfig": {
+                                                "cidrRanges": [
+                                                    {
+                                                        "addressPrefix": "10.0.0.0",
+                                                        "prefixLen": 8
+                                                    },
+                                                    {
+                                                        "addressPrefix": "172.16.0.0",
+                                                        "prefixLen": 12
+                                                    },
+                                                    {
+                                                        "addressPrefix": "192.168.0.0",
+                                                        "prefixLen": 16
+                                                    },
+                                                    {
+                                                        "addressPrefix": "127.0.0.1",
+                                                        "prefixLen": 32
+                                                    }
+                                                ]
+                                            },
+                                            "rds": {
+                                                "routeConfigName": "listener-secure"
+                                            },
+                                            "statPrefix": "listener-secure",
+                                            "streamIdleTimeout": "300s",
+                                            "upgradeConfigs": [
+                                                {
+                                                    "upgradeType": "websocket"
+                                                }
+                                            ],
+                                            "useRemoteAddress": true
+                                        }
+                                    }
+                                ],
+                                "transportSocket": {
+                                    "name": "envoy.transport_sockets.tls",
+                                    "typedConfig": {
+                                        "@type": "type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext",
+                                        "commonTlsContext": {
+                                            "tlsCertificateSdsSecretConfigs": [
+                                                {
+                                                    "name": "cilium-secrets/cilium-sync-secret-41f5f585a46aeec408c4f7cfd873539a26191cf1dc0a2dc6b87300a0e848152d"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        ],
+                        "listenerFilters": [
+                            {
+                                "name": "envoy.filters.listener.tls_inspector",
+                                "typedConfig": {
+                                    "@type": "type.googleapis.com/envoy.extensions.filters.listener.tls_inspector.v3.TlsInspector"
+                                }
+                            }
+                        ],
+                        "name": "listener",
+                        "socketOptions": [
+                            {
+                                "description": "Enable TCP keep-alive (default to enabled)",
+                                "intValue": "1",
+                                "level": "1",
+                                "name": "9"
+                            },
+                            {
+                                "description": "TCP keep-alive idle time (in seconds) (defaults to 10s)",
+                                "intValue": "10",
+                                "level": "6",
+                                "name": "4"
+                            },
+                            {
+                                "description": "TCP keep-alive probe intervals (in seconds) (defaults to 5s)",
+                                "intValue": "5",
+                                "level": "6",
+                                "name": "5"
+                            },
+                            {
+                                "description": "TCP keep-alive probe max failures.",
+                                "intValue": "10",
+                                "level": "6",
+                                "name": "6"
+                            }
+                        ]
+                    },
+                    {
+                        "@type": "type.googleapis.com/envoy.config.route.v3.RouteConfiguration",
+                        "name": "listener-insecure"
+                    },
+                    {
+                        "@type": "type.googleapis.com/envoy.config.route.v3.RouteConfiguration",
+                        "name": "listener-secure",
+                        "virtualHosts": [
+                            {
+                                "domains": [
+                                    "admin.ai.tarnwick.example",
+                                    "admin.ai.tarnwick.example:*"
+                                ],
+                                "name": "admin.ai.tarnwick.example",
+                                "routes": [
+                                    {
+                                        "match": {
+                                            "pathSeparatedPrefix": "/echo"
+                                        },
+                                        "route": {
+                                            "cluster": "echo:echo:8080",
+                                            "maxStreamDuration": {
+                                                "maxStreamDuration": "0s"
+                                            }
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domains": [
+                                    "grafana.ai.tarnwick.example",
+                                    "grafana.ai.tarnwick.example:*"
+                                ],
+                                "name": "grafana.ai.tarnwick.example",
+                                "routes": [
+                                    {
+                                        "match": {
+                                            "pathSeparatedPrefix": "/echo"
+                                        },
+                                        "route": {
+                                            "cluster": "echo:echo:8080",
+                                            "maxStreamDuration": {
+                                                "maxStreamDuration": "0s"
+                                            }
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domains": [
+                                    "id.ai.tarnwick.example",
+                                    "id.ai.tarnwick.example:*"
+                                ],
+                                "name": "id.ai.tarnwick.example",
+                                "routes": [
+                                    {
+                                        "match": {
+                                            "prefix": "/"
+                                        },
+                                        "route": {
+                                            "cluster": "identity:idp:5556",
+                                            "maxStreamDuration": {
+                                                "maxStreamDuration": "0s"
+                                            }
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domains": [
+                                    "llm.ai.tarnwick.example",
+                                    "llm.ai.tarnwick.example:*"
+                                ],
+                                "name": "llm.ai.tarnwick.example",
+                                "routes": [
+                                    {
+                                        "match": {
+                                            "pathSeparatedPrefix": "/models"
+                                        },
+                                        "route": {
+                                            "cluster": "inference:api-gateway:9080",
+                                            "timeout": "620s"
+                                        }
+                                    },
+                                    {
+                                        "match": {
+                                            "pathSeparatedPrefix": "/echo"
+                                        },
+                                        "route": {
+                                            "cluster": "echo:echo:8080",
+                                            "maxStreamDuration": {
+                                                "maxStreamDuration": "0s"
+                                            }
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domains": [
+                                    "serve.ai.tarnwick.example",
+                                    "serve.ai.tarnwick.example:*"
+                                ],
+                                "name": "serve.ai.tarnwick.example",
+                                "routes": [
+                                    {
+                                        "match": {
+                                            "pathSeparatedPrefix": "/staff-a"
+                                        },
+                                        "route": {
+                                            "cluster": "serving:staff-a:8080",
+                                            "regexRewrite": {
+                                                "pattern": {
+                                                    "regex": "^/staff-a(/?)(.*)"
+                                                },
+                                                "substitution": "/\\2"
+                                            },
+                                            "timeout": "900s"
+                                        }
+                                    },
+                                    {
+                                        "match": {
+                                            "pathSeparatedPrefix": "/staff-b"
+                                        },
+                                        "route": {
+                                            "cluster": "serving:staff-b:8080",
+                                            "regexRewrite": {
+                                                "pattern": {
+                                                    "regex": "^/staff-b(/?)(.*)"
+                                                },
+                                                "substitution": "/\\2"
+                                            },
+                                            "timeout": "900s"
+                                        }
+                                    },
+                                    {
+                                        "match": {
+                                            "pathSeparatedPrefix": "/chat-a"
+                                        },
+                                        "route": {
+                                            "cluster": "serving:chat-a:8080",
+                                            "regexRewrite": {
+                                                "pattern": {
+                                                    "regex": "^/chat-a(/?)(.*)"
+                                                },
+                                                "substitution": "/\\2"
+                                            },
+                                            "timeout": "900s"
+                                        }
+                                    },
+                                    {
+                                        "match": {
+                                            "pathSeparatedPrefix": "/chat-b"
+                                        },
+                                        "route": {
+                                            "cluster": "serving:chat-b:8080",
+                                            "regexRewrite": {
+                                                "pattern": {
+                                                    "regex": "^/chat-b(/?)(.*)"
+                                                },
+                                                "substitution": "/\\2"
+                                            },
+                                            "timeout": "900s"
+                                        }
+                                    },
+                                    {
+                                        "match": {
+                                            "pathSeparatedPrefix": "/chat-c"
+                                        },
+                                        "route": {
+                                            "cluster": "serving:chat-c:8080",
+                                            "regexRewrite": {
+                                                "pattern": {
+                                                    "regex": "^/chat-c(/?)(.*)"
+                                                },
+                                                "substitution": "/\\2"
+                                            },
+                                            "timeout": "900s"
+                                        }
+                                    },
+                                    {
+                                        "match": {
+                                            "pathSeparatedPrefix": "/staff"
+                                        },
+                                        "route": {
+                                            "cluster": "serving:staff:8080",
+                                            "regexRewrite": {
+                                                "pattern": {
+                                                    "regex": "^/staff(/?)(.*)"
+                                                },
+                                                "substitution": "/\\2"
+                                            },
+                                            "timeout": "900s"
+                                        }
+                                    },
+                                    {
+                                        "match": {
+                                            "pathSeparatedPrefix": "/chat"
+                                        },
+                                        "route": {
+                                            "cluster": "serving:chat:8080",
+                                            "regexRewrite": {
+                                                "pattern": {
+                                                    "regex": "^/chat(/?)(.*)"
+                                                },
+                                                "substitution": "/\\2"
+                                            },
+                                            "timeout": "900s"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "@type": "type.googleapis.com/envoy.config.cluster.v3.Cluster",
+                        "edsClusterConfig": {
+                            "serviceName": "echo/echo:8080"
+                        },
+                        "name": "echo:echo:8080",
+                        "outlierDetection": {
+                            "splitExternalLocalOriginErrors": true
+                        },
+                        "type": "EDS",
+                        "typedExtensionProtocolOptions": {
+                            "envoy.extensions.upstreams.http.v3.HttpProtocolOptions": {
+                                "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
+                                "commonHttpProtocolOptions": {
+                                    "idleTimeout": "60s"
+                                },
+                                "useDownstreamProtocolConfig": {
+                                    "http2ProtocolOptions": {}
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "@type": "type.googleapis.com/envoy.config.cluster.v3.Cluster",
+                        "edsClusterConfig": {
+                            "serviceName": "identity/idp:5556"
+                        },
+                        "name": "identity:idp:5556",
+                        "outlierDetection": {
+                            "splitExternalLocalOriginErrors": true
+                        },
+                        "type": "EDS",
+                        "typedExtensionProtocolOptions": {
+                            "envoy.extensions.upstreams.http.v3.HttpProtocolOptions": {
+                                "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
+                                "commonHttpProtocolOptions": {
+                                    "idleTimeout": "60s"
+                                },
+                                "useDownstreamProtocolConfig": {
+                                    "http2ProtocolOptions": {}
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "@type": "type.googleapis.com/envoy.config.cluster.v3.Cluster",
+                        "edsClusterConfig": {
+                            "serviceName": "inference/api-gateway:9080"
+                        },
+                        "name": "inference:api-gateway:9080",
+                        "outlierDetection": {
+                            "splitExternalLocalOriginErrors": true
+                        },
+                        "type": "EDS",
+                        "typedExtensionProtocolOptions": {
+                            "envoy.extensions.upstreams.http.v3.HttpProtocolOptions": {
+                                "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
+                                "commonHttpProtocolOptions": {
+                                    "idleTimeout": "60s"
+                                },
+                                "useDownstreamProtocolConfig": {
+                                    "http2ProtocolOptions": {}
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "@type": "type.googleapis.com/envoy.config.cluster.v3.Cluster",
+                        "edsClusterConfig": {
+                            "serviceName": "serving/chat-a:8080"
+                        },
+                        "name": "serving:chat-a:8080",
+                        "outlierDetection": {
+                            "splitExternalLocalOriginErrors": true
+                        },
+                        "type": "EDS",
+                        "typedExtensionProtocolOptions": {
+                            "envoy.extensions.upstreams.http.v3.HttpProtocolOptions": {
+                                "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
+                                "commonHttpProtocolOptions": {
+                                    "idleTimeout": "60s"
+                                },
+                                "useDownstreamProtocolConfig": {
+                                    "http2ProtocolOptions": {}
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "@type": "type.googleapis.com/envoy.config.cluster.v3.Cluster",
+                        "edsClusterConfig": {
+                            "serviceName": "serving/chat-b:8080"
+                        },
+                        "name": "serving:chat-b:8080",
+                        "outlierDetection": {
+                            "splitExternalLocalOriginErrors": true
+                        },
+                        "type": "EDS",
+                        "typedExtensionProtocolOptions": {
+                            "envoy.extensions.upstreams.http.v3.HttpProtocolOptions": {
+                                "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
+                                "commonHttpProtocolOptions": {
+                                    "idleTimeout": "60s"
+                                },
+                                "useDownstreamProtocolConfig": {
+                                    "http2ProtocolOptions": {}
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "@type": "type.googleapis.com/envoy.config.cluster.v3.Cluster",
+                        "edsClusterConfig": {
+                            "serviceName": "serving/chat-c:8080"
+                        },
+                        "name": "serving:chat-c:8080",
+                        "outlierDetection": {
+                            "splitExternalLocalOriginErrors": true
+                        },
+                        "type": "EDS",
+                        "typedExtensionProtocolOptions": {
+                            "envoy.extensions.upstreams.http.v3.HttpProtocolOptions": {
+                                "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
+                                "commonHttpProtocolOptions": {
+                                    "idleTimeout": "60s"
+                                },
+                                "useDownstreamProtocolConfig": {
+                                    "http2ProtocolOptions": {}
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "@type": "type.googleapis.com/envoy.config.cluster.v3.Cluster",
+                        "edsClusterConfig": {
+                            "serviceName": "serving/chat:8080"
+                        },
+                        "name": "serving:chat:8080",
+                        "outlierDetection": {
+                            "splitExternalLocalOriginErrors": true
+                        },
+                        "type": "EDS",
+                        "typedExtensionProtocolOptions": {
+                            "envoy.extensions.upstreams.http.v3.HttpProtocolOptions": {
+                                "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
+                                "commonHttpProtocolOptions": {
+                                    "idleTimeout": "60s"
+                                },
+                                "useDownstreamProtocolConfig": {
+                                    "http2ProtocolOptions": {}
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "@type": "type.googleapis.com/envoy.config.cluster.v3.Cluster",
+                        "edsClusterConfig": {
+                            "serviceName": "serving/staff-a:8080"
+                        },
+                        "name": "serving:staff-a:8080",
+                        "outlierDetection": {
+                            "splitExternalLocalOriginErrors": true
+                        },
+                        "type": "EDS",
+                        "typedExtensionProtocolOptions": {
+                            "envoy.extensions.upstreams.http.v3.HttpProtocolOptions": {
+                                "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
+                                "commonHttpProtocolOptions": {
+                                    "idleTimeout": "60s"
+                                },
+                                "useDownstreamProtocolConfig": {
+                                    "http2ProtocolOptions": {}
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "@type": "type.googleapis.com/envoy.config.cluster.v3.Cluster",
+                        "edsClusterConfig": {
+                            "serviceName": "serving/staff-b:8080"
+                        },
+                        "name": "serving:staff-b:8080",
+                        "outlierDetection": {
+                            "splitExternalLocalOriginErrors": true
+                        },
+                        "type": "EDS",
+                        "typedExtensionProtocolOptions": {
+                            "envoy.extensions.upstreams.http.v3.HttpProtocolOptions": {
+                                "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
+                                "commonHttpProtocolOptions": {
+                                    "idleTimeout": "60s"
+                                },
+                                "useDownstreamProtocolConfig": {
+                                    "http2ProtocolOptions": {}
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "@type": "type.googleapis.com/envoy.config.cluster.v3.Cluster",
+                        "edsClusterConfig": {
+                            "serviceName": "serving/staff:8080"
+                        },
+                        "name": "serving:staff:8080",
+                        "outlierDetection": {
+                            "splitExternalLocalOriginErrors": true
+                        },
+                        "type": "EDS",
+                        "typedExtensionProtocolOptions": {
+                            "envoy.extensions.upstreams.http.v3.HttpProtocolOptions": {
+                                "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
+                                "commonHttpProtocolOptions": {
+                                    "idleTimeout": "60s"
+                                },
+                                "useDownstreamProtocolConfig": {
+                                    "http2ProtocolOptions": {}
+                                }
+                            }
+                        }
+                    }
+                ],
+                "services": [
+                    {
+                        "name": "cilium-gateway-gw-internal",
+                        "namespace": "gateways",
+                        "ports": [
+                            443
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "cilium.io/v2",
+            "kind": "CiliumEnvoyConfig",
+            "metadata": {
+                "annotations": {
+                    "cec.cilium.io/use-original-source-address": "false",
+                    "io.cilium/lb-ipam-ips": "10.20.11.210"
+                },
+                "creationTimestamp": "2026-11-01T06:43:46Z",
+                "generation": 2,
+                "labels": {
+                    "gateway.networking.k8s.io/gateway-name": "gw-users",
+                    "tarnwick.example/audience": "enterprise",
+                    "tarnwick.example/lb-pool": "gw-users"
+                },
+                "name": "cilium-gateway-gw-users",
+                "namespace": "gateways",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "gateway.networking.k8s.io/v1",
+                        "controller": true,
+                        "kind": "Gateway",
+                        "name": "gw-users",
+                        "uid": "105854ae-a6ce-4a4c-bc69-c034b5a8b836"
+                    }
+                ],
+                "resourceVersion": "6876",
+                "uid": "fd22d1e5-9e28-476b-8abd-acdc4734056b"
+            },
+            "spec": {
+                "backendServices": [
+                    {
+                        "name": "echo",
+                        "namespace": "echo",
+                        "number": [
+                            "8080"
+                        ]
+                    },
+                    {
+                        "name": "idp",
+                        "namespace": "identity",
+                        "number": [
+                            "5556"
+                        ]
+                    },
+                    {
+                        "name": "api-gateway",
+                        "namespace": "inference",
+                        "number": [
+                            "9080"
+                        ]
+                    }
+                ],
+                "resources": [
+                    {
+                        "@type": "type.googleapis.com/envoy.config.listener.v3.Listener",
+                        "filterChains": [
+                            {
+                                "filterChainMatch": {
+                                    "transportProtocol": "raw_buffer"
+                                },
+                                "filters": [
+                                    {
+                                        "name": "envoy.filters.network.http_connection_manager",
+                                        "typedConfig": {
+                                            "@type": "type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager",
+                                            "commonHttpProtocolOptions": {
+                                                "maxStreamDuration": "0s"
+                                            },
+                                            "httpFilters": [
+                                                {
+                                                    "name": "envoy.filters.http.grpc_web",
+                                                    "typedConfig": {
+                                                        "@type": "type.googleapis.com/envoy.extensions.filters.http.grpc_web.v3.GrpcWeb"
+                                                    }
+                                                },
+                                                {
+                                                    "name": "envoy.filters.http.grpc_stats",
+                                                    "typedConfig": {
+                                                        "@type": "type.googleapis.com/envoy.extensions.filters.http.grpc_stats.v3.FilterConfig",
+                                                        "emitFilterState": true,
+                                                        "enableUpstreamStats": true
+                                                    }
+                                                },
+                                                {
+                                                    "name": "envoy.filters.http.router",
+                                                    "typedConfig": {
+                                                        "@type": "type.googleapis.com/envoy.extensions.filters.http.router.v3.Router"
+                                                    }
+                                                }
+                                            ],
+                                            "internalAddressConfig": {
+                                                "cidrRanges": [
+                                                    {
+                                                        "addressPrefix": "10.0.0.0",
+                                                        "prefixLen": 8
+                                                    },
+                                                    {
+                                                        "addressPrefix": "172.16.0.0",
+                                                        "prefixLen": 12
+                                                    },
+                                                    {
+                                                        "addressPrefix": "192.168.0.0",
+                                                        "prefixLen": 16
+                                                    },
+                                                    {
+                                                        "addressPrefix": "127.0.0.1",
+                                                        "prefixLen": 32
+                                                    }
+                                                ]
+                                            },
+                                            "rds": {
+                                                "routeConfigName": "listener-insecure"
+                                            },
+                                            "statPrefix": "listener-insecure",
+                                            "streamIdleTimeout": "300s",
+                                            "upgradeConfigs": [
+                                                {
+                                                    "upgradeType": "websocket"
+                                                }
+                                            ],
+                                            "useRemoteAddress": true
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "filterChainMatch": {
+                                    "serverNames": [
+                                        "*.ai.tarnwick.example"
+                                    ],
+                                    "transportProtocol": "tls"
+                                },
+                                "filters": [
+                                    {
+                                        "name": "envoy.filters.network.http_connection_manager",
+                                        "typedConfig": {
+                                            "@type": "type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager",
+                                            "commonHttpProtocolOptions": {
+                                                "maxStreamDuration": "0s"
+                                            },
+                                            "httpFilters": [
+                                                {
+                                                    "name": "envoy.filters.http.grpc_web",
+                                                    "typedConfig": {
+                                                        "@type": "type.googleapis.com/envoy.extensions.filters.http.grpc_web.v3.GrpcWeb"
+                                                    }
+                                                },
+                                                {
+                                                    "name": "envoy.filters.http.grpc_stats",
+                                                    "typedConfig": {
+                                                        "@type": "type.googleapis.com/envoy.extensions.filters.http.grpc_stats.v3.FilterConfig",
+                                                        "emitFilterState": true,
+                                                        "enableUpstreamStats": true
+                                                    }
+                                                },
+                                                {
+                                                    "name": "envoy.filters.http.router",
+                                                    "typedConfig": {
+                                                        "@type": "type.googleapis.com/envoy.extensions.filters.http.router.v3.Router"
+                                                    }
+                                                }
+                                            ],
+                                            "internalAddressConfig": {
+                                                "cidrRanges": [
+                                                    {
+                                                        "addressPrefix": "10.0.0.0",
+                                                        "prefixLen": 8
+                                                    },
+                                                    {
+                                                        "addressPrefix": "172.16.0.0",
+                                                        "prefixLen": 12
+                                                    },
+                                                    {
+                                                        "addressPrefix": "192.168.0.0",
+                                                        "prefixLen": 16
+                                                    },
+                                                    {
+                                                        "addressPrefix": "127.0.0.1",
+                                                        "prefixLen": 32
+                                                    }
+                                                ]
+                                            },
+                                            "rds": {
+                                                "routeConfigName": "listener-secure"
+                                            },
+                                            "statPrefix": "listener-secure",
+                                            "streamIdleTimeout": "300s",
+                                            "upgradeConfigs": [
+                                                {
+                                                    "upgradeType": "websocket"
+                                                }
+                                            ],
+                                            "useRemoteAddress": true
+                                        }
+                                    }
+                                ],
+                                "transportSocket": {
+                                    "name": "envoy.transport_sockets.tls",
+                                    "typedConfig": {
+                                        "@type": "type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext",
+                                        "commonTlsContext": {
+                                            "tlsCertificateSdsSecretConfigs": [
+                                                {
+                                                    "name": "cilium-secrets/cilium-sync-secret-daa8a80c060e73b29189ad2e5827c701649855eaa5aad26d73058959636b3f78"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        ],
+                        "listenerFilters": [
+                            {
+                                "name": "envoy.filters.listener.tls_inspector",
+                                "typedConfig": {
+                                    "@type": "type.googleapis.com/envoy.extensions.filters.listener.tls_inspector.v3.TlsInspector"
+                                }
+                            }
+                        ],
+                        "name": "listener",
+                        "socketOptions": [
+                            {
+                                "description": "Enable TCP keep-alive (default to enabled)",
+                                "intValue": "1",
+                                "level": "1",
+                                "name": "9"
+                            },
+                            {
+                                "description": "TCP keep-alive idle time (in seconds) (defaults to 10s)",
+                                "intValue": "10",
+                                "level": "6",
+                                "name": "4"
+                            },
+                            {
+                                "description": "TCP keep-alive probe intervals (in seconds) (defaults to 5s)",
+                                "intValue": "5",
+                                "level": "6",
+                                "name": "5"
+                            },
+                            {
+                                "description": "TCP keep-alive probe max failures.",
+                                "intValue": "10",
+                                "level": "6",
+                                "name": "6"
+                            }
+                        ]
+                    },
+                    {
+                        "@type": "type.googleapis.com/envoy.config.route.v3.RouteConfiguration",
+                        "name": "listener-insecure"
+                    },
+                    {
+                        "@type": "type.googleapis.com/envoy.config.route.v3.RouteConfiguration",
+                        "name": "listener-secure",
+                        "virtualHosts": [
+                            {
+                                "domains": [
+                                    "id.ai.tarnwick.example",
+                                    "id.ai.tarnwick.example:*"
+                                ],
+                                "name": "id.ai.tarnwick.example",
+                                "routes": [
+                                    {
+                                        "match": {
+                                            "prefix": "/"
+                                        },
+                                        "route": {
+                                            "cluster": "identity:idp:5556",
+                                            "maxStreamDuration": {
+                                                "maxStreamDuration": "0s"
+                                            }
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "domains": [
+                                    "llm.ai.tarnwick.example",
+                                    "llm.ai.tarnwick.example:*"
+                                ],
+                                "name": "llm.ai.tarnwick.example",
+                                "routes": [
+                                    {
+                                        "match": {
+                                            "pathSeparatedPrefix": "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7"
+                                        },
+                                        "route": {
+                                            "cluster": "inference:api-gateway:9080",
+                                            "timeout": "620s"
+                                        }
+                                    },
+                                    {
+                                        "match": {
+                                            "pathSeparatedPrefix": "/models/8242d5c4-9bce-5497-8414-f5bad94fdd84"
+                                        },
+                                        "route": {
+                                            "cluster": "inference:api-gateway:9080",
+                                            "timeout": "620s"
+                                        }
+                                    },
+                                    {
+                                        "match": {
+                                            "pathSeparatedPrefix": "/echo"
+                                        },
+                                        "route": {
+                                            "cluster": "echo:echo:8080",
+                                            "maxStreamDuration": {
+                                                "maxStreamDuration": "0s"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "@type": "type.googleapis.com/envoy.config.cluster.v3.Cluster",
+                        "edsClusterConfig": {
+                            "serviceName": "echo/echo:8080"
+                        },
+                        "name": "echo:echo:8080",
+                        "outlierDetection": {
+                            "splitExternalLocalOriginErrors": true
+                        },
+                        "type": "EDS",
+                        "typedExtensionProtocolOptions": {
+                            "envoy.extensions.upstreams.http.v3.HttpProtocolOptions": {
+                                "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
+                                "commonHttpProtocolOptions": {
+                                    "idleTimeout": "60s"
+                                },
+                                "useDownstreamProtocolConfig": {
+                                    "http2ProtocolOptions": {}
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "@type": "type.googleapis.com/envoy.config.cluster.v3.Cluster",
+                        "edsClusterConfig": {
+                            "serviceName": "identity/idp:5556"
+                        },
+                        "name": "identity:idp:5556",
+                        "outlierDetection": {
+                            "splitExternalLocalOriginErrors": true
+                        },
+                        "type": "EDS",
+                        "typedExtensionProtocolOptions": {
+                            "envoy.extensions.upstreams.http.v3.HttpProtocolOptions": {
+                                "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
+                                "commonHttpProtocolOptions": {
+                                    "idleTimeout": "60s"
+                                },
+                                "useDownstreamProtocolConfig": {
+                                    "http2ProtocolOptions": {}
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "@type": "type.googleapis.com/envoy.config.cluster.v3.Cluster",
+                        "edsClusterConfig": {
+                            "serviceName": "inference/api-gateway:9080"
+                        },
+                        "name": "inference:api-gateway:9080",
+                        "outlierDetection": {
+                            "splitExternalLocalOriginErrors": true
+                        },
+                        "type": "EDS",
+                        "typedExtensionProtocolOptions": {
+                            "envoy.extensions.upstreams.http.v3.HttpProtocolOptions": {
+                                "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
+                                "commonHttpProtocolOptions": {
+                                    "idleTimeout": "60s"
+                                },
+                                "useDownstreamProtocolConfig": {
+                                    "http2ProtocolOptions": {}
+                                }
+                            }
+                        }
+                    }
+                ],
+                "services": [
+                    {
+                        "name": "cilium-gateway-gw-users",
+                        "namespace": "gateways",
+                        "ports": [
+                            443
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

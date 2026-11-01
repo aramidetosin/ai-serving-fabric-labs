@@ -1,0 +1,3025 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"cilium\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"10.22.0.121\"\n    ],\n    \"mac\": \"66:4a:72:ff:13:c0\",\n    \"default\": true,\n    \"dns\": {},\n    \"gateway\": [\n        \"10.22.0.231\"\n    ]\n},{\n    \"name\": \"serving/rail3\",\n    \"interface\": \"rail3\",\n    \"ips\": [\n        \"10.21.3.100\"\n    ],\n    \"mac\": \"02:5a:fe:03:00:64\",\n    \"dns\": {}\n}]",
+                    "k8s.v1.cni.cncf.io/networks": "[{\"name\":\"rail3\",\"namespace\":\"serving\",\"interface\":\"rail3\",\"ips\":[\"10.21.3.100/24\"],\"mac\":\"02:5a:fe:03:00:64\"}]",
+                    "tarnwick.example/spec": "96a5f2b745733bc2"
+                },
+                "creationTimestamp": "2026-11-01T06:47:44Z",
+                "generateName": "chat-a-server-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/component": "server",
+                    "app.kubernetes.io/name": "serving",
+                    "apps.kubernetes.io/pod-index": "0",
+                    "controller-revision-hash": "chat-a-server-69c557cd88",
+                    "decision.tarnwick.example/id": "dec-place-chat",
+                    "statefulset.kubernetes.io/pod-name": "chat-a-server-0",
+                    "tarnwick.example/copy": "a",
+                    "tarnwick.example/model": "chat",
+                    "tarnwick.example/pod": "chat-a-server-0",
+                    "tarnwick.example/rail": "rail3",
+                    "tarnwick.example/role": "server"
+                },
+                "name": "chat-a-server-0",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "StatefulSet",
+                        "name": "chat-a-server",
+                        "uid": "a6bd28d9-47f6-466e-81e6-b71b7cb39a8a"
+                    }
+                ],
+                "resourceVersion": "6246",
+                "uid": "a97446e1-91ab-4bc5-bc3e-9c3c3984457e"
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "llama-server",
+                            "-m",
+                            "/models/LFM2.5-24B-A2B-Q4_K_M.gguf",
+                            "--alias",
+                            "chat",
+                            "--host",
+                            "$(POD_IP)",
+                            "--port",
+                            "8080",
+                            "--rpc",
+                            "10.21.3.101:50052",
+                            "-ngl",
+                            "99",
+                            "-c",
+                            "4096",
+                            "-np",
+                            "8",
+                            "-n",
+                            "256",
+                            "-t",
+                            "2",
+                            "--reasoning-budget",
+                            "0",
+                            "--cache-ram",
+                            "0",
+                            "--ctx-checkpoints",
+                            "0",
+                            "--no-ui",
+                            "--api-key-file",
+                            "/secret/key"
+                        ],
+                        "env": [
+                            {
+                                "name": "POD_IP",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "status.podIP"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "SFAB_READY_HOST",
+                                "value": "$(POD_IP)"
+                            }
+                        ],
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "server",
+                        "ports": [
+                            {
+                                "containerPort": 8080,
+                                "name": "http",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "sfab-ready",
+                                    "server",
+                                    "--port",
+                                    "8080",
+                                    "--rpc-port",
+                                    "50052",
+                                    "--probe-port",
+                                    "50053",
+                                    "10.21.3.101"
+                                ]
+                            },
+                            "failureThreshold": 2,
+                            "periodSeconds": 2,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "resources": {
+                            "limits": {
+                                "memory": "4Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "512Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/secret",
+                                "name": "key",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/models",
+                                "name": "models",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": false,
+                "hostname": "chat-a-server-0",
+                "nodeName": "k8s-gpu1",
+                "nodeSelector": {
+                    "kubernetes.io/hostname": "k8s-gpu1"
+                },
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 65532,
+                    "runAsGroup": 65532,
+                    "runAsNonRoot": true,
+                    "runAsUser": 65532,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "subdomain": "chat-a-server",
+                "terminationGracePeriodSeconds": 2,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "name": "key",
+                        "secret": {
+                            "defaultMode": 288,
+                            "items": [
+                                {
+                                    "key": "key",
+                                    "path": "key"
+                                }
+                            ],
+                            "secretName": "llm-api-key"
+                        }
+                    },
+                    {
+                        "name": "models",
+                        "persistentVolumeClaim": {
+                            "claimName": "models-k8s-gpu1",
+                            "readOnly": true
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:46Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:44Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:50:02Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:50:02Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:44Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "500m",
+                            "memory": "512Mi"
+                        },
+                        "containerID": "containerd://09b0d469a00865a3223aaac4dc7e6e698d3a5200df9055d382e2244bdc9bc6e3",
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imageID": "192.0.2.6:5000/sfab/serving@sha256:61f913c060ffb84f1c724fe623cd1023cc91efa20592cd251d5dd3c00914d0e4",
+                        "lastState": {},
+                        "name": "server",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "memory": "4Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "512Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-11-01T06:47:45Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 65532,
+                                "supplementalGroups": [
+                                    65532
+                                ],
+                                "uid": 65532
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/secret",
+                                "name": "key",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/models",
+                                "name": "models",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "10.20.1.21",
+                "hostIPs": [
+                    {
+                        "ip": "10.20.1.21"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.22.0.121",
+                "podIPs": [
+                    {
+                        "ip": "10.22.0.121"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-11-01T06:47:44Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"cilium\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"10.22.0.5\"\n    ],\n    \"mac\": \"de:4f:92:64:03:6e\",\n    \"default\": true,\n    \"dns\": {},\n    \"gateway\": [\n        \"10.22.0.231\"\n    ]\n},{\n    \"name\": \"serving/rail3\",\n    \"interface\": \"rail3\",\n    \"ips\": [\n        \"10.21.3.101\"\n    ],\n    \"mac\": \"02:5a:fe:03:00:65\",\n    \"dns\": {}\n}]",
+                    "k8s.v1.cni.cncf.io/networks": "[{\"name\":\"rail3\",\"namespace\":\"serving\",\"interface\":\"rail3\",\"ips\":[\"10.21.3.101/24\"],\"mac\":\"02:5a:fe:03:00:65\"}]",
+                    "tarnwick.example/spec": "0ad0b3f6f7fda078"
+                },
+                "creationTimestamp": "2026-11-01T06:47:32Z",
+                "generateName": "chat-a-worker0-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/component": "worker",
+                    "app.kubernetes.io/name": "serving",
+                    "apps.kubernetes.io/pod-index": "0",
+                    "controller-revision-hash": "chat-a-worker0-7886dcd5b4",
+                    "decision.tarnwick.example/id": "dec-place-chat",
+                    "statefulset.kubernetes.io/pod-name": "chat-a-worker0-0",
+                    "tarnwick.example/copy": "a",
+                    "tarnwick.example/model": "chat",
+                    "tarnwick.example/pod": "chat-a-worker0-0",
+                    "tarnwick.example/rail": "rail3",
+                    "tarnwick.example/role": "worker"
+                },
+                "name": "chat-a-worker0-0",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "StatefulSet",
+                        "name": "chat-a-worker0",
+                        "uid": "cb6ee945-d892-4a1e-b61c-0f75bfd14823"
+                    }
+                ],
+                "resourceVersion": "5128",
+                "uid": "f054d183-908a-4346-ac68-3e7e04215cef"
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "ggml-rpc-server",
+                            "-H",
+                            "10.21.3.101",
+                            "-p",
+                            "50052",
+                            "-t",
+                            "4"
+                        ],
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "worker",
+                        "ports": [
+                            {
+                                "containerPort": 50052,
+                                "name": "rpc",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "sfab-ready",
+                                    "worker",
+                                    "--rpc-port",
+                                    "50052",
+                                    "10.21.3.101"
+                                ]
+                            },
+                            "failureThreshold": 2,
+                            "periodSeconds": 2,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "resources": {
+                            "limits": {
+                                "memory": "15774Mi"
+                            },
+                            "requests": {
+                                "cpu": "1",
+                                "memory": "14238Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": false,
+                "hostname": "chat-a-worker0-0",
+                "nodeName": "k8s-gpu1",
+                "nodeSelector": {
+                    "kubernetes.io/hostname": "k8s-gpu1"
+                },
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 65532,
+                    "runAsGroup": 65532,
+                    "runAsNonRoot": true,
+                    "runAsUser": 65532,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "subdomain": "chat-a-worker0",
+                "terminationGracePeriodSeconds": 2,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:38Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:32Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:39Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:39Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:32Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "1",
+                            "memory": "14238Mi"
+                        },
+                        "containerID": "containerd://3ad41a31b22903f491586a5a23f416e4110a0bcf888e03504d7b99029088596a",
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imageID": "192.0.2.6:5000/sfab/serving@sha256:61f913c060ffb84f1c724fe623cd1023cc91efa20592cd251d5dd3c00914d0e4",
+                        "lastState": {},
+                        "name": "worker",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "memory": "15774Mi"
+                            },
+                            "requests": {
+                                "cpu": "1",
+                                "memory": "14238Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-11-01T06:47:38Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 65532,
+                                "supplementalGroups": [
+                                    65532
+                                ],
+                                "uid": 65532
+                            }
+                        }
+                    }
+                ],
+                "hostIP": "10.20.1.21",
+                "hostIPs": [
+                    {
+                        "ip": "10.20.1.21"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.22.0.5",
+                "podIPs": [
+                    {
+                        "ip": "10.22.0.5"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-11-01T06:47:32Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"cilium\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"10.22.1.253\"\n    ],\n    \"mac\": \"d2:a5:e6:fe:42:4a\",\n    \"default\": true,\n    \"dns\": {},\n    \"gateway\": [\n        \"10.22.1.70\"\n    ]\n},{\n    \"name\": \"serving/rail6\",\n    \"interface\": \"rail6\",\n    \"ips\": [\n        \"10.21.6.100\"\n    ],\n    \"mac\": \"02:5a:fe:06:00:64\",\n    \"dns\": {}\n}]",
+                    "k8s.v1.cni.cncf.io/networks": "[{\"name\":\"rail6\",\"namespace\":\"serving\",\"interface\":\"rail6\",\"ips\":[\"10.21.6.100/24\"],\"mac\":\"02:5a:fe:06:00:64\"}]",
+                    "tarnwick.example/spec": "e3e379b0ea4cef22"
+                },
+                "creationTimestamp": "2026-11-01T06:47:44Z",
+                "generateName": "chat-b-server-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/component": "server",
+                    "app.kubernetes.io/name": "serving",
+                    "apps.kubernetes.io/pod-index": "0",
+                    "controller-revision-hash": "chat-b-server-6c7c469778",
+                    "decision.tarnwick.example/id": "dec-place-chat",
+                    "statefulset.kubernetes.io/pod-name": "chat-b-server-0",
+                    "tarnwick.example/copy": "b",
+                    "tarnwick.example/model": "chat",
+                    "tarnwick.example/pod": "chat-b-server-0",
+                    "tarnwick.example/rail": "rail6",
+                    "tarnwick.example/role": "server"
+                },
+                "name": "chat-b-server-0",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "StatefulSet",
+                        "name": "chat-b-server",
+                        "uid": "ee913b69-4183-4609-95f5-b800a1e5a53e"
+                    }
+                ],
+                "resourceVersion": "6256",
+                "uid": "5aa534a2-27ef-44fa-b644-780be11ab24a"
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "llama-server",
+                            "-m",
+                            "/models/LFM2.5-24B-A2B-Q4_K_M.gguf",
+                            "--alias",
+                            "chat",
+                            "--host",
+                            "$(POD_IP)",
+                            "--port",
+                            "8080",
+                            "--rpc",
+                            "10.21.6.101:50052",
+                            "-ngl",
+                            "99",
+                            "-c",
+                            "4096",
+                            "-np",
+                            "8",
+                            "-n",
+                            "256",
+                            "-t",
+                            "2",
+                            "--reasoning-budget",
+                            "0",
+                            "--cache-ram",
+                            "0",
+                            "--ctx-checkpoints",
+                            "0",
+                            "--no-ui",
+                            "--api-key-file",
+                            "/secret/key"
+                        ],
+                        "env": [
+                            {
+                                "name": "POD_IP",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "status.podIP"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "SFAB_READY_HOST",
+                                "value": "$(POD_IP)"
+                            }
+                        ],
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "server",
+                        "ports": [
+                            {
+                                "containerPort": 8080,
+                                "name": "http",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "sfab-ready",
+                                    "server",
+                                    "--port",
+                                    "8080",
+                                    "--rpc-port",
+                                    "50052",
+                                    "--probe-port",
+                                    "50053",
+                                    "10.21.6.101"
+                                ]
+                            },
+                            "failureThreshold": 2,
+                            "periodSeconds": 2,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "resources": {
+                            "limits": {
+                                "memory": "4Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "512Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/secret",
+                                "name": "key",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/models",
+                                "name": "models",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": false,
+                "hostname": "chat-b-server-0",
+                "nodeName": "k8s-gpu2",
+                "nodeSelector": {
+                    "kubernetes.io/hostname": "k8s-gpu2"
+                },
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 65532,
+                    "runAsGroup": 65532,
+                    "runAsNonRoot": true,
+                    "runAsUser": 65532,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "subdomain": "chat-b-server",
+                "terminationGracePeriodSeconds": 2,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "name": "key",
+                        "secret": {
+                            "defaultMode": 288,
+                            "items": [
+                                {
+                                    "key": "key",
+                                    "path": "key"
+                                }
+                            ],
+                            "secretName": "llm-api-key"
+                        }
+                    },
+                    {
+                        "name": "models",
+                        "persistentVolumeClaim": {
+                            "claimName": "models-k8s-gpu2",
+                            "readOnly": true
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:46Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:44Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:50:04Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:50:04Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:44Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "500m",
+                            "memory": "512Mi"
+                        },
+                        "containerID": "containerd://ac6abf9d1e2c369baa477342de33546f1ec03a7298b9f5741556832905e5d58e",
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imageID": "192.0.2.6:5000/sfab/serving@sha256:61f913c060ffb84f1c724fe623cd1023cc91efa20592cd251d5dd3c00914d0e4",
+                        "lastState": {},
+                        "name": "server",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "memory": "4Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "512Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-11-01T06:47:45Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 65532,
+                                "supplementalGroups": [
+                                    65532
+                                ],
+                                "uid": 65532
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/secret",
+                                "name": "key",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/models",
+                                "name": "models",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "10.20.1.22",
+                "hostIPs": [
+                    {
+                        "ip": "10.20.1.22"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.22.1.253",
+                "podIPs": [
+                    {
+                        "ip": "10.22.1.253"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-11-01T06:47:44Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"cilium\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"10.22.1.126\"\n    ],\n    \"mac\": \"6a:23:07:1b:17:b9\",\n    \"default\": true,\n    \"dns\": {},\n    \"gateway\": [\n        \"10.22.1.70\"\n    ]\n},{\n    \"name\": \"serving/rail6\",\n    \"interface\": \"rail6\",\n    \"ips\": [\n        \"10.21.6.101\"\n    ],\n    \"mac\": \"02:5a:fe:06:00:65\",\n    \"dns\": {}\n}]",
+                    "k8s.v1.cni.cncf.io/networks": "[{\"name\":\"rail6\",\"namespace\":\"serving\",\"interface\":\"rail6\",\"ips\":[\"10.21.6.101/24\"],\"mac\":\"02:5a:fe:06:00:65\"}]",
+                    "tarnwick.example/spec": "60f6eab2747b313a"
+                },
+                "creationTimestamp": "2026-11-01T06:47:32Z",
+                "generateName": "chat-b-worker0-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/component": "worker",
+                    "app.kubernetes.io/name": "serving",
+                    "apps.kubernetes.io/pod-index": "0",
+                    "controller-revision-hash": "chat-b-worker0-7fc44574b5",
+                    "decision.tarnwick.example/id": "dec-place-chat",
+                    "statefulset.kubernetes.io/pod-name": "chat-b-worker0-0",
+                    "tarnwick.example/copy": "b",
+                    "tarnwick.example/model": "chat",
+                    "tarnwick.example/pod": "chat-b-worker0-0",
+                    "tarnwick.example/rail": "rail6",
+                    "tarnwick.example/role": "worker"
+                },
+                "name": "chat-b-worker0-0",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "StatefulSet",
+                        "name": "chat-b-worker0",
+                        "uid": "0956e69b-6f58-4383-acf3-a7d1275d1ff3"
+                    }
+                ],
+                "resourceVersion": "5168",
+                "uid": "85fea014-645e-4b5e-a0e8-ba8f76ca333e"
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "ggml-rpc-server",
+                            "-H",
+                            "10.21.6.101",
+                            "-p",
+                            "50052",
+                            "-t",
+                            "4"
+                        ],
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "worker",
+                        "ports": [
+                            {
+                                "containerPort": 50052,
+                                "name": "rpc",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "sfab-ready",
+                                    "worker",
+                                    "--rpc-port",
+                                    "50052",
+                                    "10.21.6.101"
+                                ]
+                            },
+                            "failureThreshold": 2,
+                            "periodSeconds": 2,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "resources": {
+                            "limits": {
+                                "memory": "15774Mi"
+                            },
+                            "requests": {
+                                "cpu": "1",
+                                "memory": "14238Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": false,
+                "hostname": "chat-b-worker0-0",
+                "nodeName": "k8s-gpu2",
+                "nodeSelector": {
+                    "kubernetes.io/hostname": "k8s-gpu2"
+                },
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 65532,
+                    "runAsGroup": 65532,
+                    "runAsNonRoot": true,
+                    "runAsUser": 65532,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "subdomain": "chat-b-worker0",
+                "terminationGracePeriodSeconds": 2,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:42Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:32Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:42Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:42Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:32Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "1",
+                            "memory": "14238Mi"
+                        },
+                        "containerID": "containerd://3db7e059351e78e777fe664b0cbb3b2bde52d10497a1705b38ee1e90b45f7dc3",
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imageID": "192.0.2.6:5000/sfab/serving@sha256:61f913c060ffb84f1c724fe623cd1023cc91efa20592cd251d5dd3c00914d0e4",
+                        "lastState": {},
+                        "name": "worker",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "memory": "15774Mi"
+                            },
+                            "requests": {
+                                "cpu": "1",
+                                "memory": "14238Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-11-01T06:47:41Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 65532,
+                                "supplementalGroups": [
+                                    65532
+                                ],
+                                "uid": 65532
+                            }
+                        }
+                    }
+                ],
+                "hostIP": "10.20.1.22",
+                "hostIPs": [
+                    {
+                        "ip": "10.20.1.22"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.22.1.126",
+                "podIPs": [
+                    {
+                        "ip": "10.22.1.126"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-11-01T06:47:32Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"cilium\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"10.22.0.253\"\n    ],\n    \"mac\": \"ba:3a:0b:e1:f7:2d\",\n    \"default\": true,\n    \"dns\": {},\n    \"gateway\": [\n        \"10.22.0.231\"\n    ]\n},{\n    \"name\": \"serving/rail7\",\n    \"interface\": \"rail7\",\n    \"ips\": [\n        \"10.21.7.100\"\n    ],\n    \"mac\": \"02:5a:fe:07:00:64\",\n    \"dns\": {}\n}]",
+                    "k8s.v1.cni.cncf.io/networks": "[{\"name\":\"rail7\",\"namespace\":\"serving\",\"interface\":\"rail7\",\"ips\":[\"10.21.7.100/24\"],\"mac\":\"02:5a:fe:07:00:64\"}]",
+                    "tarnwick.example/spec": "90fdb7c9041e8ba3"
+                },
+                "creationTimestamp": "2026-11-01T06:47:44Z",
+                "generateName": "chat-c-server-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/component": "server",
+                    "app.kubernetes.io/name": "serving",
+                    "apps.kubernetes.io/pod-index": "0",
+                    "controller-revision-hash": "chat-c-server-656dd7cc69",
+                    "decision.tarnwick.example/id": "dec-place-chat",
+                    "statefulset.kubernetes.io/pod-name": "chat-c-server-0",
+                    "tarnwick.example/copy": "c",
+                    "tarnwick.example/model": "chat",
+                    "tarnwick.example/pod": "chat-c-server-0",
+                    "tarnwick.example/rail": "rail7",
+                    "tarnwick.example/role": "server"
+                },
+                "name": "chat-c-server-0",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "StatefulSet",
+                        "name": "chat-c-server",
+                        "uid": "7ed70593-e7c6-477b-bd96-315a3f08bafe"
+                    }
+                ],
+                "resourceVersion": "6598",
+                "uid": "6e8c1423-baa5-49d9-95e8-378a8cc7acc5"
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "llama-server",
+                            "-m",
+                            "/models/LFM2.5-24B-A2B-Q4_K_M.gguf",
+                            "--alias",
+                            "chat",
+                            "--host",
+                            "$(POD_IP)",
+                            "--port",
+                            "8080",
+                            "--rpc",
+                            "10.21.7.101:50052,10.21.7.102:50052",
+                            "--tensor-split",
+                            "1,1",
+                            "-ngl",
+                            "99",
+                            "-c",
+                            "4096",
+                            "-np",
+                            "8",
+                            "-n",
+                            "256",
+                            "-t",
+                            "2",
+                            "--reasoning-budget",
+                            "0",
+                            "--cache-ram",
+                            "0",
+                            "--ctx-checkpoints",
+                            "0",
+                            "--no-ui",
+                            "--api-key-file",
+                            "/secret/key"
+                        ],
+                        "env": [
+                            {
+                                "name": "POD_IP",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "status.podIP"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "SFAB_READY_HOST",
+                                "value": "$(POD_IP)"
+                            }
+                        ],
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "server",
+                        "ports": [
+                            {
+                                "containerPort": 8080,
+                                "name": "http",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "sfab-ready",
+                                    "server",
+                                    "--port",
+                                    "8080",
+                                    "--rpc-port",
+                                    "50052",
+                                    "--probe-port",
+                                    "50053",
+                                    "10.21.7.101",
+                                    "10.21.7.102"
+                                ]
+                            },
+                            "failureThreshold": 2,
+                            "periodSeconds": 2,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "resources": {
+                            "limits": {
+                                "memory": "4Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "512Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/secret",
+                                "name": "key",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/models",
+                                "name": "models",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": false,
+                "hostname": "chat-c-server-0",
+                "nodeName": "k8s-gpu1",
+                "nodeSelector": {
+                    "kubernetes.io/hostname": "k8s-gpu1"
+                },
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 65532,
+                    "runAsGroup": 65532,
+                    "runAsNonRoot": true,
+                    "runAsUser": 65532,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "subdomain": "chat-c-server",
+                "terminationGracePeriodSeconds": 2,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "name": "key",
+                        "secret": {
+                            "defaultMode": 288,
+                            "items": [
+                                {
+                                    "key": "key",
+                                    "path": "key"
+                                }
+                            ],
+                            "secretName": "llm-api-key"
+                        }
+                    },
+                    {
+                        "name": "models",
+                        "persistentVolumeClaim": {
+                            "claimName": "models-k8s-gpu1",
+                            "readOnly": true
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:46Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:44Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:50:59Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:50:59Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:44Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "500m",
+                            "memory": "512Mi"
+                        },
+                        "containerID": "containerd://112dee6fdbd06bc99a56693307c6d6324e42aec75763c6b98cea3911c2e26326",
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imageID": "192.0.2.6:5000/sfab/serving@sha256:61f913c060ffb84f1c724fe623cd1023cc91efa20592cd251d5dd3c00914d0e4",
+                        "lastState": {},
+                        "name": "server",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "memory": "4Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "512Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-11-01T06:47:45Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 65532,
+                                "supplementalGroups": [
+                                    65532
+                                ],
+                                "uid": 65532
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/secret",
+                                "name": "key",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/models",
+                                "name": "models",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "10.20.1.21",
+                "hostIPs": [
+                    {
+                        "ip": "10.20.1.21"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.22.0.253",
+                "podIPs": [
+                    {
+                        "ip": "10.22.0.253"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-11-01T06:47:44Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"cilium\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"10.22.1.240\"\n    ],\n    \"mac\": \"f6:2f:94:5c:b3:bf\",\n    \"default\": true,\n    \"dns\": {},\n    \"gateway\": [\n        \"10.22.1.70\"\n    ]\n},{\n    \"name\": \"serving/rail7\",\n    \"interface\": \"rail7\",\n    \"ips\": [\n        \"10.21.7.101\"\n    ],\n    \"mac\": \"02:5a:fe:07:00:65\",\n    \"dns\": {}\n}]",
+                    "k8s.v1.cni.cncf.io/networks": "[{\"name\":\"rail7\",\"namespace\":\"serving\",\"interface\":\"rail7\",\"ips\":[\"10.21.7.101/24\"],\"mac\":\"02:5a:fe:07:00:65\"}]",
+                    "tarnwick.example/spec": "51df018c19884d1a"
+                },
+                "creationTimestamp": "2026-11-01T06:47:32Z",
+                "generateName": "chat-c-worker0-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/component": "worker",
+                    "app.kubernetes.io/name": "serving",
+                    "apps.kubernetes.io/pod-index": "0",
+                    "controller-revision-hash": "chat-c-worker0-54964bf4c7",
+                    "decision.tarnwick.example/id": "dec-place-chat",
+                    "statefulset.kubernetes.io/pod-name": "chat-c-worker0-0",
+                    "tarnwick.example/copy": "c",
+                    "tarnwick.example/model": "chat",
+                    "tarnwick.example/pod": "chat-c-worker0-0",
+                    "tarnwick.example/rail": "rail7",
+                    "tarnwick.example/role": "worker"
+                },
+                "name": "chat-c-worker0-0",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "StatefulSet",
+                        "name": "chat-c-worker0",
+                        "uid": "09859900-b876-4eff-a2de-e15b3766dba8"
+                    }
+                ],
+                "resourceVersion": "5170",
+                "uid": "b0aec175-0384-429e-8bdb-ca2d96c80b6e"
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "ggml-rpc-server",
+                            "-H",
+                            "10.21.7.101",
+                            "-p",
+                            "50052",
+                            "-t",
+                            "4"
+                        ],
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "worker",
+                        "ports": [
+                            {
+                                "containerPort": 50052,
+                                "name": "rpc",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "sfab-ready",
+                                    "worker",
+                                    "--rpc-port",
+                                    "50052",
+                                    "10.21.7.101"
+                                ]
+                            },
+                            "failureThreshold": 2,
+                            "periodSeconds": 2,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "resources": {
+                            "limits": {
+                                "memory": "8847Mi"
+                            },
+                            "requests": {
+                                "cpu": "1",
+                                "memory": "7311Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": false,
+                "hostname": "chat-c-worker0-0",
+                "nodeName": "k8s-gpu2",
+                "nodeSelector": {
+                    "kubernetes.io/hostname": "k8s-gpu2"
+                },
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 65532,
+                    "runAsGroup": 65532,
+                    "runAsNonRoot": true,
+                    "runAsUser": 65532,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "subdomain": "chat-c-worker0",
+                "terminationGracePeriodSeconds": 2,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:42Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:32Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:42Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:42Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:32Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "1",
+                            "memory": "7311Mi"
+                        },
+                        "containerID": "containerd://56678513e382d963a49476b0fff46332598718e2a8eb79871b776602b27435aa",
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imageID": "192.0.2.6:5000/sfab/serving@sha256:61f913c060ffb84f1c724fe623cd1023cc91efa20592cd251d5dd3c00914d0e4",
+                        "lastState": {},
+                        "name": "worker",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "memory": "8847Mi"
+                            },
+                            "requests": {
+                                "cpu": "1",
+                                "memory": "7311Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-11-01T06:47:41Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 65532,
+                                "supplementalGroups": [
+                                    65532
+                                ],
+                                "uid": 65532
+                            }
+                        }
+                    }
+                ],
+                "hostIP": "10.20.1.22",
+                "hostIPs": [
+                    {
+                        "ip": "10.20.1.22"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.22.1.240",
+                "podIPs": [
+                    {
+                        "ip": "10.22.1.240"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-11-01T06:47:32Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"cilium\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"10.22.0.120\"\n    ],\n    \"mac\": \"ba:df:aa:87:ac:7c\",\n    \"default\": true,\n    \"dns\": {},\n    \"gateway\": [\n        \"10.22.0.231\"\n    ]\n},{\n    \"name\": \"serving/rail7\",\n    \"interface\": \"rail7\",\n    \"ips\": [\n        \"10.21.7.102\"\n    ],\n    \"mac\": \"02:5a:fe:07:00:66\",\n    \"dns\": {}\n}]",
+                    "k8s.v1.cni.cncf.io/networks": "[{\"name\":\"rail7\",\"namespace\":\"serving\",\"interface\":\"rail7\",\"ips\":[\"10.21.7.102/24\"],\"mac\":\"02:5a:fe:07:00:66\"}]",
+                    "tarnwick.example/spec": "2303a28a3726aad2"
+                },
+                "creationTimestamp": "2026-11-01T06:47:32Z",
+                "generateName": "chat-c-worker1-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/component": "worker",
+                    "app.kubernetes.io/name": "serving",
+                    "apps.kubernetes.io/pod-index": "0",
+                    "controller-revision-hash": "chat-c-worker1-6d54b674f7",
+                    "decision.tarnwick.example/id": "dec-place-chat",
+                    "statefulset.kubernetes.io/pod-name": "chat-c-worker1-0",
+                    "tarnwick.example/copy": "c",
+                    "tarnwick.example/model": "chat",
+                    "tarnwick.example/pod": "chat-c-worker1-0",
+                    "tarnwick.example/rail": "rail7",
+                    "tarnwick.example/role": "worker"
+                },
+                "name": "chat-c-worker1-0",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "StatefulSet",
+                        "name": "chat-c-worker1",
+                        "uid": "d1418bca-a53a-4c94-8512-98cd0e686ade"
+                    }
+                ],
+                "resourceVersion": "5130",
+                "uid": "27de3878-5996-44cc-ba4d-4729f14c32d1"
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "ggml-rpc-server",
+                            "-H",
+                            "10.21.7.102",
+                            "-p",
+                            "50052",
+                            "-t",
+                            "4"
+                        ],
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "worker",
+                        "ports": [
+                            {
+                                "containerPort": 50052,
+                                "name": "rpc",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "sfab-ready",
+                                    "worker",
+                                    "--rpc-port",
+                                    "50052",
+                                    "10.21.7.102"
+                                ]
+                            },
+                            "failureThreshold": 2,
+                            "periodSeconds": 2,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "resources": {
+                            "limits": {
+                                "memory": "8847Mi"
+                            },
+                            "requests": {
+                                "cpu": "1",
+                                "memory": "7311Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": false,
+                "hostname": "chat-c-worker1-0",
+                "nodeName": "k8s-gpu1",
+                "nodeSelector": {
+                    "kubernetes.io/hostname": "k8s-gpu1"
+                },
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 65532,
+                    "runAsGroup": 65532,
+                    "runAsNonRoot": true,
+                    "runAsUser": 65532,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "subdomain": "chat-c-worker1",
+                "terminationGracePeriodSeconds": 2,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:38Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:32Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:39Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:39Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:32Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "1",
+                            "memory": "7311Mi"
+                        },
+                        "containerID": "containerd://58105f1ae8369294981af4cd10976fb086343e8c515b8f6c4103c251ce5e0ebe",
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imageID": "192.0.2.6:5000/sfab/serving@sha256:61f913c060ffb84f1c724fe623cd1023cc91efa20592cd251d5dd3c00914d0e4",
+                        "lastState": {},
+                        "name": "worker",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "memory": "8847Mi"
+                            },
+                            "requests": {
+                                "cpu": "1",
+                                "memory": "7311Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-11-01T06:47:38Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 65532,
+                                "supplementalGroups": [
+                                    65532
+                                ],
+                                "uid": 65532
+                            }
+                        }
+                    }
+                ],
+                "hostIP": "10.20.1.21",
+                "hostIPs": [
+                    {
+                        "ip": "10.20.1.21"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.22.0.120",
+                "podIPs": [
+                    {
+                        "ip": "10.22.0.120"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-11-01T06:47:32Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"cilium\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"10.22.0.47\"\n    ],\n    \"mac\": \"e6:df:5d:60:73:3d\",\n    \"default\": true,\n    \"dns\": {},\n    \"gateway\": [\n        \"10.22.0.231\"\n    ]\n},{\n    \"name\": \"serving/rail4\",\n    \"interface\": \"rail4\",\n    \"ips\": [\n        \"10.21.4.100\"\n    ],\n    \"mac\": \"02:5a:fe:04:00:64\",\n    \"dns\": {}\n}]",
+                    "k8s.v1.cni.cncf.io/networks": "[{\"name\":\"rail4\",\"namespace\":\"serving\",\"interface\":\"rail4\",\"ips\":[\"10.21.4.100/24\"],\"mac\":\"02:5a:fe:04:00:64\"}]",
+                    "tarnwick.example/spec": "e881e99a47b8c096"
+                },
+                "creationTimestamp": "2026-11-01T06:47:44Z",
+                "generateName": "staff-a-server-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/component": "server",
+                    "app.kubernetes.io/name": "serving",
+                    "apps.kubernetes.io/pod-index": "0",
+                    "controller-revision-hash": "staff-a-server-777d4578b8",
+                    "decision.tarnwick.example/id": "dec-place-staff",
+                    "statefulset.kubernetes.io/pod-name": "staff-a-server-0",
+                    "tarnwick.example/copy": "a",
+                    "tarnwick.example/model": "staff",
+                    "tarnwick.example/pod": "staff-a-server-0",
+                    "tarnwick.example/rail": "rail4",
+                    "tarnwick.example/role": "server"
+                },
+                "name": "staff-a-server-0",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "StatefulSet",
+                        "name": "staff-a-server",
+                        "uid": "3353ad21-dfde-4861-9b87-71f4ba862112"
+                    }
+                ],
+                "resourceVersion": "6403",
+                "uid": "9fe6932c-9970-4954-9920-fbf3391e1466"
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "llama-server",
+                            "-m",
+                            "/models/Qwen3.8-27B-UD-Q4_K_M.gguf",
+                            "--alias",
+                            "staff",
+                            "--host",
+                            "$(POD_IP)",
+                            "--port",
+                            "8080",
+                            "--rpc",
+                            "10.21.4.101:50052",
+                            "-ngl",
+                            "99",
+                            "-c",
+                            "4096",
+                            "-np",
+                            "8",
+                            "-n",
+                            "256",
+                            "-t",
+                            "2",
+                            "--reasoning-budget",
+                            "0",
+                            "--cache-ram",
+                            "0",
+                            "--ctx-checkpoints",
+                            "0",
+                            "--no-ui",
+                            "--api-key-file",
+                            "/secret/key"
+                        ],
+                        "env": [
+                            {
+                                "name": "POD_IP",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "status.podIP"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "SFAB_READY_HOST",
+                                "value": "$(POD_IP)"
+                            }
+                        ],
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "server",
+                        "ports": [
+                            {
+                                "containerPort": 8080,
+                                "name": "http",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "sfab-ready",
+                                    "server",
+                                    "--port",
+                                    "8080",
+                                    "--rpc-port",
+                                    "50052",
+                                    "--probe-port",
+                                    "50053",
+                                    "10.21.4.101"
+                                ]
+                            },
+                            "failureThreshold": 2,
+                            "periodSeconds": 2,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "resources": {
+                            "limits": {
+                                "memory": "4Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "512Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/secret",
+                                "name": "key",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/models",
+                                "name": "models",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": false,
+                "hostname": "staff-a-server-0",
+                "nodeName": "k8s-gpu1",
+                "nodeSelector": {
+                    "kubernetes.io/hostname": "k8s-gpu1"
+                },
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 65532,
+                    "runAsGroup": 65532,
+                    "runAsNonRoot": true,
+                    "runAsUser": 65532,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "subdomain": "staff-a-server",
+                "terminationGracePeriodSeconds": 2,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "name": "key",
+                        "secret": {
+                            "defaultMode": 288,
+                            "items": [
+                                {
+                                    "key": "key",
+                                    "path": "key"
+                                }
+                            ],
+                            "secretName": "llm-api-key"
+                        }
+                    },
+                    {
+                        "name": "models",
+                        "persistentVolumeClaim": {
+                            "claimName": "models-k8s-gpu1",
+                            "readOnly": true
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:46Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:44Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:50:27Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:50:27Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:44Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "500m",
+                            "memory": "512Mi"
+                        },
+                        "containerID": "containerd://eec6afcf2fc9d7cfa5dc1231732eb274ffbcbaf7dbecf2f32f3aea7722a3ae8c",
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imageID": "192.0.2.6:5000/sfab/serving@sha256:61f913c060ffb84f1c724fe623cd1023cc91efa20592cd251d5dd3c00914d0e4",
+                        "lastState": {},
+                        "name": "server",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "memory": "4Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "512Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-11-01T06:47:45Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 65532,
+                                "supplementalGroups": [
+                                    65532
+                                ],
+                                "uid": 65532
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/secret",
+                                "name": "key",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/models",
+                                "name": "models",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "10.20.1.21",
+                "hostIPs": [
+                    {
+                        "ip": "10.20.1.21"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.22.0.47",
+                "podIPs": [
+                    {
+                        "ip": "10.22.0.47"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-11-01T06:47:44Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"cilium\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"10.22.0.171\"\n    ],\n    \"mac\": \"06:93:db:76:df:37\",\n    \"default\": true,\n    \"dns\": {},\n    \"gateway\": [\n        \"10.22.0.231\"\n    ]\n},{\n    \"name\": \"serving/rail4\",\n    \"interface\": \"rail4\",\n    \"ips\": [\n        \"10.21.4.101\"\n    ],\n    \"mac\": \"02:5a:fe:04:00:65\",\n    \"dns\": {}\n}]",
+                    "k8s.v1.cni.cncf.io/networks": "[{\"name\":\"rail4\",\"namespace\":\"serving\",\"interface\":\"rail4\",\"ips\":[\"10.21.4.101/24\"],\"mac\":\"02:5a:fe:04:00:65\"}]",
+                    "tarnwick.example/spec": "ee0531238afaa35b"
+                },
+                "creationTimestamp": "2026-11-01T06:47:32Z",
+                "generateName": "staff-a-worker0-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/component": "worker",
+                    "app.kubernetes.io/name": "serving",
+                    "apps.kubernetes.io/pod-index": "0",
+                    "controller-revision-hash": "staff-a-worker0-75996d6d4d",
+                    "decision.tarnwick.example/id": "dec-place-staff",
+                    "statefulset.kubernetes.io/pod-name": "staff-a-worker0-0",
+                    "tarnwick.example/copy": "a",
+                    "tarnwick.example/model": "staff",
+                    "tarnwick.example/pod": "staff-a-worker0-0",
+                    "tarnwick.example/rail": "rail4",
+                    "tarnwick.example/role": "worker"
+                },
+                "name": "staff-a-worker0-0",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "StatefulSet",
+                        "name": "staff-a-worker0",
+                        "uid": "86f2b390-decc-4a1e-a5ef-a994f0d2961c"
+                    }
+                ],
+                "resourceVersion": "5126",
+                "uid": "b8584b81-7e65-4ff9-ab7b-378296eea74d"
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "ggml-rpc-server",
+                            "-H",
+                            "10.21.4.101",
+                            "-p",
+                            "50052",
+                            "-t",
+                            "4"
+                        ],
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "worker",
+                        "ports": [
+                            {
+                                "containerPort": 50052,
+                                "name": "rpc",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "sfab-ready",
+                                    "worker",
+                                    "--rpc-port",
+                                    "50052",
+                                    "10.21.4.101"
+                                ]
+                            },
+                            "failureThreshold": 2,
+                            "periodSeconds": 2,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "resources": {
+                            "limits": {
+                                "memory": "17622Mi"
+                            },
+                            "requests": {
+                                "cpu": "1",
+                                "memory": "16086Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": false,
+                "hostname": "staff-a-worker0-0",
+                "nodeName": "k8s-gpu1",
+                "nodeSelector": {
+                    "kubernetes.io/hostname": "k8s-gpu1"
+                },
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 65532,
+                    "runAsGroup": 65532,
+                    "runAsNonRoot": true,
+                    "runAsUser": 65532,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "subdomain": "staff-a-worker0",
+                "terminationGracePeriodSeconds": 2,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:38Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:32Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:39Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:39Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:32Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "1",
+                            "memory": "16086Mi"
+                        },
+                        "containerID": "containerd://5c6ec294a640d71839262805e3c07fe765af2bd8e42c19c49677bdb725eda95a",
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imageID": "192.0.2.6:5000/sfab/serving@sha256:61f913c060ffb84f1c724fe623cd1023cc91efa20592cd251d5dd3c00914d0e4",
+                        "lastState": {},
+                        "name": "worker",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "memory": "17622Mi"
+                            },
+                            "requests": {
+                                "cpu": "1",
+                                "memory": "16086Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-11-01T06:47:38Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 65532,
+                                "supplementalGroups": [
+                                    65532
+                                ],
+                                "uid": 65532
+                            }
+                        }
+                    }
+                ],
+                "hostIP": "10.20.1.21",
+                "hostIPs": [
+                    {
+                        "ip": "10.20.1.21"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.22.0.171",
+                "podIPs": [
+                    {
+                        "ip": "10.22.0.171"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-11-01T06:47:32Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"cilium\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"10.22.1.206\"\n    ],\n    \"mac\": \"62:78:dc:b7:25:9c\",\n    \"default\": true,\n    \"dns\": {},\n    \"gateway\": [\n        \"10.22.1.70\"\n    ]\n},{\n    \"name\": \"serving/rail5\",\n    \"interface\": \"rail5\",\n    \"ips\": [\n        \"10.21.5.100\"\n    ],\n    \"mac\": \"02:5a:fe:05:00:64\",\n    \"dns\": {}\n}]",
+                    "k8s.v1.cni.cncf.io/networks": "[{\"name\":\"rail5\",\"namespace\":\"serving\",\"interface\":\"rail5\",\"ips\":[\"10.21.5.100/24\"],\"mac\":\"02:5a:fe:05:00:64\"}]",
+                    "tarnwick.example/spec": "331eed0258b0a398"
+                },
+                "creationTimestamp": "2026-11-01T06:47:44Z",
+                "generateName": "staff-b-server-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/component": "server",
+                    "app.kubernetes.io/name": "serving",
+                    "apps.kubernetes.io/pod-index": "0",
+                    "controller-revision-hash": "staff-b-server-645db79cbc",
+                    "decision.tarnwick.example/id": "dec-place-staff",
+                    "statefulset.kubernetes.io/pod-name": "staff-b-server-0",
+                    "tarnwick.example/copy": "b",
+                    "tarnwick.example/model": "staff",
+                    "tarnwick.example/pod": "staff-b-server-0",
+                    "tarnwick.example/rail": "rail5",
+                    "tarnwick.example/role": "server"
+                },
+                "name": "staff-b-server-0",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "StatefulSet",
+                        "name": "staff-b-server",
+                        "uid": "9402f68f-c5f8-41df-a0a9-07f61ac26c71"
+                    }
+                ],
+                "resourceVersion": "6354",
+                "uid": "ea6d220e-c1af-42ab-86f3-f1188ae95b78"
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "llama-server",
+                            "-m",
+                            "/models/Qwen3.8-27B-UD-Q4_K_M.gguf",
+                            "--alias",
+                            "staff",
+                            "--host",
+                            "$(POD_IP)",
+                            "--port",
+                            "8080",
+                            "--rpc",
+                            "10.21.5.101:50052",
+                            "-ngl",
+                            "99",
+                            "-c",
+                            "4096",
+                            "-np",
+                            "8",
+                            "-n",
+                            "256",
+                            "-t",
+                            "2",
+                            "--reasoning-budget",
+                            "0",
+                            "--cache-ram",
+                            "0",
+                            "--ctx-checkpoints",
+                            "0",
+                            "--no-ui",
+                            "--api-key-file",
+                            "/secret/key"
+                        ],
+                        "env": [
+                            {
+                                "name": "POD_IP",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "status.podIP"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "SFAB_READY_HOST",
+                                "value": "$(POD_IP)"
+                            }
+                        ],
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "server",
+                        "ports": [
+                            {
+                                "containerPort": 8080,
+                                "name": "http",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "sfab-ready",
+                                    "server",
+                                    "--port",
+                                    "8080",
+                                    "--rpc-port",
+                                    "50052",
+                                    "--probe-port",
+                                    "50053",
+                                    "10.21.5.101"
+                                ]
+                            },
+                            "failureThreshold": 2,
+                            "periodSeconds": 2,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "resources": {
+                            "limits": {
+                                "memory": "4Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "512Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/secret",
+                                "name": "key",
+                                "readOnly": true
+                            },
+                            {
+                                "mountPath": "/models",
+                                "name": "models",
+                                "readOnly": true
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": false,
+                "hostname": "staff-b-server-0",
+                "nodeName": "k8s-gpu2",
+                "nodeSelector": {
+                    "kubernetes.io/hostname": "k8s-gpu2"
+                },
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 65532,
+                    "runAsGroup": 65532,
+                    "runAsNonRoot": true,
+                    "runAsUser": 65532,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "subdomain": "staff-b-server",
+                "terminationGracePeriodSeconds": 2,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "name": "key",
+                        "secret": {
+                            "defaultMode": 288,
+                            "items": [
+                                {
+                                    "key": "key",
+                                    "path": "key"
+                                }
+                            ],
+                            "secretName": "llm-api-key"
+                        }
+                    },
+                    {
+                        "name": "models",
+                        "persistentVolumeClaim": {
+                            "claimName": "models-k8s-gpu2",
+                            "readOnly": true
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:46Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:44Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:50:20Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:50:20Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:44Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "500m",
+                            "memory": "512Mi"
+                        },
+                        "containerID": "containerd://6c45a5835b9622dcf2d246ab1d9af19c5c4d906508514c1f226c135b439899ae",
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imageID": "192.0.2.6:5000/sfab/serving@sha256:61f913c060ffb84f1c724fe623cd1023cc91efa20592cd251d5dd3c00914d0e4",
+                        "lastState": {},
+                        "name": "server",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "memory": "4Gi"
+                            },
+                            "requests": {
+                                "cpu": "500m",
+                                "memory": "512Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-11-01T06:47:45Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 65532,
+                                "supplementalGroups": [
+                                    65532
+                                ],
+                                "uid": 65532
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/secret",
+                                "name": "key",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            },
+                            {
+                                "mountPath": "/models",
+                                "name": "models",
+                                "readOnly": true,
+                                "recursiveReadOnly": "Disabled"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "10.20.1.22",
+                "hostIPs": [
+                    {
+                        "ip": "10.20.1.22"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.22.1.206",
+                "podIPs": [
+                    {
+                        "ip": "10.22.1.206"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-11-01T06:47:44Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"cilium\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"10.22.1.225\"\n    ],\n    \"mac\": \"02:31:e6:2b:b5:1c\",\n    \"default\": true,\n    \"dns\": {},\n    \"gateway\": [\n        \"10.22.1.70\"\n    ]\n},{\n    \"name\": \"serving/rail5\",\n    \"interface\": \"rail5\",\n    \"ips\": [\n        \"10.21.5.101\"\n    ],\n    \"mac\": \"02:5a:fe:05:00:65\",\n    \"dns\": {}\n}]",
+                    "k8s.v1.cni.cncf.io/networks": "[{\"name\":\"rail5\",\"namespace\":\"serving\",\"interface\":\"rail5\",\"ips\":[\"10.21.5.101/24\"],\"mac\":\"02:5a:fe:05:00:65\"}]",
+                    "tarnwick.example/spec": "7ef0ffda2197cb97"
+                },
+                "creationTimestamp": "2026-11-01T06:47:32Z",
+                "generateName": "staff-b-worker0-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/component": "worker",
+                    "app.kubernetes.io/name": "serving",
+                    "apps.kubernetes.io/pod-index": "0",
+                    "controller-revision-hash": "staff-b-worker0-5596fd456",
+                    "decision.tarnwick.example/id": "dec-place-staff",
+                    "statefulset.kubernetes.io/pod-name": "staff-b-worker0-0",
+                    "tarnwick.example/copy": "b",
+                    "tarnwick.example/model": "staff",
+                    "tarnwick.example/pod": "staff-b-worker0-0",
+                    "tarnwick.example/rail": "rail5",
+                    "tarnwick.example/role": "worker"
+                },
+                "name": "staff-b-worker0-0",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "apps/v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "StatefulSet",
+                        "name": "staff-b-worker0",
+                        "uid": "d27eff87-d48f-4dc0-b817-b4c2aeb36c09"
+                    }
+                ],
+                "resourceVersion": "5172",
+                "uid": "52c02a3e-311f-45b5-a2f6-af2d4a96c353"
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "ggml-rpc-server",
+                            "-H",
+                            "10.21.5.101",
+                            "-p",
+                            "50052",
+                            "-t",
+                            "4"
+                        ],
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "worker",
+                        "ports": [
+                            {
+                                "containerPort": 50052,
+                                "name": "rpc",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": [
+                                    "sfab-ready",
+                                    "worker",
+                                    "--rpc-port",
+                                    "50052",
+                                    "10.21.5.101"
+                                ]
+                            },
+                            "failureThreshold": 2,
+                            "periodSeconds": 2,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 2
+                        },
+                        "resources": {
+                            "limits": {
+                                "memory": "17622Mi"
+                            },
+                            "requests": {
+                                "cpu": "1",
+                                "memory": "16086Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": false,
+                "hostname": "staff-b-worker0-0",
+                "nodeName": "k8s-gpu2",
+                "nodeSelector": {
+                    "kubernetes.io/hostname": "k8s-gpu2"
+                },
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 65532,
+                    "runAsGroup": 65532,
+                    "runAsNonRoot": true,
+                    "runAsUser": 65532,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "subdomain": "staff-b-worker0",
+                "terminationGracePeriodSeconds": 2,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:42Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:32Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:42Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:42Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-01T06:47:32Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "1",
+                            "memory": "16086Mi"
+                        },
+                        "containerID": "containerd://054a8e96f5fa959634450b360e7a3b58a74a7b73a2405af754a5538db26faf42",
+                        "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+                        "imageID": "192.0.2.6:5000/sfab/serving@sha256:61f913c060ffb84f1c724fe623cd1023cc91efa20592cd251d5dd3c00914d0e4",
+                        "lastState": {},
+                        "name": "worker",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "memory": "17622Mi"
+                            },
+                            "requests": {
+                                "cpu": "1",
+                                "memory": "16086Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-11-01T06:47:41Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 65532,
+                                "supplementalGroups": [
+                                    65532
+                                ],
+                                "uid": 65532
+                            }
+                        }
+                    }
+                ],
+                "hostIP": "10.20.1.22",
+                "hostIPs": [
+                    {
+                        "ip": "10.20.1.22"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.22.1.225",
+                "podIPs": [
+                    {
+                        "ip": "10.22.1.225"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-11-01T06:47:32Z"
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

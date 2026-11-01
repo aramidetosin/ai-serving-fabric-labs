@@ -1,0 +1,38 @@
+06:17:21 chain start, set sfab-ch01_record-run_20261101T061721Z
+06:17:21 reading before -> host-before-clean.txt
+git-clone: git clone https://github.com/aramidetosin/ai-serving-fabric-labs.git -> typescripts/rec-git-clone.typescript
+06:17:21..06:17:29 git clone https://github.com/aramidetosin/ai-serving-fabric-labs.git rc=0 
+06:17:30 reading clone -> clone-check.txt
+clean-down: make down -> typescripts/rec-clean-down.typescript
+06:17:30..06:17:32 make down rc=0 == RESULT: 3 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+clean-wipe: make wipe -> typescripts/rec-clean-wipe.typescript
+06:17:32..06:17:34 make wipe rc=0 == RESULT: 4 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+06:17:34 memory guard: MemAvailable 307 GiB >= 235.0 GiB
+06:17:34 reading before -> host-before-up.txt
+06:17:34 memory watcher started (rec-ch01-memwatch)
+make-up: make up -> typescripts/rec-make-up.typescript
+06:17:34..07:19:07 make up rc=0 == RESULT: 1036 passed, 0 failed, 0 known platform limitation(s), 3 skipped
+07:19:08 reading starts -> startedat-after-up.txt
+07:19:17 reading timesync -> guest-timesync-after-up.txt
+07:19:17 reading layers -> container-layers.txt
+make-audit: make audit -> typescripts/rec-make-audit.typescript
+07:19:17..07:36:36 make audit rc=0 == RESULT: 1036 passed, 0 failed, 0 known platform limitation(s), 3 skipped
+make-trace: make trace -> typescripts/rec-make-trace.typescript
+07:36:36..07:40:48 make trace rc=0 == RESULT: 57 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+make-break-1a: make break-1a -> typescripts/rec-make-break-1a.typescript
+07:40:48..07:43:41 make break-1a rc=0 == RESULT: 8 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+make-heal-1a: make heal-1a -> typescripts/rec-make-heal-1a.typescript
+07:43:41..08:03:13 make heal-1a rc=0 == RESULT: 9 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+08:03:14 reading starts -> startedat-before-record.txt
+make-record: make record -> typescripts/rec-make-record.typescript
+08:03:14..08:24:55 make record rc=0 == RESULT: 12 passed, 0 failed, 0 known platform limitation(s), 5 skipped
+08:24:56 reading starts -> startedat-after-record.txt
+08:25:04 reading timesync -> guest-timesync-before-down.txt
+08:25:04 reading du -> state-du.txt
+08:25:04 reading clabwrites -> clab-writes-before-down.txt
+08:25:05 reading after -> host-after-record.txt
+make-down: make down -> typescripts/rec-make-down.typescript
+08:25:05..08:29:04 make down rc=0 == RESULT: 4 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+08:29:05 reading after -> host-after-down.txt
+08:29:05 memory watcher stopped
+08:29:05 CHAIN DONE

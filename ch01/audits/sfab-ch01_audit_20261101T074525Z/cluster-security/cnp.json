@@ -1,0 +1,716 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "cilium.io/v2",
+            "kind": "CiliumNetworkPolicy",
+            "metadata": {
+                "creationTimestamp": "2026-11-01T06:42:56Z",
+                "generation": 1,
+                "name": "allow-gateways-to-backend",
+                "namespace": "echo",
+                "resourceVersion": "2773",
+                "uid": "26c2870f-d260-4789-9ff1-8f2183f987a9"
+            },
+            "spec": {
+                "description": "the Gateways' Envoy to the test backend",
+                "endpointSelector": {
+                    "matchLabels": {
+                        "k8s:app.kubernetes.io/name": "echo"
+                    }
+                },
+                "ingress": [
+                    {
+                        "fromEntities": [
+                            "ingress"
+                        ],
+                        "toPorts": [
+                            {
+                                "ports": [
+                                    {
+                                        "port": "8080",
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T06:42:56Z",
+                        "message": "Policy validation succeeded",
+                        "status": "True",
+                        "type": "Valid"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "cilium.io/v2",
+            "kind": "CiliumNetworkPolicy",
+            "metadata": {
+                "creationTimestamp": "2026-11-01T06:42:56Z",
+                "generation": 1,
+                "name": "default-deny",
+                "namespace": "echo",
+                "resourceVersion": "2771",
+                "uid": "1fcce0a1-c809-4d51-b1b4-8ffc4ecafcba"
+            },
+            "spec": {
+                "description": "every pod in echo: no ingress and no egress but what an allow names",
+                "egress": [
+                    {}
+                ],
+                "endpointSelector": {},
+                "ingress": [
+                    {}
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T06:42:56Z",
+                        "message": "Policy validation succeeded",
+                        "status": "True",
+                        "type": "Valid"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "cilium.io/v2",
+            "kind": "CiliumNetworkPolicy",
+            "metadata": {
+                "creationTimestamp": "2026-11-01T06:42:56Z",
+                "generation": 1,
+                "name": "allow-to-idp",
+                "namespace": "identity",
+                "resourceVersion": "2776",
+                "uid": "d1309d8d-9426-4672-927d-6a5d559ac17c"
+            },
+            "spec": {
+                "description": "the Gateways' Envoy (people signing in) and the API gateway (the signing keys) to the IdP",
+                "endpointSelector": {
+                    "matchLabels": {
+                        "k8s:app.kubernetes.io/name": "idp"
+                    }
+                },
+                "ingress": [
+                    {
+                        "fromEntities": [
+                            "ingress"
+                        ],
+                        "toPorts": [
+                            {
+                                "ports": [
+                                    {
+                                        "port": "5556",
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "fromEndpoints": [
+                            {
+                                "matchLabels": {
+                                    "k8s:app.kubernetes.io/name": "api-gateway",
+                                    "k8s:io.kubernetes.pod.namespace": "inference"
+                                }
+                            }
+                        ],
+                        "toPorts": [
+                            {
+                                "ports": [
+                                    {
+                                        "port": "5556",
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T06:42:56Z",
+                        "message": "Policy validation succeeded",
+                        "status": "True",
+                        "type": "Valid"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "cilium.io/v2",
+            "kind": "CiliumNetworkPolicy",
+            "metadata": {
+                "creationTimestamp": "2026-11-01T06:42:56Z",
+                "generation": 1,
+                "name": "default-deny",
+                "namespace": "identity",
+                "resourceVersion": "2774",
+                "uid": "ea468781-7da7-4f72-abeb-96c991af5fcd"
+            },
+            "spec": {
+                "description": "every pod in identity: no ingress and no egress but what an allow names",
+                "egress": [
+                    {}
+                ],
+                "endpointSelector": {},
+                "ingress": [
+                    {}
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T06:42:56Z",
+                        "message": "Policy validation succeeded",
+                        "status": "True",
+                        "type": "Valid"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "cilium.io/v2",
+            "kind": "CiliumNetworkPolicy",
+            "metadata": {
+                "creationTimestamp": "2026-11-01T06:52:29Z",
+                "generation": 1,
+                "name": "allow-api-gateway",
+                "namespace": "inference",
+                "resourceVersion": "7364",
+                "uid": "fa4caae1-f9e2-476b-b5dc-db62e252d532"
+            },
+            "spec": {
+                "description": "the API gateway: in from the Gateways' Envoy and the key probe; out to the router, the IdP's keys and DNS",
+                "egress": [
+                    {
+                        "toEndpoints": [
+                            {
+                                "matchLabels": {
+                                    "k8s:app.kubernetes.io/name": "router",
+                                    "k8s:io.kubernetes.pod.namespace": "inference"
+                                }
+                            }
+                        ],
+                        "toPorts": [
+                            {
+                                "ports": [
+                                    {
+                                        "port": "4000",
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "toEndpoints": [
+                            {
+                                "matchLabels": {
+                                    "k8s:app.kubernetes.io/name": "idp",
+                                    "k8s:io.kubernetes.pod.namespace": "identity"
+                                }
+                            }
+                        ],
+                        "toPorts": [
+                            {
+                                "ports": [
+                                    {
+                                        "port": "5556",
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "toEndpoints": [
+                            {
+                                "matchLabels": {
+                                    "k8s:io.kubernetes.pod.namespace": "kube-system",
+                                    "k8s:k8s-app": "kube-dns"
+                                }
+                            }
+                        ],
+                        "toPorts": [
+                            {
+                                "ports": [
+                                    {
+                                        "port": "53",
+                                        "protocol": "UDP"
+                                    },
+                                    {
+                                        "port": "53",
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "endpointSelector": {
+                    "matchLabels": {
+                        "k8s:app.kubernetes.io/name": "api-gateway"
+                    }
+                },
+                "ingress": [
+                    {
+                        "fromEntities": [
+                            "ingress"
+                        ],
+                        "toPorts": [
+                            {
+                                "ports": [
+                                    {
+                                        "port": "9080",
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "fromEndpoints": [
+                            {
+                                "matchLabels": {
+                                    "k8s:app.kubernetes.io/component": "key-probe",
+                                    "k8s:app.kubernetes.io/part-of": "inference",
+                                    "k8s:io.kubernetes.pod.namespace": "inference"
+                                }
+                            }
+                        ],
+                        "toPorts": [
+                            {
+                                "ports": [
+                                    {
+                                        "port": "9080",
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T06:52:29Z",
+                        "message": "Policy validation succeeded",
+                        "status": "True",
+                        "type": "Valid"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "cilium.io/v2",
+            "kind": "CiliumNetworkPolicy",
+            "metadata": {
+                "creationTimestamp": "2026-11-01T06:52:29Z",
+                "generation": 1,
+                "name": "allow-key-jobs",
+                "namespace": "inference",
+                "resourceVersion": "7368",
+                "uid": "09a8ee12-66df-418b-ada7-8985cedcabd7"
+            },
+            "spec": {
+                "description": "the key Jobs: out to the API server",
+                "egress": [
+                    {
+                        "toEntities": [
+                            "kube-apiserver"
+                        ],
+                        "toPorts": [
+                            {
+                                "ports": [
+                                    {
+                                        "port": "6443",
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "endpointSelector": {
+                    "matchLabels": {
+                        "k8s:app.kubernetes.io/component": "keys",
+                        "k8s:app.kubernetes.io/part-of": "inference"
+                    }
+                }
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T06:52:29Z",
+                        "message": "Policy validation succeeded",
+                        "status": "True",
+                        "type": "Valid"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "cilium.io/v2",
+            "kind": "CiliumNetworkPolicy",
+            "metadata": {
+                "creationTimestamp": "2026-11-01T06:52:29Z",
+                "generation": 1,
+                "name": "allow-key-probe",
+                "namespace": "inference",
+                "resourceVersion": "7370",
+                "uid": "ea8d14b7-d2d6-4fad-85eb-057968e20551"
+            },
+            "spec": {
+                "description": "the key probe: out to the API server (it lists the API gateway's pods) and to each API gateway pod",
+                "egress": [
+                    {
+                        "toEntities": [
+                            "kube-apiserver"
+                        ],
+                        "toPorts": [
+                            {
+                                "ports": [
+                                    {
+                                        "port": "6443",
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "toEndpoints": [
+                            {
+                                "matchLabels": {
+                                    "k8s:app.kubernetes.io/name": "api-gateway",
+                                    "k8s:io.kubernetes.pod.namespace": "inference"
+                                }
+                            }
+                        ],
+                        "toPorts": [
+                            {
+                                "ports": [
+                                    {
+                                        "port": "9080",
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "endpointSelector": {
+                    "matchLabels": {
+                        "k8s:app.kubernetes.io/component": "key-probe",
+                        "k8s:app.kubernetes.io/part-of": "inference"
+                    }
+                }
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T06:52:29Z",
+                        "message": "Policy validation succeeded",
+                        "status": "True",
+                        "type": "Valid"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "cilium.io/v2",
+            "kind": "CiliumNetworkPolicy",
+            "metadata": {
+                "creationTimestamp": "2026-11-01T06:52:29Z",
+                "generation": 1,
+                "name": "allow-router",
+                "namespace": "inference",
+                "resourceVersion": "7366",
+                "uid": "b2ba2f85-5b3d-411e-834d-790ef6c7f6df"
+            },
+            "spec": {
+                "description": "the router: in from the API gateway; out to the model servers and DNS",
+                "egress": [
+                    {
+                        "toEndpoints": [
+                            {
+                                "matchLabels": {
+                                    "k8s:app.kubernetes.io/component": "server",
+                                    "k8s:app.kubernetes.io/name": "serving",
+                                    "k8s:io.kubernetes.pod.namespace": "serving"
+                                }
+                            }
+                        ],
+                        "toPorts": [
+                            {
+                                "ports": [
+                                    {
+                                        "port": "8080",
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "toEndpoints": [
+                            {
+                                "matchLabels": {
+                                    "k8s:io.kubernetes.pod.namespace": "kube-system",
+                                    "k8s:k8s-app": "kube-dns"
+                                }
+                            }
+                        ],
+                        "toPorts": [
+                            {
+                                "ports": [
+                                    {
+                                        "port": "53",
+                                        "protocol": "UDP"
+                                    },
+                                    {
+                                        "port": "53",
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "endpointSelector": {
+                    "matchLabels": {
+                        "k8s:app.kubernetes.io/name": "router"
+                    }
+                },
+                "ingress": [
+                    {
+                        "fromEndpoints": [
+                            {
+                                "matchLabels": {
+                                    "k8s:app.kubernetes.io/name": "api-gateway",
+                                    "k8s:io.kubernetes.pod.namespace": "inference"
+                                }
+                            }
+                        ],
+                        "toPorts": [
+                            {
+                                "ports": [
+                                    {
+                                        "port": "4000",
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T06:52:29Z",
+                        "message": "Policy validation succeeded",
+                        "status": "True",
+                        "type": "Valid"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "cilium.io/v2",
+            "kind": "CiliumNetworkPolicy",
+            "metadata": {
+                "creationTimestamp": "2026-11-01T06:52:29Z",
+                "generation": 1,
+                "name": "default-deny",
+                "namespace": "inference",
+                "resourceVersion": "7362",
+                "uid": "2279294a-f85a-4a6b-8578-26a95abca7b0"
+            },
+            "spec": {
+                "description": "every pod in inference: no ingress and no egress but what an allow names",
+                "egress": [
+                    {}
+                ],
+                "endpointSelector": {},
+                "ingress": [
+                    {}
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T06:52:29Z",
+                        "message": "Policy validation succeeded",
+                        "status": "True",
+                        "type": "Valid"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "cilium.io/v2",
+            "kind": "CiliumNetworkPolicy",
+            "metadata": {
+                "creationTimestamp": "2026-11-01T06:52:29Z",
+                "generation": 1,
+                "name": "allow-key-job",
+                "namespace": "serving",
+                "resourceVersion": "7376",
+                "uid": "741d3489-546f-4b3c-98ec-8355adeb5cf9"
+            },
+            "spec": {
+                "description": "the recipe's key Job: out to the API server",
+                "egress": [
+                    {
+                        "toEntities": [
+                            "kube-apiserver"
+                        ],
+                        "toPorts": [
+                            {
+                                "ports": [
+                                    {
+                                        "port": "6443",
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "endpointSelector": {
+                    "matchLabels": {
+                        "k8s:app.kubernetes.io/component": "key",
+                        "k8s:app.kubernetes.io/name": "serving"
+                    }
+                }
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T06:52:29Z",
+                        "message": "Policy validation succeeded",
+                        "status": "True",
+                        "type": "Valid"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "cilium.io/v2",
+            "kind": "CiliumNetworkPolicy",
+            "metadata": {
+                "creationTimestamp": "2026-11-01T06:52:29Z",
+                "generation": 1,
+                "name": "allow-to-servers",
+                "namespace": "serving",
+                "resourceVersion": "7374",
+                "uid": "82e396f1-f4ea-4acc-b2f6-f4306a82fd42"
+            },
+            "spec": {
+                "description": "the model servers: in from the router and from the Gateways' Envoy (the recipe's own route)",
+                "endpointSelector": {
+                    "matchLabels": {
+                        "k8s:app.kubernetes.io/component": "server",
+                        "k8s:app.kubernetes.io/name": "serving"
+                    }
+                },
+                "ingress": [
+                    {
+                        "fromEndpoints": [
+                            {
+                                "matchLabels": {
+                                    "k8s:app.kubernetes.io/name": "router",
+                                    "k8s:io.kubernetes.pod.namespace": "inference"
+                                }
+                            }
+                        ],
+                        "toPorts": [
+                            {
+                                "ports": [
+                                    {
+                                        "port": "8080",
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "fromEntities": [
+                            "ingress"
+                        ],
+                        "toPorts": [
+                            {
+                                "ports": [
+                                    {
+                                        "port": "8080",
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T06:52:29Z",
+                        "message": "Policy validation succeeded",
+                        "status": "True",
+                        "type": "Valid"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "cilium.io/v2",
+            "kind": "CiliumNetworkPolicy",
+            "metadata": {
+                "creationTimestamp": "2026-11-01T06:52:29Z",
+                "generation": 1,
+                "name": "default-deny",
+                "namespace": "serving",
+                "resourceVersion": "7372",
+                "uid": "d82eb44f-5c6b-48e4-b42e-07b9d91f937f"
+            },
+            "spec": {
+                "description": "every pod in serving: no ingress and no egress but what an allow names",
+                "egress": [
+                    {}
+                ],
+                "endpointSelector": {},
+                "ingress": [
+                    {}
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T06:52:29Z",
+                        "message": "Policy validation succeeded",
+                        "status": "True",
+                        "type": "Valid"
+                    }
+                ]
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

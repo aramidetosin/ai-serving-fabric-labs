@@ -1,0 +1,27 @@
+1-ent-client-eth1	host	ent-client	-	-	eth1	(host 10.24.10.10 and (tcp port 443 or tcp port 22)) or (vlan and (host 10.24.10.10 and (tcp port 443 or tcp port 22)))	96	0
+2-fw-ethernet1-4	host	fw	-	-	eth4	(host 10.24.10.10 and (tcp port 443 or tcp port 22)) or (vlan and (host 10.24.10.10 and (tcp port 443 or tcp port 22)))	96	0
+3-fw-ae1-leg1	host	fw	-	-	eth1	(host 10.24.10.10 and (tcp port 443 or tcp port 22)) or (vlan and (host 10.24.10.10 and (tcp port 443 or tcp port 22)))	96	0
+3-fw-ae1-leg2	host	fw	-	-	eth2	(host 10.24.10.10 and (tcp port 443 or tcp port 22)) or (vlan and (host 10.24.10.10 and (tcp port 443 or tcp port 22)))	96	0
+4-fe-sw1-Ethernet2	host	fe-sw1	-	-	eth3	(host 10.24.10.10 and (tcp port 443 or tcp port 22)) or (vlan and (host 10.24.10.10 and (tcp port 443 or tcp port 22)))	96	0
+4-fe-sw2-Ethernet2	host	fe-sw2	-	-	eth3	(host 10.24.10.10 and (tcp port 443 or tcp port 22)) or (vlan and (host 10.24.10.10 and (tcp port 443 or tcp port 22)))	96	0
+5-fe-sw1-Ethernet14	host	fe-sw1	-	-	eth15	(host 10.24.10.10 and (tcp port 443 or tcp port 22)) or (vlan and (host 10.24.10.10 and (tcp port 443 or tcp port 22)))	96	0
+5-fe-sw2-Ethernet14	host	fe-sw2	-	-	eth15	(host 10.24.10.10 and (tcp port 443 or tcp port 22)) or (vlan and (host 10.24.10.10 and (tcp port 443 or tcp port 22)))	96	0
+6-k8s-ingress2-bond0	guest	k8s-ingress2	-	-	bond0	tcp port 443 and host 10.20.11.210	96	0
+7-api-gateway-64bc7b94df-xmb5w-eth0	pod	k8s-ingress1	inference	api-gateway-64bc7b94df-xmb5w	eth0	tcp port 9080 or tcp port 4000	2048	1
+7-api-gateway-64bc7b94df-zv57v-eth0	pod	k8s-ingress2	inference	api-gateway-64bc7b94df-zv57v	eth0	tcp port 9080 or tcp port 4000	2048	1
+8-router-76cf778fb6-8lcxw-eth0	pod	k8s-ingress1	inference	router-76cf778fb6-8lcxw	eth0	tcp port 4000 or tcp port 8080	2048	1
+8-router-76cf778fb6-phz26-eth0	pod	k8s-ingress2	inference	router-76cf778fb6-phz26	eth0	tcp port 4000 or tcp port 8080	2048	1
+9-chat-a-server-0-eth0	pod	k8s-gpu1	serving	chat-a-server-0	eth0	tcp port 8080	66	0
+9-chat-a-server-0-rail3	pod	k8s-gpu1	serving	chat-a-server-0	rail3	tcp port 50052	128	0
+10-chat-a-worker0-0-rail3	pod	k8s-gpu1	serving	chat-a-worker0-0	rail3	tcp port 50052	128	0
+11-rail-sw1-Ethernet1	host	rail-sw1	-	-	eth2	tcp port 50052	128	0
+9-chat-b-server-0-eth0	pod	k8s-gpu2	serving	chat-b-server-0	eth0	tcp port 8080	66	0
+9-chat-b-server-0-rail6	pod	k8s-gpu2	serving	chat-b-server-0	rail6	tcp port 50052	128	0
+10-chat-b-worker0-0-rail6	pod	k8s-gpu2	serving	chat-b-worker0-0	rail6	tcp port 50052	128	0
+11-rail-sw2-Ethernet6	host	rail-sw2	-	-	eth7	tcp port 50052	128	0
+9-chat-c-server-0-eth0	pod	k8s-gpu1	serving	chat-c-server-0	eth0	tcp port 8080	66	0
+9-chat-c-server-0-rail7	pod	k8s-gpu1	serving	chat-c-server-0	rail7	tcp port 50052	128	0
+10-chat-c-worker0-0-rail7	pod	k8s-gpu2	serving	chat-c-worker0-0	rail7	tcp port 50052	128	0
+10-chat-c-worker1-0-rail7	pod	k8s-gpu1	serving	chat-c-worker1-0	rail7	tcp port 50052	128	0
+11-rail-sw1-Ethernet3	host	rail-sw1	-	-	eth4	tcp port 50052	128	0
+11-rail-sw1-Ethernet7	host	rail-sw1	-	-	eth8	tcp port 50052	128	0

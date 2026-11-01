@@ -1,0 +1,723 @@
+# serving-layer manifests for sfab-ch01: rendered by serving.py from serving.env
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: chat-a-server
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+    app.kubernetes.io/component: server
+    tarnwick.example/model: chat
+    tarnwick.example/copy: a
+    tarnwick.example/role: server
+    tarnwick.example/pod: chat-a-server-0
+    tarnwick.example/rail: rail3
+    decision.tarnwick.example/id: dec-place-chat
+spec:
+  replicas: 1
+  serviceName: chat-a-server
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: OnDelete
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: serving
+      tarnwick.example/pod: chat-a-server-0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: serving
+        app.kubernetes.io/component: server
+        tarnwick.example/model: chat
+        tarnwick.example/copy: a
+        tarnwick.example/role: server
+        tarnwick.example/pod: chat-a-server-0
+        tarnwick.example/rail: rail3
+        decision.tarnwick.example/id: dec-place-chat
+      annotations:
+        k8s.v1.cni.cncf.io/networks: "[{\"name\":\"rail3\",\"namespace\":\"serving\",\"interface\":\"rail3\",\"ips\":[\"10.21.3.100/24\"],\"mac\":\"02:5a:fe:03:00:64\"}]"
+        tarnwick.example/spec: "96a5f2b745733bc2"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-gpu1
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 2
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: server
+        image: "192.0.2.6:5000/sfab/serving:b11382-2"
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: SFAB_READY_HOST
+          value: "$(POD_IP)"
+        command:
+        - llama-server
+        - "-m"
+        - /models/LFM2.5-24B-A2B-Q4_K_M.gguf
+        - "--alias"
+        - chat
+        - "--host"
+        - "$(POD_IP)"
+        - "--port"
+        - "8080"
+        - "--rpc"
+        - "10.21.3.101:50052"
+        - "-ngl"
+        - "99"
+        - "-c"
+        - "4096"
+        - "-np"
+        - "8"
+        - "-n"
+        - "256"
+        - "-t"
+        - "2"
+        - "--reasoning-budget"
+        - "0"
+        - "--cache-ram"
+        - "0"
+        - "--ctx-checkpoints"
+        - "0"
+        - "--no-ui"
+        - "--api-key-file"
+        - /secret/key
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - sfab-ready
+            - server
+            - "--port"
+            - "8080"
+            - "--rpc-port"
+            - "50052"
+            - "--probe-port"
+            - "50053"
+            - "10.21.3.101"
+          periodSeconds: 2
+          failureThreshold: 2
+          timeoutSeconds: 2
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            memory: "4Gi"
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: key
+          mountPath: /secret
+          readOnly: true
+        - name: models
+          mountPath: /models
+          readOnly: true
+      volumes:
+      - name: key
+        secret:
+          secretName: llm-api-key
+          defaultMode: 288
+          items:
+          - key: key
+            path: key
+      - name: models
+        persistentVolumeClaim:
+          claimName: models-k8s-gpu1
+          readOnly: true
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: chat-b-server
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+    app.kubernetes.io/component: server
+    tarnwick.example/model: chat
+    tarnwick.example/copy: b
+    tarnwick.example/role: server
+    tarnwick.example/pod: chat-b-server-0
+    tarnwick.example/rail: rail6
+    decision.tarnwick.example/id: dec-place-chat
+spec:
+  replicas: 1
+  serviceName: chat-b-server
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: OnDelete
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: serving
+      tarnwick.example/pod: chat-b-server-0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: serving
+        app.kubernetes.io/component: server
+        tarnwick.example/model: chat
+        tarnwick.example/copy: b
+        tarnwick.example/role: server
+        tarnwick.example/pod: chat-b-server-0
+        tarnwick.example/rail: rail6
+        decision.tarnwick.example/id: dec-place-chat
+      annotations:
+        k8s.v1.cni.cncf.io/networks: "[{\"name\":\"rail6\",\"namespace\":\"serving\",\"interface\":\"rail6\",\"ips\":[\"10.21.6.100/24\"],\"mac\":\"02:5a:fe:06:00:64\"}]"
+        tarnwick.example/spec: e3e379b0ea4cef22
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-gpu2
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 2
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: server
+        image: "192.0.2.6:5000/sfab/serving:b11382-2"
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: SFAB_READY_HOST
+          value: "$(POD_IP)"
+        command:
+        - llama-server
+        - "-m"
+        - /models/LFM2.5-24B-A2B-Q4_K_M.gguf
+        - "--alias"
+        - chat
+        - "--host"
+        - "$(POD_IP)"
+        - "--port"
+        - "8080"
+        - "--rpc"
+        - "10.21.6.101:50052"
+        - "-ngl"
+        - "99"
+        - "-c"
+        - "4096"
+        - "-np"
+        - "8"
+        - "-n"
+        - "256"
+        - "-t"
+        - "2"
+        - "--reasoning-budget"
+        - "0"
+        - "--cache-ram"
+        - "0"
+        - "--ctx-checkpoints"
+        - "0"
+        - "--no-ui"
+        - "--api-key-file"
+        - /secret/key
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - sfab-ready
+            - server
+            - "--port"
+            - "8080"
+            - "--rpc-port"
+            - "50052"
+            - "--probe-port"
+            - "50053"
+            - "10.21.6.101"
+          periodSeconds: 2
+          failureThreshold: 2
+          timeoutSeconds: 2
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            memory: "4Gi"
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: key
+          mountPath: /secret
+          readOnly: true
+        - name: models
+          mountPath: /models
+          readOnly: true
+      volumes:
+      - name: key
+        secret:
+          secretName: llm-api-key
+          defaultMode: 288
+          items:
+          - key: key
+            path: key
+      - name: models
+        persistentVolumeClaim:
+          claimName: models-k8s-gpu2
+          readOnly: true
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: chat-c-server
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+    app.kubernetes.io/component: server
+    tarnwick.example/model: chat
+    tarnwick.example/copy: c
+    tarnwick.example/role: server
+    tarnwick.example/pod: chat-c-server-0
+    tarnwick.example/rail: rail7
+    decision.tarnwick.example/id: dec-place-chat
+spec:
+  replicas: 1
+  serviceName: chat-c-server
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: OnDelete
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: serving
+      tarnwick.example/pod: chat-c-server-0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: serving
+        app.kubernetes.io/component: server
+        tarnwick.example/model: chat
+        tarnwick.example/copy: c
+        tarnwick.example/role: server
+        tarnwick.example/pod: chat-c-server-0
+        tarnwick.example/rail: rail7
+        decision.tarnwick.example/id: dec-place-chat
+      annotations:
+        k8s.v1.cni.cncf.io/networks: "[{\"name\":\"rail7\",\"namespace\":\"serving\",\"interface\":\"rail7\",\"ips\":[\"10.21.7.100/24\"],\"mac\":\"02:5a:fe:07:00:64\"}]"
+        tarnwick.example/spec: "90fdb7c9041e8ba3"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-gpu1
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 2
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: server
+        image: "192.0.2.6:5000/sfab/serving:b11382-2"
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: SFAB_READY_HOST
+          value: "$(POD_IP)"
+        command:
+        - llama-server
+        - "-m"
+        - /models/LFM2.5-24B-A2B-Q4_K_M.gguf
+        - "--alias"
+        - chat
+        - "--host"
+        - "$(POD_IP)"
+        - "--port"
+        - "8080"
+        - "--rpc"
+        - "10.21.7.101:50052,10.21.7.102:50052"
+        - "--tensor-split"
+        - "1,1"
+        - "-ngl"
+        - "99"
+        - "-c"
+        - "4096"
+        - "-np"
+        - "8"
+        - "-n"
+        - "256"
+        - "-t"
+        - "2"
+        - "--reasoning-budget"
+        - "0"
+        - "--cache-ram"
+        - "0"
+        - "--ctx-checkpoints"
+        - "0"
+        - "--no-ui"
+        - "--api-key-file"
+        - /secret/key
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - sfab-ready
+            - server
+            - "--port"
+            - "8080"
+            - "--rpc-port"
+            - "50052"
+            - "--probe-port"
+            - "50053"
+            - "10.21.7.101"
+            - "10.21.7.102"
+          periodSeconds: 2
+          failureThreshold: 2
+          timeoutSeconds: 2
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            memory: "4Gi"
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: key
+          mountPath: /secret
+          readOnly: true
+        - name: models
+          mountPath: /models
+          readOnly: true
+      volumes:
+      - name: key
+        secret:
+          secretName: llm-api-key
+          defaultMode: 288
+          items:
+          - key: key
+            path: key
+      - name: models
+        persistentVolumeClaim:
+          claimName: models-k8s-gpu1
+          readOnly: true
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: staff-a-server
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+    app.kubernetes.io/component: server
+    tarnwick.example/model: staff
+    tarnwick.example/copy: a
+    tarnwick.example/role: server
+    tarnwick.example/pod: staff-a-server-0
+    tarnwick.example/rail: rail4
+    decision.tarnwick.example/id: dec-place-staff
+spec:
+  replicas: 1
+  serviceName: staff-a-server
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: OnDelete
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: serving
+      tarnwick.example/pod: staff-a-server-0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: serving
+        app.kubernetes.io/component: server
+        tarnwick.example/model: staff
+        tarnwick.example/copy: a
+        tarnwick.example/role: server
+        tarnwick.example/pod: staff-a-server-0
+        tarnwick.example/rail: rail4
+        decision.tarnwick.example/id: dec-place-staff
+      annotations:
+        k8s.v1.cni.cncf.io/networks: "[{\"name\":\"rail4\",\"namespace\":\"serving\",\"interface\":\"rail4\",\"ips\":[\"10.21.4.100/24\"],\"mac\":\"02:5a:fe:04:00:64\"}]"
+        tarnwick.example/spec: e881e99a47b8c096
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-gpu1
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 2
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: server
+        image: "192.0.2.6:5000/sfab/serving:b11382-2"
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: SFAB_READY_HOST
+          value: "$(POD_IP)"
+        command:
+        - llama-server
+        - "-m"
+        - /models/Qwen3.8-27B-UD-Q4_K_M.gguf
+        - "--alias"
+        - staff
+        - "--host"
+        - "$(POD_IP)"
+        - "--port"
+        - "8080"
+        - "--rpc"
+        - "10.21.4.101:50052"
+        - "-ngl"
+        - "99"
+        - "-c"
+        - "4096"
+        - "-np"
+        - "8"
+        - "-n"
+        - "256"
+        - "-t"
+        - "2"
+        - "--reasoning-budget"
+        - "0"
+        - "--cache-ram"
+        - "0"
+        - "--ctx-checkpoints"
+        - "0"
+        - "--no-ui"
+        - "--api-key-file"
+        - /secret/key
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - sfab-ready
+            - server
+            - "--port"
+            - "8080"
+            - "--rpc-port"
+            - "50052"
+            - "--probe-port"
+            - "50053"
+            - "10.21.4.101"
+          periodSeconds: 2
+          failureThreshold: 2
+          timeoutSeconds: 2
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            memory: "4Gi"
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: key
+          mountPath: /secret
+          readOnly: true
+        - name: models
+          mountPath: /models
+          readOnly: true
+      volumes:
+      - name: key
+        secret:
+          secretName: llm-api-key
+          defaultMode: 288
+          items:
+          - key: key
+            path: key
+      - name: models
+        persistentVolumeClaim:
+          claimName: models-k8s-gpu1
+          readOnly: true
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: staff-b-server
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+    app.kubernetes.io/component: server
+    tarnwick.example/model: staff
+    tarnwick.example/copy: b
+    tarnwick.example/role: server
+    tarnwick.example/pod: staff-b-server-0
+    tarnwick.example/rail: rail5
+    decision.tarnwick.example/id: dec-place-staff
+spec:
+  replicas: 1
+  serviceName: staff-b-server
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: OnDelete
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: serving
+      tarnwick.example/pod: staff-b-server-0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: serving
+        app.kubernetes.io/component: server
+        tarnwick.example/model: staff
+        tarnwick.example/copy: b
+        tarnwick.example/role: server
+        tarnwick.example/pod: staff-b-server-0
+        tarnwick.example/rail: rail5
+        decision.tarnwick.example/id: dec-place-staff
+      annotations:
+        k8s.v1.cni.cncf.io/networks: "[{\"name\":\"rail5\",\"namespace\":\"serving\",\"interface\":\"rail5\",\"ips\":[\"10.21.5.100/24\"],\"mac\":\"02:5a:fe:05:00:64\"}]"
+        tarnwick.example/spec: "331eed0258b0a398"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-gpu2
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 2
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: server
+        image: "192.0.2.6:5000/sfab/serving:b11382-2"
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: SFAB_READY_HOST
+          value: "$(POD_IP)"
+        command:
+        - llama-server
+        - "-m"
+        - /models/Qwen3.8-27B-UD-Q4_K_M.gguf
+        - "--alias"
+        - staff
+        - "--host"
+        - "$(POD_IP)"
+        - "--port"
+        - "8080"
+        - "--rpc"
+        - "10.21.5.101:50052"
+        - "-ngl"
+        - "99"
+        - "-c"
+        - "4096"
+        - "-np"
+        - "8"
+        - "-n"
+        - "256"
+        - "-t"
+        - "2"
+        - "--reasoning-budget"
+        - "0"
+        - "--cache-ram"
+        - "0"
+        - "--ctx-checkpoints"
+        - "0"
+        - "--no-ui"
+        - "--api-key-file"
+        - /secret/key
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - sfab-ready
+            - server
+            - "--port"
+            - "8080"
+            - "--rpc-port"
+            - "50052"
+            - "--probe-port"
+            - "50053"
+            - "10.21.5.101"
+          periodSeconds: 2
+          failureThreshold: 2
+          timeoutSeconds: 2
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            memory: "4Gi"
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: key
+          mountPath: /secret
+          readOnly: true
+        - name: models
+          mountPath: /models
+          readOnly: true
+      volumes:
+      - name: key
+        secret:
+          secretName: llm-api-key
+          defaultMode: 288
+          items:
+          - key: key
+            path: key
+      - name: models
+        persistentVolumeClaim:
+          claimName: models-k8s-gpu2
+          readOnly: true

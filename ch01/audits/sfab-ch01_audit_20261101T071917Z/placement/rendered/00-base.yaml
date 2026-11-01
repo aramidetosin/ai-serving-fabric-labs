@@ -1,0 +1,196 @@
+# serving-layer manifests for sfab-ch01: rendered by serving.py from serving.env
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: serving
+  labels:
+    app.kubernetes.io/name: serving
+    pod-security.kubernetes.io/enforce: restricted
+    routes.tarnwick.example/gw-internal: "true"
+---
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: rail3
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+spec:
+  config: "{\"cniVersion\":\"1.0.0\",\"name\":\"rail3\",\"type\":\"macvlan\",\"master\":\"rail3\",\"mode\":\"bridge\",\"mtu\":9000,\"capabilities\":{\"ips\":true,\"mac\":true},\"ipam\":{\"type\":\"static\"}}"
+---
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: rail4
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+spec:
+  config: "{\"cniVersion\":\"1.0.0\",\"name\":\"rail4\",\"type\":\"macvlan\",\"master\":\"rail4\",\"mode\":\"bridge\",\"mtu\":9000,\"capabilities\":{\"ips\":true,\"mac\":true},\"ipam\":{\"type\":\"static\"}}"
+---
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: rail5
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+spec:
+  config: "{\"cniVersion\":\"1.0.0\",\"name\":\"rail5\",\"type\":\"macvlan\",\"master\":\"rail5\",\"mode\":\"bridge\",\"mtu\":9000,\"capabilities\":{\"ips\":true,\"mac\":true},\"ipam\":{\"type\":\"static\"}}"
+---
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: rail6
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+spec:
+  config: "{\"cniVersion\":\"1.0.0\",\"name\":\"rail6\",\"type\":\"macvlan\",\"master\":\"rail6\",\"mode\":\"bridge\",\"mtu\":9000,\"capabilities\":{\"ips\":true,\"mac\":true},\"ipam\":{\"type\":\"static\"}}"
+---
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: rail7
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+spec:
+  config: "{\"cniVersion\":\"1.0.0\",\"name\":\"rail7\",\"type\":\"macvlan\",\"master\":\"rail7\",\"mode\":\"bridge\",\"mtu\":9000,\"capabilities\":{\"ips\":true,\"mac\":true},\"ipam\":{\"type\":\"static\"}}"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: serving-keys
+  namespace: serving
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: serving-keys
+  namespace: serving
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  resourceNames:
+  - llm-api-key
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: serving-keys
+  namespace: serving
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: serving-keys
+subjects:
+- kind: ServiceAccount
+  name: serving-keys
+  namespace: serving
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: serving-models-k8s-gpu1
+  labels:
+    app.kubernetes.io/name: serving
+    tarnwick.example/namespace: serving
+    tarnwick.example/node: k8s-gpu1
+spec:
+  capacity:
+    storage: "29Gi"
+  accessModes:
+  - ReadOnlyMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: serving-models
+  volumeMode: Filesystem
+  local:
+    path: /srv/models
+  claimRef:
+    namespace: serving
+    name: models-k8s-gpu1
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - k8s-gpu1
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: models-k8s-gpu1
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+    tarnwick.example/namespace: serving
+    tarnwick.example/node: k8s-gpu1
+spec:
+  accessModes:
+  - ReadOnlyMany
+  storageClassName: serving-models
+  volumeName: serving-models-k8s-gpu1
+  resources:
+    requests:
+      storage: "29Gi"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: serving-models-k8s-gpu2
+  labels:
+    app.kubernetes.io/name: serving
+    tarnwick.example/namespace: serving
+    tarnwick.example/node: k8s-gpu2
+spec:
+  capacity:
+    storage: "29Gi"
+  accessModes:
+  - ReadOnlyMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: serving-models
+  volumeMode: Filesystem
+  local:
+    path: /srv/models
+  claimRef:
+    namespace: serving
+    name: models-k8s-gpu2
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - k8s-gpu2
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: models-k8s-gpu2
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+    tarnwick.example/namespace: serving
+    tarnwick.example/node: k8s-gpu2
+spec:
+  accessModes:
+  - ReadOnlyMany
+  storageClassName: serving-models
+  volumeName: serving-models-k8s-gpu2
+  resources:
+    requests:
+      storage: "29Gi"

@@ -1,0 +1,1842 @@
+### 2026-11-01T07:36:42Z k8s-cp1 kubectl
++ kubectl -n inference get pods -o wide
+NAME                           READY   STATUS    RESTARTS   AGE   IP            NODE           NOMINATED NODE   READINESS GATES
+api-gateway-64bc7b94df-xmb5w   2/2     Running   0          45m   10.22.2.226   k8s-ingress1   <none>           <none>
+api-gateway-64bc7b94df-zv57v   2/2     Running   0          45m   10.22.3.62    k8s-ingress2   <none>           <none>
+router-76cf778fb6-8lcxw        1/1     Running   0          45m   10.22.2.87    k8s-ingress1   <none>           <none>
+router-76cf778fb6-phz26        1/1     Running   0          45m   10.22.3.46    k8s-ingress2   <none>           <none>
+
+### 2026-11-01T07:36:43Z k8s-cp1 kubectl
++ kubectl -n serving get pods -o wide
+NAME                READY   STATUS    RESTARTS   AGE   IP            NODE       NOMINATED NODE   READINESS GATES
+chat-a-server-0     1/1     Running   0          48m   10.22.0.121   k8s-gpu1   <none>           <none>
+chat-a-worker0-0    1/1     Running   0          49m   10.22.0.5     k8s-gpu1   <none>           <none>
+chat-b-server-0     1/1     Running   0          48m   10.22.1.253   k8s-gpu2   <none>           <none>
+chat-b-worker0-0    1/1     Running   0          49m   10.22.1.126   k8s-gpu2   <none>           <none>
+chat-c-server-0     1/1     Running   0          48m   10.22.0.253   k8s-gpu1   <none>           <none>
+chat-c-worker0-0    1/1     Running   0          49m   10.22.1.240   k8s-gpu2   <none>           <none>
+chat-c-worker1-0    1/1     Running   0          49m   10.22.0.120   k8s-gpu1   <none>           <none>
+staff-a-server-0    1/1     Running   0          48m   10.22.0.47    k8s-gpu1   <none>           <none>
+staff-a-worker0-0   1/1     Running   0          49m   10.22.0.171   k8s-gpu1   <none>           <none>
+staff-b-server-0    1/1     Running   0          48m   10.22.1.206   k8s-gpu2   <none>           <none>
+staff-b-worker0-0   1/1     Running   0          49m   10.22.1.225   k8s-gpu2   <none>           <none>
+
+### 2026-11-01T07:36:44Z k8s-cp1 kubectl
++ kubectl get httproutes -A
+NAMESPACE   NAME                 HOSTNAMES                                                                               AGE
+echo        echo-gw-internal     ["llm.ai.tarnwick.example","admin.ai.tarnwick.example","grafana.ai.tarnwick.example"]   53m
+echo        echo-gw-users        ["llm.ai.tarnwick.example"]                                                             53m
+identity    idp-gw-internal      ["id.ai.tarnwick.example"]                                                              53m
+identity    idp-gw-users         ["id.ai.tarnwick.example"]                                                              53m
+inference   models-gw-internal   ["llm.ai.tarnwick.example"]                                                             45m
+inference   models-gw-users      ["llm.ai.tarnwick.example"]                                                             45m
+serving     serving              ["serve.ai.tarnwick.example"]                                                           45m
+
+### 2026-11-01T07:36:45Z k8s-cp1 kubectl
++ kubectl -n kube-system get lease cilium-l2announce-gateways-cilium-gateway-gw-users
+NAME                                                 HOLDER         AGE
+cilium-l2announce-gateways-cilium-gateway-gw-users   k8s-ingress2   52m
+
+### 2026-11-01T07:36:47Z ent-client container
++ dig llm.ai.tarnwick.example
+
+; <<>> DiG 9.18.49 <<>> llm.ai.tarnwick.example
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 64127
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: c0016c0b69131ab9010000006ae6ec0f36d67863cf894845 (good)
+;; QUESTION SECTION:
+;llm.ai.tarnwick.example.	IN	A
+
+;; ANSWER SECTION:
+llm.ai.tarnwick.example. 300	IN	A	10.20.11.210
+
+;; Query time: 8 msec
+;; SERVER: 10.24.10.53#53(10.24.10.53) (UDP)
+;; WHEN: Sun Nov 01 07:36:47 UTC 2026
+;; MSG SIZE  rcvd: 96
+
+### 2026-11-01T07:36:48Z dns-res1 container
++ dig -b 10.20.13.21 @10.20.13.21 llm.ai.tarnwick.example
+
+; <<>> DiG 9.18.49 <<>> -b 10.20.13.21 @10.20.13.21 llm.ai.tarnwick.example
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 59832
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: ac53ac5a86a4f6f0010000006ae6ec10ca7f299dc04312ed (good)
+;; QUESTION SECTION:
+;llm.ai.tarnwick.example.	IN	A
+
+;; ANSWER SECTION:
+llm.ai.tarnwick.example. 300	IN	A	10.20.11.200
+
+;; Query time: 0 msec
+;; SERVER: 10.20.13.21#53(10.20.13.21) (UDP)
+;; WHEN: Sun Nov 01 07:36:48 UTC 2026
+;; MSG SIZE  rcvd: 96
+
+### 2026-11-01T07:36:58Z ent-client container
++ curl -sS --max-time 120 -o /tmp/sfab-trace/warmup-body.json -D /tmp/sfab-trace/warmup-headers.txt -w %{http_code} %{local_port}\n -H @/tmp/sfab-trace/hdr-chat -H Content-Type: application/json --data @/tmp/sfab-trace/request.json https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions
+200 42912
+
+### 2026-11-01T07:37:09Z fw panos-cli
+Last login: Sun Nov  1 07:36:22 2026 from 172.21.40.1
+set cli pager off
+show routing route
+show running security-policy
+show running nat-policy
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show routing 
+admin@fw> show routing route
+
+flags: A:active, ?:loose, C:connect, H:host, S:static, ~:internal, R:rip, O:ospf, B:bgp, 
+       Oi:ospf intra-area, Oo:ospf inter-area, O1:ospf ext-type-1, O2:ospf ext-type-2, E:ecmp, M:multicast
+
+  
+VIRTUAL ROUTER: core (id 2)
+  ==========
+destination                                 nexthop                                 metric flags      age   interface          next-AS    
+0.0.0.0/0                                   198.51.100.1                            10     A S              ethernet1/5                   
+10.0.0.0/8                                  discard                                 10     A S                                            
+10.20.1.0/24                                10.20.1.1                               0      A C              ae1.100                       
+10.20.1.1/32                                0.0.0.0                                 0      A H                                            
+10.20.2.0/24                                10.20.2.1                               0      A C              ae1.200                       
+10.20.2.1/32                                0.0.0.0                                 0      A H                                            
+10.20.3.0/24                                10.20.3.1                               0      A C              ae1.300                       
+10.20.3.1/32                                0.0.0.0                                 0      A H                                            
+10.20.9.0/24                                10.20.9.254                             0      A C              ethernet1/3                   
+10.20.9.254/32                              0.0.0.0                                 0      A H                                            
+10.20.11.0/24                               10.20.11.1                              0      A C              ae1.110                       
+10.20.11.1/32                               0.0.0.0                                 0      A H                                            
+10.20.13.0/24                               10.20.13.1                              0      A C              ae1.130                       
+10.20.13.1/32                               0.0.0.0                                 0      A H                                            
+10.20.14.0/24                               10.20.14.1                              0      A C              ae1.131                       
+10.20.14.1/32                               0.0.0.0                                 0      A H                                            
+10.24.10.8/30                               10.24.10.9                              0      A C              ethernet1/4                   
+10.24.10.9/32                               0.0.0.0                                 0      A H                                            
+10.24.10.52/30                              10.24.10.54                             0      A C              ethernet1/7                   
+10.24.10.54/32                              0.0.0.0                                 0      A H                                            
+172.16.0.0/12                               discard                                 10     A S                                            
+192.0.2.0/30                                0.0.0.0                                 10     A S              tunnel.1                      
+192.168.0.0/16                              discard                                 10     A S                                            
+198.51.100.0/29                             198.51.100.2                            0      A C              ethernet1/5                   
+198.51.100.2/32                             0.0.0.0                                 0      A H                                            
+total routes shown: 25
+
+admin@fw> show 
+admin@fw> show running 
+admin@fw> show running security-policy
+
+"staff-to-users-gateway; index: 1" {
+        from enterprise;
+        source 10.24.10.0/24;
+        source-region none;
+        to ingress;
+        destination 10.20.11.210;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"ent-dns-to-platform-dns; index: 2" {
+        from enterprise;
+        source 10.24.10.53;
+        source-region none;
+        to services;
+        destination [ 10.20.14.11 10.20.13.11 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"staff-to-enterprise-dns; index: 3" {
+        from enterprise;
+        source 10.24.10.0/24;
+        source-region none;
+        to enterprise;
+        destination 10.24.10.53;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"admins-to-bastion; index: 4" {
+        from [ enterprise operator-vpn ];
+        source [ 10.24.10.10 192.0.2.0/30 ];
+        source-region none;
+        to bastion;
+        destination 10.20.3.10;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssh/tcp/any/22;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-firewall-admin; index: 5" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to bastion;
+        destination 10.20.3.1;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ssl/tcp/any/443 1:ssh/tcp/any/22 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-nodes; index: 6" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to k8s-nodes;
+        destination 10.20.1.0/24;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssh/tcp/any/22;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-api; index: 7" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to k8s-nodes;
+        destination 10.20.1.0/24;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/6443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-internal-gateway; index: 8" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to ingress;
+        destination 10.20.11.200;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-stor-mgmt; index: 9" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to stor-mgmt;
+        destination 10.20.2.31;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-bmc; index: 10" {
+        from bastion;
+        source [ 10.20.3.10 10.20.3.20 ];
+        source-region none;
+        to oob;
+        destination 10.20.9.0/24;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ssl/tcp/any/443 1:ssh/tcp/any/22 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-services-admin; index: 11" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to services;
+        destination [ 10.20.13.21 10.20.14.11 10.20.13.11 10.20.14.21 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssh/tcp/any/22;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"inside-to-gateway-ping; index: 12" {
+        from [ k8s-nodes ingress stor-mgmt bastion services oob enterprise ];
+        source [ 10.20.14.0/24 10.20.3.0/24 10.20.13.0/24 10.20.2.0/24 10.20.1.0/24 10.20.9.0/24 10.24.10.0/24 10.20.11.0/24 ];
+        source-region none;
+        to [ k8s-nodes ingress stor-mgmt bastion services oob enterprise ];
+        destination [ 10.20.13.1 10.20.2.1 10.20.14.1 10.20.9.254 10.24.10.54 10.20.1.1 10.24.10.9 10.20.11.1 10.20.3.1 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ping/icmp/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"inside-to-resolvers; index: 13" {
+        from [ k8s-nodes ingress stor-mgmt bastion services oob ];
+        source [ 10.20.14.0/24 10.20.3.0/24 10.20.13.0/24 10.20.2.0/24 10.20.1.0/24 10.20.9.0/24 10.20.11.0/24 ];
+        source-region none;
+        to services;
+        destination [ 10.20.13.21 10.20.14.21 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"inside-to-ntp; index: 14" {
+        from [ k8s-nodes ingress stor-mgmt bastion services oob ];
+        source [ 10.20.14.0/24 10.20.3.0/24 10.20.13.0/24 10.20.2.0/24 10.20.1.0/24 10.20.9.0/24 10.20.11.0/24 ];
+        source-region none;
+        to services;
+        destination [ 10.20.13.21 10.20.14.21 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ntp-base/tcp/any/123 1:ntp-base/udp/any/123 2:ntp-non-rfc/tcp/any/123 3:ntp-non-rfc/udp/any/123 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"resolvers-to-auth; index: 15" {
+        from services;
+        source [ 10.20.13.21 10.20.14.21 ];
+        source-region none;
+        to services;
+        destination [ 10.20.14.11 10.20.13.11 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"auth-zone-transfer; index: 16" {
+        from services;
+        source [ 10.20.14.11 10.20.13.11 ];
+        source-region none;
+        to services;
+        destination [ 10.20.14.11 10.20.13.11 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"ntp-upstream; index: 17" {
+        from services;
+        source [ 10.20.13.21 10.20.14.21 ];
+        source-region none;
+        to uplink;
+        destination 192.0.2.14;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ntp-base/tcp/any/123 1:ntp-base/udp/any/123 2:ntp-non-rfc/tcp/any/123 3:ntp-non-rfc/udp/any/123 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"nts-ke-upstream; index: 18" {
+        from services;
+        source [ 10.20.13.21 10.20.14.21 ];
+        source-region none;
+        to uplink;
+        destination 192.0.2.14;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/4460;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"nodes-to-registry; index: 19" {
+        from k8s-nodes;
+        source 10.20.1.0/24;
+        source-region none;
+        to uplink;
+        destination 192.0.2.6;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/5000;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"nodes-to-internal-gateway; index: 20" {
+        from k8s-nodes;
+        source 10.20.1.0/24;
+        source-region none;
+        to ingress;
+        destination 10.20.11.200;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"csi-to-storage-api; index: 21" {
+        from k8s-nodes;
+        source 10.20.1.0/24;
+        source-region none;
+        to stor-mgmt;
+        destination 10.20.2.31;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"operator-ike; index: 22" {
+        from uplink;
+        source 192.0.2.22;
+        source-region none;
+        to uplink;
+        destination 198.51.100.2;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ike/tcp/any/500 1:ike/udp/any/500 2:ipsec-esp/50/any/any 3:ipsec-esp-udp/udp/any/4500 4:ipsec-esp-udp/udp/any/4501 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"operator-to-internal-gateway; index: 23" {
+        from operator-vpn;
+        source 192.0.2.0/30;
+        source-region none;
+        to ingress;
+        destination 10.20.11.200;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"deny-all-log; index: 24" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal no;
+}
+
+"vsys1+intrazone-default; index: 25" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal yes;
+        type intrazone;
+}
+
+"vsys1+interzone-default; index: 26" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal yes;
+        type interzone;
+}
+
+dynamic url: no
+
+
+admin@fw> show 
+admin@fw> show running 
+admin@fw> show running nat-policy
+
+Nat policy configured on vsys1:
+"no-nat-public; index: 1" {
+        nat-type ipv4;
+        from [ k8s-nodes services ];
+        source any;
+        source-region none;
+        to uplink;
+        to-interface  ;
+        destination 198.51.100.2;
+        destination-region none;
+        service 0:any/any/any;
+        terminal no;
+}
+
+"internet-snat; index: 2" {
+        nat-type ipv4;
+        from [ k8s-nodes services ];
+        source any;
+        source-region none;
+        to uplink;
+        to-interface  ;
+        destination any;
+        destination-region none;
+        service 0:any/any/any;
+        translate-to "src: ethernet1/5 198.51.100.2 (dynamic-ip-and-port) (pool idx: 1)";
+        terminal no;
+}
+
+
+
+admin@fw> exit
+
+### 2026-11-01T07:37:25Z rail-sw1 klish
+terminal length 0
+terminal length 0
+rail-sw1# terminal length 0
+rail-sw1# clear counters interface all
+Clear all Interface counters [confirm y/N]: y
+rail-sw1# exit
+
+### 2026-11-01T07:37:30Z rail-sw1 klish
+terminal length 0
+show interface counters
+exit
+terminal length 0
+show interface counters
+exit
+rail-sw1# terminal length 0
+rail-sw1# show interface counters
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Interface      State     RX_OK                 RX_ERR                RX_DRP                RX_OVERSIZE           TX_OK                 TX_ERR                TX_DRP                TX_OVERSIZE           
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Ethernet0      U         0                     0                     0                     0                     6                     0                     0                     0                     
+Ethernet1      U         0                     0                     0                     0                     5                     0                     0                     0                     
+Ethernet2      U         0                     0                     0                     0                     5                     0                     0                     0                     
+Ethernet3      U         6                     0                     0                     0                     11                    0                     0                     0                     
+Ethernet4      U         0                     0                     0                     0                     5                     0                     0                     0                     
+Ethernet5      U         0                     0                     0                     0                     5                     0                     0                     0                     
+Ethernet6      U         0                     0                     0                     0                     5                     0                     0                     0                     
+Ethernet7      U         7                     0                     0                     0                     11                    0                     0                     0                     
+Ethernet8      D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet9      D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet10     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet11     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet12     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet13     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet14     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet15     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet16     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet17     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet18     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet19     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet20     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet21     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet22     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet23     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet24     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet25     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet26     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet27     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet28     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet29     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet30     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet31     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet32     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet33     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet34     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet35     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet36     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet37     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet38     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet39     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet40     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet41     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet42     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet43     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet44     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet45     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet46     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet47     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet48     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet52     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet56     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet60     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet64     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet68     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet72     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet76     D         0                     0                     0                     0                     0                     0                     0                     0                     
+rail-sw1# exit
+
+### 2026-11-01T07:37:45Z rail-sw2 klish
+terminal length 0
+terminal length 0
+rail-sw2# terminal length 0
+rail-sw2# clear counters interface all
+Clear all Interface counters [confirm y/N]: y
+rail-sw2# exit
+
+### 2026-11-01T07:37:49Z rail-sw2 klish
+terminal length 0
+show interface counters
+exit
+terminal length 0
+show interface counters
+exit
+rail-sw2# terminal length 0
+rail-sw2# show interface counters
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Interface      State     RX_OK                 RX_ERR                RX_DRP                RX_OVERSIZE           TX_OK                 TX_ERR                TX_DRP                TX_OVERSIZE           
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Ethernet0      U         1                     0                     0                     0                     6                     0                     0                     0                     
+Ethernet1      U         1                     0                     0                     0                     6                     0                     0                     0                     
+Ethernet2      U         1                     0                     0                     0                     6                     0                     0                     0                     
+Ethernet3      U         0                     0                     0                     0                     6                     0                     0                     0                     
+Ethernet4      U         0                     0                     0                     0                     5                     0                     0                     0                     
+Ethernet5      U         0                     0                     0                     0                     5                     0                     0                     0                     
+Ethernet6      U         0                     0                     0                     0                     5                     0                     0                     0                     
+Ethernet7      U         0                     0                     0                     0                     5                     0                     0                     0                     
+Ethernet8      D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet9      D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet10     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet11     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet12     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet13     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet14     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet15     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet16     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet17     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet18     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet19     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet20     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet21     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet22     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet23     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet24     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet25     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet26     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet27     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet28     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet29     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet30     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet31     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet32     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet33     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet34     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet35     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet36     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet37     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet38     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet39     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet40     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet41     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet42     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet43     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet44     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet45     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet46     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet47     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet48     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet52     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet56     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet60     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet64     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet68     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet72     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet76     D         0                     0                     0                     0                     0                     0                     0                     0                     
+rail-sw2# exit
+
+### 2026-11-01T07:37:50Z ent-client capture
++ nsenter -t 112951 -n timeout 900 tcpdump -i eth1 -nn -s 96 -U -w captures/1-ent-client-eth1.pcap '(host 10.24.10.10 and (tcp port 443 or tcp port 22)) or (vlan and (host 10.24.10.10 and (tcp port 443 or tcp port 22)))'
+
+### 2026-11-01T07:37:50Z fw capture
++ nsenter -t 113819 -n timeout 900 tcpdump -i eth4 -nn -s 96 -U -w captures/2-fw-ethernet1-4.pcap '(host 10.24.10.10 and (tcp port 443 or tcp port 22)) or (vlan and (host 10.24.10.10 and (tcp port 443 or tcp port 22)))'
+
+### 2026-11-01T07:37:50Z fw capture
++ nsenter -t 113819 -n timeout 900 tcpdump -i eth1 -nn -s 96 -U -w captures/3-fw-ae1-leg1.pcap '(host 10.24.10.10 and (tcp port 443 or tcp port 22)) or (vlan and (host 10.24.10.10 and (tcp port 443 or tcp port 22)))'
+
+### 2026-11-01T07:37:50Z fw capture
++ nsenter -t 113819 -n timeout 900 tcpdump -i eth2 -nn -s 96 -U -w captures/3-fw-ae1-leg2.pcap '(host 10.24.10.10 and (tcp port 443 or tcp port 22)) or (vlan and (host 10.24.10.10 and (tcp port 443 or tcp port 22)))'
+
+### 2026-11-01T07:37:50Z fe-sw1 capture
++ nsenter -t 113828 -n timeout 900 tcpdump -i eth3 -nn -s 96 -U -w captures/4-fe-sw1-Ethernet2.pcap '(host 10.24.10.10 and (tcp port 443 or tcp port 22)) or (vlan and (host 10.24.10.10 and (tcp port 443 or tcp port 22)))'
+
+### 2026-11-01T07:37:50Z fe-sw2 capture
++ nsenter -t 113855 -n timeout 900 tcpdump -i eth3 -nn -s 96 -U -w captures/4-fe-sw2-Ethernet2.pcap '(host 10.24.10.10 and (tcp port 443 or tcp port 22)) or (vlan and (host 10.24.10.10 and (tcp port 443 or tcp port 22)))'
+
+### 2026-11-01T07:37:50Z fe-sw1 capture
++ nsenter -t 113828 -n timeout 900 tcpdump -i eth15 -nn -s 96 -U -w captures/5-fe-sw1-Ethernet14.pcap '(host 10.24.10.10 and (tcp port 443 or tcp port 22)) or (vlan and (host 10.24.10.10 and (tcp port 443 or tcp port 22)))'
+
+### 2026-11-01T07:37:50Z fe-sw2 capture
++ nsenter -t 113855 -n timeout 900 tcpdump -i eth15 -nn -s 96 -U -w captures/5-fe-sw2-Ethernet14.pcap '(host 10.24.10.10 and (tcp port 443 or tcp port 22)) or (vlan and (host 10.24.10.10 and (tcp port 443 or tcp port 22)))'
+
+### 2026-11-01T07:37:51Z k8s-ingress2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-6-k8s-ingress2-bond0.pcap /tmp/sfab-rail-trace-6-k8s-ingress2-bond0.txt; exec timeout 900 tcpdump -i bond0 -nn -s 96 -U -w /tmp/sfab-rail-trace-6-k8s-ingress2-bond0.pcap 'tcp port 443 and host 10.20.11.210' &
+
+
+### 2026-11-01T07:37:53Z k8s-ingress1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-7-api-gateway-64bc7b94df-xmb5w-eth0.pcap /tmp/sfab-rail-trace-7-api-gateway-64bc7b94df-xmb5w-eth0.txt; exec nsenter -t 5633 -n timeout 900 tcpdump -i eth0 -nn -s 2048 -U -w /tmp/sfab-rail-trace-7-api-gateway-64bc7b94df-xmb5w-eth0.pcap 'tcp port 9080 or tcp port 4000' &
+
+
+### 2026-11-01T07:37:54Z k8s-ingress2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-7-api-gateway-64bc7b94df-zv57v-eth0.pcap /tmp/sfab-rail-trace-7-api-gateway-64bc7b94df-zv57v-eth0.txt; exec nsenter -t 5768 -n timeout 900 tcpdump -i eth0 -nn -s 2048 -U -w /tmp/sfab-rail-trace-7-api-gateway-64bc7b94df-zv57v-eth0.pcap 'tcp port 9080 or tcp port 4000' &
+
+
+### 2026-11-01T07:37:55Z k8s-ingress1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-8-router-76cf778fb6-8lcxw-eth0.pcap /tmp/sfab-rail-trace-8-router-76cf778fb6-8lcxw-eth0.txt; exec nsenter -t 5664 -n timeout 900 tcpdump -i eth0 -nn -s 2048 -U -w /tmp/sfab-rail-trace-8-router-76cf778fb6-8lcxw-eth0.pcap 'tcp port 4000 or tcp port 8080' &
+
+
+### 2026-11-01T07:37:56Z k8s-ingress2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-8-router-76cf778fb6-phz26-eth0.pcap /tmp/sfab-rail-trace-8-router-76cf778fb6-phz26-eth0.txt; exec nsenter -t 5774 -n timeout 900 tcpdump -i eth0 -nn -s 2048 -U -w /tmp/sfab-rail-trace-8-router-76cf778fb6-phz26-eth0.pcap 'tcp port 4000 or tcp port 8080' &
+
+
+### 2026-11-01T07:37:58Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-9-chat-a-server-0-eth0.pcap /tmp/sfab-rail-trace-9-chat-a-server-0-eth0.txt; exec nsenter -t 8476 -n timeout 900 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-9-chat-a-server-0-eth0.pcap 'tcp port 8080' &
+
+
+### 2026-11-01T07:37:59Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-9-chat-a-server-0-rail3.pcap /tmp/sfab-rail-trace-9-chat-a-server-0-rail3.txt; exec nsenter -t 8476 -n timeout 900 tcpdump -i rail3 -nn -s 128 -U -w /tmp/sfab-rail-trace-9-chat-a-server-0-rail3.pcap 'tcp port 50052' &
+
+
+### 2026-11-01T07:38:00Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-10-chat-a-worker0-0-rail3.pcap /tmp/sfab-rail-trace-10-chat-a-worker0-0-rail3.txt; exec nsenter -t 7742 -n timeout 900 tcpdump -i rail3 -nn -s 128 -U -w /tmp/sfab-rail-trace-10-chat-a-worker0-0-rail3.pcap 'tcp port 50052' &
+
+
+### 2026-11-01T07:38:00Z rail-sw1 capture
++ nsenter -t 113756 -n timeout 900 tcpdump -i eth2 -nn -s 128 -U -w captures/11-rail-sw1-Ethernet1.pcap 'tcp port 50052'
+
+### 2026-11-01T07:38:02Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-9-chat-b-server-0-eth0.pcap /tmp/sfab-rail-trace-9-chat-b-server-0-eth0.txt; exec nsenter -t 7298 -n timeout 900 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-9-chat-b-server-0-eth0.pcap 'tcp port 8080' &
+
+
+### 2026-11-01T07:38:03Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-9-chat-b-server-0-rail6.pcap /tmp/sfab-rail-trace-9-chat-b-server-0-rail6.txt; exec nsenter -t 7298 -n timeout 900 tcpdump -i rail6 -nn -s 128 -U -w /tmp/sfab-rail-trace-9-chat-b-server-0-rail6.pcap 'tcp port 50052' &
+
+
+### 2026-11-01T07:38:05Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-10-chat-b-worker0-0-rail6.pcap /tmp/sfab-rail-trace-10-chat-b-worker0-0-rail6.txt; exec nsenter -t 6751 -n timeout 900 tcpdump -i rail6 -nn -s 128 -U -w /tmp/sfab-rail-trace-10-chat-b-worker0-0-rail6.pcap 'tcp port 50052' &
+
+
+### 2026-11-01T07:38:05Z rail-sw2 capture
++ nsenter -t 113718 -n timeout 900 tcpdump -i eth7 -nn -s 128 -U -w captures/11-rail-sw2-Ethernet6.pcap 'tcp port 50052'
+
+### 2026-11-01T07:38:06Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-9-chat-c-server-0-eth0.pcap /tmp/sfab-rail-trace-9-chat-c-server-0-eth0.txt; exec nsenter -t 8490 -n timeout 900 tcpdump -i eth0 -nn -s 66 -U -w /tmp/sfab-rail-trace-9-chat-c-server-0-eth0.pcap 'tcp port 8080' &
+
+
+### 2026-11-01T07:38:07Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-9-chat-c-server-0-rail7.pcap /tmp/sfab-rail-trace-9-chat-c-server-0-rail7.txt; exec nsenter -t 8490 -n timeout 900 tcpdump -i rail7 -nn -s 128 -U -w /tmp/sfab-rail-trace-9-chat-c-server-0-rail7.pcap 'tcp port 50052' &
+
+
+### 2026-11-01T07:38:08Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-10-chat-c-worker0-0-rail7.pcap /tmp/sfab-rail-trace-10-chat-c-worker0-0-rail7.txt; exec nsenter -t 6736 -n timeout 900 tcpdump -i rail7 -nn -s 128 -U -w /tmp/sfab-rail-trace-10-chat-c-worker0-0-rail7.pcap 'tcp port 50052' &
+
+
+### 2026-11-01T07:38:09Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-trace-10-chat-c-worker1-0-rail7.pcap /tmp/sfab-rail-trace-10-chat-c-worker1-0-rail7.txt; exec nsenter -t 7749 -n timeout 900 tcpdump -i rail7 -nn -s 128 -U -w /tmp/sfab-rail-trace-10-chat-c-worker1-0-rail7.pcap 'tcp port 50052' &
+
+
+### 2026-11-01T07:38:09Z rail-sw1 capture
++ nsenter -t 113756 -n timeout 900 tcpdump -i eth4 -nn -s 128 -U -w captures/11-rail-sw1-Ethernet3.pcap 'tcp port 50052'
+
+### 2026-11-01T07:38:09Z rail-sw1 capture
++ nsenter -t 113756 -n timeout 900 tcpdump -i eth8 -nn -s 128 -U -w captures/11-rail-sw1-Ethernet7.pcap 'tcp port 50052'
+
+### 2026-11-01T07:38:28Z ent-client container
++ python3 - 10.20.11.210 llm.ai.tarnwick.example /models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions 42106 30 /shared/ca/root.crt POST /tmp/sfab-trace/request.json /tmp/sfab-trace/hdr-chat < common/trace/hold_request.py (started)
+
+### 2026-11-01T07:38:43Z fw panos-cli
+Last login: Sun Nov  1 07:37:00 2026 from 172.21.40.1
+set cli pager off
+show session all filter source 10.24.10.10 source-port 42106
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show session 
+admin@fw> show session all 
+admin@fw> show session all filter 
+admin@fw> show session all filter source 
+admin@fw> show session all filter source 10.24.10.10 
+admin@fw> show session all filter source 10.24.10.10 source-port 
+admin@fw> show session all filter source 10.24.10.10 source-port 42106
+
+--------------------------------------------------------------------------------
+ID          Application    State   Type Flag  Src[Sport]/Zone/Proto (translated IP[Port])
+Vsys                                          Dst[Dport]/Zone (translated IP[Port])
+--------------------------------------------------------------------------------
+1646         ssl            ACTIVE  FLOW       10.24.10.10[42106]/enterprise/6  (10.24.10.10[42106])
+vsys1                                          10.20.11.210[443]/ingress  (10.20.11.210[443])
+admin@fw> exit
+
+### 2026-11-01T07:38:43Z fw xml-api
++ GET /api/?type=op&cmd=<show><session><all><filter><source>10.24.10.10</source><source-port>42106</source-port></filter></all></session></show>
+<response status="success"><result>
+  <entry>
+    <dst>10.20.11.210</dst>
+    <xsource>10.24.10.10</xsource>
+    <source>10.24.10.10</source>
+    <xdst>10.20.11.210</xdst>
+    <xsport>42106</xsport>
+    <xdport>443</xdport>
+    <sport>42106</sport>
+    <dport>443</dport>
+    <proto>6</proto>
+    <from>enterprise</from>
+    <to>ingress</to>
+    <start-time>Sun Nov  1 07:38:26 2026</start-time>
+    <nat>False</nat>
+    <srcnat>False</srcnat>
+    <dstnat>False</dstnat>
+    <proxy>False</proxy>
+    <decrypt-mirror>False</decrypt-mirror>
+    <state>ACTIVE</state>
+    <type>FLOW</type>
+    <total-byte-count>5899</total-byte-count>
+    <idx>1646</idx>
+    <vsys-idx>1</vsys-idx>
+    <vsys>vsys1</vsys>
+    <application>ssl</application>
+    <security-rule>staff-to-users-gateway</security-rule>
+    <ingress>ethernet1/4</ingress>
+    <egress>ae1.110</egress>
+    <flags>   </flags>
+  </entry>
+</result></response>
+
+### 2026-11-01T07:38:54Z fw panos-cli
+Last login: Sun Nov  1 07:38:34 2026 from 172.21.40.1
+set cli pager off
+show session id 1646
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show session 
+admin@fw> show session id 
+admin@fw> show session id 1646
+
+Session            1646
+
+        c2s flow:
+                source:      10.24.10.10 [enterprise]
+                dst:         10.20.11.210
+                proto:       6
+                sport:       42106           dport:      443
+                state:       ACTIVE          type:       FLOW
+                src user:    unknown
+                dst user:    unknown
+
+        s2c flow:
+                source:      10.20.11.210 [ingress]
+                dst:         10.24.10.10
+                proto:       6
+                sport:       443             dport:      42106
+                state:       ACTIVE          type:       FLOW
+                src user:    unknown
+                dst user:    unknown
+
+        start time                           : Sun Nov  1 07:38:26 2026
+        timeout                              : 1800 sec
+        time to live                         : 1778 sec 
+        total byte count(c2s)                : 1507
+        total byte count(s2c)                : 4392
+        layer7 packet count(c2s)             : 7
+        layer7 packet count(s2c)             : 7
+        vsys                                 : vsys1
+        application                          : ssl  
+        rule                                 : staff-to-users-gateway
+        service timeout override(index)      : False
+        session is promoted                  : False
+        session to be logged at end          : True
+        session in session ager              : True
+        session updated by HA peer           : False
+        layer7 processing                    : completed
+        URL filtering enabled                : False
+        session via syn-cookies              : False
+        session terminated on host           : False
+        session traverses tunnel             : False
+        session terminate tunnel             : False
+        captive portal session               : False
+        ingress interface                    : ethernet1/4
+        egress interface                     : ae1.110
+        session QoS rule                     : N/A (class 4)
+        tracker stage l7proc                 : ctd decoder done
+        end-reason                           : unknown
+admin@fw> exit
+
+### 2026-11-01T07:38:55Z fw xml-api
++ GET /api/?type=op&cmd=<show><session><id>1646</id></session></show>
+<response status="success"><result>
+  <slot>1</slot>
+  <cpu>0</cpu>
+  <c2s>
+    <source>10.24.10.10</source>
+    <dst>10.20.11.210</dst>
+    <proto>6</proto>
+    <sport>42106</sport>
+    <dport>443</dport>
+    <type>FLOW</type>
+    <state>ACTIVE</state>
+    <ipver>4</ipver>
+    <source-zone>enterprise</source-zone>
+    <src-user>unknown</src-user>
+    <dst-user>unknown</dst-user>
+  </c2s>
+  <s2c>
+    <source>10.20.11.210</source>
+    <dst>10.24.10.10</dst>
+    <proto>6</proto>
+    <sport>443</sport>
+    <dport>42106</dport>
+    <type>FLOW</type>
+    <state>ACTIVE</state>
+    <ipver>4</ipver>
+    <source-zone>ingress</source-zone>
+    <src-user>unknown</src-user>
+    <dst-user>unknown</dst-user>
+  </s2c>
+  <start-time>Sun Nov  1 07:38:26 2026</start-time>
+  <vsys>vsys1</vsys>
+  <application>ssl</application>
+  <l7proc>ctd decoder done</l7proc>
+  <end-reason>unknown</end-reason>
+  <pktlog-up>1793514496</pktlog-up>
+  <pansys-up>4237</pansys-up>
+  <timeout>1800</timeout>
+  <timestamp>4214</timestamp>
+  <time-start>4210</time-start>
+  <c2s-packets>7</c2s-packets>
+  <c2s-octets>1507</c2s-octets>
+  <s2c-packets>7</s2c-packets>
+  <s2c-octets>4392</s2c-octets>
+  <prxy-started>False</prxy-started>
+  <prxy-wait-ssl>False</prxy-wait-ssl>
+  <app-insufficient>False</app-insufficient>
+  <sess-promoted>False</sess-promoted>
+  <sess-log>True</sess-log>
+  <sess-ager>True</sess-ager>
+  <sess-ha-sync>False</sess-ha-sync>
+  <rule>staff-to-users-gateway</rule>
+  <override>False</override>
+  <flow-type>0</flow-type>
+  <l7-proc>completed</l7-proc>
+  <src-user-invalid>False</src-user-invalid>
+  <session-rematched>False</session-rematched>
+  <url-en>False</url-en>
+  <syncookie>False</syncookie>
+  <host-session>False</host-session>
+  <tunnel-session>False</tunnel-session>
+  <tunnel-termination>False</tunnel-termination>
+  <captive-portal>False</captive-portal>
+  <igr-if>ethernet1/4</igr-if>
+  <egr-if>ae1.110</egr-if>
+  <qos-class>4</qos-class>
+  <qos-rule>N/A</qos-rule>
+  <ttl>1777</ttl>
+  <prxy-status/>
+</result></response>
+
+### 2026-11-01T07:39:00Z rail-sw1 klish
+terminal length 0
+show interface counters
+show mac address-table
+exit
+terminal length 0
+show interface counters
+show mac address-table
+exit
+rail-sw1# terminal length 0
+rail-sw1# show interface counters
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Interface      State     RX_OK                 RX_ERR                RX_DRP                RX_OVERSIZE           TX_OK                 TX_ERR                TX_DRP                TX_OVERSIZE           
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Ethernet0      U         3                     0                     0                     0                     54                    0                     0                     0                     
+Ethernet1      U         3                     0                     0                     0                     53                    0                     0                     0                     
+Ethernet2      U         3                     0                     0                     0                     53                    0                     0                     0                     
+Ethernet3      U         59                    0                     0                     0                     110                   0                     0                     0                     
+Ethernet4      U         3                     0                     0                     0                     53                    0                     0                     0                     
+Ethernet5      U         3                     0                     0                     0                     53                    0                     0                     0                     
+Ethernet6      U         3                     0                     0                     0                     53                    0                     0                     0                     
+Ethernet7      U         60                    0                     0                     0                     110                   0                     0                     0                     
+Ethernet8      D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet9      D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet10     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet11     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet12     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet13     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet14     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet15     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet16     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet17     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet18     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet19     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet20     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet21     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet22     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet23     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet24     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet25     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet26     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet27     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet28     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet29     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet30     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet31     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet32     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet33     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet34     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet35     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet36     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet37     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet38     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet39     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet40     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet41     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet42     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet43     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet44     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet45     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet46     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet47     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet48     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet52     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet56     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet60     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet64     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet68     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet72     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet76     D         0                     0                     0                     0                     0                     0                     0                     0                     
+rail-sw1# show mac address-table
+-----------------------------------------------------------
+VLAN         MAC-ADDRESS         TYPE         INTERFACE           
+-----------------------------------------------------------
+101         02:5a:6f:00:00:04   DYNAMIC       Ethernet0           
+101         02:5a:70:00:00:04   DYNAMIC       Ethernet4           
+103         02:5a:6f:00:00:06   DYNAMIC       Ethernet1           
+103         02:5a:70:00:00:06   DYNAMIC       Ethernet5           
+105         02:5a:6f:00:00:08   DYNAMIC       Ethernet2           
+105         02:5a:70:00:00:08   DYNAMIC       Ethernet6           
+107         02:5a:6f:00:00:0a   DYNAMIC       Ethernet3           
+107         02:5a:fe:07:00:64   DYNAMIC       Ethernet3           
+107         02:5a:70:00:00:0a   DYNAMIC       Ethernet7           
+107         02:5a:fe:07:00:65   DYNAMIC       Ethernet7           
+rail-sw1# exit
+
+### 2026-11-01T07:39:06Z rail-sw2 klish
+terminal length 0
+show interface counters
+show mac address-table
+exit
+terminal length 0
+show interface counters
+show mac address-table
+exit
+rail-sw2# terminal length 0
+rail-sw2# show interface counters
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Interface      State     RX_OK                 RX_ERR                RX_DRP                RX_OVERSIZE           TX_OK                 TX_ERR                TX_DRP                TX_OVERSIZE           
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Ethernet0      U         3                     0                     0                     0                     46                    0                     0                     0                     
+Ethernet1      U         3                     0                     0                     0                     46                    0                     0                     0                     
+Ethernet2      U         3                     0                     0                     0                     46                    0                     0                     0                     
+Ethernet3      U         3                     0                     0                     0                     46                    0                     0                     0                     
+Ethernet4      U         3                     0                     0                     0                     46                    0                     0                     0                     
+Ethernet5      U         3                     0                     0                     0                     46                    0                     0                     0                     
+Ethernet6      U         3                     0                     0                     0                     46                    0                     0                     0                     
+Ethernet7      U         3                     0                     0                     0                     46                    0                     0                     0                     
+Ethernet8      D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet9      D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet10     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet11     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet12     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet13     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet14     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet15     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet16     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet17     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet18     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet19     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet20     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet21     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet22     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet23     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet24     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet25     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet26     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet27     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet28     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet29     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet30     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet31     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet32     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet33     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet34     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet35     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet36     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet37     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet38     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet39     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet40     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet41     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet42     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet43     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet44     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet45     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet46     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet47     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet48     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet52     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet56     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet60     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet64     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet68     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet72     D         0                     0                     0                     0                     0                     0                     0                     0                     
+Ethernet76     D         0                     0                     0                     0                     0                     0                     0                     0                     
+rail-sw2# show mac address-table
+-----------------------------------------------------------
+VLAN         MAC-ADDRESS         TYPE         INTERFACE           
+-----------------------------------------------------------
+102         02:5a:6f:00:00:05   DYNAMIC       Ethernet0           
+102         02:5a:70:00:00:05   DYNAMIC       Ethernet4           
+104         02:5a:6f:00:00:07   DYNAMIC       Ethernet1           
+104         02:5a:70:00:00:07   DYNAMIC       Ethernet5           
+106         02:5a:6f:00:00:09   DYNAMIC       Ethernet2           
+106         02:5a:70:00:00:09   DYNAMIC       Ethernet6           
+108         02:5a:6f:00:00:0b   DYNAMIC       Ethernet3           
+108         02:5a:70:00:00:0b   DYNAMIC       Ethernet7           
+rail-sw2# exit
+
+### 2026-11-01T07:39:10Z fe-sw1 klish
+terminal length 0
+show mac address-table
+exit
+terminal length 0
+show mac address-table
+exit
+fe-sw1# terminal length 0
+fe-sw1# show mac address-table
+-----------------------------------------------------------
+VLAN         MAC-ADDRESS         TYPE         INTERFACE           
+-----------------------------------------------------------
+1           aa:c1:ab:a5:97:c6   DYNAMIC       PortChannel10       
+100         ba:db:ee:fb:ad:f0   DYNAMIC       PortChannel10       
+100         02:5a:65:00:00:01   DYNAMIC       PortChannel11       
+100         02:5a:65:00:00:02   DYNAMIC       PortChannel11       
+100         02:5a:66:00:00:01   DYNAMIC       PortChannel12       
+100         02:5a:66:00:00:02   DYNAMIC       PortChannel12       
+100         02:5a:67:00:00:01   DYNAMIC       PortChannel13       
+100         02:5a:67:00:00:02   DYNAMIC       PortChannel13       
+100         02:5a:68:00:00:01   DYNAMIC       PortChannel14       
+100         02:5a:68:00:00:02   DYNAMIC       PortChannel14       
+100         02:5a:69:00:00:01   DYNAMIC       PortChannel15       
+100         02:5a:69:00:00:02   DYNAMIC       PortChannel15       
+100         02:5a:6f:00:00:01   DYNAMIC       PortChannel21       
+100         02:5a:6f:00:00:02   DYNAMIC       PortChannel21       
+100         02:5a:70:00:00:01   DYNAMIC       PortChannel22       
+100         02:5a:70:00:00:02   DYNAMIC       PortChannel22       
+110         ba:db:ee:fb:ad:f0   DYNAMIC       PortChannel10       
+110         02:5a:69:00:00:01   DYNAMIC       PortChannel15       
+120         aa:c1:ab:60:8c:c7   DYNAMIC       PortChannel31       
+120         aa:c1:ab:86:f7:88   DYNAMIC       PortChannel31       
+120         aa:c1:ab:a7:7f:3d   DYNAMIC       PortChannel31       
+120         aa:c1:ab:ba:76:63   DYNAMIC       PortChannel31       
+130         ba:db:ee:fb:ad:f0   DYNAMIC       PortChannel10       
+130         aa:c1:ab:3c:ba:e4   DYNAMIC       PortChannel41       
+130         aa:c1:ab:b4:b4:65   DYNAMIC       PortChannel41       
+130         aa:c1:ab:59:1f:2b   DYNAMIC       PortChannel42       
+130         aa:c1:ab:c0:df:68   DYNAMIC       PortChannel42       
+131         ba:db:ee:fb:ad:f0   DYNAMIC       PortChannel10       
+131         aa:c1:ab:83:3b:9a   DYNAMIC       PortChannel43       
+131         aa:c1:ab:ad:c4:73   DYNAMIC       PortChannel43       
+131         aa:c1:ab:8f:9a:2e   DYNAMIC       PortChannel44       
+131         aa:c1:ab:c2:10:a6   DYNAMIC       PortChannel44       
+200         ba:db:ee:fb:ad:f0   DYNAMIC       PortChannel10       
+200         aa:c1:ab:1c:bc:58   DYNAMIC       PortChannel32       
+200         aa:c1:ab:90:2f:d6   DYNAMIC       PortChannel32       
+300         ba:db:ee:fb:ad:f0   DYNAMIC       PortChannel10       
+300         aa:c1:ab:83:4d:31   DYNAMIC       PortChannel30       
+300         aa:c1:ab:88:94:10   DYNAMIC       PortChannel30       
+3966        0c:00:72:e0:0c:14   DYNAMIC       PortChannel1        
+fe-sw1# exit
+
+### 2026-11-01T07:39:13Z fe-sw2 klish
+terminal length 0
+show mac address-table
+exit
+terminal length 0
+show mac address-table
+exit
+fe-sw2# terminal length 0
+fe-sw2# show mac address-table
+-----------------------------------------------------------
+VLAN         MAC-ADDRESS         TYPE         INTERFACE           
+-----------------------------------------------------------
+1           aa:c1:ab:f5:53:b5   DYNAMIC       PortChannel10       
+100         ba:db:ee:fb:ad:f0   DYNAMIC       PortChannel10       
+100         02:5a:65:00:00:01   DYNAMIC       PortChannel11       
+100         02:5a:65:00:00:02   DYNAMIC       PortChannel11       
+100         02:5a:66:00:00:01   DYNAMIC       PortChannel12       
+100         02:5a:66:00:00:02   DYNAMIC       PortChannel12       
+100         02:5a:67:00:00:01   DYNAMIC       PortChannel13       
+100         02:5a:67:00:00:02   DYNAMIC       PortChannel13       
+100         02:5a:68:00:00:01   DYNAMIC       PortChannel14       
+100         02:5a:68:00:00:02   DYNAMIC       PortChannel14       
+100         02:5a:69:00:00:01   DYNAMIC       PortChannel15       
+100         02:5a:69:00:00:02   DYNAMIC       PortChannel15       
+100         02:5a:6f:00:00:01   DYNAMIC       PortChannel21       
+100         02:5a:6f:00:00:02   DYNAMIC       PortChannel21       
+100         02:5a:70:00:00:01   DYNAMIC       PortChannel22       
+100         02:5a:70:00:00:02   DYNAMIC       PortChannel22       
+110         ba:db:ee:fb:ad:f0   DYNAMIC       PortChannel10       
+110         02:5a:69:00:00:01   DYNAMIC       PortChannel15       
+120         aa:c1:ab:60:8c:c7   DYNAMIC       PortChannel31       
+120         aa:c1:ab:86:f7:88   DYNAMIC       PortChannel31       
+120         aa:c1:ab:a7:7f:3d   DYNAMIC       PortChannel31       
+120         aa:c1:ab:ba:76:63   DYNAMIC       PortChannel31       
+130         ba:db:ee:fb:ad:f0   DYNAMIC       PortChannel10       
+130         aa:c1:ab:3c:ba:e4   DYNAMIC       PortChannel41       
+130         aa:c1:ab:06:93:6e   DYNAMIC       PortChannel41       
+130         aa:c1:ab:b4:b4:65   DYNAMIC       PortChannel41       
+130         aa:c1:ab:9f:cf:dc   DYNAMIC       PortChannel42       
+130         aa:c1:ab:59:1f:2b   DYNAMIC       PortChannel42       
+130         aa:c1:ab:c0:df:68   DYNAMIC       PortChannel42       
+131         ba:db:ee:fb:ad:f0   DYNAMIC       PortChannel10       
+131         aa:c1:ab:83:3b:9a   DYNAMIC       PortChannel43       
+131         aa:c1:ab:a8:e2:7a   DYNAMIC       PortChannel43       
+131         aa:c1:ab:ad:c4:73   DYNAMIC       PortChannel43       
+131         aa:c1:ab:8f:9a:2e   DYNAMIC       PortChannel44       
+131         aa:c1:ab:a3:84:ec   DYNAMIC       PortChannel44       
+131         aa:c1:ab:c2:10:a6   DYNAMIC       PortChannel44       
+200         ba:db:ee:fb:ad:f0   DYNAMIC       PortChannel10       
+200         aa:c1:ab:1c:bc:58   DYNAMIC       PortChannel32       
+200         aa:c1:ab:90:2f:d6   DYNAMIC       PortChannel32       
+300         ba:db:ee:fb:ad:f0   DYNAMIC       PortChannel10       
+300         aa:c1:ab:45:d3:dd   DYNAMIC       PortChannel30       
+300         aa:c1:ab:83:4d:31   DYNAMIC       PortChannel30       
+300         aa:c1:ab:88:94:10   DYNAMIC       PortChannel30       
+3966        0c:00:0e:29:0c:14   DYNAMIC       PortChannel1        
+fe-sw2# exit
+
+### 2026-11-01T07:39:13Z ent-client container
++ hold_request.py 10.20.11.210 llm.ai.tarnwick.example (finished)
+HTTP/1.1 200 OK
+content-type: application/json
+content-length: 788
+x-ratelimit-limit: 3000
+x-ratelimit-remaining: 2999
+x-ratelimit-reset: 60
+date: Sun, 01 Nov 2026 07:38:28 GMT
+x-litellm-call-id: 86abccbd-d26e-4f86-b516-fb6598d0b917
+x-litellm-model-id: dfea58b1cdb88cf428e2ddc94803076f83122b9dfd6a124bc018e25cf5d44eeb
+x-litellm-model-name: openai/chat
+x-litellm-model-api-base: http://chat.serving.svc.cluster.local:8080/v1
+x-litellm-version: 1.104.0
+x-litellm-response-cost-original: 0.0
+x-litellm-response-cost-discount-amount: 0.0
+x-litellm-response-cost-margin-amount: 0.0
+x-litellm-response-cost-margin-percent: 0.0
+x-litellm-response-cost-input: 0.0
+x-litellm-response-cost-output: 0.0
+x-litellm-response-cost-tool-usage: 0.0
+x-litellm-key-spend: 0.0
+x-litellm-response-duration-ms: 3612.5450134277344
+x-litellm-overhead-duration-ms: 15.234
+x-litellm-callback-duration-ms: 0.0
+llm_provider-server: llama.cpp
+llm_provider-content-type: application/json; charset=utf-8
+llm_provider-content-length: 714
+llm_provider-keep-alive: timeout=5, max=100
+x-litellm-model-group: chat
+x-litellm-attempted-retries: 0
+x-litellm-attempted-fallbacks: 0
+x-frame-options: DENY
+content-security-policy: frame-ancestors 'none'
+x-content-type-options: nosniff
+server: envoy
+x-envoy-upstream-service-time: 3639
+
+{"id":"chatcmpl-LpLnMc6EqF8rykIs4Z2crK08ENBeyDQr","created":1793518712,"model":"chat","object":"chat.completion","system_fingerprint":"b11382-11fe02151","choices":[{"finish_reason":"length","index":0,"message":{"content":"\nA Network Rail is the organization that manages and maintains the national railway infrastructure","role":"assistant","provider_specific_fields":{"refusal":null}},"provider_specific_fields":{}}],"usage":{"completion_tokens":16,"prompt_tokens":20,"total_tokens":36,"prompt_tokens_details":{"cached_tokens":0}},"timings":{"cache_n":0,"prompt_n":20,"prompt_ms":[redacted: throughput],"prompt_per_token_ms":[redacted: throughput],"prompt_per_second":[redacted: throughput],"predicted_n":16,"predicted_ms":[redacted: throughput],"predicted_per_token_ms":[redacted: throughput],"predicted_per_second":[redacted: throughput]}}
+HELD 1793518712.600595
+CLOSED 1793518742.600953
+
+### 2026-11-01T07:39:24Z fw panos-cli
+Last login: Sun Nov  1 07:38:46 2026 from 172.21.40.1
+set cli pager off
+show log traffic direction equal backward receive_time in last-15-minutes dport equal 443
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show log 
+admin@fw> show log traffic 
+admin@fw> show log traffic direction 
+admin@fw> show log traffic direction equal 
+admin@fw> show log traffic direction equal backward 
+admin@fw> show log traffic direction equal backward receive_time 
+admin@fw> show log traffic direction equal backward receive_time in 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 443
+Time                App             From                            Src Port          Source
+Rule                Action          To                              Dst Port          Destination
+Src User        Dst User                        End Reason
+Rule_UUid
+====================================================================================================
+2026/11/01 07:39:17 ssl             enterprise                      42106             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+b65e68a3-2e9a-426b-8a4a-8f69c03f4600
+2026/11/01 07:37:13 ssl             enterprise                      42912             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+b65e68a3-2e9a-426b-8a4a-8f69c03f4600
+2026/11/01 07:28:37 not-applicable  operator-vpn                    50084             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:28:36 not-applicable  operator-vpn                    50084             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:28:35 not-applicable  operator-vpn                    50084             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:28:34 not-applicable  operator-vpn                    50084             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:53 ssl             bastion                         46332             10.20.3.10
+bastion-to-firewall allow           bastion                         443               10.20.3.1
+                                                tcp-fin
+54f37a5e-d62a-40c0-bfff-610c698ab493
+2026/11/01 07:27:52 not-applicable  k8s-nodes                       54216             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:50 not-applicable  k8s-nodes                       54216             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:49 not-applicable  k8s-nodes                       54216             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:48 not-applicable  k8s-nodes                       54216             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:47 not-applicable  k8s-nodes                       54216             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:46 not-applicable  k8s-nodes                       54216             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:45 not-applicable  k8s-nodes                       54216             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:27 not-applicable  k8s-nodes                       45722             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:26 not-applicable  k8s-nodes                       45722             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:25 not-applicable  k8s-nodes                       45722             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:24 not-applicable  k8s-nodes                       45722             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:20 incomplete      enterprise                      42519             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-fin
+b65e68a3-2e9a-426b-8a4a-8f69c03f4600
+2026/11/01 07:27:19 incomplete      enterprise                      45255             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-fin
+b65e68a3-2e9a-426b-8a4a-8f69c03f4600
+2026/11/01 07:27:18 incomplete      enterprise                      35759             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-fin
+b65e68a3-2e9a-426b-8a4a-8f69c03f4600
+2026/11/01 07:24:33 ssl             enterprise                      52920             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-fin
+b65e68a3-2e9a-426b-8a4a-8f69c03f4600
+2026/11/01 07:24:29 ssl             operator-vpn                    59958             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-fin
+54f9286f-a9ed-4b45-b956-458d5c0218d5
+admin@fw> exit
+
+### 2026-11-01T07:39:26Z ent-client container
++ curl -sS --max-time 30 --local-port 42107 --resolve admin.ai.tarnwick.example:443:10.20.11.210 -o /tmp/sfab-trace/refuse-body.txt -D /tmp/sfab-trace/refuse-headers.txt -w %{http_code} %{local_port}\n https://admin.ai.tarnwick.example/echo?msg=sfab-trace-refused
+404 42107
+
+### 2026-11-01T07:39:28Z ent-client container
++ curl -sS --max-time 60 --local-port 42108 -o /tmp/sfab-trace/refuse-key-body.txt -D /tmp/sfab-trace/refuse-key-headers.txt -w %{http_code} %{local_port}\n -H @/tmp/sfab-trace/hdr-staff -H Content-Type: application/json --data @/tmp/sfab-trace/request.json https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions
+401 42108
+
+### 2026-11-01T07:39:29Z ent-client container
++ python3 - 10.20.1.21 22 42109 1 5 0 < common/trace/syn_connect.py
+
+### 2026-11-01T07:39:34Z ent-client container
+1793518769.922976 0 0 42109 TIMEOUT 5.005
+
+### 2026-11-01T07:39:39Z k8s-ingress2 guest
++ tcpdump -nn -tt -e -v -S -r /tmp/sfab-rail-trace-6-k8s-ingress2-bond0.pcap > /tmp/sfab-rail-trace-6-k8s-ingress2-bond0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-6-k8s-ingress2-bond0.txt
+115
+
+### 2026-11-01T07:39:51Z k8s-gpu1 guest
++ tcpdump -nn -tt -e -v -S -r /tmp/sfab-rail-trace-9-chat-a-server-0-eth0.pcap > /tmp/sfab-rail-trace-9-chat-a-server-0-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-9-chat-a-server-0-eth0.txt
+1
+
+### 2026-11-01T07:39:54Z k8s-gpu1 guest
++ tcpdump -nn -tt -e -v -S -r /tmp/sfab-rail-trace-9-chat-a-server-0-rail3.pcap > /tmp/sfab-rail-trace-9-chat-a-server-0-rail3.txt 2>&1; wc -l < /tmp/sfab-rail-trace-9-chat-a-server-0-rail3.txt
+1
+
+### 2026-11-01T07:39:57Z k8s-gpu1 guest
++ tcpdump -nn -tt -e -v -S -r /tmp/sfab-rail-trace-10-chat-a-worker0-0-rail3.pcap > /tmp/sfab-rail-trace-10-chat-a-worker0-0-rail3.txt 2>&1; wc -l < /tmp/sfab-rail-trace-10-chat-a-worker0-0-rail3.txt
+1
+
+### 2026-11-01T07:40:01Z k8s-gpu2 guest
++ tcpdump -nn -tt -e -v -S -r /tmp/sfab-rail-trace-9-chat-b-server-0-eth0.pcap > /tmp/sfab-rail-trace-9-chat-b-server-0-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-9-chat-b-server-0-eth0.txt
+21
+
+### 2026-11-01T07:40:04Z k8s-gpu2 guest
++ tcpdump -nn -tt -e -v -S -r /tmp/sfab-rail-trace-9-chat-b-server-0-rail6.pcap > /tmp/sfab-rail-trace-9-chat-b-server-0-rail6.txt 2>&1; wc -l < /tmp/sfab-rail-trace-9-chat-b-server-0-rail6.txt
+2167
+
+### 2026-11-01T07:40:07Z k8s-gpu2 guest
++ tcpdump -nn -tt -e -v -S -r /tmp/sfab-rail-trace-10-chat-b-worker0-0-rail6.pcap > /tmp/sfab-rail-trace-10-chat-b-worker0-0-rail6.txt 2>&1; wc -l < /tmp/sfab-rail-trace-10-chat-b-worker0-0-rail6.txt
+2167
+
+### 2026-11-01T07:40:11Z k8s-gpu1 guest
++ tcpdump -nn -tt -e -v -S -r /tmp/sfab-rail-trace-9-chat-c-server-0-eth0.pcap > /tmp/sfab-rail-trace-9-chat-c-server-0-eth0.txt 2>&1; wc -l < /tmp/sfab-rail-trace-9-chat-c-server-0-eth0.txt
+1
+
+### 2026-11-01T07:40:14Z k8s-gpu1 guest
++ tcpdump -nn -tt -e -v -S -r /tmp/sfab-rail-trace-9-chat-c-server-0-rail7.pcap > /tmp/sfab-rail-trace-9-chat-c-server-0-rail7.txt 2>&1; wc -l < /tmp/sfab-rail-trace-9-chat-c-server-0-rail7.txt
+1
+
+### 2026-11-01T07:40:17Z k8s-gpu2 guest
++ tcpdump -nn -tt -e -v -S -r /tmp/sfab-rail-trace-10-chat-c-worker0-0-rail7.pcap > /tmp/sfab-rail-trace-10-chat-c-worker0-0-rail7.txt 2>&1; wc -l < /tmp/sfab-rail-trace-10-chat-c-worker0-0-rail7.txt
+1
+
+### 2026-11-01T07:40:20Z k8s-gpu1 guest
++ tcpdump -nn -tt -e -v -S -r /tmp/sfab-rail-trace-10-chat-c-worker1-0-rail7.pcap > /tmp/sfab-rail-trace-10-chat-c-worker1-0-rail7.txt 2>&1; wc -l < /tmp/sfab-rail-trace-10-chat-c-worker1-0-rail7.txt
+1
+
+### 2026-11-01T07:40:33Z fw panos-cli
+Last login: Sun Nov  1 07:39:15 2026 from 172.21.40.1
+set cli pager off
+show log traffic direction equal backward receive_time in last-15-minutes dport equal 22
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show log 
+admin@fw> show log traffic 
+admin@fw> show log traffic direction 
+admin@fw> show log traffic direction equal 
+admin@fw> show log traffic direction equal backward 
+admin@fw> show log traffic direction equal backward receive_time 
+admin@fw> show log traffic direction equal backward receive_time in 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 22
+Time                App             From                            Src Port          Source
+Rule                Action          To                              Dst Port          Destination
+Src User        Dst User                        End Reason
+Rule_UUid
+====================================================================================================
+2026/11/01 07:39:34 not-applicable  enterprise                      42109             10.24.10.10
+deny-all-log        deny            k8s-nodes                       22                10.20.1.21
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:39:33 not-applicable  enterprise                      42109             10.24.10.10
+deny-all-log        deny            k8s-nodes                       22                10.20.1.21
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:39:32 not-applicable  enterprise                      42109             10.24.10.10
+deny-all-log        deny            k8s-nodes                       22                10.20.1.21
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:39:31 not-applicable  enterprise                      42109             10.24.10.10
+deny-all-log        deny            k8s-nodes                       22                10.20.1.21
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:39:30 not-applicable  enterprise                      42109             10.24.10.10
+deny-all-log        deny            k8s-nodes                       22                10.20.1.21
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:59 ssh             bastion                         59430             10.20.3.10
+bastion-to-firewall allow           bastion                         22                10.20.3.1
+                                                tcp-fin
+54f37a5e-d62a-40c0-bfff-610c698ab493
+admin@fw> exit
+
+### 2026-11-01T07:40:45Z fw panos-cli
+Last login: Sun Nov  1 07:40:24 2026 from 172.21.40.1
+set cli pager off
+show log traffic direction equal backward receive_time in last-15-minutes dport equal 443
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show log 
+admin@fw> show log traffic 
+admin@fw> show log traffic direction 
+admin@fw> show log traffic direction equal 
+admin@fw> show log traffic direction equal backward 
+admin@fw> show log traffic direction equal backward receive_time 
+admin@fw> show log traffic direction equal backward receive_time in 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 443
+Time                App             From                            Src Port          Source
+Rule                Action          To                              Dst Port          Destination
+Src User        Dst User                        End Reason
+Rule_UUid
+====================================================================================================
+2026/11/01 07:39:43 ssl             enterprise                      42108             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+b65e68a3-2e9a-426b-8a4a-8f69c03f4600
+2026/11/01 07:39:41 ssl             enterprise                      42107             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+b65e68a3-2e9a-426b-8a4a-8f69c03f4600
+2026/11/01 07:39:17 ssl             enterprise                      42106             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+b65e68a3-2e9a-426b-8a4a-8f69c03f4600
+2026/11/01 07:37:13 ssl             enterprise                      42912             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+b65e68a3-2e9a-426b-8a4a-8f69c03f4600
+2026/11/01 07:28:37 not-applicable  operator-vpn                    50084             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:28:36 not-applicable  operator-vpn                    50084             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:28:35 not-applicable  operator-vpn                    50084             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:28:34 not-applicable  operator-vpn                    50084             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:53 ssl             bastion                         46332             10.20.3.10
+bastion-to-firewall allow           bastion                         443               10.20.3.1
+                                                tcp-fin
+54f37a5e-d62a-40c0-bfff-610c698ab493
+2026/11/01 07:27:52 not-applicable  k8s-nodes                       54216             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:50 not-applicable  k8s-nodes                       54216             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:49 not-applicable  k8s-nodes                       54216             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:48 not-applicable  k8s-nodes                       54216             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:47 not-applicable  k8s-nodes                       54216             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:46 not-applicable  k8s-nodes                       54216             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:45 not-applicable  k8s-nodes                       54216             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:27 not-applicable  k8s-nodes                       45722             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:26 not-applicable  k8s-nodes                       45722             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:25 not-applicable  k8s-nodes                       45722             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:24 not-applicable  k8s-nodes                       45722             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+890d442c-76db-48e3-9e56-09b30d0f9604
+2026/11/01 07:27:20 incomplete      enterprise                      42519             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-fin
+b65e68a3-2e9a-426b-8a4a-8f69c03f4600
+2026/11/01 07:27:19 incomplete      enterprise                      45255             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-fin
+b65e68a3-2e9a-426b-8a4a-8f69c03f4600
+2026/11/01 07:27:18 incomplete      enterprise                      35759             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-fin
+b65e68a3-2e9a-426b-8a4a-8f69c03f4600
+admin@fw> exit
+
