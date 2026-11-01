@@ -370,6 +370,9 @@ class Ch09Test(P3LabTest):
         self.assertIn("  PASS  ... nothing of it past the device that refuses it: none at 3-fw-ae1-leg1, 3-fw-ae1-leg2", v)
         self.assertRegex(v, r"  PASS  \.\.\. the traffic log: deny-all-log \(deny\), zone isp to isp")
         self.assertIn("# Split-horizon trace", (rs / "TRACE.md").read_text())
+        # the warm-up before the captures: the two answered populations only, from their own ports
+        self.assertEqual(sorted(p.name for p in (rs / "warmup").iterdir()), ["enterprise.txt", "nodes.txt"])
+        self.assertIn(" 42916 ", (rs / "warmup" / "enterprise.txt").read_text())
 
 
 # --------------------------------------------------------------------------------------------

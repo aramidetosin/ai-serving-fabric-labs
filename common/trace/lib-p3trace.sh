@@ -7,7 +7,9 @@
 #
 # The plan is gen/trace.json (sfab.render.trace), one of three forms:
 #
-#   dns     chapter 9. Every point captures at once (each population's resolver on its port, port
+#   dns     chapter 9. A warm-up connect, not captured, for each population whose connect is answered
+#           (warmup/), so the pair's MAC tables hold the lease holders' MACs; then every point
+#           captures at once (each population's resolver on its port, port
 #           53; the rungs the connects cross, tcp 443), on the lab host in the node's own namespace
 #           (nsenter and tcpdump); then each population's client looks the name up through its own
 #           resolver (dig, the container's or the guest's) and connects toward the answer from its
@@ -60,10 +62,21 @@ p3_lookup() {  # p3_lookup OUT NODE KIND NAME: the client's own lookup through i
 }
 
 p3trace_dns() {
-  local n i row pop client kind name addr sport
-  p3_captures "$RS/captures"
-  mkdir -p "$RS/lookups" "$RS/connects" "$RS/fw"
+  local n i row pop client kind name addr sport outcome
+  mkdir -p "$RS/lookups" "$RS/connects" "$RS/fw" "$RS/warmup"
   n="$(p3_get rows | grep -c .)"
+  # the warm-up, not captured: each connect the plan says is answered, from a source port the
+  # trace's own connects do not use, so the pair's MAC tables hold each lease holder's MAC in VLAN
+  # 110 before the captures start. A frame to a MAC the pair has aged out is flooded, and the
+  # virtual bridge sends it back out the MCLAG bonds across the peer link (KNOWN L1), so the SYN
+  # would be seen on both legs of the bundle
+  for ((i = 0; i < n; i++)); do
+    row="$(p3_get "rows.$i")"
+    read -r pop client kind addr sport outcome <<<"$(py -c 'import json, sys; r = json.loads(sys.argv[1]); print(r["population"], r["client"], r["kind"], r["syn"]["address"], r["syn"]["sport"], r["syn"]["outcome"])' "$row")"
+    [ "$outcome" = reached ] || continue
+    t_connect "$RS/warmup/$pop.txt" "$client" "$kind" "$addr" 443 "$((sport + 10))"
+  done
+  p3_captures "$RS/captures"
   for ((i = 0; i < n; i++)); do
     row="$(p3_get "rows.$i")"
     read -r pop client kind name addr sport <<<"$(py -c 'import json, sys; r = json.loads(sys.argv[1]); print(r["population"], r["client"], r["kind"], r["name"], r["syn"]["address"], r["syn"]["sport"])' "$row")"

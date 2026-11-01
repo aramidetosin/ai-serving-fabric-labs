@@ -334,6 +334,8 @@ def md_dns(rs: Path, plan: dict, res: list, stamp) -> None:
     L += [""] + verdict_block(rs)
     L += ["## Files", "", "- `captures/<point>.pcap` and `.txt`: each resolver's port (port 53) and each rung the connects cross (tcp 443)",
           "- `lookups/<population>.txt`: the client's own lookup; `connects/<population>.txt`: its connect (syn_connect.py)",
+          "- `warmup/<population>.txt`: the warm-up connect before the captures, for each population whose connect is answered, "
+          "so the pair's MAC tables hold the lease holders' MACs (not captured)",
           "- `fw/traffic-log-443.txt`: the firewall's traffic log after the connects", ""]
     (rs / "TRACE.md").write_text("\n".join(L), encoding="utf-8")
 
