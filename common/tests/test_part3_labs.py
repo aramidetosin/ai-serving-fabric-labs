@@ -347,9 +347,12 @@ class Ch09Test(P3LabTest):
         self.assertRegex(out, r"  PASS  ops-dns \(192\.0\.2\.10\), the uplink side's public server, holds no platform name")
         self.assertRegex(out, r"  PASS  isp-rtr holds no route into 10\.0\.0\.0/8 \(4 routes read\)")
         self.assertIn("  PASS  inet-client's connect to 198.51.100.10:443 from port 42390 refused (TIMEOUT), logged by deny-all-log from isp to isp", out)
+        self.assertIn("  PASS  Cilium's copies of the Gateway certificates in cilium-secrets recorded (3 copies, each named by a hash, "
+                      "labelled with the Secret it copies: gw-inet-tls, gw-internal-tls, gw-users-tls)", out)
         for n in ("k8s-ingress1", "k8s-ingress2", "k8s-cp1"):
             self.assertIn(f"  PASS  {n}'s Envoy: its loaded certificates as cilium-dbg envoy admin certs lists them recorded "
-                          f"(envoy-certs-{n}.txt, 3 of the 3 Gateway certificates named), not judged", out)
+                          f"(envoy-certs-{n}.txt, 3 certificates loaded; by serial, the certificates of gw-inet, gw-internal, "
+                          f"gw-users), not judged", out)
             self.assertNotIn("PRIVATE KEY", (rs / "split-horizon" / f"envoy-certs-{n}.txt").read_text())
 
     def test_dns_trace(self):

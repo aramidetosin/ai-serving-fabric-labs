@@ -137,6 +137,19 @@ print("\n".join(e["metadata"]["name"] for e in mine))' "$job" "$d/refused-mint-e
     done
 }
 
+# tn_gateway_certs FILE: each Gateway's certificate as its Secret holds it, read in the init node:
+# subject, issuer, serial and the public key's sha256 (never the key)
+tn_gateway_certs() {
+  local f="$1" ns g s
+  : >"$f"
+  ns="$(tn_get audiences.gateway_namespace)"
+  for g in $(tn_get audiences.gateways | py -c 'import json, sys; print(" ".join(sorted(json.loads(sys.stdin.read()))))'); do
+    s="$(tn_get "audiences.gateways.$g.secret")"
+    { echo "== $g $s"
+      KSH "kubectl -n $ns get secret $s -o jsonpath='{.data.tls\.crt}' | base64 -d > /tmp/sfab-tn-cert.pem; openssl x509 -in /tmp/sfab-tn-cert.pem -noout -subject -issuer -nameopt RFC2253; openssl x509 -in /tmp/sfab-tn-cert.pem -noout -serial; printf 'spki sha256 '; openssl x509 -in /tmp/sfab-tn-cert.pem -noout -pubkey | openssl pkey -pubin -outform DER | sha256sum | cut -c1-64; rm -f /tmp/sfab-tn-cert.pem" 2>&1; } >>"$f" || true
+  done
+}
+
 audit_audiences() {
   local d ns sec g s cm rm phase
   [ "${STAGE_SERVING:-0}" = 1 ] || return 0
@@ -156,14 +169,8 @@ audit_audiences() {
   K get httproutes -A >"$d/httproutes.txt" 2>&1 || true
   K -n kube-system get leases >"$d/leases.txt" 2>&1 || true
   K get ciliuml2announcementpolicies >"$d/l2-policies.txt" 2>&1 || true
-  # each Gateway's certificate: its Secret's public key fingerprint, read in the init node
-  : >"$d/certs.txt"
-  ns="$(tn_get audiences.gateway_namespace)"
-  for g in $(tn_get audiences.gateways | py -c 'import json, sys; print(" ".join(sorted(json.loads(sys.stdin.read()))))'); do
-    s="$(tn_get "audiences.gateways.$g.secret")"
-    { echo "== $g $s"
-      KSH "kubectl -n $ns get secret $s -o jsonpath='{.data.tls\.crt}' | base64 -d > /tmp/sfab-tn-cert.pem; openssl x509 -in /tmp/sfab-tn-cert.pem -noout -subject -issuer -nameopt RFC2253; printf 'spki sha256 '; openssl x509 -in /tmp/sfab-tn-cert.pem -noout -pubkey | openssl pkey -pubin -outform DER | sha256sum | cut -c1-64; rm -f /tmp/sfab-tn-cert.pem" 2>&1; } >>"$d/certs.txt" || true
-  done
+  # each Gateway's certificate: its Secret's serial and public key fingerprint, read in the init node
+  tn_gateway_certs "$d/certs.txt"
   # the refused mint: the key Secret's fields before and after it (fingerprints only)
   sec="$(tn_get audiences.keys.secret)" ns="$(tn_get audiences.keys.namespace)"
   EVID_OFF=1 K -n "$ns" get secret "$sec" -o json 2>/dev/null | py "$SFAB_COMMON/trace/servekeys.py" list >"$d/keys-before.txt" 2>&1 || true
@@ -263,9 +270,14 @@ audit_split_horizon() {
     fwt_tlog "$d/traffic-log.txt" "show log traffic direction equal backward receive_time in last-15-minutes dport equal 443" \
       --src "$(inv get nodes."$c".address | cut -d/ -f1)" --sport "$sp" >/dev/null 2>&1 || true
   fi
-  # Cilium's copies of the Gateway certificates, which every node's Envoy loads (recorded), and
-  # the certificates each recorded node's Envoy has loaded, listed from its Cilium agent pod
-  K -n "$(tn_get dns.envoy_certs.namespace)" get secrets >"$d/cilium-secrets.txt" 2>&1 || true
+  # Cilium's copies of the Gateway certificates, which every node's Envoy loads (recorded): Cilium
+  # 1.19 names each copy by a hash and labels it with the Secret it copies, so the listing carries
+  # that label as a column (no Secret data is read); and the certificates each recorded node's
+  # Envoy has loaded, listed from its Cilium agent pod (serials, names and expiry, no key), beside
+  # each Gateway's own certificate with its serial (gateway-certs.txt, as audiences/certs.txt)
+  tn_gateway_certs "$d/gateway-certs.txt"
+  K -n "$(tn_get dns.envoy_certs.namespace)" get secrets -L secretsync.cilium.io/owning-secret-name \
+    -L secretsync.cilium.io/owning-secret-namespace >"$d/cilium-secrets.txt" 2>&1 || true
   local pod node ecmd
   ecmd="$(tn_get dns.envoy_certs.command | paste -sd ' ' -)"
   while read -r pod node; do

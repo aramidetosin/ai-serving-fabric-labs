@@ -307,6 +307,57 @@ def _certs(text: str) -> dict:
     return out
 
 
+def _cert_serials(text: str) -> dict:
+    """gateway-certs.txt (and audiences/certs.txt): Gateway -> (its Secret, its certificate's serial in lower-case hex, or
+    None when the file holds no serial line: sets recorded before the serial was read)."""
+    out, cur = {}, None
+    for line in (text or "").splitlines():
+        m = re.match(r"^== (\S+) (\S+)", line)
+        if m:
+            cur = m.group(1)
+            out[cur] = (m.group(2), None)
+            continue
+        m = re.match(r"^serial=([0-9A-Fa-f]+)$", line.strip())
+        if m and cur:
+            out[cur] = (out[cur][0], m.group(1).lower().lstrip("0") or "0")
+    return out
+
+
+def _secret_copies(text: str) -> dict:
+    """kubectl get secrets -L <owning-secret-name label> ...: copy name -> the Secret it copies
+    (the first label column), or None where the copy carries no such label."""
+    out, cols = {}, None
+    for line in (text or "").splitlines():
+        x = line.split()
+        if not x:
+            continue
+        if x[0] == "NAME":
+            cols = x
+            continue
+        if cols is None or len(x) < 4:
+            continue
+        owner = None
+        if len(cols) > 4 and len(x) == len(cols):
+            owner = x[4] if x[4] not in ("", "<none>") else None
+        out[x[0]] = owner
+    return out
+
+
+def _envoy_serials(text: str) -> set:
+    """Envoy's admin /certs (cilium-dbg envoy admin certs): every certificate's serial in the chains,
+    lower-case hex without leading zeros."""
+    try:
+        d = json.loads(text or "{}")
+    except ValueError:
+        return {m.lower().lstrip("0") or "0" for m in re.findall(r'"serial_number":\s*"([0-9A-Fa-f]+)"', text or "")}
+    out = set()
+    for c in d.get("certificates") or []:
+        for ch in c.get("cert_chain") or []:
+            if ch.get("serial_number"):
+                out.add(str(ch["serial_number"]).lower().lstrip("0") or "0")
+    return out
+
+
 def _fields(text: str) -> dict:
     out = {}
     for line in (text or "").splitlines():
@@ -524,14 +575,22 @@ def g_split_horizon(self, names):
                 f"from {s.get('from_zone')} to {s.get('to_zone')}", c["outcome"] == "CONNECTED" and e.get("rule") == str(s.get("rule"))[:19],
                 f"client {c['outcome']}, log {e.get('rule') or 'none'}")
     ec = p["envoy_certs"]
-    t = _text(d / "cilium-secrets.txt")
-    have = [x for x in ec["secrets"] if re.search(rf"(?m)^{re.escape(x)}\s", t)]
-    v.ok(f"Cilium's copies of the Gateway certificates in {ec['namespace']} recorded ({len(have)} of {len(ec['secrets'])}: "
-         f"{', '.join(have) or 'none'}); every node's Envoy loads them, which the audit records and does not judge")
+    # each Gateway's certificate by its serial, read beside the Envoy lists (gateway-certs.txt)
+    serials = _cert_serials(_text(d / "gateway-certs.txt"))
+    copies = _secret_copies(_text(d / "cilium-secrets.txt"))
+    owners = sorted({o for o in copies.values() if o})
+    v.ok(f"Cilium's copies of the Gateway certificates in {ec['namespace']} recorded ({len(copies)} copies, each named by a hash, "
+         f"labelled with the Secret it copies: {', '.join(owners) or 'none'}); every node's Envoy loads them, which the audit "
+         f"records and does not judge")
     for n in ec.get("nodes") or []:
         t = _text(d / f"envoy-certs-{n}.txt")
-        seen = [x for x in ec["secrets"] if x.split("-", 1)[-1] in t or x in t]
-        what = (f"{len(seen)} of the {len(ec['secrets'])} Gateway certificates named" if t.strip() else "nothing read")
+        held = _envoy_serials(t)
+        named = sorted(g for g, (_s, ser) in serials.items() if ser and ser in held)
+        if not t.strip():
+            what = "nothing read"
+        else:
+            what = (f"{len(held)} certificates loaded; by serial, the certificates of {', '.join(named) or 'no Gateway'}"
+                    + (f", {len(held) - len(named)} other" if len(held) > len(named) else ""))
         v.ok(f"{n}'s Envoy: its loaded certificates as {' '.join(ec.get('command') or [])} lists them recorded "
              f"(envoy-certs-{n}.txt, {what}), not judged")
 

@@ -986,7 +986,9 @@ def kube_p3(s, cmd, stdin, now):
     if cmd[:2] == ["bash", "-c"] and "openssl x509" in cmd[2] and "spki sha256" in cmd[2]:
         m = re.search(r"get secret (\S+) ", cmd[2])
         sec = m.group(1) if m else "x"
-        return 0, (f"subject=CN={sec}\nissuer=CN=Tarnwick Platform CA\nspki sha256 {hashlib.sha256(sec.encode()).hexdigest()}")
+        # the serial as openssl x509 -serial prints it: upper-case hex, the value Envoy's /certs lists
+        ser = hashlib.sha256(sec.encode()).hexdigest()[:16].upper()
+        return 0, (f"subject=CN={sec}\nissuer=CN=Tarnwick Platform CA\nserial={ser}\nspki sha256 {hashlib.sha256(sec.encode()).hexdigest()}")
     if cmd[:1] != ["kubectl"]:
         return None
     args = cmd[1:]
@@ -1009,7 +1011,7 @@ def kube_p3(s, cmd, stdin, now):
     if words[:1] == ["exec"] and ns == "kube-system" and "--" in args and args[args.index("--") + 1:][:4] == ["cilium-dbg", "envoy", "admin", "certs"]:
         # Envoy's admin /certs as the stand-in lists it: each Gateway certificate's name and serial, no key
         rows = [{"ca_cert": [], "cert_chain": [{"path": f"<inline:{K8S['gateway_namespace']}/{x['listener']['secret']}>",
-                                                "serial_number": hashlib.sha256(g.encode()).hexdigest()[:16]}]}
+                                                "serial_number": hashlib.sha256(x['listener']['secret'].encode()).hexdigest()[:16]}]}
                 for g, x in sorted(K8S["gateways"].items())]
         return 0, json.dumps({"certificates": rows}, indent=1)
     if words[:2] == ["get", "ciliuml2announcementpolicies"]:
@@ -1058,8 +1060,16 @@ def kube_p3(s, cmd, stdin, now):
         return 0, "NAMESPACE   NAME   READY   STATUS   NODE\n" + "\n".join(
             f"{p['metadata'].get('namespace', '-')}   {n}   1/1   Running   {p['spec']['nodeName']}" for n, p in sorted(s["pods"].items()))
     if words[:2] == ["get", "secrets"] and ns == "cilium-secrets":
-        return 0, "NAME   TYPE   DATA   AGE\n" + "\n".join(f"{K8S['gateway_namespace']}-{g['listener']['secret']}   kubernetes.io/tls   2   9m"
-                                                         for g in K8S["gateways"].values())
+        # Cilium 1.19's copies: each named by a hash and labelled with the Secret it copies, the labels
+        # printed as columns when -L names them
+        labels = [args[i + 1] for i, a in enumerate(args[:-1]) if a == "-L"]
+        cols = {"secretsync.cilium.io/owning-secret-name": lambda g: g["listener"]["secret"],
+                "secretsync.cilium.io/owning-secret-namespace": lambda g: K8S["gateway_namespace"]}
+        head = "NAME   TYPE   DATA   AGE" + "".join(f"   {lb.rsplit('/', 1)[-1].upper()}" for lb in labels)
+        return 0, head + "\n" + "\n".join(
+            f"cilium-sync-secret-{hashlib.sha256(g['listener']['secret'].encode()).hexdigest()}   kubernetes.io/tls   3   9m"
+            + "".join(f"   {(cols.get(lb) or (lambda _g: '<none>'))(g)}" for lb in labels)
+            for g in K8S["gateways"].values())
     if words[:2] in (["get", "gateway"], ["get", "gateways.gateway.networking.k8s.io"]) and len(words) > 2 and o == "yaml":
         return 0, json.dumps({"metadata": {"name": words[2]}, "status": {"conditions": [{"type": "Programmed", "status": "True"}]}}, indent=1)
     if words[:2] in (["get", "httproute"], ["get", "httproutes.gateway.networking.k8s.io"]) and len(words) > 2 and o == "yaml":
