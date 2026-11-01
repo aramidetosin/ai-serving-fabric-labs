@@ -66,9 +66,11 @@ CILIUM_LEASE_KEYS = {"duration": "l2-announcements-lease-duration", "renew_deadl
                      "retry_period": "l2-announcements-retry-period"}
 # the refused mint's key id: a fixed id the lab's own keys never take (they start at 0a1b2c3d)
 REFUSED_ID = "fe000000"
-# PAN-OS 12.1 help, "Session Timeouts" (seconds): what show session info must print on the pinned
-# release before the chapter quotes it; discard is the time a denied TCP session holds its entry
-SESSION_TIMEOUTS = {"tcp": 3600, "tcp_handshake": 10, "tcp_init": 5, "tcp_half_closed": 120, "tcp_time_wait": 15,
+# The TCP timeouts show session info prints on the pinned PA-VM 12.1.2 with no session setting
+# configured (seconds), the values the chapter quotes; discard is the time a denied TCP session holds
+# its entry. PAN-OS 12.1 help, "Session Timeouts", gives the same values but for half closed, which it
+# documents as 120 s and the pinned release prints as 30 s (the lab's first ch10 deploy).
+SESSION_TIMEOUTS = {"tcp": 3600, "tcp_handshake": 10, "tcp_init": 5, "tcp_half_closed": 30, "tcp_time_wait": 15,
                     "discard_tcp": 90}
 HOLD_KEYS = {"n", "hold_s", "every_s", "sport", "chat", "slack", "populations"}
 INSIDE = ("10.0.0.0/8",)

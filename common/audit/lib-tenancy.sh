@@ -118,6 +118,25 @@ t_dig() {
 # ---------------------------------------------------------------------------------------------
 # chapter 8: a Gateway per audience
 
+# tn_refused_events DIR JOB NS: the Warning events of the refused mint's Job and its pods saved as
+# DIR/refused-mint-events.json, then deleted by name (no other event is touched)
+tn_refused_events() {
+  local d="$1" job="$2" ns="$3" e
+  EVID_OFF=1 K -n "$ns" get events --field-selector type=Warning -o json 2>/dev/null |
+    py -c 'import json, sys
+job = sys.argv[1]
+try:
+    items = json.load(sys.stdin).get("items") or []
+except ValueError:
+    items = []
+mine = [e for e in items if ((e.get("involvedObject") or {}).get("name") or "").startswith(job)]
+json.dump({"items": mine}, open(sys.argv[2], "w"), indent=1, sort_keys=True)
+print("\n".join(e["metadata"]["name"] for e in mine))' "$job" "$d/refused-mint-events.json" |
+    while read -r e; do
+      [ -z "$e" ] || EVID_OFF=1 K -n "$ns" delete event "$e" --ignore-not-found >/dev/null 2>&1 || true
+    done
+}
+
 audit_audiences() {
   local d ns sec g s cm rm phase
   [ "${STAGE_SERVING:-0}" = 1 ] || return 0
@@ -156,6 +175,10 @@ audit_audiences() {
       "$(tn_get audiences.refused_mint.model)" "$(tn_get audiences.refused_mint.id)" "$(tn_get audiences.refused_mint.caller)" \
       >/dev/null 2>&1 || phase=Failed
     printf '%s\n' "$phase" >"$d/refused-mint.phase"
+    # the refused Job leaves a Warning event (BackoffLimitExceeded) that the next audit's cluster
+    # group would read as a fault (the lab's first ch10 deploy, its second audit): it is this
+    # check's own evidence, so it is saved here and deleted, as the drills archive theirs
+    tn_refused_events "$d" "$(k8s_get inference.probe.name)-refused" "$(k8s_get inference.namespace)"
     EVID_OFF=1 K -n "$ns" get secret "$sec" -o json 2>/dev/null | py "$SFAB_COMMON/trace/servekeys.py" list >"$d/keys-after.txt" 2>&1 || true
   fi
   # the internet Gateway's column: every other population's connect to its VIP, and the firewall's

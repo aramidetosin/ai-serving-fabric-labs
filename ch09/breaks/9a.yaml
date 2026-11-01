@@ -11,9 +11,11 @@
 #
 # record: the staff client's lookups of llm.ai.tarnwick.example by each stub it has: dig for A and for
 # AAAA, python3's getaddrinfo (musl) and curl (its own resolver library, c-ares on Alpine), each
-# timed, with ent-client's resolv.conf. The broken state is checked for the A answer, and for an AAAA
-# answer that is anything but the healthy NOERROR with no record; which status it is, and what each
-# stub makes of it, are recorded before the exercise text names them.
+# timed, with ent-client's resolv.conf. The broken state is checked for the A answer, for an AAAA
+# answer that is anything but the healthy NOERROR with no record, and for what each stub made of it
+# on the lab's first deploy of this state (dnsmasq 2.90 answered the AAAA REFUSED; musl's getaddrinfo
+# gave up on the whole name with EAI_AGAIN after its resolv.conf timeout, and curl, through c-ares,
+# connected on the A answer alone): python3's lookup fails and curl's succeeds.
 # The heal installs the rendered dnsmasq.conf again (restore),
 # and every lookup is checked: A answered, AAAA NODATA (NOERROR with no record), both stubs resolve
 # and curl connects.
@@ -27,6 +29,8 @@ record:
 expect_broken:
   - lookup_answer: {probe: staff, type: A, rcode: NOERROR, answers: 1}
   - lookup_answer: {probe: staff, type: AAAA, rcode: NOERROR, answers: 0, not: true}
+  - lookup_answer: {probe: staff, tool: getaddrinfo, ok: false}
+  - lookup_answer: {probe: staff, tool: curl, ok: true}
 heal:
   - restore: ent-dns
 expect_healed:

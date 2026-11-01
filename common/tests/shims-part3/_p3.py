@@ -416,11 +416,17 @@ Session timeout
   TCP default timeout:                           3600 secs
   TCP session timeout before SYN-ACK received:      5 secs
   TCP session timeout before 3-way handshaking:    10 secs
-  TCP half-closed session timeout:                120 secs
+  TCP half-closed session timeout:                 30 secs
   TCP session timeout in TIME_WAIT:                15 secs
-  TCP session delayed ack timeout:                250 millisecs
+  TCP session timeout for unverified RST:          30 secs
+  TCP session delayed ack timeout:                 25 millisecs
   UDP default timeout:                             30 secs
-  ICMP default timeout:                             6 secs"""
+  ICMP default timeout:                             6 secs
+  SCTP default timeout:                          3600 secs
+  other IP default timeout:                        30 secs
+  Captive Portal session timeout:                  30 secs
+  Session timeout in discard state:
+    TCP: 90 secs, UDP: 60 secs, SCTP: 60 secs, other IP protocols: 60 secs"""
 
 
 def arp_text(s, now):

@@ -10,9 +10,10 @@ $SFAB_VERDICT:
                 and its zone's session count on the firewall, read while they are held, within the
                 plan's bound (N to N plus the chat request plus the plan's slack)
   chat          one chat completion per population with its own caller's key: HTTP 200
-  timeouts      show session info's TCP timeouts equal PAN-OS 12.1's documented ones (the
-                plan's): TCP 3,600 s, handshake 10 s, init 5 s, half closed 120 s, time wait 15 s,
-                and the discard timeout of a denied TCP session, 90 s, where the command prints it
+  timeouts      show session info's TCP timeouts equal the plan's, the pinned PA-VM 12.1.2's
+                defaults: TCP 3,600 s, handshake 10 s, init 5 s, half closed 30 s (PAN-OS 12.1 help
+                documents 120 s), time wait 15 s, and the discard timeout of a denied TCP session,
+                90 s
 
 HOLD.md holds, per zone, the counts before, while held, after the chat and after the stop, and
 Little's law worked from the run's own events: the connections the zone's client opened over the
@@ -73,13 +74,13 @@ def judge(a) -> int:
         key = (read(d / f"chat-{r['population']}-key.txt").strip().splitlines() or ["no key"])[-1].split()[0]
         v.check(f"{r['population']}: {r['chat']['model']} through {r['gateway']} with {r['chat']['caller']}'s key ({key}): HTTP {st}",
                 st == "200" and key.startswith(f"{r['chat']['caller']}."), f"HTTP {st}, key {key}")
-    v.sec("the firewall's session timeouts (PAN-OS 12.1 help, Session Timeouts)")
+    v.sec("the firewall's session timeouts (the pinned PA-VM 12.1.2's defaults)")
     got = T.session_timeouts(read(d / "session-info-held.txt"))
     for k, want in hp["timeouts"].items():
         if k not in got and k == "discard_tcp":
             v.skip(f"show session info: the discard timeout of a denied TCP session, {want} s", "the command does not print it")
             continue
-        v.check(f"show session info: {k.replace('_', ' ')} {got.get(k, 'not printed')} s, PAN-OS 12.1's {want} s", got.get(k) == want,
+        v.check(f"show session info: {k.replace('_', ' ')} {got.get(k, 'not printed')} s, the plan's {want} s", got.get(k) == want,
                 f"{got.get(k, 'not printed')}")
     try:
         stop_t = float(read(d / "stopped-at.txt").strip() or 0) or None
@@ -126,7 +127,7 @@ def write_md(d: Path, plan: dict, rows: list, factor: int, stamp, timeouts: dict
             L.append(f"| {r['zone']} | {lt['arrivals']} | {lt['window_s']} | {lt['mean_hold_s']} | {lt['predicted']} | {c['held']} |")
     L += ["", "A denied TCP attempt holds its entry for the discard timeout"
           + (f" ({timeouts['discard_tcp']} s as show session info prints it)" if "discard_tcp" in timeouts else
-             f" ({hp['timeouts']['discard_tcp']} s in PAN-OS 12.1's help; show session info did not print it)")
+             f" ({hp['timeouts']['discard_tcp']} s in the plan; show session info did not print it)")
           + ", so a zone's denied arrivals add their own term to its total. The counts above do not hold that term: each "
           "population's filter names its zone and its own Gateway's address and port, so a denied attempt to any other address, "
           "held for the discard timeout, is outside every count here.", ""]

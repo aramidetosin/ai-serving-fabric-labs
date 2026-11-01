@@ -200,6 +200,8 @@ def hold_summary(events: list) -> dict:
             "first_error": (errors[0].get("error") if errors else None)}
 
 
+# the predefined rules show running security-policy lists after the rulebase (PAN-OS 12.1.2)
+PREDEFINED = re.compile(r"^[^+\s]+\+(intrazone|interzone)-default$")
 COUNT = re.compile(r"(?i)number of sessions that match filter\s*:?\s*(\d+)")
 TIMEOUTS = {
     "tcp": re.compile(r"(?i)^\s*TCP default timeout:\s*(\d+)\s*secs"),
@@ -216,13 +218,24 @@ def session_count(text: str) -> int | None:
     return int(m.group(1)) if m else None
 
 
+# PAN-OS 12.1.2 prints the discard timeouts on the line after their heading (recorded on the lab's
+# first ch10 deploy): "Session timeout in discard state:" then "TCP: 90 secs, UDP: 60 secs, ..."
+DISCARD_HEAD = re.compile(r"(?i)^\s*Session timeout in discard state:\s*$")
+DISCARD_TCP = re.compile(r"(?i)^\s*TCP:\s*(\d+)\s*secs")
+
+
 def session_timeouts(text: str) -> dict:
     out = {}
-    for line in (text or "").splitlines():
+    lines = (text or "").splitlines()
+    for i, line in enumerate(lines):
         for k, rx in TIMEOUTS.items():
             m = rx.match(line)
             if m and k not in out:
                 out[k] = int(m.group(1))
+        if DISCARD_HEAD.match(line) and i + 1 < len(lines) and "discard_tcp" not in out:
+            m = DISCARD_TCP.match(lines[i + 1])
+            if m:
+                out["discard_tcp"] = int(m.group(1))
     return out
 
 
@@ -587,12 +600,22 @@ def g_zone_nat(self, names):
         v.skip("the zone-keyed translation", "the lab publishes no address to the internet users")
         return
     nat_t, sec_t = _text(d / "running-nat.txt"), _text(d / "running-security.txt")
-    got_nat, got_sec = PP.policy(nat_t), PP.policy(sec_t)
+    got_nat, got_all = PP.policy(nat_t), PP.policy(sec_t)
     v.check(f"the NAT rulebase in the rendered order: {', '.join(p['nat_order'])}", got_nat == p["nat_order"], f"running {', '.join(got_nat) or 'none'}")
+    # PAN-OS 12.1.2 lists its predefined rules after the rulebase in show running security-policy, as
+    # "vsys1+intrazone-default" and "vsys1+interzone-default" (recorded on the lab's first ch10
+    # deploy); they are not the rulebase's, so the order is judged without them and each is checked
+    # to deny, as the render overrides them
+    predef = [x for x in got_all if PREDEFINED.match(x)]
+    got_sec = [x for x in got_all if not PREDEFINED.match(x)]
     v.check(f"the security rulebase in the rendered order ({len(p['security_order'])} rules, {p['security_order'][-1]} last)",
             got_sec == p["security_order"], f"running {len(got_sec)}: " + ", ".join(x for x in got_sec if x not in p["security_order"])[:120])
-    pub = p["published"]
     nb, sb = _blocks(nat_t), _blocks(sec_t)
+    if predef:
+        acts = {x: (sb.get(x) or {"fields": {}})["fields"].get("action", ("", 0))[0] for x in predef}
+        v.check(f"the predefined rules after it deny: {', '.join(predef)}", all(a == "deny" for a in acts.values())
+                and got_all[-len(predef):] == predef, ", ".join(f"{k} {a or '?'}" for k, a in acts.items()))
+    pub = p["published"]
     isp = set(pub["from_zones"])
     nat_isp = [n for n, b in nb.items() if set(_members(b["fields"].get("from", ("", 0))[0])) & isp]
     rule = nb.get(pub["nat_rule"]) or {"fields": {}}

@@ -7,7 +7,7 @@
 # connections a population to its own Gateway's /echo, used again every 20 s, held 120 s), each
 # zone's session count on the firewall and show session info read before, while held, after one chat
 # completion a population with its own caller's key, and after the stop; the counts against the
-# plan's bound, the TCP timeouts against PAN-OS 12.1's, and Little's law per zone in HOLD.md.
+# plan's bound, the TCP timeouts against the pinned release's defaults, and Little's law per zone in HOLD.md.
 # HOLD_FACTOR=2 doubles the connections. Changes nothing on any device; every process it starts it
 # stops.
 set -euo pipefail
