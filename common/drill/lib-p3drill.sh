@@ -38,6 +38,13 @@ P3D_BG=()
 . "$SFAB_COMMON/audit/lib-tenancy.sh"
 
 p3d_get() { py "$P3D" get --plan "$P3D_PLAN" "$1"; }
+# p3d_warning_namespaces NS...: the namespaces given, then every other namespace holding a Warning event
+# now, each once
+p3d_warning_namespaces() {
+  { printf '%s\n' "$@"
+    EVID_OFF=1 K get events -A --field-selector type=Warning -o jsonpath='{range .items[*]}{.metadata.namespace}{"\n"}{end}' 2>/dev/null || true
+  } | awk 'NF && !seen[$0]++'
+}
 p3d_now() { date +%s.%N; }
 p3d_tl() { printf '%s %s\n' "$(p3d_now)" "$*" >>"$D/timeline.txt"; }
 p3d_restore_add() { P3D_RESTORES+=("$*"); }
@@ -209,7 +216,10 @@ leasedrill() {
   P3D_BG=()
   p3d_whole whole-after || rc=2
   FW "show arp all" | fwt_body "show arp all" >"$D/arp-after.txt" 2>/dev/null || true
-  events_archive "$D/events" "$(p3d_get "list.$DRILL_ID.endpoints" | head -n 1)" kube-system >/dev/null 2>&1 || true
+  # The cut node's pods draw Warning events (NodeNotReady among them) in every namespace with a pod on
+  # it, the identity provider's included; each such namespace's are saved here and cleared, as the
+  # gateway drills do, since the next full audit wants none since finish.
+  events_archive "$D/events" $(p3d_warning_namespaces "$(p3d_get "list.$DRILL_ID.endpoints" | head -n 1)" kube-system) >/dev/null 2>&1 || true
   p3d_quick_audit
   py "$P3D" analyze-lease --plan "$P3D_PLAN" --dir "$D" --drill "$DRILL_ID" --pass "$PASS" >"$D/analyze.out" 2>&1 || true
   cat "$D/analyze.out"
