@@ -598,7 +598,7 @@ def judge_keys(v, rs: Path, plan: dict, rows: list, pi: dict, agp, rop, srv_ip) 
 
 def judge_refuse(v, rs: Path, plan: dict, rows: list, decs: dict, pi: dict) -> dict:
     rf, gw, ag = plan["refuse"], plan["gateway"], plan["api_gateway"]
-    v.sec(f"the refusal: {rf['hostname']} sent to {gw['name']}, which does not carry it")
+    v.sec(f"the refusal: {rf['hostname']} sent to {rf.get('gateway') or gw['name']}, which does not carry it")
     res = read(rs / "request" / "refuse-result.txt").split()
     status = int(res[0]) if res and res[0].isdigit() else 0
     h = headers(read(rs / "request" / "refuse-headers.txt"))
