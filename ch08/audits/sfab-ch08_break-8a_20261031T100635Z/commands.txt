@@ -1,0 +1,334 @@
+### 2026-10-31T10:06:36Z k8s-cp1 kubectl
++ kubectl patch ciliuml2announcementpolicies.cilium.io gateways-internet --type merge -p {"spec": {"interfaces": ["^bond0\\.111$"]}}
+ciliuml2announcementpolicy.cilium.io/gateways-internet patched
+
+### 2026-10-31T10:06:36Z k8s-cp1 kubectl
++ kubectl get ciliuml2announcementpolicies.cilium.io gateways-internet -o yaml
+apiVersion: cilium.io/v2alpha1
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  creationTimestamp: "2026-10-31T09:24:32Z"
+  generation: 2
+  name: gateways-internet
+  resourceVersion: "49530"
+  uid: 46302222-5319-44a7-be25-366092908fee
+spec:
+  externalIPs: false
+  interfaces:
+  - ^bond0\.111$
+  loadBalancerIPs: true
+  nodeSelector:
+    matchExpressions:
+    - key: node-role.tarnwick.example/ingress
+      operator: Exists
+  serviceSelector:
+    matchLabels:
+      tarnwick.example/audience: internet
+
+### 2026-10-31T10:06:41Z k8s-cp1 kubectl
++ kubectl get ciliuml2announcementpolicies.cilium.io gateways-internet -o yaml
+apiVersion: cilium.io/v2alpha1
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  creationTimestamp: "2026-10-31T09:24:32Z"
+  generation: 2
+  name: gateways-internet
+  resourceVersion: "49530"
+  uid: 46302222-5319-44a7-be25-366092908fee
+spec:
+  externalIPs: false
+  interfaces:
+  - ^bond0\.111$
+  loadBalancerIPs: true
+  nodeSelector:
+    matchExpressions:
+    - key: node-role.tarnwick.example/ingress
+      operator: Exists
+  serviceSelector:
+    matchLabels:
+      tarnwick.example/audience: internet
+
+### 2026-10-31T10:06:41Z k8s-cp1 kubectl
++ kubectl -n kube-system get leases.coordination.k8s.io cilium-l2announce-gateways-cilium-gateway-gw-inet -o yaml
+apiVersion: coordination.k8s.io/v1
+kind: Lease
+metadata:
+  creationTimestamp: "2026-10-31T09:25:01Z"
+  name: cilium-l2announce-gateways-cilium-gateway-gw-inet
+  namespace: kube-system
+  resourceVersion: "49637"
+  uid: 88ac0503-1887-4f16-a9e0-c9e08d33e533
+spec:
+  acquireTime: "2026-10-31T10:04:04.816198Z"
+  holderIdentity: k8s-ingress1
+  leaseDurationSeconds: 3
+  leaseTransitions: 3
+  renewTime: "2026-10-31T10:06:41.740941Z"
+
+### 2026-10-31T10:06:42Z k8s-cp1 kubectl
++ kubectl -n gateways get gateways.gateway.networking.k8s.io gw-inet -o yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  creationTimestamp: "2026-10-31T09:24:33Z"
+  generation: 1
+  labels:
+    decision.tarnwick.example/id: dec-routeset-internet
+    tarnwick.example/audience: internet
+  name: gw-inet
+  namespace: gateways
+  resourceVersion: "4846"
+  uid: 3e5ba000-2e41-480b-8c5a-0be1afbbe46b
+spec:
+  addresses:
+  - type: IPAddress
+    value: 10.20.11.220
+  gatewayClassName: cilium
+  infrastructure:
+    labels:
+      tarnwick.example/audience: internet
+      tarnwick.example/lb-pool: gw-inet
+  listeners:
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: HTTPRoute
+      namespaces:
+        from: Selector
+        selector:
+          matchLabels:
+            routes.tarnwick.example/gw-inet: "true"
+    hostname: '*.ai.tarnwick.example'
+    name: https
+    port: 443
+    protocol: HTTPS
+    tls:
+      certificateRefs:
+      - group: ""
+        kind: Secret
+        name: gw-inet-tls
+      mode: Terminate
+status:
+  addresses:
+  - type: IPAddress
+    value: 10.20.11.220
+  conditions:
+  - lastTransitionTime: "2026-10-31T09:25:01Z"
+    message: Gateway successfully scheduled
+    observedGeneration: 1
+    reason: Accepted
+    status: "True"
+    type: Accepted
+  - lastTransitionTime: "2026-10-31T09:26:56Z"
+    message: Gateway Programmed
+    observedGeneration: 1
+    reason: Programmed
+    status: "True"
+    type: Programmed
+  listeners:
+  - attachedRoutes: 2
+    conditions:
+    - lastTransitionTime: "2026-10-31T09:26:56Z"
+      message: Resolved Refs
+      observedGeneration: 1
+      reason: ResolvedRefs
+      status: "True"
+      type: ResolvedRefs
+    - lastTransitionTime: "2026-10-31T09:26:56Z"
+      message: Listener Accepted
+      observedGeneration: 1
+      reason: Accepted
+      status: "True"
+      type: Accepted
+    - lastTransitionTime: "2026-10-31T09:26:56Z"
+      message: Listener Programmed
+      observedGeneration: 1
+      reason: Programmed
+      status: "True"
+      type: Programmed
+    name: https
+    supportedKinds:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+
+### 2026-10-31T10:06:42Z k8s-cp1 kubectl
++ kubectl -n gateways get services cilium-gateway-gw-inet -o yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    io.cilium/lb-ipam-ips: 10.20.11.220
+  creationTimestamp: "2026-10-31T09:25:01Z"
+  labels:
+    gateway.networking.k8s.io/gateway-name: gw-inet
+    io.cilium.gateway/owning-gateway: gw-inet
+    tarnwick.example/audience: internet
+    tarnwick.example/lb-pool: gw-inet
+  name: cilium-gateway-gw-inet
+  namespace: gateways
+  ownerReferences:
+  - apiVersion: gateway.networking.k8s.io/v1
+    controller: true
+    kind: Gateway
+    name: gw-inet
+    uid: 3e5ba000-2e41-480b-8c5a-0be1afbbe46b
+  resourceVersion: "2128"
+  uid: 8715fbac-c5d4-4982-82c0-cb2788264e2a
+spec:
+  allocateLoadBalancerNodePorts: true
+  clusterIP: 10.23.119.0
+  clusterIPs:
+  - 10.23.119.0
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: port-443
+    nodePort: 32355
+    port: 443
+    protocol: TCP
+    targetPort: 443
+  sessionAffinity: None
+  type: LoadBalancer
+status:
+  conditions:
+  - lastTransitionTime: "2026-10-31T09:25:01Z"
+    message: ""
+    reason: satisfied
+    status: "True"
+    type: cilium.io/IPAMRequestSatisfied
+  loadBalancer:
+    ingress:
+    - ip: 10.20.11.220
+      ipMode: VIP
+
+### 2026-10-31T10:06:42Z k8s-cp1 kubectl
++ kubectl get ciliuml2announcementpolicies.cilium.io gateways-enterprise -o yaml
+apiVersion: cilium.io/v2alpha1
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  creationTimestamp: "2026-10-31T09:24:32Z"
+  generation: 1
+  name: gateways-enterprise
+  resourceVersion: "1554"
+  uid: 2a26a94c-f0f0-4590-a789-9503af648166
+spec:
+  externalIPs: false
+  interfaces:
+  - ^bond0\.110$
+  loadBalancerIPs: true
+  nodeSelector:
+    matchExpressions:
+    - key: node-role.tarnwick.example/ingress
+      operator: Exists
+  serviceSelector:
+    matchLabels:
+      tarnwick.example/audience: enterprise
+
+### 2026-10-31T10:06:42Z k8s-cp1 kubectl
++ kubectl -n kube-system get leases.coordination.k8s.io cilium-l2announce-gateways-cilium-gateway-gw-users -o yaml
+apiVersion: coordination.k8s.io/v1
+kind: Lease
+metadata:
+  creationTimestamp: "2026-10-31T09:25:01Z"
+  name: cilium-l2announce-gateways-cilium-gateway-gw-users
+  namespace: kube-system
+  resourceVersion: "49656"
+  uid: 54116893-0e4c-4007-abd2-4198fb6064ce
+spec:
+  acquireTime: "2026-10-31T10:04:04.739908Z"
+  holderIdentity: k8s-ingress1
+  leaseDurationSeconds: 3
+  leaseTransitions: 3
+  renewTime: "2026-10-31T10:06:42.761943Z"
+
+### 2026-10-31T10:06:47Z fw panos-cli
+Last login: Sat Oct 31 10:05:46 2026 from 172.21.40.1
+set cli pager off
+show arp all
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show arp 
+admin@fw> show arp all
+
+maximum of entries supported :      32000
+default timeout:                    1800 seconds
+total ARP entries in table :        28
+total ARP entries shown :           28
+status: s - static, c - complete, e - expiring, i - incomplete
+
+interface                ip address      hw address        port              status   ttl  
+--------------------------------------------------------------------------------
+ethernet1/3              10.20.9.11      02:5a:65:00:00:03 ethernet1/3                c      470  
+ethernet1/3              10.20.9.12      02:5a:66:00:00:03 ethernet1/3                c      470  
+ethernet1/3              10.20.9.13      02:5a:67:00:00:03 ethernet1/3                c      470  
+ethernet1/3              10.20.9.21      02:5a:6f:00:00:03 ethernet1/3                c      470  
+ethernet1/3              10.20.9.22      02:5a:70:00:00:03 ethernet1/3                c      470  
+ethernet1/3              10.20.9.31      02:5a:68:00:00:03 ethernet1/3                c      470  
+ethernet1/3              10.20.9.32      02:5a:69:00:00:03 ethernet1/3                c      470  
+ethernet1/4              10.24.10.10     aa:c1:ab:da:b0:4a ethernet1/4                c      1146 
+ethernet1/5              198.51.100.1    aa:c1:ab:3b:ef:6b ethernet1/5                c      1746 
+ethernet1/7              10.24.10.53     aa:c1:ab:13:41:6a ethernet1/7                c      1774 
+ae1.100                  10.20.1.10      02:5a:65:00:00:01 ae1                        c      1799 
+ae1.100                  10.20.1.11      02:5a:65:00:00:01 ae1                        c      1195 
+ae1.100                  10.20.1.12      02:5a:66:00:00:01 ae1                        c      1192 
+ae1.100                  10.20.1.13      02:5a:67:00:00:01 ae1                        c      1192 
+ae1.100                  10.20.1.21      02:5a:6f:00:00:01 ae1                        c      1157 
+ae1.100                  10.20.1.22      02:5a:70:00:00:01 ae1                        c      1195 
+ae1.100                  10.20.1.31      02:5a:68:00:00:01 ae1                        c      1197 
+ae1.100                  10.20.1.32      02:5a:69:00:00:01 ae1                        c      1192 
+ae1.110                  10.20.11.11     02:5a:68:00:00:01 ae1                        c      1637 
+ae1.110                  10.20.11.12     02:5a:69:00:00:01 ae1                        c      1337 
+ae1.110                  10.20.11.200    02:5a:68:00:00:01 ae1                        c      1637 
+ae1.110                  10.20.11.210    02:5a:68:00:00:01 ae1                        c      1637 
+ae1.110                  10.20.11.220    02:5a:68:00:00:01 ae1                        c      1637 
+ae1.300                  10.20.3.10      aa:c1:ab:0b:30:9b ae1                        c      643  
+ae1.130                  10.20.13.11     aa:c1:ab:fe:32:b9 ae1                        c      1774 
+ae1.130                  10.20.13.21     aa:c1:ab:d2:73:91 ae1                        c      1782 
+ae1.131                  10.20.14.11     aa:c1:ab:0c:76:a6 ae1                        c      1774 
+ae1.131                  10.20.14.21     aa:c1:ab:cb:ca:1e ae1                        c      1738 
+
+admin@fw> exit
+
+### 2026-10-31T10:06:53Z ent-client container
++ bash -c for i in $(seq 0 9); do t=$(date +%s.%N); c=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 'https://llm.ai.tarnwick.example/echo?msg=sfab-break-8a'); if [ "$c" = 200 ]; then ok=1; else ok=0; fi; echo "$t $i $ok $c"; sleep 0.5; done
+1793441207. 0 1 200
+1793441208. 1 1 200
+1793441208. 2 1 200
+1793441209. 3 1 200
+1793441209. 4 1 200
+1793441210. 5 1 200
+1793441211. 6 1 200
+1793441211. 7 1 200
+1793441212. 8 1 200
+1793441212. 9 1 200
+
+### 2026-10-31T10:06:53Z k8s-cp1 kubectl
++ kubectl -n kube-system get lease cilium-l2announce-gateways-cilium-gateway-gw-inet -o jsonpath={.spec.holderIdentity}
+k8s-ingress1
+
+### 2026-10-31T10:06:56Z k8s-ingress2 guest
++ ip neigh flush to 10.20.11.220 dev bond0.110 2>/dev/null; ping -c 2 -W 1 10.20.11.220 >/dev/null 2>&1; ip neigh show to 10.20.11.220 dev bond0.110
+10.20.11.220 INCOMPLETE 
+
+### 2026-10-31T10:06:56Z k8s-cp1 kubectl
++ kubectl -n kube-system get lease cilium-l2announce-gateways-cilium-gateway-gw-users -o jsonpath={.spec.holderIdentity}
+k8s-ingress1
+
+### 2026-10-31T10:06:58Z k8s-ingress2 guest
++ ip neigh flush to 10.20.11.210 dev bond0.110 2>/dev/null; ping -c 2 -W 1 10.20.11.210 >/dev/null 2>&1; ip neigh show to 10.20.11.210 dev bond0.110
+10.20.11.210 lladdr 02:5a:68:00:00:01 REACHABLE 
+

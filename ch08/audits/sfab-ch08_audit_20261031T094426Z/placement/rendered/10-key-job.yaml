@@ -1,0 +1,53 @@
+# serving-layer manifests for sfab-ch08: rendered by serving.py from serving.env
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: llm-api-key
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+    app.kubernetes.io/component: key
+spec:
+  backoffLimit: 2
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: serving
+        app.kubernetes.io/component: key
+    spec:
+      serviceAccountName: serving-keys
+      restartPolicy: Never
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: keys
+        image: "192.0.2.6:5000/sfab/keys:4"
+        imagePullPolicy: IfNotPresent
+        command:
+        - sfab-keys
+        - ensure
+        - "--namespace"
+        - serving
+        - "--secret"
+        - llm-api-key
+        - "--field"
+        - key
+        - "--prefix"
+        - sk-tw-serving
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "32Mi"
+          limits:
+            memory: "128Mi"
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL

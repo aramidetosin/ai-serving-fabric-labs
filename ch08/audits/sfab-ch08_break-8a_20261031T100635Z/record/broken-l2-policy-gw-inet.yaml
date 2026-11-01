@@ -1,0 +1,20 @@
+apiVersion: cilium.io/v2alpha1
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  creationTimestamp: "2026-10-31T09:24:32Z"
+  generation: 2
+  name: gateways-internet
+  resourceVersion: "49530"
+  uid: 46302222-5319-44a7-be25-366092908fee
+spec:
+  externalIPs: false
+  interfaces:
+  - ^bond0\.111$
+  loadBalancerIPs: true
+  nodeSelector:
+    matchExpressions:
+    - key: node-role.tarnwick.example/ingress
+      operator: Exists
+  serviceSelector:
+    matchLabels:
+      tarnwick.example/audience: internet

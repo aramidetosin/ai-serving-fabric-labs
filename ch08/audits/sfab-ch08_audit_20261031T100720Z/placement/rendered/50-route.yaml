@@ -1,0 +1,130 @@
+# serving-layer manifests for sfab-ch08: rendered by serving.py from serving.env
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: serving
+  namespace: serving
+  labels:
+    app.kubernetes.io/name: serving
+spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: gw-internal
+    namespace: gateways
+    sectionName: https
+  hostnames:
+  - serve.ai.tarnwick.example
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /chat
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+    backendRefs:
+    - name: chat
+      port: 8080
+    timeouts:
+      request: "900s"
+      backendRequest: "900s"
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /staff
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+    backendRefs:
+    - name: staff
+      port: 8080
+    timeouts:
+      request: "900s"
+      backendRequest: "900s"
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /chat-a
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+    backendRefs:
+    - name: chat-a
+      port: 8080
+    timeouts:
+      request: "900s"
+      backendRequest: "900s"
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /chat-b
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+    backendRefs:
+    - name: chat-b
+      port: 8080
+    timeouts:
+      request: "900s"
+      backendRequest: "900s"
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /chat-c
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+    backendRefs:
+    - name: chat-c
+      port: 8080
+    timeouts:
+      request: "900s"
+      backendRequest: "900s"
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /staff-a
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+    backendRefs:
+    - name: staff-a
+      port: 8080
+    timeouts:
+      request: "900s"
+      backendRequest: "900s"
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /staff-b
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+    backendRefs:
+    - name: staff-b
+      port: 8080
+    timeouts:
+      request: "900s"
+      backendRequest: "900s"

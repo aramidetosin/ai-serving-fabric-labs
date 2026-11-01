@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    io.cilium/lb-ipam-ips: 10.20.11.220
+  creationTimestamp: "2026-10-31T09:25:01Z"
+  labels:
+    gateway.networking.k8s.io/gateway-name: gw-inet
+    io.cilium.gateway/owning-gateway: gw-inet
+    tarnwick.example/audience: internet
+    tarnwick.example/lb-pool: gw-inet
+  name: cilium-gateway-gw-inet
+  namespace: gateways
+  ownerReferences:
+  - apiVersion: gateway.networking.k8s.io/v1
+    controller: true
+    kind: Gateway
+    name: gw-inet
+    uid: 3e5ba000-2e41-480b-8c5a-0be1afbbe46b
+  resourceVersion: "2128"
+  uid: 8715fbac-c5d4-4982-82c0-cb2788264e2a
+spec:
+  allocateLoadBalancerNodePorts: true
+  clusterIP: 10.23.119.0
+  clusterIPs:
+  - 10.23.119.0
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: port-443
+    nodePort: 32355
+    port: 443
+    protocol: TCP
+    targetPort: 443
+  sessionAffinity: None
+  type: LoadBalancer
+status:
+  conditions:
+  - lastTransitionTime: "2026-10-31T09:25:01Z"
+    message: ""
+    reason: satisfied
+    status: "True"
+    type: cilium.io/IPAMRequestSatisfied
+  loadBalancer:
+    ingress:
+    - ip: 10.20.11.220
+      ipMode: VIP

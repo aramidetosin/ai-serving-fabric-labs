@@ -1,0 +1,102 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "cilium.io/v2alpha1",
+            "kind": "CiliumL2AnnouncementPolicy",
+            "metadata": {
+                "creationTimestamp": "2026-10-31T09:24:32Z",
+                "generation": 1,
+                "name": "gateways-enterprise",
+                "resourceVersion": "1554",
+                "uid": "2a26a94c-f0f0-4590-a789-9503af648166"
+            },
+            "spec": {
+                "externalIPs": false,
+                "interfaces": [
+                    "^bond0\\.110$"
+                ],
+                "loadBalancerIPs": true,
+                "nodeSelector": {
+                    "matchExpressions": [
+                        {
+                            "key": "node-role.tarnwick.example/ingress",
+                            "operator": "Exists"
+                        }
+                    ]
+                },
+                "serviceSelector": {
+                    "matchLabels": {
+                        "tarnwick.example/audience": "enterprise"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "cilium.io/v2alpha1",
+            "kind": "CiliumL2AnnouncementPolicy",
+            "metadata": {
+                "creationTimestamp": "2026-10-31T09:24:32Z",
+                "generation": 1,
+                "name": "gateways-internal",
+                "resourceVersion": "1553",
+                "uid": "eebd2706-0d7f-4a67-832b-a91abf6a5fc8"
+            },
+            "spec": {
+                "externalIPs": false,
+                "interfaces": [
+                    "^bond0\\.110$"
+                ],
+                "loadBalancerIPs": true,
+                "nodeSelector": {
+                    "matchExpressions": [
+                        {
+                            "key": "node-role.tarnwick.example/ingress",
+                            "operator": "Exists"
+                        }
+                    ]
+                },
+                "serviceSelector": {
+                    "matchLabels": {
+                        "tarnwick.example/audience": "internal"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "cilium.io/v2alpha1",
+            "kind": "CiliumL2AnnouncementPolicy",
+            "metadata": {
+                "creationTimestamp": "2026-10-31T09:24:32Z",
+                "generation": 1,
+                "name": "gateways-internet",
+                "resourceVersion": "1555",
+                "uid": "46302222-5319-44a7-be25-366092908fee"
+            },
+            "spec": {
+                "externalIPs": false,
+                "interfaces": [
+                    "^bond0\\.110$"
+                ],
+                "loadBalancerIPs": true,
+                "nodeSelector": {
+                    "matchExpressions": [
+                        {
+                            "key": "node-role.tarnwick.example/ingress",
+                            "operator": "Exists"
+                        }
+                    ]
+                },
+                "serviceSelector": {
+                    "matchLabels": {
+                        "tarnwick.example/audience": "internet"
+                    }
+                }
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

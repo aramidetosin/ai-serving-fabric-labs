@@ -1,0 +1,830 @@
+### 2026-10-31T09:57:08Z fw panos-cli
+Last login: Sat Oct 31 09:55:58 2026 from 172.21.40.1
+set cli pager off
+show arp all
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show arp 
+admin@fw> show arp all
+
+maximum of entries supported :      32000
+default timeout:                    1800 seconds
+total ARP entries in table :        27
+total ARP entries shown :           27
+status: s - static, c - complete, e - expiring, i - incomplete
+
+interface                ip address      hw address        port              status   ttl  
+--------------------------------------------------------------------------------
+ethernet1/3              10.20.9.11      02:5a:65:00:00:03 ethernet1/3                c      1050 
+ethernet1/3              10.20.9.12      02:5a:66:00:00:03 ethernet1/3                c      1050 
+ethernet1/3              10.20.9.13      02:5a:67:00:00:03 ethernet1/3                c      1050 
+ethernet1/3              10.20.9.21      02:5a:6f:00:00:03 ethernet1/3                c      1050 
+ethernet1/3              10.20.9.22      02:5a:70:00:00:03 ethernet1/3                c      1050 
+ethernet1/3              10.20.9.31      02:5a:68:00:00:03 ethernet1/3                c      1050 
+ethernet1/3              10.20.9.32      02:5a:69:00:00:03 ethernet1/3                c      1050 
+ethernet1/4              10.24.10.10     aa:c1:ab:da:b0:4a ethernet1/4                c      1726 
+ethernet1/5              198.51.100.1    aa:c1:ab:3b:ef:6b ethernet1/5                c      1781 
+ethernet1/7              10.24.10.53     aa:c1:ab:13:41:6a ethernet1/7                c      1125 
+ae1.100                  10.20.1.10      02:5a:65:00:00:01 ae1                        c      1798 
+ae1.100                  10.20.1.11      02:5a:65:00:00:01 ae1                        c      1775 
+ae1.100                  10.20.1.12      02:5a:66:00:00:01 ae1                        c      1772 
+ae1.100                  10.20.1.13      02:5a:67:00:00:01 ae1                        c      1772 
+ae1.100                  10.20.1.21      02:5a:6f:00:00:01 ae1                        c      1737 
+ae1.100                  10.20.1.22      02:5a:70:00:00:01 ae1                        c      1775 
+ae1.100                  10.20.1.31      02:5a:68:00:00:01 ae1                        c      1777 
+ae1.100                  10.20.1.32      02:5a:69:00:00:01 ae1                        c      1772 
+ae1.110                  10.20.11.12     02:5a:69:00:00:01 ae1                        c      117  
+ae1.110                  10.20.11.200    02:5a:69:00:00:01 ae1                        c      1674 
+ae1.110                  10.20.11.210    02:5a:69:00:00:01 ae1                        c      1674 
+ae1.110                  10.20.11.220    02:5a:69:00:00:01 ae1                        c      1674 
+ae1.300                  10.20.3.10      aa:c1:ab:0b:30:9b ae1                        c      1223 
+ae1.130                  10.20.13.11     aa:c1:ab:fe:32:b9 ae1                        c      1125 
+ae1.130                  10.20.13.21     aa:c1:ab:d2:73:91 ae1                        c      1795 
+ae1.131                  10.20.14.11     aa:c1:ab:0c:76:a6 ae1                        c      1737 
+ae1.131                  10.20.14.21     aa:c1:ab:cb:ca:1e ae1                        c      1771 
+
+admin@fw> exit
+
+### 2026-10-31T09:57:08Z ent-client container
++ sh -c nohup python3 /tmp/sfab-p3drill/probe_echo.py --url https://llm.ai.tarnwick.example/echo --log /tmp/sfab-p3drill/echo.jsonl --interval 2 --stop /tmp/sfab-p3drill/stop >/tmp/sfab-p3drill/echo.out 2>&1 </dev/null &
+
+
+### 2026-10-31T09:57:08Z ent-client container
++ sh -c nohup python3 /tmp/sfab-p3drill/probe_tcp.py 10.20.11.210 443 3600 0.5 1 /tmp/sfab-p3drill/tcp.log >/tmp/sfab-p3drill/tcp.out 2>&1 </dev/null &
+
+
+### 2026-10-31T09:57:08Z ops-client container
++ sh -c nohup python3 /tmp/sfab-p3drill/probe_echo.py --url https://llm.ai.tarnwick.example/echo --log /tmp/sfab-p3drill/echo.jsonl --interval 2 --stop /tmp/sfab-p3drill/stop --resolve llm.ai.tarnwick.example:443:10.20.11.200 >/tmp/sfab-p3drill/echo.out 2>&1 </dev/null &
+
+
+### 2026-10-31T09:57:08Z ops-client container
++ sh -c nohup python3 /tmp/sfab-p3drill/probe_tcp.py 10.20.11.200 443 3600 0.5 1 /tmp/sfab-p3drill/tcp.log >/tmp/sfab-p3drill/tcp.out 2>&1 </dev/null &
+
+
+### 2026-10-31T09:57:09Z ent-client container
++ sh -c nohup python3 /tmp/sfab-p3drill/probe_gateway.py --dir /tmp/sfab-p3drill/model --target chat https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions --interval 2 --timeout 100 --max-tokens 4 --until-stop --cafile /shared/ca/root.crt >/tmp/sfab-p3drill/model.out 2>&1 </dev/null &
+
+
+### 2026-10-31T09:57:31Z fe-sw1 klish
+terminal length 0
+configure terminal
+interface Ethernet14
+shutdown
+end
+exit
+terminal length 0
+configure terminal
+interface Ethernet14
+shutdown
+end
+exit
+fe-sw1# terminal length 0
+fe-sw1# configure terminal
+fe-sw1(config)# interface Ethernet14
+fe-sw1(config-if-Ethernet14)# shutdown
+fe-sw1(config-if-Ethernet14)# end
+fe-sw1# exit
+
+### 2026-10-31T09:57:32Z fe-sw2 klish
+terminal length 0
+configure terminal
+interface Ethernet14
+shutdown
+end
+exit
+terminal length 0
+configure terminal
+interface Ethernet14
+shutdown
+end
+exit
+fe-sw2# terminal length 0
+fe-sw2# configure terminal
+fe-sw2(config)# interface Ethernet14
+fe-sw2(config-if-Ethernet14)# shutdown
+fe-sw2(config-if-Ethernet14)# end
+fe-sw2# exit
+
+### 2026-10-31T09:58:06Z fw panos-cli
+Last login: Sat Oct 31 09:57:04 2026 from 172.21.40.1
+set cli pager off
+show arp all
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show arp 
+admin@fw> show arp all
+
+maximum of entries supported :      32000
+default timeout:                    1800 seconds
+total ARP entries in table :        28
+total ARP entries shown :           28
+status: s - static, c - complete, e - expiring, i - incomplete
+
+interface                ip address      hw address        port              status   ttl  
+--------------------------------------------------------------------------------
+ethernet1/3              10.20.9.11      02:5a:65:00:00:03 ethernet1/3                c      991  
+ethernet1/3              10.20.9.12      02:5a:66:00:00:03 ethernet1/3                c      991  
+ethernet1/3              10.20.9.13      02:5a:67:00:00:03 ethernet1/3                c      991  
+ethernet1/3              10.20.9.21      02:5a:6f:00:00:03 ethernet1/3                c      991  
+ethernet1/3              10.20.9.22      02:5a:70:00:00:03 ethernet1/3                c      991  
+ethernet1/3              10.20.9.31      02:5a:68:00:00:03 ethernet1/3                c      991  
+ethernet1/3              10.20.9.32      02:5a:69:00:00:03 ethernet1/3                c      991  
+ethernet1/4              10.24.10.10     aa:c1:ab:da:b0:4a ethernet1/4                c      1667 
+ethernet1/5              198.51.100.1    aa:c1:ab:3b:ef:6b ethernet1/5                c      1722 
+ethernet1/7              10.24.10.53     aa:c1:ab:13:41:6a ethernet1/7                c      1793 
+ae1.100                  10.20.1.10      02:5a:65:00:00:01 ae1                        c      1799 
+ae1.100                  10.20.1.11      02:5a:65:00:00:01 ae1                        c      1716 
+ae1.100                  10.20.1.12      02:5a:66:00:00:01 ae1                        c      1713 
+ae1.100                  10.20.1.13      02:5a:67:00:00:01 ae1                        c      1713 
+ae1.100                  10.20.1.21      02:5a:6f:00:00:01 ae1                        c      1678 
+ae1.100                  10.20.1.22      02:5a:70:00:00:01 ae1                        c      1716 
+ae1.100                  10.20.1.31      02:5a:68:00:00:01 ae1                        c      1718 
+ae1.100                  10.20.1.32      02:5a:69:00:00:01 ae1                        c      1713 
+ae1.110                  10.20.11.11     02:5a:68:00:00:01 ae1                        c      1769 
+ae1.110                  10.20.11.12     02:5a:69:00:00:01 ae1                        c      58   
+ae1.110                  10.20.11.200    02:5a:68:00:00:01 ae1                        c      1769 
+ae1.110                  10.20.11.210    02:5a:68:00:00:01 ae1                        c      1769 
+ae1.110                  10.20.11.220    02:5a:68:00:00:01 ae1                        c      1769 
+ae1.300                  10.20.3.10      aa:c1:ab:0b:30:9b ae1                        c      1164 
+ae1.130                  10.20.13.11     aa:c1:ab:fe:32:b9 ae1                        c      1747 
+ae1.130                  10.20.13.21     aa:c1:ab:d2:73:91 ae1                        c      1771 
+ae1.131                  10.20.14.11     aa:c1:ab:0c:76:a6 ae1                        c      1747 
+ae1.131                  10.20.14.21     aa:c1:ab:cb:ca:1e ae1                        c      1742 
+
+admin@fw> exit
+
+### 2026-10-31T09:58:08Z fe-sw2 klish
+terminal length 0
+configure terminal
+interface Ethernet14
+no shutdown
+end
+exit
+terminal length 0
+configure terminal
+interface Ethernet14
+no shutdown
+end
+exit
+fe-sw2# terminal length 0
+fe-sw2# configure terminal
+fe-sw2(config)# interface Ethernet14
+fe-sw2(config-if-Ethernet14)# no shutdown
+fe-sw2(config-if-Ethernet14)# end
+fe-sw2# exit
+
+### 2026-10-31T09:58:09Z fe-sw1 klish
+terminal length 0
+configure terminal
+interface Ethernet14
+no shutdown
+end
+exit
+terminal length 0
+configure terminal
+interface Ethernet14
+no shutdown
+end
+exit
+fe-sw1# terminal length 0
+fe-sw1# configure terminal
+fe-sw1(config)# interface Ethernet14
+fe-sw1(config-if-Ethernet14)# no shutdown
+fe-sw1(config-if-Ethernet14)# end
+fe-sw1# exit
+
+### 2026-10-31T09:59:10Z fw panos-cli
+Last login: Sat Oct 31 09:58:03 2026 from 172.21.40.1
+set cli pager off
+show arp all
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show arp 
+admin@fw> show arp all
+
+maximum of entries supported :      32000
+default timeout:                    1800 seconds
+total ARP entries in table :        28
+total ARP entries shown :           28
+status: s - static, c - complete, e - expiring, i - incomplete
+
+interface                ip address      hw address        port              status   ttl  
+--------------------------------------------------------------------------------
+ethernet1/3              10.20.9.11      02:5a:65:00:00:03 ethernet1/3                c      928  
+ethernet1/3              10.20.9.12      02:5a:66:00:00:03 ethernet1/3                c      928  
+ethernet1/3              10.20.9.13      02:5a:67:00:00:03 ethernet1/3                c      928  
+ethernet1/3              10.20.9.21      02:5a:6f:00:00:03 ethernet1/3                c      928  
+ethernet1/3              10.20.9.22      02:5a:70:00:00:03 ethernet1/3                c      928  
+ethernet1/3              10.20.9.31      02:5a:68:00:00:03 ethernet1/3                c      928  
+ethernet1/3              10.20.9.32      02:5a:69:00:00:03 ethernet1/3                c      928  
+ethernet1/4              10.24.10.10     aa:c1:ab:da:b0:4a ethernet1/4                c      1604 
+ethernet1/5              198.51.100.1    aa:c1:ab:3b:ef:6b ethernet1/5                c      1659 
+ethernet1/7              10.24.10.53     aa:c1:ab:13:41:6a ethernet1/7                c      1775 
+ae1.100                  10.20.1.10      02:5a:65:00:00:01 ae1                        c      1799 
+ae1.100                  10.20.1.11      02:5a:65:00:00:01 ae1                        c      1653 
+ae1.100                  10.20.1.12      02:5a:66:00:00:01 ae1                        c      1650 
+ae1.100                  10.20.1.13      02:5a:67:00:00:01 ae1                        c      1650 
+ae1.100                  10.20.1.21      02:5a:6f:00:00:01 ae1                        c      1615 
+ae1.100                  10.20.1.22      02:5a:70:00:00:01 ae1                        c      1653 
+ae1.100                  10.20.1.31      02:5a:68:00:00:01 ae1                        c      1655 
+ae1.100                  10.20.1.32      02:5a:69:00:00:01 ae1                        c      1650 
+ae1.110                  10.20.11.11     02:5a:68:00:00:01 ae1                        c      1706 
+ae1.110                  10.20.11.12     02:5a:69:00:00:01 ae1                        c      1795 
+ae1.110                  10.20.11.200    02:5a:68:00:00:01 ae1                        c      1706 
+ae1.110                  10.20.11.210    02:5a:68:00:00:01 ae1                        c      1706 
+ae1.110                  10.20.11.220    02:5a:68:00:00:01 ae1                        c      1706 
+ae1.300                  10.20.3.10      aa:c1:ab:0b:30:9b ae1                        c      1101 
+ae1.130                  10.20.13.11     aa:c1:ab:fe:32:b9 ae1                        c      1744 
+ae1.130                  10.20.13.21     aa:c1:ab:d2:73:91 ae1                        c      1768 
+ae1.131                  10.20.14.11     aa:c1:ab:0c:76:a6 ae1                        c      1744 
+ae1.131                  10.20.14.21     aa:c1:ab:cb:ca:1e ae1                        c      1743 
+
+admin@fw> exit
+
+### 2026-10-31T10:00:25Z fw panos-cli
+Last login: Sat Oct 31 09:59:18 2026 from 172.21.40.1
+set cli pager off
+show arp all
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show arp 
+admin@fw> show arp all
+
+maximum of entries supported :      32000
+default timeout:                    1800 seconds
+total ARP entries in table :        28
+total ARP entries shown :           28
+status: s - static, c - complete, e - expiring, i - incomplete
+
+interface                ip address      hw address        port              status   ttl  
+--------------------------------------------------------------------------------
+ethernet1/3              10.20.9.11      02:5a:65:00:00:03 ethernet1/3                c      853  
+ethernet1/3              10.20.9.12      02:5a:66:00:00:03 ethernet1/3                c      853  
+ethernet1/3              10.20.9.13      02:5a:67:00:00:03 ethernet1/3                c      853  
+ethernet1/3              10.20.9.21      02:5a:6f:00:00:03 ethernet1/3                c      853  
+ethernet1/3              10.20.9.22      02:5a:70:00:00:03 ethernet1/3                c      853  
+ethernet1/3              10.20.9.31      02:5a:68:00:00:03 ethernet1/3                c      853  
+ethernet1/3              10.20.9.32      02:5a:69:00:00:03 ethernet1/3                c      853  
+ethernet1/4              10.24.10.10     aa:c1:ab:da:b0:4a ethernet1/4                c      1529 
+ethernet1/5              198.51.100.1    aa:c1:ab:3b:ef:6b ethernet1/5                c      1749 
+ethernet1/7              10.24.10.53     aa:c1:ab:13:41:6a ethernet1/7                c      1769 
+ae1.100                  10.20.1.10      02:5a:65:00:00:01 ae1                        c      1800 
+ae1.100                  10.20.1.11      02:5a:65:00:00:01 ae1                        c      1578 
+ae1.100                  10.20.1.12      02:5a:66:00:00:01 ae1                        c      1575 
+ae1.100                  10.20.1.13      02:5a:67:00:00:01 ae1                        c      1575 
+ae1.100                  10.20.1.21      02:5a:6f:00:00:01 ae1                        c      1540 
+ae1.100                  10.20.1.22      02:5a:70:00:00:01 ae1                        c      1578 
+ae1.100                  10.20.1.31      02:5a:68:00:00:01 ae1                        c      1580 
+ae1.100                  10.20.1.32      02:5a:69:00:00:01 ae1                        c      1575 
+ae1.110                  10.20.11.11     02:5a:68:00:00:01 ae1                        c      1631 
+ae1.110                  10.20.11.12     02:5a:69:00:00:01 ae1                        c      1720 
+ae1.110                  10.20.11.200    02:5a:68:00:00:01 ae1                        c      1631 
+ae1.110                  10.20.11.210    02:5a:68:00:00:01 ae1                        c      1631 
+ae1.110                  10.20.11.220    02:5a:68:00:00:01 ae1                        c      1631 
+ae1.300                  10.20.3.10      aa:c1:ab:0b:30:9b ae1                        c      1026 
+ae1.130                  10.20.13.11     aa:c1:ab:fe:32:b9 ae1                        c      1769 
+ae1.130                  10.20.13.21     aa:c1:ab:d2:73:91 ae1                        c      1752 
+ae1.131                  10.20.14.11     aa:c1:ab:0c:76:a6 ae1                        c      1732 
+ae1.131                  10.20.14.21     aa:c1:ab:cb:ca:1e ae1                        c      1793 
+
+admin@fw> exit
+
+### 2026-10-31T10:00:25Z ent-client container
++ sh -c nohup python3 /tmp/sfab-p3drill/probe_echo.py --url https://llm.ai.tarnwick.example/echo --log /tmp/sfab-p3drill/echo.jsonl --interval 2 --stop /tmp/sfab-p3drill/stop >/tmp/sfab-p3drill/echo.out 2>&1 </dev/null &
+
+
+### 2026-10-31T10:00:25Z ent-client container
++ sh -c nohup python3 /tmp/sfab-p3drill/probe_tcp.py 10.20.11.210 443 3600 0.5 1 /tmp/sfab-p3drill/tcp.log >/tmp/sfab-p3drill/tcp.out 2>&1 </dev/null &
+
+
+### 2026-10-31T10:00:26Z ops-client container
++ sh -c nohup python3 /tmp/sfab-p3drill/probe_echo.py --url https://llm.ai.tarnwick.example/echo --log /tmp/sfab-p3drill/echo.jsonl --interval 2 --stop /tmp/sfab-p3drill/stop --resolve llm.ai.tarnwick.example:443:10.20.11.200 >/tmp/sfab-p3drill/echo.out 2>&1 </dev/null &
+
+
+### 2026-10-31T10:00:26Z ops-client container
++ sh -c nohup python3 /tmp/sfab-p3drill/probe_tcp.py 10.20.11.200 443 3600 0.5 1 /tmp/sfab-p3drill/tcp.log >/tmp/sfab-p3drill/tcp.out 2>&1 </dev/null &
+
+
+### 2026-10-31T10:00:26Z ent-client container
++ sh -c nohup python3 /tmp/sfab-p3drill/probe_gateway.py --dir /tmp/sfab-p3drill/model --target chat https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions --interval 2 --timeout 100 --max-tokens 4 --until-stop --cafile /shared/ca/root.crt >/tmp/sfab-p3drill/model.out 2>&1 </dev/null &
+
+
+### 2026-10-31T10:00:48Z fe-sw1 klish
+terminal length 0
+configure terminal
+interface Ethernet13
+shutdown
+end
+exit
+terminal length 0
+configure terminal
+interface Ethernet13
+shutdown
+end
+exit
+fe-sw1# terminal length 0
+fe-sw1# configure terminal
+fe-sw1(config)# interface Ethernet13
+fe-sw1(config-if-Ethernet13)# shutdown
+fe-sw1(config-if-Ethernet13)# end
+fe-sw1# exit
+
+### 2026-10-31T10:00:49Z fe-sw2 klish
+terminal length 0
+configure terminal
+interface Ethernet13
+shutdown
+end
+exit
+terminal length 0
+configure terminal
+interface Ethernet13
+shutdown
+end
+exit
+fe-sw2# terminal length 0
+fe-sw2# configure terminal
+fe-sw2(config)# interface Ethernet13
+fe-sw2(config-if-Ethernet13)# shutdown
+fe-sw2(config-if-Ethernet13)# end
+fe-sw2# exit
+
+### 2026-10-31T10:01:23Z fw panos-cli
+Last login: Sat Oct 31 10:00:21 2026 from 172.21.40.1
+set cli pager off
+show arp all
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show arp 
+admin@fw> show arp all
+
+maximum of entries supported :      32000
+default timeout:                    1800 seconds
+total ARP entries in table :        28
+total ARP entries shown :           28
+status: s - static, c - complete, e - expiring, i - incomplete
+
+interface                ip address      hw address        port              status   ttl  
+--------------------------------------------------------------------------------
+ethernet1/3              10.20.9.11      02:5a:65:00:00:03 ethernet1/3                c      794  
+ethernet1/3              10.20.9.12      02:5a:66:00:00:03 ethernet1/3                c      794  
+ethernet1/3              10.20.9.13      02:5a:67:00:00:03 ethernet1/3                c      794  
+ethernet1/3              10.20.9.21      02:5a:6f:00:00:03 ethernet1/3                c      794  
+ethernet1/3              10.20.9.22      02:5a:70:00:00:03 ethernet1/3                c      794  
+ethernet1/3              10.20.9.31      02:5a:68:00:00:03 ethernet1/3                c      794  
+ethernet1/3              10.20.9.32      02:5a:69:00:00:03 ethernet1/3                c      794  
+ethernet1/4              10.24.10.10     aa:c1:ab:da:b0:4a ethernet1/4                c      1470 
+ethernet1/5              198.51.100.1    aa:c1:ab:3b:ef:6b ethernet1/5                c      1690 
+ethernet1/7              10.24.10.53     aa:c1:ab:13:41:6a ethernet1/7                c      1782 
+ae1.100                  10.20.1.10      02:5a:65:00:00:01 ae1                        c      1798 
+ae1.100                  10.20.1.11      02:5a:65:00:00:01 ae1                        c      1519 
+ae1.100                  10.20.1.12      02:5a:66:00:00:01 ae1                        c      1516 
+ae1.100                  10.20.1.13      02:5a:67:00:00:01 ae1                        c      1516 
+ae1.100                  10.20.1.21      02:5a:6f:00:00:01 ae1                        c      1481 
+ae1.100                  10.20.1.22      02:5a:70:00:00:01 ae1                        c      1519 
+ae1.100                  10.20.1.31      02:5a:68:00:00:01 ae1                        c      1521 
+ae1.100                  10.20.1.32      02:5a:69:00:00:01 ae1                        c      1516 
+ae1.110                  10.20.11.11     02:5a:68:00:00:01 ae1                        c      1572 
+ae1.110                  10.20.11.12     02:5a:69:00:00:01 ae1                        c      1661 
+ae1.110                  10.20.11.200    02:5a:69:00:00:01 ae1                        c      1769 
+ae1.110                  10.20.11.210    02:5a:69:00:00:01 ae1                        c      1769 
+ae1.110                  10.20.11.220    02:5a:69:00:00:01 ae1                        c      1769 
+ae1.300                  10.20.3.10      aa:c1:ab:0b:30:9b ae1                        c      967  
+ae1.130                  10.20.13.11     aa:c1:ab:fe:32:b9 ae1                        c      1770 
+ae1.130                  10.20.13.21     aa:c1:ab:d2:73:91 ae1                        c      1754 
+ae1.131                  10.20.14.11     aa:c1:ab:0c:76:a6 ae1                        c      1770 
+ae1.131                  10.20.14.21     aa:c1:ab:cb:ca:1e ae1                        c      1734 
+
+admin@fw> exit
+
+### 2026-10-31T10:01:24Z fe-sw2 klish
+terminal length 0
+configure terminal
+interface Ethernet13
+no shutdown
+end
+exit
+terminal length 0
+configure terminal
+interface Ethernet13
+no shutdown
+end
+exit
+fe-sw2# terminal length 0
+fe-sw2# configure terminal
+fe-sw2(config)# interface Ethernet13
+fe-sw2(config-if-Ethernet13)# no shutdown
+fe-sw2(config-if-Ethernet13)# end
+fe-sw2# exit
+
+### 2026-10-31T10:01:26Z fe-sw1 klish
+terminal length 0
+configure terminal
+interface Ethernet13
+no shutdown
+end
+exit
+terminal length 0
+configure terminal
+interface Ethernet13
+no shutdown
+end
+exit
+fe-sw1# terminal length 0
+fe-sw1# configure terminal
+fe-sw1(config)# interface Ethernet13
+fe-sw1(config-if-Ethernet13)# no shutdown
+fe-sw1(config-if-Ethernet13)# end
+fe-sw1# exit
+
+### 2026-10-31T10:02:24Z fw panos-cli
+Last login: Sat Oct 31 10:01:20 2026 from 172.21.40.1
+set cli pager off
+show arp all
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show arp 
+admin@fw> show arp all
+
+maximum of entries supported :      32000
+default timeout:                    1800 seconds
+total ARP entries in table :        28
+total ARP entries shown :           28
+status: s - static, c - complete, e - expiring, i - incomplete
+
+interface                ip address      hw address        port              status   ttl  
+--------------------------------------------------------------------------------
+ethernet1/3              10.20.9.11      02:5a:65:00:00:03 ethernet1/3                c      733  
+ethernet1/3              10.20.9.12      02:5a:66:00:00:03 ethernet1/3                c      733  
+ethernet1/3              10.20.9.13      02:5a:67:00:00:03 ethernet1/3                c      733  
+ethernet1/3              10.20.9.21      02:5a:6f:00:00:03 ethernet1/3                c      733  
+ethernet1/3              10.20.9.22      02:5a:70:00:00:03 ethernet1/3                c      733  
+ethernet1/3              10.20.9.31      02:5a:68:00:00:03 ethernet1/3                c      733  
+ethernet1/3              10.20.9.32      02:5a:69:00:00:03 ethernet1/3                c      733  
+ethernet1/4              10.24.10.10     aa:c1:ab:da:b0:4a ethernet1/4                c      1409 
+ethernet1/5              198.51.100.1    aa:c1:ab:3b:ef:6b ethernet1/5                c      1629 
+ethernet1/7              10.24.10.53     aa:c1:ab:13:41:6a ethernet1/7                c      1756 
+ae1.100                  10.20.1.10      02:5a:65:00:00:01 ae1                        c      1797 
+ae1.100                  10.20.1.11      02:5a:65:00:00:01 ae1                        c      1458 
+ae1.100                  10.20.1.12      02:5a:66:00:00:01 ae1                        c      1455 
+ae1.100                  10.20.1.13      02:5a:67:00:00:01 ae1                        c      1455 
+ae1.100                  10.20.1.21      02:5a:6f:00:00:01 ae1                        c      1420 
+ae1.100                  10.20.1.22      02:5a:70:00:00:01 ae1                        c      1458 
+ae1.100                  10.20.1.31      02:5a:68:00:00:01 ae1                        c      1460 
+ae1.100                  10.20.1.32      02:5a:69:00:00:01 ae1                        c      1455 
+ae1.110                  10.20.11.11     02:5a:68:00:00:01 ae1                        c      1511 
+ae1.110                  10.20.11.12     02:5a:69:00:00:01 ae1                        c      1600 
+ae1.110                  10.20.11.200    02:5a:69:00:00:01 ae1                        c      1708 
+ae1.110                  10.20.11.210    02:5a:69:00:00:01 ae1                        c      1708 
+ae1.110                  10.20.11.220    02:5a:69:00:00:01 ae1                        c      1708 
+ae1.300                  10.20.3.10      aa:c1:ab:0b:30:9b ae1                        c      906  
+ae1.130                  10.20.13.11     aa:c1:ab:fe:32:b9 ae1                        c      1769 
+ae1.130                  10.20.13.21     aa:c1:ab:d2:73:91 ae1                        c      1753 
+ae1.131                  10.20.14.11     aa:c1:ab:0c:76:a6 ae1                        c      1769 
+ae1.131                  10.20.14.21     aa:c1:ab:cb:ca:1e ae1                        c      1745 
+
+admin@fw> exit
+
+### 2026-10-31T10:03:38Z fw panos-cli
+Last login: Sat Oct 31 10:02:34 2026 from 172.21.40.1
+set cli pager off
+show arp all
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show arp 
+admin@fw> show arp all
+
+maximum of entries supported :      32000
+default timeout:                    1800 seconds
+total ARP entries in table :        28
+total ARP entries shown :           28
+status: s - static, c - complete, e - expiring, i - incomplete
+
+interface                ip address      hw address        port              status   ttl  
+--------------------------------------------------------------------------------
+ethernet1/3              10.20.9.11      02:5a:65:00:00:03 ethernet1/3                c      660  
+ethernet1/3              10.20.9.12      02:5a:66:00:00:03 ethernet1/3                c      660  
+ethernet1/3              10.20.9.13      02:5a:67:00:00:03 ethernet1/3                c      660  
+ethernet1/3              10.20.9.21      02:5a:6f:00:00:03 ethernet1/3                c      660  
+ethernet1/3              10.20.9.22      02:5a:70:00:00:03 ethernet1/3                c      660  
+ethernet1/3              10.20.9.31      02:5a:68:00:00:03 ethernet1/3                c      660  
+ethernet1/3              10.20.9.32      02:5a:69:00:00:03 ethernet1/3                c      660  
+ethernet1/4              10.24.10.10     aa:c1:ab:da:b0:4a ethernet1/4                c      1336 
+ethernet1/5              198.51.100.1    aa:c1:ab:3b:ef:6b ethernet1/5                c      1751 
+ethernet1/7              10.24.10.53     aa:c1:ab:13:41:6a ethernet1/7                c      1772 
+ae1.100                  10.20.1.10      02:5a:65:00:00:01 ae1                        c      1800 
+ae1.100                  10.20.1.11      02:5a:65:00:00:01 ae1                        c      1385 
+ae1.100                  10.20.1.12      02:5a:66:00:00:01 ae1                        c      1382 
+ae1.100                  10.20.1.13      02:5a:67:00:00:01 ae1                        c      1382 
+ae1.100                  10.20.1.21      02:5a:6f:00:00:01 ae1                        c      1347 
+ae1.100                  10.20.1.22      02:5a:70:00:00:01 ae1                        c      1385 
+ae1.100                  10.20.1.31      02:5a:68:00:00:01 ae1                        c      1387 
+ae1.100                  10.20.1.32      02:5a:69:00:00:01 ae1                        c      1382 
+ae1.110                  10.20.11.11     02:5a:68:00:00:01 ae1                        c      1438 
+ae1.110                  10.20.11.12     02:5a:69:00:00:01 ae1                        c      1527 
+ae1.110                  10.20.11.200    02:5a:69:00:00:01 ae1                        c      1635 
+ae1.110                  10.20.11.210    02:5a:69:00:00:01 ae1                        c      1635 
+ae1.110                  10.20.11.220    02:5a:69:00:00:01 ae1                        c      1635 
+ae1.300                  10.20.3.10      aa:c1:ab:0b:30:9b ae1                        c      833  
+ae1.130                  10.20.13.11     aa:c1:ab:fe:32:b9 ae1                        c      1772 
+ae1.130                  10.20.13.21     aa:c1:ab:d2:73:91 ae1                        c      1793 
+ae1.131                  10.20.14.11     aa:c1:ab:0c:76:a6 ae1                        c      1772 
+ae1.131                  10.20.14.21     aa:c1:ab:cb:ca:1e ae1                        c      1800 
+
+admin@fw> exit
+
+### 2026-10-31T10:03:38Z ent-client container
++ sh -c nohup python3 /tmp/sfab-p3drill/probe_echo.py --url https://llm.ai.tarnwick.example/echo --log /tmp/sfab-p3drill/echo.jsonl --interval 2 --stop /tmp/sfab-p3drill/stop >/tmp/sfab-p3drill/echo.out 2>&1 </dev/null &
+
+
+### 2026-10-31T10:03:38Z ent-client container
++ sh -c nohup python3 /tmp/sfab-p3drill/probe_tcp.py 10.20.11.210 443 3600 0.5 1 /tmp/sfab-p3drill/tcp.log >/tmp/sfab-p3drill/tcp.out 2>&1 </dev/null &
+
+
+### 2026-10-31T10:03:39Z ops-client container
++ sh -c nohup python3 /tmp/sfab-p3drill/probe_echo.py --url https://llm.ai.tarnwick.example/echo --log /tmp/sfab-p3drill/echo.jsonl --interval 2 --stop /tmp/sfab-p3drill/stop --resolve llm.ai.tarnwick.example:443:10.20.11.200 >/tmp/sfab-p3drill/echo.out 2>&1 </dev/null &
+
+
+### 2026-10-31T10:03:39Z ops-client container
++ sh -c nohup python3 /tmp/sfab-p3drill/probe_tcp.py 10.20.11.200 443 3600 0.5 1 /tmp/sfab-p3drill/tcp.log >/tmp/sfab-p3drill/tcp.out 2>&1 </dev/null &
+
+
+### 2026-10-31T10:03:39Z ent-client container
++ sh -c nohup python3 /tmp/sfab-p3drill/probe_gateway.py --dir /tmp/sfab-p3drill/model --target chat https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions --interval 2 --timeout 100 --max-tokens 4 --until-stop --cafile /shared/ca/root.crt >/tmp/sfab-p3drill/model.out 2>&1 </dev/null &
+
+
+### 2026-10-31T10:04:01Z fe-sw1 klish
+terminal length 0
+configure terminal
+interface Ethernet14
+shutdown
+end
+exit
+terminal length 0
+configure terminal
+interface Ethernet14
+shutdown
+end
+exit
+fe-sw1# terminal length 0
+fe-sw1# configure terminal
+fe-sw1(config)# interface Ethernet14
+fe-sw1(config-if-Ethernet14)# shutdown
+fe-sw1(config-if-Ethernet14)# end
+fe-sw1# exit
+
+### 2026-10-31T10:04:02Z fe-sw2 klish
+terminal length 0
+configure terminal
+interface Ethernet14
+shutdown
+end
+exit
+terminal length 0
+configure terminal
+interface Ethernet14
+shutdown
+end
+exit
+fe-sw2# terminal length 0
+fe-sw2# configure terminal
+fe-sw2(config)# interface Ethernet14
+fe-sw2(config-if-Ethernet14)# shutdown
+fe-sw2(config-if-Ethernet14)# end
+fe-sw2# exit
+
+### 2026-10-31T10:04:36Z fw panos-cli
+Last login: Sat Oct 31 10:03:34 2026 from 172.21.40.1
+set cli pager off
+show arp all
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show arp 
+admin@fw> show arp all
+
+maximum of entries supported :      32000
+default timeout:                    1800 seconds
+total ARP entries in table :        28
+total ARP entries shown :           28
+status: s - static, c - complete, e - expiring, i - incomplete
+
+interface                ip address      hw address        port              status   ttl  
+--------------------------------------------------------------------------------
+ethernet1/3              10.20.9.11      02:5a:65:00:00:03 ethernet1/3                c      601  
+ethernet1/3              10.20.9.12      02:5a:66:00:00:03 ethernet1/3                c      601  
+ethernet1/3              10.20.9.13      02:5a:67:00:00:03 ethernet1/3                c      601  
+ethernet1/3              10.20.9.21      02:5a:6f:00:00:03 ethernet1/3                c      601  
+ethernet1/3              10.20.9.22      02:5a:70:00:00:03 ethernet1/3                c      601  
+ethernet1/3              10.20.9.31      02:5a:68:00:00:03 ethernet1/3                c      601  
+ethernet1/3              10.20.9.32      02:5a:69:00:00:03 ethernet1/3                c      601  
+ethernet1/4              10.24.10.10     aa:c1:ab:da:b0:4a ethernet1/4                c      1277 
+ethernet1/5              198.51.100.1    aa:c1:ab:3b:ef:6b ethernet1/5                c      1692 
+ethernet1/7              10.24.10.53     aa:c1:ab:13:41:6a ethernet1/7                c      1777 
+ae1.100                  10.20.1.10      02:5a:65:00:00:01 ae1                        c      1798 
+ae1.100                  10.20.1.11      02:5a:65:00:00:01 ae1                        c      1326 
+ae1.100                  10.20.1.12      02:5a:66:00:00:01 ae1                        c      1323 
+ae1.100                  10.20.1.13      02:5a:67:00:00:01 ae1                        c      1323 
+ae1.100                  10.20.1.21      02:5a:6f:00:00:01 ae1                        c      1288 
+ae1.100                  10.20.1.22      02:5a:70:00:00:01 ae1                        c      1326 
+ae1.100                  10.20.1.31      02:5a:68:00:00:01 ae1                        c      1328 
+ae1.100                  10.20.1.32      02:5a:69:00:00:01 ae1                        c      1323 
+ae1.110                  10.20.11.11     02:5a:68:00:00:01 ae1                        c      1768 
+ae1.110                  10.20.11.12     02:5a:69:00:00:01 ae1                        c      1468 
+ae1.110                  10.20.11.200    02:5a:68:00:00:01 ae1                        c      1768 
+ae1.110                  10.20.11.210    02:5a:68:00:00:01 ae1                        c      1768 
+ae1.110                  10.20.11.220    02:5a:68:00:00:01 ae1                        c      1768 
+ae1.300                  10.20.3.10      aa:c1:ab:0b:30:9b ae1                        c      774  
+ae1.130                  10.20.13.11     aa:c1:ab:fe:32:b9 ae1                        c      1773 
+ae1.130                  10.20.13.21     aa:c1:ab:d2:73:91 ae1                        c      1789 
+ae1.131                  10.20.14.11     aa:c1:ab:0c:76:a6 ae1                        c      1773 
+ae1.131                  10.20.14.21     aa:c1:ab:cb:ca:1e ae1                        c      1741 
+
+admin@fw> exit
+
+### 2026-10-31T10:04:37Z fe-sw2 klish
+terminal length 0
+configure terminal
+interface Ethernet14
+no shutdown
+end
+exit
+terminal length 0
+configure terminal
+interface Ethernet14
+no shutdown
+end
+exit
+fe-sw2# terminal length 0
+fe-sw2# configure terminal
+fe-sw2(config)# interface Ethernet14
+fe-sw2(config-if-Ethernet14)# no shutdown
+fe-sw2(config-if-Ethernet14)# end
+fe-sw2# exit
+
+### 2026-10-31T10:04:39Z fe-sw1 klish
+terminal length 0
+configure terminal
+interface Ethernet14
+no shutdown
+end
+exit
+terminal length 0
+configure terminal
+interface Ethernet14
+no shutdown
+end
+exit
+fe-sw1# terminal length 0
+fe-sw1# configure terminal
+fe-sw1(config)# interface Ethernet14
+fe-sw1(config-if-Ethernet14)# no shutdown
+fe-sw1(config-if-Ethernet14)# end
+fe-sw1# exit
+
+### 2026-10-31T10:05:38Z fw panos-cli
+Last login: Sat Oct 31 10:04:33 2026 from 172.21.40.1
+set cli pager off
+show arp all
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show arp 
+admin@fw> show arp all
+
+maximum of entries supported :      32000
+default timeout:                    1800 seconds
+total ARP entries in table :        28
+total ARP entries shown :           28
+status: s - static, c - complete, e - expiring, i - incomplete
+
+interface                ip address      hw address        port              status   ttl  
+--------------------------------------------------------------------------------
+ethernet1/3              10.20.9.11      02:5a:65:00:00:03 ethernet1/3                c      540  
+ethernet1/3              10.20.9.12      02:5a:66:00:00:03 ethernet1/3                c      540  
+ethernet1/3              10.20.9.13      02:5a:67:00:00:03 ethernet1/3                c      540  
+ethernet1/3              10.20.9.21      02:5a:6f:00:00:03 ethernet1/3                c      540  
+ethernet1/3              10.20.9.22      02:5a:70:00:00:03 ethernet1/3                c      540  
+ethernet1/3              10.20.9.31      02:5a:68:00:00:03 ethernet1/3                c      540  
+ethernet1/3              10.20.9.32      02:5a:69:00:00:03 ethernet1/3                c      540  
+ethernet1/4              10.24.10.10     aa:c1:ab:da:b0:4a ethernet1/4                c      1216 
+ethernet1/5              198.51.100.1    aa:c1:ab:3b:ef:6b ethernet1/5                c      1631 
+ethernet1/7              10.24.10.53     aa:c1:ab:13:41:6a ethernet1/7                c      1776 
+ae1.100                  10.20.1.10      02:5a:65:00:00:01 ae1                        c      1800 
+ae1.100                  10.20.1.11      02:5a:65:00:00:01 ae1                        c      1265 
+ae1.100                  10.20.1.12      02:5a:66:00:00:01 ae1                        c      1262 
+ae1.100                  10.20.1.13      02:5a:67:00:00:01 ae1                        c      1262 
+ae1.100                  10.20.1.21      02:5a:6f:00:00:01 ae1                        c      1227 
+ae1.100                  10.20.1.22      02:5a:70:00:00:01 ae1                        c      1265 
+ae1.100                  10.20.1.31      02:5a:68:00:00:01 ae1                        c      1267 
+ae1.100                  10.20.1.32      02:5a:69:00:00:01 ae1                        c      1262 
+ae1.110                  10.20.11.11     02:5a:68:00:00:01 ae1                        c      1707 
+ae1.110                  10.20.11.12     02:5a:69:00:00:01 ae1                        c      1407 
+ae1.110                  10.20.11.200    02:5a:68:00:00:01 ae1                        c      1707 
+ae1.110                  10.20.11.210    02:5a:68:00:00:01 ae1                        c      1707 
+ae1.110                  10.20.11.220    02:5a:68:00:00:01 ae1                        c      1707 
+ae1.300                  10.20.3.10      aa:c1:ab:0b:30:9b ae1                        c      713  
+ae1.130                  10.20.13.11     aa:c1:ab:fe:32:b9 ae1                        c      1772 
+ae1.130                  10.20.13.21     aa:c1:ab:d2:73:91 ae1                        c      1767 
+ae1.131                  10.20.14.11     aa:c1:ab:0c:76:a6 ae1                        c      1772 
+ae1.131                  10.20.14.21     aa:c1:ab:cb:ca:1e ae1                        c      1742 
+
+admin@fw> exit
+

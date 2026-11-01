@@ -1,0 +1,180 @@
+{
+  "kind": "part3",
+  "lab": "sfab-ch08",
+  "list": [
+    {
+      "candidates": {
+        "k8s-ingress1": {
+          "mac": "02:5a:68:00:00:01",
+          "members": [
+            {
+              "port": "Ethernet13",
+              "switch": "fe-sw1"
+            },
+            {
+              "port": "Ethernet13",
+              "switch": "fe-sw2"
+            }
+          ],
+          "restore": {
+            "fe-sw1": [
+              "configure terminal",
+              "interface Ethernet13",
+              "no shutdown",
+              "end"
+            ],
+            "fe-sw2": [
+              "configure terminal",
+              "interface Ethernet13",
+              "no shutdown",
+              "end"
+            ]
+          },
+          "shut": {
+            "fe-sw1": [
+              "configure terminal",
+              "interface Ethernet13",
+              "shutdown",
+              "end"
+            ],
+            "fe-sw2": [
+              "configure terminal",
+              "interface Ethernet13",
+              "shutdown",
+              "end"
+            ]
+          }
+        },
+        "k8s-ingress2": {
+          "mac": "02:5a:69:00:00:01",
+          "members": [
+            {
+              "port": "Ethernet14",
+              "switch": "fe-sw1"
+            },
+            {
+              "port": "Ethernet14",
+              "switch": "fe-sw2"
+            }
+          ],
+          "restore": {
+            "fe-sw1": [
+              "configure terminal",
+              "interface Ethernet14",
+              "no shutdown",
+              "end"
+            ],
+            "fe-sw2": [
+              "configure terminal",
+              "interface Ethernet14",
+              "no shutdown",
+              "end"
+            ]
+          },
+          "shut": {
+            "fe-sw1": [
+              "configure terminal",
+              "interface Ethernet14",
+              "shutdown",
+              "end"
+            ],
+            "fe-sw2": [
+              "configure terminal",
+              "interface Ethernet14",
+              "shutdown",
+              "end"
+            ]
+          }
+        }
+      },
+      "connect": [
+        {
+          "address": "10.20.11.210",
+          "client": "ent-client",
+          "gateway": "gw-users",
+          "port": 443
+        },
+        {
+          "address": "10.20.11.200",
+          "client": "ops-client",
+          "gateway": "gw-internal",
+          "port": 443
+        }
+      ],
+      "connect_interval_s": 0.5,
+      "echo": [
+        {
+          "address": "10.20.11.210",
+          "client": "ent-client",
+          "gateway": "gw-users",
+          "hostname": "llm.ai.tarnwick.example",
+          "resolve": null,
+          "url": "https://llm.ai.tarnwick.example/echo",
+          "vip": "10.20.11.210"
+        },
+        {
+          "address": "10.20.11.200",
+          "client": "ops-client",
+          "gateway": "gw-internal",
+          "hostname": "llm.ai.tarnwick.example",
+          "resolve": "llm.ai.tarnwick.example:443:10.20.11.200",
+          "url": "https://llm.ai.tarnwick.example/echo",
+          "vip": "10.20.11.200"
+        }
+      ],
+      "endpoints": [
+        "echo",
+        "inference"
+      ],
+      "id": "lease-holder-loss",
+      "ingress": [
+        "k8s-ingress1",
+        "k8s-ingress2"
+      ],
+      "interval_s": 2,
+      "kind": "lease-loss",
+      "leases": {
+        "gw-inet": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-inet",
+        "gw-internal": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-internal",
+        "gw-users": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-users"
+      },
+      "model": {
+        "address": "10.20.11.210",
+        "client": "ent-client",
+        "every": 1,
+        "gateway": "gw-users",
+        "hostname": "llm.ai.tarnwick.example",
+        "keys": {
+          "namespace": "inference",
+          "secret": "api-keys"
+        },
+        "model": "chat",
+        "resolve": null,
+        "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions",
+        "vip": "10.20.11.210"
+      },
+      "prediction": {
+        "duration": "3s",
+        "max_ms": 4000,
+        "min_ms": 2000,
+        "renew_deadline": "1s",
+        "retry_period": "200ms",
+        "tuned": true
+      },
+      "title": "the ingress node holding the most leases cut from the pair, its leases taken by the other",
+      "vips": {
+        "gw-inet": "10.20.11.220",
+        "gw-internal": "10.20.11.200",
+        "gw-users": "10.20.11.210"
+      }
+    }
+  ],
+  "schema": 1,
+  "timing": {
+    "hold_s": 30,
+    "lead_s": 20,
+    "settle_max_s": 300,
+    "tail_s": 30,
+    "whole_polls": 3
+  }
+}

@@ -1,0 +1,83 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  creationTimestamp: "2026-10-31T09:24:33Z"
+  generation: 1
+  labels:
+    decision.tarnwick.example/id: dec-routeset-internet
+    tarnwick.example/audience: internet
+  name: gw-inet
+  namespace: gateways
+  resourceVersion: "4846"
+  uid: 3e5ba000-2e41-480b-8c5a-0be1afbbe46b
+spec:
+  addresses:
+  - type: IPAddress
+    value: 10.20.11.220
+  gatewayClassName: cilium
+  infrastructure:
+    labels:
+      tarnwick.example/audience: internet
+      tarnwick.example/lb-pool: gw-inet
+  listeners:
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: HTTPRoute
+      namespaces:
+        from: Selector
+        selector:
+          matchLabels:
+            routes.tarnwick.example/gw-inet: "true"
+    hostname: '*.ai.tarnwick.example'
+    name: https
+    port: 443
+    protocol: HTTPS
+    tls:
+      certificateRefs:
+      - group: ""
+        kind: Secret
+        name: gw-inet-tls
+      mode: Terminate
+status:
+  addresses:
+  - type: IPAddress
+    value: 10.20.11.220
+  conditions:
+  - lastTransitionTime: "2026-10-31T09:25:01Z"
+    message: Gateway successfully scheduled
+    observedGeneration: 1
+    reason: Accepted
+    status: "True"
+    type: Accepted
+  - lastTransitionTime: "2026-10-31T09:26:56Z"
+    message: Gateway Programmed
+    observedGeneration: 1
+    reason: Programmed
+    status: "True"
+    type: Programmed
+  listeners:
+  - attachedRoutes: 2
+    conditions:
+    - lastTransitionTime: "2026-10-31T09:26:56Z"
+      message: Resolved Refs
+      observedGeneration: 1
+      reason: ResolvedRefs
+      status: "True"
+      type: ResolvedRefs
+    - lastTransitionTime: "2026-10-31T09:26:56Z"
+      message: Listener Accepted
+      observedGeneration: 1
+      reason: Accepted
+      status: "True"
+      type: Accepted
+    - lastTransitionTime: "2026-10-31T09:26:56Z"
+      message: Listener Programmed
+      observedGeneration: 1
+      reason: Programmed
+      status: "True"
+      type: Programmed
+    name: https
+    supportedKinds:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute

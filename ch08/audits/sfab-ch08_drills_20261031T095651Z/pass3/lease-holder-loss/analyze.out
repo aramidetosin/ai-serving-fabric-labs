@@ -1,0 +1,15 @@
+  PASS  pass 3 lease-holder-loss: gw-inet's lease, held by k8s-ingress2 at the cut, taken by k8s-ingress1 within 2.751 s of both ports shut, 5.185 s of the cut's start (the first lease read naming it)
+  PASS  pass 3 lease-holder-loss: gw-internal's lease, held by k8s-ingress2 at the cut, taken by k8s-ingress1 within 2.751 s of both ports shut, 5.185 s of the cut's start (the first lease read naming it)
+  PASS  pass 3 lease-holder-loss: gw-users's lease, held by k8s-ingress2 at the cut, taken by k8s-ingress1 within 2.751 s of both ports shut, 5.185 s of the cut's start (the first lease read naming it)
+  PASS  pass 3 lease-holder-loss: ent-client through gw-users: 0 of 46 echo requests lost, the gap 2.0 s from the last request answered before both ports were shut to the first sent after it that was answered (sent times, every 2 s), the slowest answer while cut 2.083 s; answered again before the ports came back
+  PASS  pass 3 lease-holder-loss: ent-client's connects to 10.20.11.210:443: 3 of 187 failed, the gap 3.503 s (every 0.5 s), the slowest connect while cut 8.8 ms; connecting again before the ports came back
+  PASS  pass 3 lease-holder-loss: the prediction, 2 to 4 s at the timers 3s, 1s, 200ms plus the firewall's ARP update, against the measured 2.0 s (the probe's own interval 2 s): within it
+  PASS  pass 3 lease-holder-loss: ops-client through gw-internal: 0 of 48 echo requests lost, the gap 2.0 s from the last request answered before both ports were shut to the first sent after it that was answered (sent times, every 2 s), the slowest answer while cut 2.086 s; answered again before the ports came back
+  PASS  pass 3 lease-holder-loss: ops-client's connects to 10.20.11.200:443: 3 of 194 failed, the gap 3.503 s (every 0.5 s), the slowest connect while cut 1.6 ms; connecting again before the ports came back
+  PASS  pass 3 lease-holder-loss: the prediction, 2 to 4 s at the timers 3s, 1s, 200ms plus the firewall's ARP update, against the measured 2.0 s (the probe's own interval 2 s): within it
+  PASS  pass 3 lease-holder-loss: the firewall's ARP entry for gw-inet's VIP 10.20.11.220 while k8s-ingress2 is cut names 02:5a:68:00:00:01 (recorded, not judged: no probe of the drill reaches gw-inet through the firewall)
+  PASS  pass 3 lease-holder-loss: the firewall's ARP entry for gw-internal's VIP 10.20.11.200 names k8s-ingress1's bond MAC 02:5a:68:00:00:01 while k8s-ingress2 is cut (arp-during.txt)
+  PASS  pass 3 lease-holder-loss: the firewall's ARP entry for gw-users's VIP 10.20.11.210 names k8s-ingress1's bond MAC 02:5a:68:00:00:01 while k8s-ingress2 is cut (arp-during.txt)
+  PASS  pass 3 lease-holder-loss: apart from the gap, the model probe (chat through gw-users): 36 of 49 answered over the drill, the API gateway, router and identity provider pods on the cut node among what it lost
+  PASS  pass 3 lease-holder-loss: echo's Services without an endpoint on k8s-ingress2 after the cut: echo from 0.688 s
+  PASS  pass 3 lease-holder-loss: inference's Services without an endpoint on k8s-ingress2 after the cut: none read

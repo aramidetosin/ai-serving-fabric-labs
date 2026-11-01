@@ -1,0 +1,10 @@
+== break-8a: the internet audience's announcement policy names an interface no ingress node has
+  PASS  policy gateways-internet (the internet audience's, gw-inet) names interfaces ^bond0\.111$ (rendered ^bond0\.110$)
+== break-8a: recorded
+  PASS  broken: l2_policy:gw-inet, lease:gw-inet, gateway:gw-inet, service:gw-inet, l2_policy:gw-users, lease:gw-users read whole (record/broken-*.yaml)
+  PASS  staff, break, pass 1: 0 of 10 requests from ent-client to https://llm.ai.tarnwick.example/echo?msg=sfab-break-8a answered other than 200 (recorded)
+== break-8a: broken as designed
+  PASS  gw-inet: 10.20.11.220 asked for by ARP from k8s-ingress2 on bond0.110: no answer (10.20.11.220 INCOMPLETE ); the lease names k8s-ingress1
+  PASS  gw-users: 10.20.11.210 asked for by ARP from k8s-ingress2 on bond0.110: answered with k8s-ingress1's bond MAC 02:5a:68:00:00:01 (the lease holder)
+  PASS  staff: every request succeeds (10 of 10)
+== RESULT: 6 passed, 0 failed, 0 known platform limitation(s), 0 skipped
