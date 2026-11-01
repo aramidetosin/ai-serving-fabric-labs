@@ -580,11 +580,18 @@ inference() {
 # --- settle --------------------------------------------------------------------------------------------
 
 # The other addresses each node pings every round (storage data addresses), and the TCP 443 targets:
-# every Gateway VIP from the nodes; per population, a client and its answer address.
+# every Gateway VIP from the nodes; per population, a client and its answer address. From chapter 8
+# gen/tenancy.json's audiences.reach gives each population's connect to its own Gateway at this
+# step, as the audit reads it: a population the firewall does not yet let through (the internet users
+# in chapter 9, before the translation) is no target.
 settle_targets() {
-  py - "$INV" <<'PY'
+  py - "$INV" "$RENDERDIR/gen/tenancy.json" <<'PY'
 import json, sys
 d = json.load(open(sys.argv[1], encoding="utf-8"))
+try:
+    reach = {r["population"]: r for r in (json.load(open(sys.argv[2], encoding="utf-8")).get("audiences") or {}).get("reach") or []}
+except (OSError, ValueError):
+    reach = {}
 nodes = d.get("nodes") or {}
 # The storage data addresses sit on their own Layer 2 VLAN: only the nodes with a unit in it ping
 # them ("ping <address> <segment>"), the frontend round sends each to the nodes holding that segment.
@@ -602,7 +609,7 @@ for g, v in sorted((d.get("gateways") or {}).items()):
 # each population's client at its answer, the populations with an audience only (an internet host
 # that is no audience reaches nothing, which chapter 2's matrix proves)
 for p, v in sorted(pops.items()):
-    if not v.get("gateway"):
+    if not v.get("gateway") or (p in reach and reach[p].get("outcome") != "reached"):
         continue
     for c in v.get("clients") or []:
         if c in nodes and v.get("answer_address"):

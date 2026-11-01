@@ -594,5 +594,31 @@ class Break11aTest(BreakMixin, P3LabTest):
         self.assertEqual(load(self.t / "world.json")["p3"]["route_add"].get("models-gw-inet"), [])
 
 
+class SettleTargetsTest(unittest.TestCase):
+    """finish's settle connects each population's client to its answer only where the firewall lets
+    it through at that step (gen/tenancy.json audiences.reach): chapter 9's internet users are
+    refused by deny-all-log by design, so a settle round that waited on them could never be clean."""
+
+    @staticmethod
+    def targets(lab: str) -> list[str]:
+        src = (COMMON / "stages" / "finish.sh").read_text(encoding="utf-8")
+        body = src.split("settle_targets() {", 1)[1].split("<<'PY'\n", 1)[1].split("\nPY\n", 1)[0]
+        gen = ROOT / lab / "gen"
+        out = subprocess.run([sys.executable, "-c", body, str(gen / "inventory.json"), str(gen / "tenancy.json")],
+                             capture_output=True, text=True, check=True).stdout
+        return [ln for ln in out.splitlines() if ln.startswith("client ")]
+
+    def test_ch09_leaves_out_the_internet_users(self):
+        self.assertEqual(self.targets("ch09"), ["client ent-client 10.20.11.210 enterprise",
+                                                "client ops-client 10.20.11.200 operator"])
+
+    def test_ch10_keeps_them_once_translated(self):
+        self.assertIn("client inet-client 198.51.100.10 internet", self.targets("ch10"))
+
+    def test_lab_without_tenancy_unchanged(self):
+        self.assertEqual(self.targets("ch07"), ["client ent-client 10.20.11.210 enterprise",
+                                                "client ops-client 10.20.11.200 operator"])
+
+
 if __name__ == "__main__":
     unittest.main()
