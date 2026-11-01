@@ -22,7 +22,7 @@ from pathlib import Path, PurePosixPath
 from typing import Any
 
 # Run order. inventory runs last; RENDER.json is computed after every renderer.
-RENDERERS = ("clab", "klish", "expect", "panos", "host", "frr", "storage", "dns", "ca", "k8s", "trace", "drills", "decisions", "inventory")
+RENDERERS = ("clab", "klish", "expect", "panos", "host", "frr", "storage", "dns", "ca", "k8s", "trace", "drills", "decisions", "tenancy", "inventory")
 ALLOWED_ROOTS = ("topo.clab.yml", "bootstrap", "gen")
 RENDER_JSON = "gen/RENDER.json"
 

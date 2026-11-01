@@ -240,14 +240,17 @@ def _syn_sports(d: Path, probe: str, mode: str) -> list:
     return out
 
 
-def _syn_count(text: str, src: str, dst: str, dport: int, sports: set) -> int:
+def _syn_count(text: str, src: str, dst, dport: int, sports: set) -> int:
+    """SYNs from src (one of sports) to dst:dport in a decode; dst may be a set of addresses (the
+    published address and the one the firewall translates it to, Part III)."""
+    want = set(dst) if isinstance(dst, (set, list, tuple)) else {dst}
     n, frame = 0, ""
     for line in (text or "").splitlines() + [""]:
         if line[:1] in (" ", "\t"):
             frame += " " + line.strip()
             continue
         m = SYN_TCP.search(frame)
-        if m and m.group(5) == "S" and m.group(1) == src and int(m.group(2)) in sports and m.group(3) == dst and int(m.group(4)) == dport:
+        if m and m.group(5) == "S" and m.group(1) == src and int(m.group(2)) in sports and m.group(3) in want and int(m.group(4)) == dport:
             n += 1
         frame = line if SYN_FRAME.match(line) else ""
     return n
@@ -263,7 +266,8 @@ def cmd_synat(a) -> int:
     sports = set(_syn_sports(d, p["id"], a.mode))
     counts = {}
     for c in p["capture"]:
-        counts[c["id"]] = sum(_syn_count(f.read_text(encoding="utf-8", errors="replace"), p["client_addr"], p["dst_addr"], p["port"], sports)
+        dsts = {p["dst_addr"]} | ({p["translated_addr"]} if p.get("translated_addr") else set())
+        counts[c["id"]] = sum(_syn_count(f.read_text(encoding="utf-8", errors="replace"), p["client_addr"], dsts, p["port"], sports)
                               for f in sorted(d.glob(f"{p['id']}-{a.mode}-pass*-{c['id']}.txt")))
     seen, any_, unseen = chk.get("seen") or [], chk.get("seen_any") or [], chk.get("unseen") or []
     good = bool(sports) and all(counts.get(x, 0) > 0 for x in seen) and (not any_ or any(counts.get(x, 0) > 0 for x in any_)) \
@@ -277,7 +281,8 @@ def cmd_synat(a) -> int:
     if unseen:
         what.append(f"at none of {', '.join(unseen)}")
     ports = f"{min(sports)} to {max(sports)}" if sports else "none"
-    print(f"SYNs from {p['client_addr']} (source ports {ports}) to {p['dst_addr']}:{p['port']}: " + ", ".join(parts)
+    via = f" (past the firewall {p['translated_addr']}:{p['port']})" if p.get("translated_addr") else ""
+    print(f"SYNs from {p['client_addr']} (source ports {ports}) to {p['dst_addr']}:{p['port']}{via}: " + ", ".join(parts)
           + (f": {'; '.join(what)}" if good else ""))
     return 0 if good else 1
 

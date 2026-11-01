@@ -38,6 +38,11 @@
 # the Gateway does not carry, with no key, its status and response headers saved as
 # request/refuse-*.
 #
+# Part III (chapter 8): the client may be a node of the cluster (the plan's client.kind vm-node),
+# its requests pinned to the VIP with curl --resolve; the key reaches it over ssh's standard input
+# (lib-servecap.sh key_to_guest). With the plan's also, after the keyed request, the same key and
+# path to each other Gateway it names, from its own source port, saved as request/also-<gateway>-*.
+#
 # Changes nothing on any device; every process it starts it stops.
 
 STP="$SFAB_COMMON/trace/servetrace.py"
@@ -47,6 +52,36 @@ ST_DIR=/tmp/sfab-trace
 . "$SFAB_COMMON/trace/lib-servecap.sh"
 
 st_get() { py "$STP" get --plan "$ST_PLAN" "$1"; }
+
+# A client of the plan is a container, or (Part III, chapter 8) a node of the cluster whose own
+# datapath answers the Gateway's VIP: st_x runs a command there, st_cat reads a file there, st_put
+# writes standard input to a 0600 file there, st_key hands it the model's key, st_clear removes the
+# trace's directory there.
+st_kind() { st_get client.kind 2>/dev/null || true; }
+st_x() {
+  local c="$1"
+  shift
+  if [ "$(st_kind)" = vm-node ]; then H "$c" "$(qargs "$@")"; else X "$c" "$@"; fi
+}
+st_cat() {
+  if [ "$(st_kind)" = vm-node ]; then EVID_OFF=1 H "$1" "cat $2 2>/dev/null"; else dk exec "$(ctr "$1")" cat "$2"; fi
+}
+st_put() {
+  local c="$1" f="$2" key
+  if [ "$(st_kind)" = vm-node ]; then
+    key="$(lab_key)"
+    timeout "${SFAB_CMD_TIMEOUT:-300}" ssh "${_SSH_BASE[@]}" -o BatchMode=yes -o IdentitiesOnly=yes -i "$key" \
+      "$GUEST_USER@$(node_mgmt "$c")" "sudo bash -c 'umask 077; mkdir -p $ST_DIR; cat >$f'"
+  else
+    dk exec -i "$(ctr "$c")" sh -c "umask 077; mkdir -p $ST_DIR; cat >$f"
+  fi
+}
+st_key() {
+  if [ "$(st_kind)" = vm-node ]; then key_to_guest "$@"; else key_to_client "$@"; fi
+}
+st_clear() {
+  if [ "$(st_kind)" = vm-node ]; then EVID_OFF=1 H "$1" "rm -rf $ST_DIR" >/dev/null 2>&1 || true; else key_clear "$1" "$ST_DIR"; fi
+}
 
 servetrace_cluster() {
   local ins sns lease
@@ -66,11 +101,26 @@ servetrace_request() {
   client="$(st_get client.node)" url="$(st_get url)" model="$(st_get model)"
   [ -z "$(st_get client.resolve 2>/dev/null || true)" ] || pin=(--resolve "$(st_get client.resolve)")
   [ -z "$sport" ] || lp=(--local-port "$sport")
-  res="$(X "$client" curl -sS --max-time 120 "${lp[@]+"${lp[@]}"}" "${pin[@]+"${pin[@]}"}" -o "$ST_DIR/$tag-body.json" -D "$ST_DIR/$tag-headers.txt" \
+  [ "$(st_kind)" != vm-node ] || pin+=(--cacert "$(st_get client.ca_root)")
+  res="$(st_x "$client" curl -sS --max-time 120 "${lp[@]+"${lp[@]}"}" "${pin[@]+"${pin[@]}"}" -o "$ST_DIR/$tag-body.json" -D "$ST_DIR/$tag-headers.txt" \
     -w '%{http_code} %{local_port}\n' -H "@$ST_DIR/hdr-$model" -H 'Content-Type: application/json' --data "@$ST_DIR/request.json" "$url" 2>&1 || true)"
   printf '%s\n' "$res" | tail -n 1 >"$RS/request/$tag-result.txt"
-  dk exec "$(ctr "$client")" cat "$ST_DIR/$tag-headers.txt" 2>/dev/null | tr -d '\r' >"$RS/request/$tag-headers.txt" || true
-  dk exec "$(ctr "$client")" cat "$ST_DIR/$tag-body.json" 2>/dev/null >"$RS/request/$tag-body.json" || true
+  st_cat "$client" "$ST_DIR/$tag-headers.txt" 2>/dev/null | tr -d '\r' >"$RS/request/$tag-headers.txt" || true
+  st_cat "$client" "$ST_DIR/$tag-body.json" 2>/dev/null >"$RS/request/$tag-body.json" || true
+}
+
+# servetrace_also N: the plan's also[N], the same key and path to another Gateway's VIP
+servetrace_also() {
+  local i="$1" client url sport gwn res tag model ca=()
+  client="$(st_get client.node)" url="$(st_get "also.$i.url")" sport="$(st_get "also.$i.sport")" gwn="$(st_get "also.$i.gateway")"
+  model="$(st_get model)" tag="also-$gwn"
+  [ "$(st_kind)" != vm-node ] || ca=(--cacert "$(st_get client.ca_root)")
+  res="$(st_x "$client" curl -sS --max-time 30 --local-port "$sport" --resolve "$(st_get "also.$i.resolve")" "${ca[@]+"${ca[@]}"}" \
+    -o "$ST_DIR/$tag-body.txt" -D "$ST_DIR/$tag-headers.txt" -w '%{http_code} %{local_port}\n' -H "@$ST_DIR/hdr-$model" \
+    -H 'Content-Type: application/json' --data "@$ST_DIR/request.json" "$url" 2>&1 || true)"
+  printf '%s\n' "$res" | tail -n 1 >"$RS/request/$tag-result.txt"
+  st_cat "$client" "$ST_DIR/$tag-headers.txt" 2>/dev/null | tr -d '\r' >"$RS/request/$tag-headers.txt" || true
+  st_cat "$client" "$ST_DIR/$tag-body.txt" 2>/dev/null >"$RS/request/$tag-body.txt" || true
 }
 
 servetrace_captures() {
@@ -134,7 +184,7 @@ servetrace_pinned() {
 
 servetrace_cleanup() {
   railcap_cleanup || true
-  key_clear "$(st_get client.node)" "$ST_DIR"
+  st_clear "$(st_get client.node)"
 }
 
 # servetrace_refuse: one request, with no key, to the hostname the Gateway does not carry
@@ -142,11 +192,12 @@ servetrace_refuse() {
   local client url sport res pin=()
   client="$(st_get client.node)" url="$(st_get refuse.url)" sport="$(st_get refuse.sport)"
   [ -z "$(st_get refuse.resolve 2>/dev/null || true)" ] || pin=(--resolve "$(st_get refuse.resolve)")
-  res="$(X "$client" curl -sS --max-time 30 --local-port "$sport" "${pin[@]+"${pin[@]}"}" -o "$ST_DIR/refuse-body.txt" \
+  [ "$(st_kind)" != vm-node ] || pin+=(--cacert "$(st_get client.ca_root)")
+  res="$(st_x "$client" curl -sS --max-time 30 --local-port "$sport" "${pin[@]+"${pin[@]}"}" -o "$ST_DIR/refuse-body.txt" \
     -D "$ST_DIR/refuse-headers.txt" -w '%{http_code} %{local_port}\n' "$url" 2>&1 || true)"
   printf '%s\n' "$res" | tail -n 1 >"$RS/request/refuse-result.txt"
-  dk exec "$(ctr "$client")" cat "$ST_DIR/refuse-headers.txt" 2>/dev/null | tr -d '\r' >"$RS/request/refuse-headers.txt" || true
-  dk exec "$(ctr "$client")" cat "$ST_DIR/refuse-body.txt" 2>/dev/null >"$RS/request/refuse-body.txt" || true
+  st_cat "$client" "$ST_DIR/refuse-headers.txt" 2>/dev/null | tr -d '\r' >"$RS/request/refuse-headers.txt" || true
+  st_cat "$client" "$ST_DIR/refuse-body.txt" 2>/dev/null >"$RS/request/refuse-body.txt" || true
 }
 
 servetrace_run() {
@@ -161,7 +212,7 @@ servetrace_run() {
   sec "the serving trace: $(st_get model) through $(st_get gateway.name)"
   servetrace_cluster
   keyed="$(st_get keys.capture)"
-  if KEY_MARK="$keyed" key_to_client "$(st_get keys.namespace)" "$(st_get keys.secret)" "$model" "$client" "$ST_DIR" >"$RS/request/key.txt" 2>&1; then
+  if KEY_MARK="$keyed" st_key "$(st_get keys.namespace)" "$(st_get keys.secret)" "$model" "$client" "$ST_DIR" >"$RS/request/key.txt" 2>&1; then
     ok "the key for $model handed to $client as a 0600 header file, read from its Secret in the cluster ($(tail -n 1 "$RS/request/key.txt"))"
   else
     bad "the key for $model handed to $client" "$(tail -n 1 "$RS/request/key.txt")"
@@ -172,7 +223,7 @@ servetrace_run() {
     echo "trace: the router's master key $(tail -n 1 "$RS/request/master-key.txt" | cut -d' ' -f2-), the backend key $(tail -n 1 "$RS/request/backend-key.txt" | cut -d' ' -f2-)"
   fi
   body="$(py -c 'import json, sys; print(json.dumps({"model": sys.argv[1], "max_tokens": int(sys.argv[2]), "messages": [{"role": "user", "content": "In one sentence, what is a network rail?"}]}))' "$model" "$(st_get max_tokens)")"
-  printf '%s\n' "$body" | dk exec -i "$(ctr "$client")" sh -c "umask 077; cat >$ST_DIR/request.json"
+  printf '%s\n' "$body" | st_put "$client" "$ST_DIR/request.json"
   printf '%s\n' "$body" >"$RS/request/request.json"
   servetrace_request warmup
   echo "trace: warm-up answered $(cut -d' ' -f1 "$RS/request/warmup-result.txt")"
@@ -184,6 +235,13 @@ servetrace_run() {
   fi
   cp "$RS/request/request-result.txt" "$RS/request/result.txt"
   cp "$RS/request/request-headers.txt" "$RS/request/headers.txt"
+  local n i
+  n="$(st_get also 2>/dev/null | grep -c . || true)"
+  for ((i = 0; i < n; i++)); do
+    sleep 1
+    servetrace_also "$i"
+    echo "trace: $(st_get "also.$i.gateway") answered $(cut -d' ' -f1 "$RS/request/also-$(st_get "also.$i.gateway")-result.txt")"
+  done
   if [ -n "$(st_get refuse.url 2>/dev/null || true)" ]; then
     sleep 1
     servetrace_refuse
@@ -191,7 +249,7 @@ servetrace_run() {
   fi
   RAILCAP_DECODE="-nn -tt -e -v" railcap_stop
   trap - EXIT
-  key_clear "$client" "$ST_DIR"
+  st_clear "$client"
   [ -z "${SFAB_TICK_STAMP:-}" ] || stamp_args=(--stamp "$SFAB_TICK_STAMP")
   py "$STP" judge --set "$RS" --plan "$ST_PLAN" --inv "$INV" "${stamp_args[@]+"${stamp_args[@]}"}" || true
   summary

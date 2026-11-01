@@ -5629,12 +5629,20 @@
   },
   "trace": {
     "serving": {
-      "client": "ent-client",
+      "also": [
+        {
+          "gateway": "gw-inet",
+          "sport": 42808
+        }
+      ],
+      "client": "k8s-cp2",
       "gateway": "gw-users",
       "keys": true,
       "max_tokens": 16,
       "model": "staff",
+      "pin": true,
       "refuse": {
+        "gateway": "gw-inet",
         "hostname": "admin",
         "path": "/echo",
         "sport": 42807

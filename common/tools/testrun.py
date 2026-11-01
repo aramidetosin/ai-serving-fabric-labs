@@ -95,7 +95,8 @@ TREE = {
 # know is never left untested. Every path outside the recorded sets also gets ALWAYS, two cheap
 # checks that read every file of the code; the public-tree guard and namecheck then read the
 # changed files themselves (their whole-tree tests run when their own rules name them).
-LABS = "harness:test_ch01 harness:test_ch02 harness:test_ch03 harness:test_ch04 harness:test_ch05 harness:test_ch06 harness:test_ch07 harness:test_m2"
+LABS = ("harness:test_ch01 harness:test_ch02 harness:test_ch03 harness:test_ch04 harness:test_ch05 harness:test_ch06 harness:test_ch07 harness:test_m2 "
+        "harness:test_part3_labs harness:test_part3_judges")
 STAGES = "harness:test_stages harness:test_m2 harness:test_ch06"
 # common/audit/: every audit, trace and drill runs redact.py (common/lib.sh), which imports
 # redact_tree.py and evfile.py, and every audit runs the judge, which imports panos_parse.py;
@@ -128,7 +129,8 @@ QUICK = [
     (r"common/tests/runscope\.py$", "harness:test_ch03 harness:test_ch04 harness:test_ch05 harness:test_ch06 harness:test_m2"),
     (r"common/tests/shims-ch0[34]/", "harness:test_ch03 harness:test_ch04"),
     (r"common/tests/shims-ch05/", "harness:test_ch05"),
-    (r"common/tests/shims-ch0[67]/", "harness:test_ch06 harness:test_ch07"),
+    (r"common/tests/shims-ch0[67]/", "harness:test_ch06 harness:test_ch07 harness:test_part3_labs"),
+    (r"common/tests/shims-part3/|common/tests/p3_world\.py$", "harness:test_part3_labs"),
     (r"common/tests/shims-m2/", "harness:test_m2 harness:test_ch03 harness:test_ch04"),
     (r"common/tests/shims/", LABS + " harness:test_stages"),
     # the serving recipe and the key tool, and the labs that run them
@@ -150,7 +152,8 @@ QUICK = [
     # chapter 5's rp_filter stage and chapter 6's attachment reads
     (r"common/reads/", "harness:test_reads harness:test_ch05 harness:test_ch06"),
     (r"common/(?:trace|drill|break)/|common/breakheal\.py$", LABS + " generator:sfab.tests.test_drills_render "
-     "generator:sfab.tests.test_ch07_render generator:sfab.tests.test_part3_render harness:test_repostate harness:test_setsize"),
+     "generator:sfab.tests.test_ch07_render generator:sfab.tests.test_part3_render generator:sfab.tests.test_part3_tools_render "
+     "harness:test_repostate harness:test_setsize"),
     (r"common/stages/", STAGES + " harness:test_platform generator:sfab.tests.test_ch04_render"),
     (r"common/(?:fw|klish|host|storage)/", "generator " + LABS + " harness:test_stages"),
     (r"common/(?:mk/|lib\.sh$)", "harness:test_repostate harness:test_harness " + LABS + " harness:test_stages"),
@@ -163,7 +166,8 @@ QUICK = [
     (r"ch03/", "harness:test_ch03 harness:test_platform"),
     (r"ch0([4-7])/", "harness:test_ch0{0} harness:test_platform generator:sfab.tests.test_ch0{0}_render"),
     # Part III's labs (chapters 8 to 11): their render tests, and the pages that name them
-    (r"ch(?:0[89]|1[01])/", "harness:test_platform generator:sfab.tests.test_part3_render"),
+    (r"ch(?:0[89]|1[01])/", "harness:test_platform harness:test_part3_labs generator:sfab.tests.test_part3_render "
+                            "generator:sfab.tests.test_part3_tools_render"),
     (r"dev/m2/", "harness:test_m2 harness:test_platform generator:sfab.tests.test_k8s generator:sfab.tests.test_storage"),
     (r"dev/m1/", "harness:test_stages harness:test_platform generator:sfab.tests.test_integration "
                  "generator:sfab.tests.test_switches generator:sfab.tests.test_firewall generator:sfab.tests.test_hosts"),

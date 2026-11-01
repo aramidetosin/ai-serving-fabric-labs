@@ -1,4 +1,15 @@
 {
+  "also": [
+    {
+      "expect": 404,
+      "gateway": "gw-inet",
+      "marker": "sfab-trace-also-gw-inet",
+      "resolve": "llm.ai.tarnwick.example:443:10.20.11.220",
+      "sport": 42808,
+      "url": "https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions?msg=sfab-trace-also-gw-inet",
+      "vip": "10.20.11.220"
+    }
+  ],
   "api_gateway": {
     "name": "api-gateway",
     "namespace": "inference",
@@ -6,12 +17,26 @@
     "selector": "app.kubernetes.io/name=api-gateway"
   },
   "client": {
-    "address": "10.24.10.10",
+    "address": "10.20.1.12",
     "ca_root": "/shared/ca/root.crt",
-    "node": "ent-client",
-    "pin": false,
-    "resolve": null,
-    "resolver": "ent-dns"
+    "kind": "vm-node",
+    "local": true,
+    "node": "k8s-cp2",
+    "pin": true,
+    "ports": [
+      {
+        "eth": "eth1",
+        "id": "0-k8s-cp2-eth1",
+        "node": "k8s-cp2"
+      },
+      {
+        "eth": "eth2",
+        "id": "0-k8s-cp2-eth2",
+        "node": "k8s-cp2"
+      }
+    ],
+    "resolve": "llm.ai.tarnwick.example:443:10.20.11.210",
+    "resolver": null
   },
   "copies": [
     {
@@ -112,11 +137,13 @@
   "pin": null,
   "refuse": {
     "expect": 404,
+    "gateway": "gw-inet",
     "hostname": "admin.ai.tarnwick.example",
     "path": "/echo",
-    "resolve": "admin.ai.tarnwick.example:443:10.20.11.210",
+    "resolve": "admin.ai.tarnwick.example:443:10.20.11.220",
     "sport": 42807,
-    "url": "https://admin.ai.tarnwick.example/echo?msg=sfab-trace-refused"
+    "url": "https://admin.ai.tarnwick.example/echo?msg=sfab-trace-refused",
+    "vip": "10.20.11.220"
   },
   "route_id": "8242d5c4-9bce-5497-8414-f5bad94fdd84",
   "router": {

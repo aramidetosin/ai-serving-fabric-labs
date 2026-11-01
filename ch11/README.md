@@ -2,7 +2,7 @@
 
 Lab `sfab-ch11`, the companion lab of the book's Chapter 11, "Validating Tenant Isolation". It runs build A's state many at step 11 with the decision table and the matrix (`decisions: true`, as chapter 2's lab): chapter 10's deployment, the internet users' row and the internet Gateway's column, 60 cells, each with its isolation depth.
 
-Status: rendered and unit-tested (`common/sfab/tests/test_part3_render.py`); not deployed or recorded yet. Part III's own audit groups, trace forms and drills land with the record stage; until then `audit.sh` and `trace.sh` run chapter 7's groups and chapter 7's keyed trace on this render.
+Status: rendered, unit-tested (`common/sfab/tests/test_part3_render.py`, `test_part3_tools_render.py`) and run against the stand-ins (`common/tests/test_part3_labs.py`); not deployed or recorded yet.
 
 | Selection | Value |
 |---|---|
@@ -26,6 +26,13 @@ Everything chapter 10's lab renders (`ch10/README.md`), and:
 
 Chapter 7's lab's (`ch07/README.md`), and `sfab/keys:4` built on the lab host (`make -C images keys`, from `images/keys` and the pinned PyYAML wheel already in the vendor directory) and pushed into the in-lab registry with the rest (`make -C images registry-seed`; preflight checks that the registry holds the key image `serving.env` names). Memory: the inventory's budget is 180 GiB for 32 nodes, and preflight wants MemAvailable to cover it plus the 16 GiB floor, 196 GiB in all; on a shared lab host the author's rule keeps about 40 GiB beyond that free before `make up`. containerlab 0.82.0, the host tick at 10000 (read and recorded, never refused on), and no other `sfab-` lab running.
 
+## The audit, the trace, the matrix and the drill
+
+- `audit.sh` runs chapter 10's, then the `isolation` group's negative checks (no route for staff on `gw-inet`, no admin or identity hostname on it, no enterprise rule beyond the users' VIP reaching another Gateway's pool, the `isp` zone translated to `gw-inet` alone, `isp-rtr` with no inside route).
+- `trace.sh` (`chapter.yaml` `trace.ladder`): the capture ladder, every population to each Gateway's VIP, the forbidden tallies per rung.
+- `matrix.sh`: the 60 cells, each with its depth and layers in `MATRIX.md`; the internet users' chat cell asked with `inetapp`'s key, its own caller, and the API gateway's access log naming it.
+- `drills.sh`: `isolation-under-load`, every population's held connections and its own Gateway probed while it tries the cells it must not reach, at the plan's load and at twice it, one line a population with its allowed count and its zeros; and `leaked-key`, a new key of batch (an enterprise caller) used from the internet client through the internet Gateway, answered 200 and logged under batch, then refused 401 after its revoke: the one cell no network layer holds.
+
 ## Running it
 
 ```
@@ -35,13 +42,14 @@ make up
 make audit
 make label           # audits/sfab-ch11_label_<UTC>/
 make matrix          # audits/sfab-ch11_matrix_<UTC>/
-make trace
+make trace           # audits/sfab-ch11_trace_<UTC>/ (the capture ladder)
+make drills          # audits/sfab-ch11_drills_<UTC>/ (isolation-under-load and leaked-key, PASSES=3)
 make break-11a       # Exercise 4
 make heal-11a
 make down
 ```
 
-`matrix.sh` and `label.sh` are chapter 2's runners on this render. The runner's use of a cell's own caller and the depth's evidence land with the record stage.
+`matrix.sh` and `label.sh` are chapter 2's runners on this render: a cell's own caller (`key_caller`) carries that caller's key, and `MATRIX.md` prints each cell's depth and its layers.
 
 ## break-11a
 

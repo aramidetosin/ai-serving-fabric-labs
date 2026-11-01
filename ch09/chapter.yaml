@@ -19,17 +19,16 @@ prints: []
 extends: ch08
 variants: {}
 
-# The keyed trace (trace.sh, common/trace/lib-servetrace.sh; rendered to gen/trace.json): chapter 7's
-# form, kept until Part III's own forms land (the record stage): one request from the staff client to
-# staff's path through the users' Gateway with helpdesk's key, every key replaced by its keyed mark,
-# then an admin hostname the users' Gateway does not carry, answered 404 there with no API gateway
-# line.
+# The split-horizon trace (trace.sh, common/trace/lib-dnstrace.sh; rendered to gen/trace.json): each
+# population's lookup of llm.ai.tarnwick.example captured at its own resolver (the staff's ent-dns,
+# the nodes' dns-res1, the internet users' inet-dns-res), then its connect toward the answer from a
+# pinned source port, captured where the firewall's render says it goes: the staff's to the users'
+# Gateway through the firewall's enterprise port and one leg of the bundle (allowed); the nodes' to
+# the internal Gateway, answered on k8s-cp2 itself (no SYN leaves its ports); the internet users' to
+# the published address on the ISP router's link, logged by deny-all-log from isp to isp, with
+# nothing on the bundle (no translation and no rule before chapter 10).
 trace:
-  serving:
-    client: ent-client
-    gateway: gw-users
-    model: staff
-    max_tokens: 16
+  dns:
+    populations: [enterprise, nodes, internet]
+    name: llm
     sport: 42906
-    keys: true
-    refuse: {hostname: admin, path: /echo, sport: 42907}

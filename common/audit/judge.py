@@ -69,6 +69,20 @@ the data NICs whose GRO, rx-gro-hw or LRO is on (boot's gro_check). Groups:
                        namespaces, the hostnames and paths each Gateway answers, the leases, the
                        VIPs (ARP and TCP, no ICMP), the chains through each VIP, the CA's proof and
                        the timeout chain as the cluster runs it (gwlayer.py), from gateway-layer/
+    audiences          Part III, chapter 8: each Gateway's routes its audience's row, its admin and
+                       identity hostnames, its labelled namespaces, the callers each model route
+                       admits within their audiences, a key per Gateway, the leases on ingress
+                       nodes at the tuned timers, a policy per audience and the refused mint
+                       (tenancy.py), from what audit_audiences saved in audiences/
+    split-horizon      Part III, chapter 9: the public server's names, refusals and recursion, the
+                       ISP resolver's clients, every population's A and AAAA answers, the uplink
+                       side's server, the ISP router's routes and the internet client's connect
+                       (tenancy.py), from split-horizon/
+    zone-nat           Part III, chapter 10: the rulebases in order, the isp zone's one translation
+                       and one rule, the published address refused from inside, and the sessions
+                       per zone under the held connections (tenancy.py), from zone-nat/
+    isolation          Part III, chapter 11: the negative checks (tenancy.py), from the three
+                       groups' directories
 
 A file the plan names but the set lacks is a FAIL (not collected), never a pass. Nothing here
 connects to a device; collect.sh does that.
@@ -3283,6 +3297,14 @@ from clustersec import g_cluster_security, g_identity  # noqa: E402
 Judge.g_cluster_security = g_cluster_security
 Judge.g_identity = g_identity
 
+# Part III: the audiences, split-horizon DNS, zone-keyed translation and the negative checks (tenancy.py)
+from tenancy import g_audiences, g_isolation, g_split_horizon, g_zone_nat  # noqa: E402
+
+Judge.g_audiences = g_audiences
+Judge.g_split_horizon = g_split_horizon
+Judge.g_zone_nat = g_zone_nat
+Judge.g_isolation = g_isolation
+
 
 GROUPS = {
     "shared": "g_shared", "vlans": "g_vlans", "mac-tables": "g_mac_tables", "forwarding-only": "g_forwarding",
@@ -3293,6 +3315,7 @@ GROUPS = {
     "pair-roles": "g_pair_roles", "bond-legs": "g_bond_legs", "fw-edge": "g_fw_edge", "rail-backend": "g_rail_backend",
     "placement": "g_placement", "gateway-layer": "g_gateway_layer", "keys": "g_keys",
     "cluster-security": "g_cluster_security", "identity": "g_identity",
+    "audiences": "g_audiences", "split-horizon": "g_split_horizon", "zone-nat": "g_zone_nat", "isolation": "g_isolation",
 }
 
 

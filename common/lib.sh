@@ -203,7 +203,7 @@ sfab_init() {
   export SFAB_TMP
   SFAB_TICK_STAMP=""
   case "$SFAB_CATEGORY" in
-    audit|trace|label|matrix|dbs|rpf|attach|drills|teardown|settle|break-*|heal-*) [ -n "$record" ] || record=1 ;;
+    audit|trace|label|matrix|dbs|rpf|attach|hold|drills|teardown|settle|break-*|heal-*) [ -n "$record" ] || record=1 ;;
     *) [ -n "$record" ] || record=0 ;;
   esac
   [ "$SFAB_QUICK" = 1 ] && [ "$record" = 1 ] && [ -z "$set_dir" ] && record=0

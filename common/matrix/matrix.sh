@@ -12,7 +12,8 @@
 # by ping: a Gateway's VIP answers TCP and not ICMP on the pinned Cilium (chapter 7). In order:
 #   1. lookups   each client looks up every name its cells ask for through its own resolver (dig in a
 #                container, getent ahostsv4 in a VM guest): the resolver view's row, and the warm-up
-#   2. keys      both models' keys handed to each client a model cell runs from, through pipes from
+#   2. keys      both models' keys (and a cell's own caller's, key_caller, Part III) handed to each
+#                client a model cell runs from, through pipes from
 #                their Secret in the cluster into a 0600 header file there (lib-servecap.sh for a
 #                container; the same pipe over ssh for a VM guest): no key is on a command line, in
 #                the transcript or on the lab host, and each is named by its fingerprint only
@@ -65,22 +66,25 @@ mx_put() {
   fi
 }
 
-# mx_key NODE KIND MODEL: the model's first key into MX_DIR/hdr-MODEL in the client, through pipes
+# mx_key NODE KIND MODEL [CALLER]: the model's first key, or with CALLER that caller's first key
+# (Part III: a cell's own key_caller), into MX_DIR/hdr-MODEL (hdr-CALLER) in the client, through pipes
 mx_key() {
-  local n="$1" kind="$2" model="$3" ns sec err rc=0
+  local n="$1" kind="$2" model="$3" caller="${4:--}" ns sec err rc=0 name extra=()
   ns="$(mx_get api_gateway.namespace)" sec="$(mx_get api_gateway.secret)"
+  name="$model"
+  if [ "$caller" != - ]; then name="$caller"; extra=(--caller "$caller"); fi
   if [ "$kind" != vm-node ]; then
-    key_to_client "$ns" "$sec" "$model" "$n" "$MX_DIR"
+    KEY_CALLER="${extra[1]:-}" key_to_client "$ns" "$sec" "$model" "$n" "$MX_DIR" "" "$name"
     return
   fi
   err="$(tmpf)"
   EVID_OFF=1 K -n "$ns" get secret "$sec" -o json 2>/dev/null |
-    py "$SFAB_COMMON/trace/servekeys.py" pick --model "$model" 2>"$err" |
-    mx_guest_in "$n" "umask 077; mkdir -p $MX_DIR; read -r k; read -r h; printf '%s\n' \"\$k\" >$MX_DIR/key-$model; printf '%s\n' \"\$h\" >$MX_DIR/hdr-$model" ||
+    py "$SFAB_COMMON/trace/servekeys.py" pick --model "$model" "${extra[@]+"${extra[@]}"}" 2>"$err" |
+    mx_guest_in "$n" "umask 077; mkdir -p $MX_DIR; read -r k; read -r h; printf '%s\n' \"\$k\" >$MX_DIR/key-$name; printf '%s\n' \"\$h\" >$MX_DIR/hdr-$name" ||
     rc=1
   cat "$err"
   rm -f "$err"
-  [ "$rc" -eq 0 ] && EVID_OFF=1 H "$n" "test -s $MX_DIR/hdr-$model" >/dev/null 2>&1
+  [ "$rc" -eq 0 ] && EVID_OFF=1 H "$n" "test -s $MX_DIR/hdr-$name" >/dev/null 2>&1
 }
 
 mx_clear() {
@@ -160,12 +164,12 @@ matrix_cells() {
     mx_lookup "$d" "$row" "$n" "$kind" "$name"
   done 3< <(py "$MXP" lookups --plan "$MX_PLAN" "${only[@]+"${only[@]}"}")
   # 2. keys and request bodies, for every client a model cell runs from
-  mapfile -t models < <(py "$MXP" requests --plan "$MX_PLAN" "${only[@]+"${only[@]}"}" | awk -F'\t' '$12 != "-" { print $4 "\t" $5 "\t" $12 }' | sort -u)
+  mapfile -t models < <(py "$MXP" requests --plan "$MX_PLAN" "${only[@]+"${only[@]}"}" | awk -F'\t' '$12 != "-" { print $4 "\t" $5 "\t" $12 "\t" ($17 == "" ? "-" : $17) }' | sort -u)
   for x in "${models[@]+"${models[@]}"}"; do
-    IFS=$'\t' read -r n kind key <<<"$x"
+    IFS=$'\t' read -r n kind key kc <<<"$x"
     case " ${clients[*]-} " in *" $n:$kind "*) ;; *) clients+=("$n:$kind") ;; esac
-    if mx_key "$n" "$kind" "$key" >>"$d/keys/$n.txt" 2>&1; then
-      echo "matrix: $key's key handed to $n ($(tail -n 1 "$d/keys/$n.txt"))"
+    if mx_key "$n" "$kind" "$key" "${kc:--}" >>"$d/keys/$n.txt" 2>&1; then
+      echo "matrix: $([ "${kc:--}" = - ] && echo "$key" || echo "$kc")'s key handed to $n ($(tail -n 1 "$d/keys/$n.txt"))"
     else
       warn "matrix: $key's key could not be handed to $n: its cells will fail"
     fi
@@ -182,8 +186,9 @@ matrix_cells() {
   local sip=""
   [ -z "${FW_NODE:-}" ] || sip="$(py "$MXP" strict-ip --plan "$MX_PLAN" "${only[@]+"${only[@]}"}")"
   [ -z "$sip" ] || FW "show counter global filter delta yes severity drop" >"$d/fw/drops-before.txt" 2>&1 || true
-  while IFS=$'\t' read -r -u 3 cell req rk c ck ca a p sp m url key mk want bm pin; do
+  while IFS=$'\t' read -r -u 3 cell req rk c ck ca a p sp m url key mk want bm pin kc; do
     [ -n "$cell" ] || continue
+    [ "${kc:--}" = - ] || key="$kc"
     case " ${clients[*]-} " in *" $c:$ck "*) ;; *) clients+=("$c:$ck") ;; esac
     for att in 1 2; do
       t="$(mx_slug "$cell")-$req-a$att"

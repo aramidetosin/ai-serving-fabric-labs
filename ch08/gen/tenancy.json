@@ -1,0 +1,185 @@
+{
+  "audiences": {
+    "callers": [
+      {
+        "audience": "enterprise",
+        "audience_models": [
+          "chat",
+          "staff"
+        ],
+        "id": "batch",
+        "kind": "application",
+        "models": [
+          "chat"
+        ]
+      },
+      {
+        "audience": "enterprise",
+        "audience_models": [
+          "chat",
+          "staff"
+        ],
+        "id": "helpdesk",
+        "kind": "application",
+        "models": [
+          "staff"
+        ]
+      },
+      {
+        "audience": "enterprise",
+        "audience_models": [
+          "chat",
+          "staff"
+        ],
+        "id": "staff",
+        "kind": "people",
+        "models": [
+          "chat",
+          "staff"
+        ]
+      },
+      {
+        "audience": "internet",
+        "audience_models": [
+          "chat"
+        ],
+        "id": "inetapp",
+        "kind": "application",
+        "models": [
+          "chat"
+        ]
+      }
+    ],
+    "gateway_namespace": "gateways",
+    "gateways": {
+      "gw-inet": {
+        "admin": [],
+        "audience": "internet",
+        "bare_prefix": false,
+        "idp": false,
+        "label": "routes.tarnwick.example/gw-inet",
+        "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-inet",
+        "models": [
+          "chat"
+        ],
+        "namespaces": [
+          "echo",
+          "inference"
+        ],
+        "policy": "gateways-internet",
+        "pool": [
+          "10.20.11.220",
+          "10.20.11.224"
+        ],
+        "route": "models-gw-inet",
+        "secret": "gw-inet-tls",
+        "service": "cilium-gateway-gw-inet",
+        "vip": "10.20.11.220"
+      },
+      "gw-internal": {
+        "admin": [
+          "admin.ai.tarnwick.example",
+          "grafana.ai.tarnwick.example"
+        ],
+        "audience": "internal",
+        "bare_prefix": true,
+        "idp": true,
+        "label": "routes.tarnwick.example/gw-internal",
+        "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-internal",
+        "models": [
+          "chat",
+          "staff"
+        ],
+        "namespaces": [
+          "echo",
+          "identity",
+          "inference",
+          "serving"
+        ],
+        "policy": "gateways-internal",
+        "pool": [
+          "10.20.11.200",
+          "10.20.11.209"
+        ],
+        "route": "models-gw-internal",
+        "secret": "gw-internal-tls",
+        "service": "cilium-gateway-gw-internal",
+        "vip": "10.20.11.200"
+      },
+      "gw-users": {
+        "admin": [],
+        "audience": "enterprise",
+        "bare_prefix": false,
+        "idp": true,
+        "label": "routes.tarnwick.example/gw-users",
+        "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-users",
+        "models": [
+          "chat",
+          "staff"
+        ],
+        "namespaces": [
+          "echo",
+          "identity",
+          "inference"
+        ],
+        "policy": "gateways-enterprise",
+        "pool": [
+          "10.20.11.210",
+          "10.20.11.214"
+        ],
+        "route": "models-gw-users",
+        "secret": "gw-users-tls",
+        "service": "cilium-gateway-gw-users",
+        "vip": "10.20.11.210"
+      }
+    },
+    "holder_role": "ingress",
+    "idp_hostname": "id.ai.tarnwick.example",
+    "ingress_nodes": [
+      "k8s-ingress1",
+      "k8s-ingress2"
+    ],
+    "interfaces": [
+      "^bond0\\.110$"
+    ],
+    "keys": {
+      "namespace": "inference",
+      "secret": "api-keys"
+    },
+    "lease": {
+      "client_qps": 50,
+      "config": {
+        "l2-announcements-lease-duration": "3s",
+        "l2-announcements-renew-deadline": "1s",
+        "l2-announcements-retry-period": "200ms"
+      },
+      "duration": "3s",
+      "failover_ms": [
+        2000,
+        4000
+      ],
+      "renew_deadline": "1s",
+      "renew_qps": 3.0,
+      "retry_period": "200ms",
+      "services": 3,
+      "tuned": true
+    },
+    "models": [
+      "chat",
+      "staff"
+    ],
+    "policy_mode": "per-audience",
+    "refused_mint": {
+      "audience": "internet",
+      "audience_models": [
+        "chat"
+      ],
+      "caller": "inetapp",
+      "id": "fe000000",
+      "model": "staff"
+    }
+  },
+  "lab": "sfab-ch08",
+  "schema": 1,
+  "step": 8
+}

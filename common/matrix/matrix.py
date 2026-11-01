@@ -8,8 +8,11 @@ break-2a's cell_mode check.
                                                  cell, request, kind (connect | http), client, client kind,
                                                  client address, address, port, source port, method,
                                                  URL, key model (- for none), marker (-), whether an
-                                                 answer is expected (1) or a refusal (0), and the model
-                                                 the request's body names (-)
+                                                 answer is expected (1) or a refusal (0), the model
+                                                 the request's body names (-), the pin (-) and the
+                                                 caller whose key it carries when the cell names one
+                                                 (Part III: the population's own, key_caller; - for
+                                                 the model's first key)
     matrix.py lookups --plan P [--only CELL...]  the names each client looks up first: row, client,
                                                  client kind, hostname
     matrix.py strict-ip --plan P [--only CELL...]
@@ -170,7 +173,7 @@ def requests(plan: dict, only=None) -> list:
             pin = f"{c['hostname']}:{c['port']}:{c['address']}" if c.get("pin") and c.get("hostname") and c.get("address") else "-"
             out.append((c["id"], q["id"], kind, c["client"], c["client_kind"], c["client_addr"], c.get("address") or "-", str(c["port"]),
                         str(q["sport"]), q.get("method") or "-", q.get("url") or "-", q.get("key") or "-", q.get("marker") or "-", answer,
-                        (q.get("body") or {}).get("model") or "-", pin))
+                        (q.get("body") or {}).get("model") or "-", pin, q.get("key_caller") or "-"))
     return out
 
 
@@ -483,6 +486,17 @@ def judge_cell(v, d: Path, plan: dict, c: dict, ob: dict, rows: dict, cols: dict
     elif want == "allowed":
         v.ok(f"{tagx} {name}: HTTP 200 from {c.get('gateway')} ({c.get('route')}), from port {o.get('sport')}")
         res["text"] = "200" if c["kind"] == "model" else "allowed"
+        kc = c["requests"][0].get("key_caller")
+        if c["kind"] == "model" and kc:
+            # Part III: the cell's own key is its population's caller's (inetapp for the internet
+            # users), and the API gateway's access log names that caller's consumer group
+            hit = [i for i, l in enumerate(gwlog.splitlines(), 1) if f'"caller":"{kc}"' in l.replace(" ", "")
+                   and ('"status":"200"' in l.replace(" ", "") or '"status":200' in l.replace(" ", ""))]
+            v.check(f"[key] {name}: with {kc}'s key, the population's own caller: the API gateway's access log names caller {kc} "
+                    f"({len(hit)} answered line(s))", bool(hit), f"no 200 line names caller {kc} in api-gateway/access.txt")
+            if hit:
+                res["cites"].append(cite("api-gateway/access.txt", hit[0]))
+            res["text"] = f"200 with {kc}'s key"
         hd = read(d / f"requests/{o['tag']}-headers.txt")
         if hd:
             res["cites"].append(cite(f"requests/{o['tag']}-headers.txt", 1))
@@ -617,6 +631,14 @@ def cmd_judge(a) -> int:
         good = sum(1 for x in out.values() if x["ok"])
         v.check(f"{good} of {len(cells)} cells in their mode ({cnt['allowed']} allowed, {cnt['log-line']} log lines, "
                 f"{cnt['404']} 404, {cnt['silence']} silent)", good == len(cells), f"{len(cells) - good} cell(s) not in their mode")
+        dc = (plan.get("counts") or {}).get("depth")
+        if dc:
+            got_d = {}
+            for c in cells:
+                got_d[str(c.get("depth"))] = got_d.get(str(c.get("depth")), 0) + 1
+            tail = f" (and {cnt['allowed']} allowed at depth 0)" if "0" not in dc else ""
+            v.check("the cells' isolation depth as the render computes it: " + ", ".join(f"depth {k} {n}" for k, n in sorted(dc.items())) + tail,
+                    all(got_d.get(k) == n for k, n in dc.items()), f"the plan's cells count {got_d}")
         write_md(d, plan, out, a.stamp)
     return 1 if v.counts()["fail"] else 0
 
@@ -654,12 +676,23 @@ def write_md(d: Path, plan: dict, out: dict, stamp=None):
             x = out.get(cid)
             cells.append(("PASS " if x and x["ok"] else "FAIL ") + (x["text"] if x else by[cid]["mode"]) if x else "-")
         L.append(f"| {col['label']} | {ap} | " + " | ".join(cells) + " |")
-    L += ["", "## Evidence by cell", "", "| Cell | Mode | Evidence |", "|---|---|---|"]
+    deep = any("depth" in c for c in plan["cells"])
+    if deep:
+        # Part III (chapter 11): each cell's isolation depth, the layers that would refuse it if every
+        # earlier layer let it through (render/decisions.py), beside its evidence
+        L += ["", "## Evidence by cell", "", "| Cell | Mode | Depth | The layers that would refuse it | Evidence |", "|---|---|---|---|---|"]
+    else:
+        L += ["", "## Evidence by cell", "", "| Cell | Mode | Evidence |", "|---|---|---|"]
     for c in plan["cells"]:
         x = out.get(c["id"])
-        if x:
+        if x and deep:
+            layers = "; ".join(f"{y['device']} ({y['row']}): {y['why']}" for y in c.get("depth_layers") or []) or "none: allowed"
+            L.append(f"| `{c['id']}` | {MODE_TEXT.get(c['mode'], c['mode'])} | {c.get('depth')} | {layers} | {', '.join(x['cites']) or '-'} |")
+        elif x:
             L.append(f"| `{c['id']}` | {MODE_TEXT.get(c['mode'], c['mode'])} | {', '.join(x['cites']) or '-'} |")
     L += ["", f"Silence: {', '.join(plan['silence']['cells']) or 'no cell'}; its evidence is {plan['silence']['evidence']}.", ""]
+    if deep and (plan.get("counts") or {}).get("depth"):
+        L += ["Cells by depth: " + ", ".join(f"depth {k} {n}" for k, n in sorted(plan["counts"]["depth"].items())) + ".", ""]
     verdict = read(d / "verdict.txt")
     L += ["## Verdict", "", "```"] + [l for l in verdict.splitlines() if l.strip()] + ["```", ""]
     L += ["## Files", "",

@@ -1288,15 +1288,32 @@ def _drill(inv: dict, d: dict, probes: dict, pair: dict, seen: set) -> dict:
     return out
 
 
-def drills(inv: dict, raw: dict, model=None) -> dict:
+def drills(inv: dict, raw: dict, model=None, ctx=None) -> dict:
     if not isinstance(raw, dict):
         _err("chapter.yaml drills", "must be a mapping")
     extra = set(raw) - {"probes", "timing", "list"}
     if extra:
         _err("chapter.yaml drills", f"unknown keys {sorted(extra)}")
+    from . import tenancy  # noqa: PLC0415
+
+    items = list(raw.get("list") or [])
+    if items and all(isinstance(d, dict) and any(k in d for k in tenancy.P3_DRILL_KEYS) for d in items):
+        # Part III's drills (render/tenancy.py): the lease-holder loss and the isolation drill under
+        # load, each carrying its own probes
+        if raw.get("probes"):
+            _err("chapter.yaml drills.probes", "Part III's drills carry their own probes")
+        timing = dict(tenancy.P3_TIMING_DEFAULTS)
+        for k, v in (raw.get("timing") or {}).items():
+            if k not in timing:
+                _err("chapter.yaml drills.timing", f"unknown key {k!r} (have {', '.join(sorted(timing))})")
+            timing[k] = _num(v, f"chapter.yaml drills.timing.{k}")
+        seen: set = set()
+        lst = [tenancy.p3_drill(model, inv, d, seen, ctx) for d in items]
+        return {"schema": SCHEMA, "lab": inv.get("lab"), "kind": "part3", "timing": timing, "list": lst}
+    if any(isinstance(d, dict) and any(k in d for k in tenancy.P3_DRILL_KEYS) for d in items):
+        _err("chapter.yaml drills.list", "Part III's drills run on their own, without the earlier chapters' kinds")
     pair = _pair(inv)
     probes = _probes(inv, raw.get("probes") or {}, model)
-    items = list(raw.get("list") or [])
     is_serve = [isinstance(d, dict) and (any(k in d for k in SERVE_DRILL_KEYS) or ("dark" in d and "gateway" in (d.get("probes") or [])))
                 for d in items]
     is_fw = [isinstance(d, dict) and any(k in d for k in FW_DRILL_KEYS) for d in items]
@@ -1535,11 +1552,28 @@ def _syn_break_action(inv: dict, model, kind: str, body, where: str) -> dict:
         if not caps or len({c["id"] for c in caps}) != len(caps):
             _err(f"{where}.probe_syn.capture", "names the container ports captured around the probe, each once")
         port = int(_num(b.get("port", 443), f"{where}.probe_syn.port"))
-        filt = f"host {bare(sn.get('address'))} and host {dst} and tcp port {port}"
-        return {"kind": "probe_syn", "id": str(b.get("id") or "syn"), "node": src, "client_addr": bare(sn.get("address")), "to": to,
-                "dst_addr": dst, "port": port, "count": count, "sport": sport,
-                "timeout_s": _num(b.get("timeout_s", 5), f"{where}.probe_syn.timeout_s"), "passes": passes, "capture": caps,
-                "filter": f"({filt}) or (vlan and ({filt}))", "snaplen": SYN_SNAPLEN}
+        # Part III (chapter 10): a destination the firewall translates (the published address) is
+        # captured, and counted, past the firewall under its translated address too
+        xdst = None
+        if model is not None and model.firewall is not None and src in model.nodes:
+            from .decisions import path  # noqa: PLC0415
+            from .panos import view  # noqa: PLC0415
+
+            try:
+                pr = path(model, view(model), model.nodes[src], dst, port, f"{where}.probe_syn")
+            except RenderError:
+                pr = {}
+            if pr.get("outcome") == "reached" and pr.get("nat_rule") and pr.get("at") and pr["at"] != dst:
+                xdst = pr["at"]
+        hosts = f"host {dst}" if xdst is None else f"(host {dst} or host {xdst})"
+        filt = f"host {bare(sn.get('address'))} and {hosts} and tcp port {port}"
+        out = {"kind": "probe_syn", "id": str(b.get("id") or "syn"), "node": src, "client_addr": bare(sn.get("address")), "to": to,
+               "dst_addr": dst, "port": port, "count": count, "sport": sport,
+               "timeout_s": _num(b.get("timeout_s", 5), f"{where}.probe_syn.timeout_s"), "passes": passes, "capture": caps,
+               "filter": f"({filt}) or (vlan and ({filt}))", "snaplen": SYN_SNAPLEN}
+        if xdst is not None:
+            out["translated_addr"] = xdst
+        return out
     if kind == "syn_at":
         extra = set(b) - {"probe", "seen", "seen_any", "unseen"}
         if extra or not b.get("probe") or not (b.get("seen") or b.get("seen_any") or b.get("unseen")):
@@ -2269,7 +2303,7 @@ def render(model, ctx) -> dict:
     inv = None
     if raw:
         inv = inventory(model)
-        out["gen/drills.json"] = dumps(drills(inv, raw, model))
+        out["gen/drills.json"] = dumps(drills(inv, raw, model, ctx))
     labdir = getattr(ctx, "labdir", None)
     if labdir is not None and (Path(labdir) / "breaks").is_dir():
         inv = inv or inventory(model)

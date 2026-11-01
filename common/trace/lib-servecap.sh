@@ -16,7 +16,12 @@
 #                               through pipes only, from the harness's kubectl (on the init node) to the client's own
 #                               file: no transcript block, no file on the lab host, no command line
 #                               holds it. Prints the key's field and fingerprint, and with
-#                               KEY_MARK=1 its mark under the lab's redaction key (chapter 7)
+#                               KEY_MARK=1 its mark under the lab's redaction key (chapter 7);
+#                               KEY_CALLER=C takes caller C's first key instead of the model's
+#                               (Part III: a population's own caller, inetapp for the internet)
+#   key_to_guest NS SECRET MODEL NODE DIR [FIELD [NAME]]
+#                               the same for a VM guest (Part III: a node of the cluster as a
+#                               trace's client), over ssh's standard input
 #   key_clear CLIENT DIR        DIR removed in the client
 #   idp_token CLIENT DIR NAME [noaud]
 #                               a person's ID token from the identity provider (gen/k8s.json
@@ -46,8 +51,9 @@
 #                               runs each in rounds until every API gateway pod answers EXPECT;
 #                               keyprobe_start and keyprobe_finish are its two halves, and
 #                               keyprobe_running waits until the started pod holds its key
-#   keyjob_run NAME OUT mint|revoke MODEL ID   a key Job (keyprobe.py job) run once, its log
-#                               (fingerprints only) saved as OUT, the Job removed
+#   keyjob_run NAME OUT mint|revoke MODEL ID [CALLER]   a key Job (keyprobe.py job) run once, its
+#                               log (fingerprints only) saved as OUT, the Job removed; CALLER names
+#                               the caller whose field it mints (Part III's refused mint)
 #   qargs ARG...                the arguments shell-quoted for a command string; nothing for none
 #   events_archive DIR NS...    each namespace's Warning events saved as DIR/events-<ns>.json and
 #                               .txt, then deleted: the readiness failures a drill or a break
@@ -95,6 +101,7 @@ key_to_client() {
   c="$(ctr "$client")"
   err="$(tmpf)"
   [ -z "$field" ] || extra+=(--field "$field")
+  [ -z "${KEY_CALLER:-}" ] || extra+=(--caller "$KEY_CALLER")
   [ "${KEY_MARK:-0}" != 1 ] || extra+=(--mark-key "$STATEDIR/secrets/redact.key")
   dk exec "$c" sh -c "umask 077; mkdir -p $dir" >/dev/null 2>&1 || true
   EVID_OFF=1 K -n "$ns" get secret "$sec" -o json 2>/dev/null |
@@ -104,6 +111,25 @@ key_to_client() {
   cat "$err"
   rm -f "$err"
   [ "$rc" -eq 0 ] && dk exec "$c" test -s "$dir/hdr-$name"
+}
+
+# key_to_guest NS SECRET MODEL NODE DIR [FIELD [NAME]]: key_to_client for a VM guest, the key and its
+# header line piped over ssh's standard input into DIR there (0600 files under a 0700 DIR)
+key_to_guest() {
+  local ns="$1" sec="$2" model="$3" node="$4" dir="$5" field="${6:-}" name="${7:-$3}" err rc=0 extra=() key
+  err="$(tmpf)"
+  key="$(lab_key)"
+  [ -z "$field" ] || extra+=(--field "$field")
+  [ -z "${KEY_CALLER:-}" ] || extra+=(--caller "$KEY_CALLER")
+  [ "${KEY_MARK:-0}" != 1 ] || extra+=(--mark-key "$STATEDIR/secrets/redact.key")
+  EVID_OFF=1 K -n "$ns" get secret "$sec" -o json 2>/dev/null |
+    py "$SFAB_COMMON/trace/servekeys.py" pick --model "$model" "${extra[@]+"${extra[@]}"}" 2>"$err" |
+    timeout "${SFAB_CMD_TIMEOUT:-300}" ssh "${_SSH_BASE[@]}" -o BatchMode=yes -o IdentitiesOnly=yes -i "$key" "$GUEST_USER@$(node_mgmt "$node")" \
+      "sudo bash -c 'umask 077; mkdir -p $dir; read -r k; read -r h; printf \"%s\\n\" \"\$k\" >$dir/key-$name; printf \"%s\\n\" \"\$h\" >$dir/hdr-$name'" ||
+    rc=1
+  cat "$err"
+  rm -f "$err"
+  [ "$rc" -eq 0 ] && EVID_OFF=1 H "$node" "test -s $dir/hdr-$name" >/dev/null 2>&1
 }
 
 key_unknown() {
@@ -198,10 +224,12 @@ keyprobe_run() {
 }
 
 keyjob_run() {
-  local name="$1" out="$2" op="$3" model="$4" id="$5" ns m phase
+  local name="$1" out="$2" op="$3" model="$4" id="$5" caller="${6:-}" ns m phase extra=()
   ns="$(k8s_get inference.namespace)"
   m="$(tmpf)"
-  py "$SFAB_COMMON/trace/keyprobe.py" job --k8s "$RENDERDIR/gen/k8s.json" --name "$name" "--$op" --model "$model" --id "$id" >"$m" || { rm -f "$m"; return 1; }
+  [ -z "$caller" ] || extra=(--caller "$caller")
+  py "$SFAB_COMMON/trace/keyprobe.py" job --k8s "$RENDERDIR/gen/k8s.json" --name "$name" "--$op" --model "$model" --id "$id" \
+    "${extra[@]+"${extra[@]}"}" >"$m" || { rm -f "$m"; return 1; }
   EVID_OFF=1 K -n "$ns" delete job "$name" --ignore-not-found --wait=true >/dev/null 2>&1 || true
   kcreate "$m" >/dev/null 2>&1 || true
   rm -f "$m"

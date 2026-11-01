@@ -216,7 +216,7 @@
           "client_addr": "203.0.113.2",
           "count": 3,
           "dst_addr": "198.51.100.10",
-          "filter": "(host 203.0.113.2 and host 198.51.100.10 and tcp port 443) or (vlan and (host 203.0.113.2 and host 198.51.100.10 and tcp port 443))",
+          "filter": "(host 203.0.113.2 and (host 198.51.100.10 or host 10.20.11.220) and tcp port 443) or (vlan and (host 203.0.113.2 and (host 198.51.100.10 or host 10.20.11.220) and tcp port 443))",
           "id": "syn",
           "kind": "probe_syn",
           "node": "inet-client",
@@ -225,7 +225,8 @@
           "snaplen": 96,
           "sport": 42310,
           "timeout_s": 5,
-          "to": "198.51.100.10"
+          "to": "198.51.100.10",
+          "translated_addr": "10.20.11.220"
         },
         {
           "kind": "fw_show",

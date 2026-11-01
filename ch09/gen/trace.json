@@ -1,143 +1,205 @@
 {
-  "api_gateway": {
-    "name": "api-gateway",
-    "namespace": "inference",
-    "port": 9080,
-    "selector": "app.kubernetes.io/name=api-gateway"
-  },
-  "client": {
-    "address": "10.24.10.10",
-    "ca_root": "/shared/ca/root.crt",
-    "node": "ent-client",
-    "pin": false,
-    "resolve": null,
-    "resolver": "ent-dns"
-  },
-  "copies": [
+  "kind": "dns",
+  "lab": "sfab-ch09",
+  "name": "llm.ai.tarnwick.example",
+  "points": [
     {
-      "copy": "a",
-      "nad": "rail4",
-      "rail": 4,
-      "server": {
-        "address": "10.21.4.100",
-        "node": "k8s-gpu1",
-        "pod": "staff-a-server-0"
-      },
-      "service": "staff-a",
-      "spans": false,
-      "switch": "rail-sw2",
-      "switch_ports": [
-        {
-          "eth": "eth2",
-          "faces": "k8s-gpu1",
-          "id": "6-rail-sw2-Ethernet1",
-          "native": "Ethernet1",
-          "node": "rail-sw2"
-        }
-      ],
-      "workers": [
-        {
-          "address": "10.21.4.101",
-          "node": "k8s-gpu1",
-          "pod": "staff-a-worker0-0",
-          "remote": false
-        }
-      ]
+      "eth": "bond0",
+      "filter": "(port 53) or (vlan and (port 53))",
+      "id": "0-dns-res1-bond0",
+      "node": "dns-res1",
+      "role": "resolver"
     },
     {
-      "copy": "b",
-      "nad": "rail5",
-      "rail": 5,
-      "server": {
-        "address": "10.21.5.100",
-        "node": "k8s-gpu2",
-        "pod": "staff-b-server-0"
-      },
-      "service": "staff-b",
-      "spans": false,
-      "switch": "rail-sw1",
-      "switch_ports": [
-        {
-          "eth": "eth7",
-          "faces": "k8s-gpu2",
-          "id": "6-rail-sw1-Ethernet6",
-          "native": "Ethernet6",
-          "node": "rail-sw1"
-        }
-      ],
-      "workers": [
-        {
-          "address": "10.21.5.101",
-          "node": "k8s-gpu2",
-          "pod": "staff-b-worker0-0",
-          "remote": false
-        }
-      ]
+      "eth": "eth1",
+      "filter": "(port 53) or (vlan and (port 53))",
+      "id": "0-ent-dns-eth1",
+      "node": "ent-dns",
+      "role": "resolver"
+    },
+    {
+      "eth": "eth1",
+      "filter": "(port 53) or (vlan and (port 53))",
+      "id": "0-inet-dns-res-eth1",
+      "node": "inet-dns-res",
+      "role": "resolver"
+    },
+    {
+      "eth": "eth1",
+      "filter": "(tcp port 443) or (vlan and (tcp port 443))",
+      "id": "0-k8s-cp2-eth1",
+      "node": "k8s-cp2",
+      "role": "node"
+    },
+    {
+      "eth": "eth2",
+      "filter": "(tcp port 443) or (vlan and (tcp port 443))",
+      "id": "0-k8s-cp2-eth2",
+      "node": "k8s-cp2",
+      "role": "node"
+    },
+    {
+      "eth": "eth1",
+      "filter": "(tcp port 443) or (vlan and (tcp port 443))",
+      "id": "1-isp-rtr-eth1",
+      "node": "isp-rtr",
+      "role": "router-uplink"
+    },
+    {
+      "eth": "eth4",
+      "filter": "(tcp port 443) or (vlan and (tcp port 443))",
+      "id": "2-fw-ethernet1-4",
+      "ifname": "ethernet1/4",
+      "node": "fw",
+      "role": "fw-ingress"
+    },
+    {
+      "eth": "eth1",
+      "filter": "(tcp port 443) or (vlan and (tcp port 443))",
+      "id": "3-fw-ae1-leg1",
+      "ifname": "ethernet1/1",
+      "leg": 1,
+      "node": "fw",
+      "role": "leg"
+    },
+    {
+      "eth": "eth2",
+      "filter": "(tcp port 443) or (vlan and (tcp port 443))",
+      "id": "3-fw-ae1-leg2",
+      "ifname": "ethernet1/2",
+      "leg": 2,
+      "node": "fw",
+      "role": "leg"
     }
   ],
-  "expect": {
-    "api_base": "http://staff.serving.svc.cluster.local:8080/v1",
-    "model_name": "openai/staff",
-    "status": 200
-  },
-  "gateway": {
-    "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-users",
-    "name": "gw-users",
-    "port": 443,
-    "route": "models-gw-users",
-    "service": "cilium-gateway-gw-users",
-    "vip": "10.20.11.210"
-  },
-  "hostname": "llm.ai.tarnwick.example",
-  "keys": {
-    "backend": {
-      "field": "key",
-      "secret": "backend-key"
+  "rows": [
+    {
+      "answer": "10.20.11.210",
+      "authorities": [
+        "10.20.13.11",
+        "10.20.14.11"
+      ],
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "dns_point": "0-ent-dns-eth1",
+      "kind": "client",
+      "name": "llm.ai.tarnwick.example",
+      "population": "enterprise",
+      "resolver": "ent-dns",
+      "resolver_addr": "10.24.10.53",
+      "syn": {
+        "address": "10.20.11.210",
+        "at": "10.20.11.210",
+        "device": null,
+        "drop": null,
+        "from_zone": "enterprise",
+        "hops": [
+          "in on ethernet1/4 (zone enterprise): 10.20.11.0/24 connected on ae1.110, zone ingress",
+          "no NAT rule from zone enterprise: no translation",
+          "staff-to-users-gateway: allow, zone enterprise to ingress"
+        ],
+        "local": false,
+        "nat_rule": null,
+        "outcome": "reached",
+        "port": 443,
+        "rule": "staff-to-users-gateway",
+        "seen": [
+          "2-fw-ethernet1-4"
+        ],
+        "seen_any": [
+          "3-fw-ae1-leg1",
+          "3-fw-ae1-leg2"
+        ],
+        "sport": 42906,
+        "to_zone": "ingress",
+        "unseen": []
+      },
+      "view": "enterprise"
     },
-    "capture": true,
-    "master": {
-      "field": "key",
-      "secret": "router-master-key"
+    {
+      "answer": "10.20.11.200",
+      "authorities": [
+        "10.20.13.11",
+        "10.20.14.11"
+      ],
+      "client": "k8s-cp2",
+      "client_addr": "10.20.1.12",
+      "dns_point": "0-dns-res1-bond0",
+      "kind": "vm-node",
+      "name": "llm.ai.tarnwick.example",
+      "population": "nodes",
+      "resolver": "dns-res1",
+      "resolver_addr": "10.20.13.21",
+      "syn": {
+        "address": "10.20.11.200",
+        "at": "10.20.11.200",
+        "device": null,
+        "drop": null,
+        "from_zone": null,
+        "hops": [
+          "10.20.11.200 is a LoadBalancer address of k8s-cp2's own cluster: Cilium translates it to a Gateway pod at connect(), so nothing to it leaves the node and no firewall sees it"
+        ],
+        "local": true,
+        "nat_rule": null,
+        "outcome": "reached",
+        "port": 443,
+        "rule": null,
+        "seen": [],
+        "seen_any": [],
+        "sport": 42907,
+        "to_zone": null,
+        "unseen": [
+          "0-k8s-cp2-eth1",
+          "0-k8s-cp2-eth2"
+        ]
+      },
+      "view": "internal"
     },
-    "model": "staff",
-    "namespace": "inference",
-    "router_path": "/engines/staff/chat/completions",
-    "secret": "api-keys"
-  },
-  "kind": "serving",
-  "lab": "sfab-ch09",
-  "max_tokens": 16,
-  "model": "staff",
-  "path": "/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions",
-  "pin": null,
-  "refuse": {
-    "expect": 404,
-    "hostname": "admin.ai.tarnwick.example",
-    "path": "/echo",
-    "resolve": "admin.ai.tarnwick.example:443:10.20.11.210",
-    "sport": 42907,
-    "url": "https://admin.ai.tarnwick.example/echo?msg=sfab-trace-refused"
-  },
-  "route_id": "8242d5c4-9bce-5497-8414-f5bad94fdd84",
-  "router": {
-    "name": "router",
-    "namespace": "inference",
-    "port": 4000,
-    "selector": "app.kubernetes.io/name=router"
-  },
+    {
+      "answer": "198.51.100.10",
+      "authorities": [
+        "203.0.113.6"
+      ],
+      "client": "inet-client",
+      "client_addr": "203.0.113.2",
+      "dns_point": "0-inet-dns-res-eth1",
+      "kind": "client",
+      "name": "llm.ai.tarnwick.example",
+      "population": "internet",
+      "resolver": "inet-dns-res",
+      "resolver_addr": "203.0.113.10",
+      "syn": {
+        "action": "deny",
+        "address": "198.51.100.10",
+        "at": null,
+        "device": "fw",
+        "drop": null,
+        "from_zone": "isp",
+        "hops": [
+          "198.51.100.8/30 connected on eth1",
+          "in on ethernet1/6 (zone isp): 198.51.100.10 is the firewall's own address on ethernet1/6, zone isp",
+          "no NAT rule from zone isp: no translation",
+          "deny-all-log: deny, zone isp to isp"
+        ],
+        "local": false,
+        "nat_rule": null,
+        "outcome": "log-line",
+        "port": 443,
+        "rule": "deny-all-log",
+        "seen": [
+          "1-isp-rtr-eth1"
+        ],
+        "seen_any": [],
+        "sport": 42908,
+        "to_zone": "isp",
+        "unseen": [
+          "3-fw-ae1-leg1",
+          "3-fw-ae1-leg2"
+        ]
+      },
+      "view": "public-internet"
+    }
+  ],
   "schema": 1,
-  "serving": {
-    "http_port": 8080,
-    "namespace": "serving",
-    "rail_probe_port": 50053,
-    "rpc_port": 50052
-  },
-  "snaplen": {
-    "http": 66,
-    "keyed": 2048,
-    "rail": 128,
-    "vip": 96
-  },
-  "sport": 42906,
-  "url": "https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions"
+  "snaplen": 256
 }

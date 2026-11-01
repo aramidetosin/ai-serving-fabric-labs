@@ -1,0 +1,635 @@
+{
+  "audiences": {
+    "callers": [
+      {
+        "audience": "enterprise",
+        "audience_models": [
+          "chat",
+          "staff"
+        ],
+        "id": "batch",
+        "kind": "application",
+        "models": [
+          "chat"
+        ]
+      },
+      {
+        "audience": "enterprise",
+        "audience_models": [
+          "chat",
+          "staff"
+        ],
+        "id": "helpdesk",
+        "kind": "application",
+        "models": [
+          "staff"
+        ]
+      },
+      {
+        "audience": "enterprise",
+        "audience_models": [
+          "chat",
+          "staff"
+        ],
+        "id": "staff",
+        "kind": "people",
+        "models": [
+          "chat",
+          "staff"
+        ]
+      },
+      {
+        "audience": "internet",
+        "audience_models": [
+          "chat"
+        ],
+        "id": "inetapp",
+        "kind": "application",
+        "models": [
+          "chat"
+        ]
+      }
+    ],
+    "gateway_namespace": "gateways",
+    "gateways": {
+      "gw-inet": {
+        "admin": [],
+        "audience": "internet",
+        "bare_prefix": false,
+        "idp": false,
+        "label": "routes.tarnwick.example/gw-inet",
+        "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-inet",
+        "models": [
+          "chat"
+        ],
+        "namespaces": [
+          "echo",
+          "inference"
+        ],
+        "policy": "gateways-internet",
+        "pool": [
+          "10.20.11.220",
+          "10.20.11.224"
+        ],
+        "route": "models-gw-inet",
+        "secret": "gw-inet-tls",
+        "service": "cilium-gateway-gw-inet",
+        "vip": "10.20.11.220"
+      },
+      "gw-internal": {
+        "admin": [
+          "admin.ai.tarnwick.example",
+          "grafana.ai.tarnwick.example"
+        ],
+        "audience": "internal",
+        "bare_prefix": true,
+        "idp": true,
+        "label": "routes.tarnwick.example/gw-internal",
+        "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-internal",
+        "models": [
+          "chat",
+          "staff"
+        ],
+        "namespaces": [
+          "echo",
+          "identity",
+          "inference",
+          "serving"
+        ],
+        "policy": "gateways-internal",
+        "pool": [
+          "10.20.11.200",
+          "10.20.11.209"
+        ],
+        "route": "models-gw-internal",
+        "secret": "gw-internal-tls",
+        "service": "cilium-gateway-gw-internal",
+        "vip": "10.20.11.200"
+      },
+      "gw-users": {
+        "admin": [],
+        "audience": "enterprise",
+        "bare_prefix": false,
+        "idp": true,
+        "label": "routes.tarnwick.example/gw-users",
+        "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-users",
+        "models": [
+          "chat",
+          "staff"
+        ],
+        "namespaces": [
+          "echo",
+          "identity",
+          "inference"
+        ],
+        "policy": "gateways-enterprise",
+        "pool": [
+          "10.20.11.210",
+          "10.20.11.214"
+        ],
+        "route": "models-gw-users",
+        "secret": "gw-users-tls",
+        "service": "cilium-gateway-gw-users",
+        "vip": "10.20.11.210"
+      }
+    },
+    "holder_role": "ingress",
+    "idp_hostname": "id.ai.tarnwick.example",
+    "ingress_nodes": [
+      "k8s-ingress1",
+      "k8s-ingress2"
+    ],
+    "interfaces": [
+      "^bond0\\.110$"
+    ],
+    "keys": {
+      "namespace": "inference",
+      "secret": "api-keys"
+    },
+    "lease": {
+      "client_qps": 50,
+      "config": {
+        "l2-announcements-lease-duration": "3s",
+        "l2-announcements-renew-deadline": "1s",
+        "l2-announcements-retry-period": "200ms"
+      },
+      "duration": "3s",
+      "failover_ms": [
+        2000,
+        4000
+      ],
+      "renew_deadline": "1s",
+      "renew_qps": 3.0,
+      "retry_period": "200ms",
+      "services": 3,
+      "tuned": true
+    },
+    "models": [
+      "chat",
+      "staff"
+    ],
+    "policy_mode": "per-audience",
+    "refused_mint": {
+      "audience": "internet",
+      "audience_models": [
+        "chat"
+      ],
+      "caller": "inetapp",
+      "id": "fe000000",
+      "model": "staff"
+    }
+  },
+  "dns": {
+    "aaaa": [
+      {
+        "answer": "10.20.11.210",
+        "client": "ent-client",
+        "kind": "client",
+        "names": [
+          "llm.ai.tarnwick.example",
+          "id.ai.tarnwick.example"
+        ],
+        "population": "enterprise",
+        "resolver": "ent-dns",
+        "server": "10.24.10.53",
+        "view": "enterprise"
+      },
+      {
+        "answer": "198.51.100.10",
+        "client": "inet-client",
+        "kind": "client",
+        "names": [
+          "llm.ai.tarnwick.example"
+        ],
+        "population": "internet",
+        "resolver": "inet-dns-res",
+        "server": "203.0.113.10",
+        "view": "public-internet"
+      },
+      {
+        "answer": "10.20.11.200",
+        "client": "k8s-cp2",
+        "kind": "vm-node",
+        "names": [
+          "llm.ai.tarnwick.example",
+          "admin.ai.tarnwick.example",
+          "grafana.ai.tarnwick.example",
+          "serve.ai.tarnwick.example",
+          "id.ai.tarnwick.example"
+        ],
+        "population": "nodes",
+        "resolver": "dns-res1",
+        "server": "10.20.13.21",
+        "view": "internal"
+      },
+      {
+        "answer": "198.51.100.2",
+        "client": "ops-client",
+        "kind": "client",
+        "names": [],
+        "population": "operator",
+        "resolver": "ops-dns",
+        "server": "192.0.2.10",
+        "view": "public-operator"
+      },
+      {
+        "answer": "198.51.100.2",
+        "client": "web-client",
+        "kind": "client",
+        "names": [],
+        "population": "web",
+        "resolver": "ops-dns",
+        "server": "192.0.2.10",
+        "view": "public-operator"
+      }
+    ],
+    "envoy_certs": {
+      "namespace": "cilium-secrets",
+      "secrets": [
+        "gateways-gw-inet-tls",
+        "gateways-gw-internal-tls",
+        "gateways-gw-users-tls"
+      ]
+    },
+    "internet_syn": {
+      "address": "198.51.100.10",
+      "at": "10.20.11.220",
+      "client": "inet-client",
+      "from_zone": "isp",
+      "hops": [
+        "198.51.100.8/30 connected on eth1",
+        "in on ethernet1/6 (zone isp): 198.51.100.10 is the firewall's own address on ethernet1/6, zone isp",
+        "dnat-internet-gateway: destination 198.51.100.10 translated to 10.20.11.220, zone ingress",
+        "isp-to-internet-gateway: allow, zone isp to ingress"
+      ],
+      "nat_rule": "dnat-internet-gateway",
+      "outcome": "reached",
+      "port": 443,
+      "rule": "isp-to-internet-gateway",
+      "sport": 42390,
+      "to_zone": "ingress"
+    },
+    "isp": {
+      "address": "203.0.113.10",
+      "answer": "198.51.100.10",
+      "clients": [
+        "203.0.113.0/26"
+      ],
+      "from": "inet-client",
+      "name": "llm.ai.tarnwick.example",
+      "outside": {
+        "node": "isp-rtr",
+        "source": "198.51.100.9"
+      },
+      "server": "inet-dns-res",
+      "to": [
+        "inet-dns-auth"
+      ]
+    },
+    "isp_router": {
+      "inside": [
+        "10.0.0.0/8"
+      ],
+      "node": "isp-rtr"
+    },
+    "ops": {
+      "address": "192.0.2.10",
+      "names": [
+        "llm.ai.tarnwick.example",
+        "admin.ai.tarnwick.example",
+        "grafana.ai.tarnwick.example",
+        "id.ai.tarnwick.example"
+      ],
+      "server": "ops-dns",
+      "view": "public-operator"
+    },
+    "public": {
+      "absent": [
+        "admin.ai.tarnwick.example",
+        "grafana.ai.tarnwick.example",
+        "serve.ai.tarnwick.example",
+        "id.ai.tarnwick.example",
+        "bastion.ai.tarnwick.example",
+        "dns-auth1.ai.tarnwick.example",
+        "dns-auth2.ai.tarnwick.example",
+        "dns-res1.ai.tarnwick.example",
+        "dns-res2.ai.tarnwick.example",
+        "k8s-cp1.ai.tarnwick.example",
+        "k8s-cp2.ai.tarnwick.example",
+        "k8s-cp3.ai.tarnwick.example",
+        "k8s-gpu1.ai.tarnwick.example",
+        "k8s-gpu2.ai.tarnwick.example",
+        "k8s-ingress1.ai.tarnwick.example",
+        "k8s-ingress2.ai.tarnwick.example",
+        "k8s.ai.tarnwick.example",
+        "truenas1-mgmt.ai.tarnwick.example",
+        "truenas1.ai.tarnwick.example"
+      ],
+      "address": "203.0.113.6",
+      "from": "inet-client",
+      "names": {
+        "llm.ai.tarnwick.example": "198.51.100.10"
+      },
+      "recursion_name": "registry.k8s.io",
+      "server": "inet-dns-auth",
+      "view": "public-internet",
+      "wildcard": "sfab-nowhere.ai.tarnwick.example"
+    },
+    "zone": "ai.tarnwick.example"
+  },
+  "firewall": {
+    "enterprise": {
+      "rules": [
+        {
+          "dst": [
+            "10.20.11.210/32"
+          ],
+          "name": "staff-to-users-gateway"
+        },
+        {
+          "dst": [
+            "10.20.1.1/32",
+            "10.20.11.1/32",
+            "10.20.13.1/32",
+            "10.20.14.1/32",
+            "10.20.2.1/32",
+            "10.20.3.1/32",
+            "10.20.9.254/32",
+            "10.24.10.9/32",
+            "10.24.10.54/32"
+          ],
+          "name": "inside-to-gateway-ping"
+        }
+      ],
+      "vip": "10.20.11.210",
+      "zones": [
+        "enterprise"
+      ]
+    },
+    "inside": [
+      {
+        "action": "deny",
+        "address": "198.51.100.10",
+        "client": "ent-client",
+        "device": "fw",
+        "from_zone": "enterprise",
+        "hops": [
+          "in on ethernet1/4 (zone enterprise): 198.51.100.10 is the firewall's own address on ethernet1/6, zone isp",
+          "no NAT rule from zone enterprise: no translation",
+          "deny-all-log: deny, zone enterprise to isp"
+        ],
+        "kind": "client",
+        "layer": "policy",
+        "outcome": "log-line",
+        "population": "enterprise",
+        "port": 443,
+        "rule": "deny-all-log",
+        "to_zone": "isp"
+      },
+      {
+        "action": "deny",
+        "address": "198.51.100.10",
+        "client": "k8s-cp2",
+        "device": "fw",
+        "from_zone": "k8s-nodes",
+        "hops": [
+          "in on ae1.100 (zone k8s-nodes): 198.51.100.10 is the firewall's own address on ethernet1/6, zone isp",
+          "no NAT rule from zone k8s-nodes: no translation",
+          "deny-all-log: deny, zone k8s-nodes to isp"
+        ],
+        "kind": "vm-node",
+        "layer": "policy",
+        "outcome": "log-line",
+        "population": "nodes",
+        "port": 443,
+        "rule": "deny-all-log",
+        "to_zone": "isp"
+      },
+      {
+        "address": "198.51.100.10",
+        "client": "ops-client",
+        "device": "uplink-rtr",
+        "hops": [
+          "198.51.100.10 is in no tunnel selector: out via 192.0.2.21",
+          "no route to 198.51.100.10"
+        ],
+        "kind": "client",
+        "layer": "routing",
+        "outcome": "silence",
+        "population": "operator",
+        "port": 443
+      },
+      {
+        "address": "198.51.100.10",
+        "client": "web-client",
+        "device": "uplink-rtr",
+        "hops": [
+          "no route to 198.51.100.10"
+        ],
+        "kind": "client",
+        "layer": "routing",
+        "outcome": "silence",
+        "population": "web",
+        "port": 443
+      }
+    ],
+    "isp_nat": [
+      "dnat-internet-gateway"
+    ],
+    "isp_rules": [
+      "isp-to-internet-gateway"
+    ],
+    "nat_order": [
+      "dnat-internet-gateway",
+      "no-nat-public",
+      "internet-snat"
+    ],
+    "published": {
+      "address": "198.51.100.10",
+      "applications": [
+        "ssl"
+      ],
+      "from_zones": [
+        "isp"
+      ],
+      "gateway": "gw-inet",
+      "interface": "ethernet1/6",
+      "nat_rule": "dnat-internet-gateway",
+      "security_rule": "isp-to-internet-gateway",
+      "services": [
+        "application-default"
+      ],
+      "translated": "10.20.11.220",
+      "zone": "isp"
+    },
+    "security_order": [
+      "staff-to-users-gateway",
+      "ent-dns-to-platform-dns",
+      "staff-to-enterprise-dns",
+      "admins-to-bastion",
+      "bastion-to-firewall-admin",
+      "bastion-to-nodes",
+      "bastion-to-api",
+      "bastion-to-internal-gateway",
+      "bastion-to-stor-mgmt",
+      "bastion-to-bmc",
+      "bastion-to-services-admin",
+      "inside-to-gateway-ping",
+      "inside-to-resolvers",
+      "inside-to-ntp",
+      "resolvers-to-auth",
+      "auth-zone-transfer",
+      "ntp-upstream",
+      "nts-ke-upstream",
+      "nodes-to-registry",
+      "nodes-to-internal-gateway",
+      "csi-to-storage-api",
+      "operator-ike",
+      "operator-to-internal-gateway",
+      "isp-to-internet-gateway",
+      "deny-all-log"
+    ]
+  },
+  "hold": {
+    "ca_root": "/shared/ca/root.crt",
+    "dir": "/tmp/sfab-hold",
+    "every_s": 20,
+    "hold_s": 120,
+    "n": 8,
+    "rows": [
+      {
+        "address": "10.20.11.210",
+        "bound": {
+          "max": 11,
+          "min": 8
+        },
+        "chat": {
+          "caller": "batch",
+          "model": "chat",
+          "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+        },
+        "client": "ent-client",
+        "filter": "from enterprise destination 10.20.11.210 destination-port 443",
+        "gateway": "gw-users",
+        "hostname": "llm.ai.tarnwick.example",
+        "nat_rule": null,
+        "path": "/echo",
+        "population": "enterprise",
+        "resolve": null,
+        "rule": "staff-to-users-gateway",
+        "sport": 44500,
+        "translated_to": null,
+        "zone": "enterprise"
+      },
+      {
+        "address": "198.51.100.10",
+        "bound": {
+          "max": 11,
+          "min": 8
+        },
+        "chat": {
+          "caller": "inetapp",
+          "model": "chat",
+          "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+        },
+        "client": "inet-client",
+        "filter": "from isp destination 198.51.100.10 destination-port 443",
+        "gateway": "gw-inet",
+        "hostname": "llm.ai.tarnwick.example",
+        "nat_rule": "dnat-internet-gateway",
+        "path": "/echo",
+        "population": "internet",
+        "resolve": null,
+        "rule": "isp-to-internet-gateway",
+        "sport": 44600,
+        "translated_to": "10.20.11.220",
+        "zone": "isp"
+      },
+      {
+        "address": "10.20.11.200",
+        "bound": {
+          "max": 11,
+          "min": 8
+        },
+        "chat": {
+          "caller": "batch",
+          "model": "chat",
+          "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+        },
+        "client": "ops-client",
+        "filter": "from operator-vpn destination 10.20.11.200 destination-port 443",
+        "gateway": "gw-internal",
+        "hostname": "llm.ai.tarnwick.example",
+        "nat_rule": null,
+        "path": "/echo",
+        "population": "operator",
+        "resolve": "llm.ai.tarnwick.example:443:10.20.11.200",
+        "rule": "operator-to-internal-gateway",
+        "sport": 44700,
+        "translated_to": null,
+        "zone": "operator-vpn"
+      }
+    ],
+    "slack": 2,
+    "timeouts": {
+      "discard_tcp": 90,
+      "tcp": 3600,
+      "tcp_half_closed": 120,
+      "tcp_handshake": 10,
+      "tcp_init": 5,
+      "tcp_time_wait": 15
+    }
+  },
+  "isolation": {
+    "enterprise": {
+      "rules": [
+        {
+          "dst": [
+            "10.20.11.210/32"
+          ],
+          "name": "staff-to-users-gateway"
+        },
+        {
+          "dst": [
+            "10.20.1.1/32",
+            "10.20.11.1/32",
+            "10.20.13.1/32",
+            "10.20.14.1/32",
+            "10.20.2.1/32",
+            "10.20.3.1/32",
+            "10.20.9.254/32",
+            "10.24.10.9/32",
+            "10.24.10.54/32"
+          ],
+          "name": "inside-to-gateway-ping"
+        }
+      ],
+      "vip": "10.20.11.210",
+      "zones": [
+        "enterprise"
+      ]
+    },
+    "forbidden_hostnames": [
+      "admin.ai.tarnwick.example",
+      "grafana.ai.tarnwick.example",
+      "id.ai.tarnwick.example"
+    ],
+    "forbidden_models": [
+      "staff"
+    ],
+    "gateway": "gw-inet",
+    "isp_nat": [
+      "dnat-internet-gateway"
+    ],
+    "isp_router": {
+      "inside": [
+        "10.0.0.0/8"
+      ],
+      "node": "isp-rtr"
+    },
+    "translated": "10.20.11.220"
+  },
+  "lab": "sfab-ch11",
+  "schema": 1,
+  "step": 11
+}

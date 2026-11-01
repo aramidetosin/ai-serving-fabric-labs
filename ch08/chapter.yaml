@@ -23,17 +23,47 @@ prints: []
 extends: ch07
 variants: {}
 
-# The keyed trace (trace.sh, common/trace/lib-servetrace.sh; rendered to gen/trace.json): chapter 7's
-# form, kept until Part III's own forms land (the record stage): one request from the staff client to
-# staff's path through the users' Gateway with helpdesk's key, every key replaced by its keyed mark,
-# then an admin hostname the users' Gateway does not carry, answered 404 there with no API gateway
-# line.
+# The keyed trace (trace.sh, common/trace/lib-servetrace.sh; rendered to gen/trace.json): from
+# k8s-cp2, a node of the cluster whose own datapath answers every Gateway VIP (pin: the request names
+# the VIP with curl --resolve, and the node's own ports are captured to show no SYN to the VIP leaves
+# it). One chat completion on staff's path through the users' Gateway with staff's own key
+# (helpdesk's), every key replaced by its keyed mark at the three in-cluster hops; then the same key
+# and path through the internet Gateway (also), whose route set carries chat alone: its 404 and no
+# request at any API gateway pod; then an admin hostname on the internet Gateway (refuse), its 404.
 trace:
   serving:
-    client: ent-client
+    client: k8s-cp2
     gateway: gw-users
     model: staff
     max_tokens: 16
     sport: 42806
     keys: true
-    refuse: {hostname: admin, path: /echo, sport: 42807}
+    pin: true
+    also: [{gateway: gw-inet, sport: 42808}]
+    refuse: {hostname: admin, path: /echo, sport: 42807, gateway: gw-inet}
+
+# The drill (drills.sh, common/drill/lib-leasedrill.sh; rendered to gen/drills.json): the lease
+# holder's two pair ports shut in KLISH on fe-sw1 and fe-sw2 (the ingress node holding the most of
+# the three leases, read when the pass begins), held, then no shutdown. The gap is measured with
+# probes that need nothing on the cut node but its lease: a GET of the test backend's /echo through
+# each Gateway every 2 s on a new connection each time (from the staff client to the users' Gateway,
+# from the operator's client to the internal Gateway) and a TCP connect to each of those VIPs every
+# 0.5 s; the leases are read every 0.5 s on the lab host for the new holder; the firewall's ARP
+# table before, during and after. A chat completion every 2 s through the users' Gateway is recorded
+# beside them and reported apart: the API gateway, the router and the identity provider run on the
+# ingress nodes too, so the cut node takes its share of them with it until their endpoints leave
+# the Services (the pods' places and the EndpointSlices are recorded through each pass). The virtual
+# switch gives the cut node no loss of carrier, so the node loses its lease because it cannot renew
+# it; the KNOWN line names that limitation on every pass.
+drills:
+  timing: {lead_s: 20, hold_s: 30, tail_s: 30, settle_max_s: 300, whole_polls: 3}
+  list:
+    - id: lease-holder-loss
+      title: the ingress node holding the most leases cut from the pair, its leases taken by the other
+      lease_loss:
+        echo:
+          - {from: ent-client, gateway: gw-users}
+          - {from: ops-client, gateway: gw-internal}
+        model: {from: ent-client, gateway: gw-users, model: chat, every: 1}
+        interval_s: 2
+        connect_interval_s: 0.5

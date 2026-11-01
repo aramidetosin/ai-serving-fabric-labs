@@ -2,7 +2,7 @@
 
 Lab `sfab-ch08`, the companion lab of the book's Chapter 8, "Multi-Tenant Inference Gateways". It runs build A's state many at step 8 (Tarnwick, the platform's names under `ai.tarnwick.example`), with serving on: chapter 7's deployment with a Gateway per audience. The internet audience gets its own Gateway, pool, announcement policy, lease, certificate, route set and caller; every caller carries its audience, and the key tool refuses a key for a model outside it.
 
-Status: rendered and unit-tested (`common/sfab/tests/test_part3_render.py`); not deployed or recorded yet. Part III's own audit groups, trace forms and drills land with the record stage; until then `audit.sh` and `trace.sh` run chapter 7's groups and chapter 7's keyed trace on this render.
+Status: rendered, unit-tested (`common/sfab/tests/test_part3_render.py`, `test_part3_tools_render.py`) and run against the stand-ins (`common/tests/test_part3_labs.py`); not deployed or recorded yet. Every live format the tools read (Cilium's lease keys in `cilium-config`, the firewall's ARP table) is the documented shape until a deploy records it.
 
 | Selection | Value |
 |---|---|
@@ -33,6 +33,12 @@ Everything chapter 7's lab renders (`ch07/README.md`), and from step 8:
 
 Chapter 7's lab's (`ch07/README.md`), and `sfab/keys:4` built on the lab host (`make -C images keys`, from `images/keys` and the pinned PyYAML wheel already in the vendor directory) and pushed into the in-lab registry with the rest (`make -C images registry-seed`; preflight checks that the registry holds the key image `serving.env` names). Memory: the inventory's budget is 162.75 GiB for 26 nodes, and preflight wants MemAvailable to cover it plus the 16 GiB floor, 178.75 GiB in all; on a shared lab host the author's rule keeps about 40 GiB beyond that free before `make up`. containerlab 0.82.0, the host tick at 10000 (read and recorded, never refused on), and no other `sfab-` lab running.
 
+## The audit, the trace and the drill
+
+- `audit.sh` runs chapter 7's audit, then the `audiences` group (`common/audit/lib-tenancy.sh`, judged by `common/audit/tenancy.py` against `gen/tenancy.json`): each Gateway's routes its audience's row, the admin and identity hostnames only where the render puts them, the namespaces labelled for `gw-inet` (`echo` and `inference` alone), every caller a model route admits within its audience, a key per Gateway (three public key fingerprints, none equal), each lease on an ingress node at the tuned 3 s, `cilium-config`'s tuned timers, a policy per audience, and the refused mint: a key Job asked for `inetapp`'s key for staff, outside the internet audience, fails with the key tool's refusal, and the key Secret holds the same fields and fingerprints after it.
+- `trace.sh` (chapter 7's keyed trace from `k8s-cp2`, `chapter.yaml` `trace.serving` with `pin: true`): staff's path through the users' Gateway with helpdesk's key, the keys at the three in-cluster hops; the same key and path through `gw-inet` (`also`), its 404 with no request at any API gateway pod; an admin hostname on `gw-inet` (`refuse.gateway`), its 404. The node's own ports are captured to show no SYN to a VIP leaves it.
+- `drills.sh` (`lease-holder-loss`, `common/drill/lib-p3drill.sh`): the ingress node holding the most leases cut from the pair by KLISH `shutdown` on its two pair ports, its leases taken by the other; the gap measured by echo probes and TCP connects through each Gateway, the model probe reported apart, the firewall's ARP table before, during and after.
+
 ## Running it
 
 ```
@@ -40,7 +46,8 @@ cd ch08
 make render          # topo.clab.yml, bootstrap/ and gen/
 make up              # preflight, up, boot, finish, audit
 make audit           # audits/sfab-ch08_audit_<UTC>/
-make trace           # audits/sfab-ch08_trace_<UTC>/ (chapter 7's keyed trace, staff through the users' Gateway)
+make trace           # audits/sfab-ch08_trace_<UTC>/ (the keyed trace from k8s-cp2 through two Gateways)
+make drills          # audits/sfab-ch08_drills_<UTC>/ (lease-holder-loss, PASSES=3)
 make break-8a        # audits/sfab-ch08_break-8a_<UTC>/ (Exercise 5)
 make heal-8a         # audits/sfab-ch08_heal-8a_<UTC>/, then the chapter audit
 make down            # keeps state/ disks; make wipe removes them

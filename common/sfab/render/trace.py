@@ -474,8 +474,9 @@ def rails_plan(model: Model, raw: dict) -> dict:
 # --------------------------------------------------------------------------------------------
 # chapter 6: one request to a model
 
-SERVE_KEYS = {"client", "gateway", "model", "max_tokens", "sport", "keys", "refuse", "copy", "tries"}
-REFUSE_KEYS = {"hostname", "path", "sport"}
+SERVE_KEYS = {"client", "gateway", "model", "max_tokens", "sport", "keys", "refuse", "copy", "tries", "pin", "also"}
+REFUSE_KEYS = {"hostname", "path", "sport", "gateway"}
+ALSO_KEYS = {"gateway", "sport"}
 # Capture lengths: on the pods' cluster interfaces only the headers (Ethernet, IP and a TCP header
 # with its timestamps, 66 bytes), so no capture holds an HTTP header and with it a key; on the rails
 # a little of the RPC payload, which holds no key. With keys: true (chapter 7) the API gateway's and
@@ -499,13 +500,19 @@ def serving_plan(model: Model, raw: dict, base: int = 0, where: str = "chapter.y
         _err(where, "the lab serves no model through the API gateway (serving off, or no inference block)")
     sv, inf = k8s.serving_summary(model), inference.settings(model)
     c = _host(model, raw.get("client"), f"{where}.client")
-    if c.kind != "client":
-        _err(f"{where}.client", f"{c.name} must be a client container (the request is curl's)")
+    pinned = raw.get("pin", False)
+    if not isinstance(pinned, bool):
+        _err(f"{where}.pin", "true (the request names the Gateway's VIP with curl --resolve) or false")
+    # Part III (chapter 8): a node of the cluster as the client, its request pinned to a Gateway's VIP,
+    # which the node's own datapath answers (render/decisions.py path: nothing to the VIP leaves it)
+    local = bool(pinned and c.kind == "vm-node" and getattr(c, "k8s", None))
+    if c.kind != "client" and not local:
+        _err(f"{where}.client", f"{c.name} must be a client container (the request is curl's), or a node of the cluster with pin: true")
     g = model.gateways.get(str(raw.get("gateway") or ""))
     if g is None:
         _err(f"{where}.gateway", f"{raw.get('gateway')!r} is not a Gateway of {model.lab}")
     pop = next((x for x in model.populations.values() if c.name in x.clients), None)
-    if pop is None or pop.answer_address != g.vip:
+    if not pinned and (pop is None or pop.answer_address != g.vip):
         _err(f"{where}.client", f"{c.name}'s population is not answered with {g.name}'s VIP {g.vip}")
     mname = str(raw.get("model") or "")
     mi = next((m for m in inf["models"] if m["name"] == mname), None)
@@ -518,7 +525,7 @@ def serving_plan(model: Model, raw: dict, base: int = 0, where: str = "chapter.y
     if not 1024 < sport < 65536:
         _err(f"{where}.sport", "must be an unprivileged port")
     host = rt["hostnames"][0]
-    resolver_in = bool(c.resolver and c.resolver in model.nodes)
+    resolver_in = bool(c.resolver and c.resolver in model.nodes) and not pinned
     keyed = raw.get("keys", False)
     if not isinstance(keyed, bool):
         _err(f"{where}.keys", "true (the API gateway's and the router's cluster interfaces captured whole, the keys marked) or false")
@@ -533,8 +540,15 @@ def serving_plan(model: Model, raw: dict, base: int = 0, where: str = "chapter.y
         if not re.match(r"^[a-z0-9]([a-z0-9-]*[a-z0-9])?$", label):
             _err(f"{where}.refuse.hostname", "a single DNS label under the org domain")
         rhost = model.org.fqdn(label)
-        if rhost in g.hostnames:
+        rg = g
+        if rf.get("gateway") is not None:
+            rg = model.gateways.get(str(rf["gateway"]))
+            if rg is None or not pinned:
+                _err(f"{where}.refuse.gateway", "another Gateway of the lab, with pin: true (the refusal is pinned to its VIP)")
+        if rhost in rg.hostnames and rf.get("gateway") is None:
             _err(f"{where}.refuse.hostname", f"{g.name} carries {rhost}: it would answer it")
+        if rf.get("gateway") is not None and any(rhost in r["hostnames"] for r in inf["routes"] if r["gateway"] == rg.name):
+            _err(f"{where}.refuse.hostname", f"{rg.name}'s model route carries {rhost}: it would answer it")
         rpath = str(rf.get("path") or "/")
         if not rpath.startswith("/") or any(ch in rpath for ch in " '\"?#"):
             _err(f"{where}.refuse.path", "a path starting with /, with no space, quote or query")
@@ -546,7 +560,9 @@ def serving_plan(model: Model, raw: dict, base: int = 0, where: str = "chapter.y
         # request still reaches the users' Gateway, which answers it 404)
         pin_refuse = not resolver_in or not _published(model, c.resolver, rhost)
         refuse = {"hostname": rhost, "path": rpath, "url": f"https://{rhost}{rpath}?msg=sfab-trace-refused", "sport": rsport,
-                  "resolve": f"{rhost}:443:{g.vip}" if pin_refuse else None, "expect": 404}
+                  "resolve": f"{rhost}:443:{rg.vip}" if pin_refuse else None, "expect": 404}
+        if rf.get("gateway") is not None:
+            refuse.update(gateway=rg.name, vip=rg.vip)
     pin = None
     if raw.get("copy") is not None:
         names = [x.name for x in model.models[mname].copies]
@@ -589,10 +605,35 @@ def serving_plan(model: Model, raw: dict, base: int = 0, where: str = "chapter.y
                         for w in wks],
             "switch_ports": ports,
         })
+    also = []
+    for i, x in enumerate(raw.get("also") or []):
+        w = f"{where}.also[{i}]"
+        if not isinstance(x, dict) or set(x) - ALSO_KEYS or not pinned:
+            _err(w, "a mapping of gateway and sport, with pin: true (the request is pinned to that Gateway's VIP)")
+        og = model.gateways.get(str(x.get("gateway") or ""))
+        if og is None or og.name == g.name:
+            _err(f"{w}.gateway", "another Gateway of the lab")
+        ort = next((r for r in inf["routes"] if r["gateway"] == og.name), None)
+        if ort is not None and any(r["model"] in (None, mname) for r in ort["rules"]):
+            _err(f"{w}.gateway", f"{og.name}'s route carries {mname}: it would answer the request")
+        osport = int(_num(x.get("sport"), f"{w}.sport"))
+        if not 1024 < osport < 65536 or osport in (sport, (refuse or {}).get("sport")) or osport in [a["sport"] for a in also]:
+            _err(f"{w}.sport", "an unprivileged port of its own")
+        marker = f"sfab-trace-also-{og.name}"
+        also.append({"gateway": og.name, "vip": og.vip, "sport": osport, "marker": marker, "expect": 404,
+                     "url": f"https://{host}{mi['path']}/v1/chat/completions?msg={marker}", "resolve": f"{host}:443:{og.vip}"})
+    if (also or (refuse or {}).get("gateway")) and not keyed:
+        _err(where, "also: and refuse.gateway need keys: true (the API gateway's whole captures show it never saw them)")
+    client = {"node": c.name, "address": _bare(c.address), "pin": not resolver_in, "resolver": c.resolver if resolver_in else None,
+              "resolve": f"{host}:443:{g.vip}" if not resolver_in else None, "ca_root": CA_ROOT}
+    if local:
+        # the node answers every VIP of its own Gateways itself: its own ports are captured to show
+        # no SYN to the VIP leaves it (the lease holder sees none)
+        client.update(kind=c.kind, local=True,
+                      ports=[{"id": f"0-{c.name}-{n.eth}", "node": c.name, "eth": n.eth} for n in c.nics if n.role == "bond-member"])
     out = {
         "schema": SCHEMA, "lab": model.lab, "kind": "serving",
-        "client": {"node": c.name, "address": _bare(c.address), "pin": not resolver_in, "resolver": c.resolver if resolver_in else None,
-                   "resolve": f"{host}:443:{g.vip}" if not resolver_in else None, "ca_root": CA_ROOT},
+        "client": client,
         "gateway": {"name": g.name, "vip": g.vip, "port": 443, "service": k8s.gateway_service(g),
                     "lease": f"{k8s.SYSTEM_NS}/{k8s.l2_lease(model, g)}", "route": rt["name"]},
         "hostname": host, "path": f"{mi['path']}/v1/chat/completions", "url": f"https://{host}{mi['path']}/v1/chat/completions",
@@ -612,6 +653,8 @@ def serving_plan(model: Model, raw: dict, base: int = 0, where: str = "chapter.y
         "copies": copies, "pin": pin, "snaplen": dict(SNAPLEN),
         "expect": {"status": 200, "model_name": f"openai/{mname}", "api_base": mi["api_base"]},
     }
+    if also:
+        out["also"] = also
     if base:
         out["depth_base"] = base
     return out
@@ -854,6 +897,299 @@ WALK_ROWS = (("1", "-"), ("2", "view"), ("3", "routing"), ("4", "nat"), ("5", "p
              ("8", "-"), ("9", "routeset"), ("10", "key"), ("11", "-"), ("12", "placement"), ("13", "placement"), ("14", "forwarding"))
 
 
+# --------------------------------------------------------------------------------------------
+# Part III (chapters 9 to 11): the per-population DNS trace, the zone-keyed NAT trace and the
+# capture ladder. Each population's outcome is render/decisions.py's path, so a changed rule or route
+# moves the plan and `sfab check` reports it.
+
+P3_FILTER_TCP = "tcp port 443"
+
+
+def _vlan_aware(f: str) -> str:
+    return f"({f}) or (vlan and ({f}))"
+
+
+def _p3_view(model: Model, where: str):
+    from .panos import view  # noqa: PLC0415
+
+    v = view(model) if model.firewall is not None else None
+    if v is None:
+        _err(where, "the trace crosses the firewall: the lab has none")
+    return v
+
+
+def _p3_path(model: Model, v, c: Host, dst: str, port: int, where: str) -> dict:
+    from .decisions import path  # noqa: PLC0415
+
+    return path(model, v, c, dst, port, where)
+
+
+def _p3_entry(model: Model, c: Host) -> dict | None:
+    """Where a client's request first meets a capture point on its way to the firewall: the
+    firewall's own port when the client's gateway is the firewall, else its router's port facing the
+    firewall; None for a client behind a VPN router (its uplink carries ESP) or a node of the
+    cluster."""
+    fw = model.firewall
+    gw = c.gateway
+    if fw is None or not gw:
+        return None
+    for i in fw.interfaces:
+        if i.address and _bare(i.address) == gw and i.eth:
+            return {"id": f"2-{fw.name}-{i.name.replace('/', '-')}", "node": fw.name, "eth": i.eth, "ifname": i.name, "role": "fw-ingress"}
+    for n in model.nodes.values():
+        if not isinstance(n, Host) or n.kind != "frr" or not any(x.address and _bare(x.address) == gw for x in n.ifaces):
+            continue
+        for x in n.ifaces:
+            if x.peer is not None and x.peer.node == fw.name:
+                return {"id": f"1-{n.name}-{x.eth}", "node": n.name, "eth": x.eth, "role": "router-uplink"}
+    return None
+
+
+def _p3_legs(model: Model, v, vip: str, where: str) -> tuple:
+    eg = _fw_iface_holding(v, vip)
+    if eg is None or eg.kind != "subinterface" or not eg.parent:
+        _err(where, f"{vip} is not on a subinterface of the firewall's bundle")
+    fw = model.firewall
+    bundle = fw.interface(eg.parent)
+    legs = []
+    for k, m in enumerate(bundle.members, 1):
+        mi = fw.interface(m)
+        legs.append({"id": f"3-{fw.name}-{bundle.name}-leg{k}", "node": fw.name, "eth": mi.eth, "ifname": m, "leg": k, "role": "leg"})
+    return legs, eg.tag
+
+
+def _p3_local_ports(c: Host) -> list:
+    return [{"id": f"0-{c.name}-{n.eth}", "node": c.name, "eth": n.eth, "role": "node"} for n in c.nics if n.role == "bond-member"]
+
+
+def _p3_population(model: Model, pid: str, where: str):
+    pop = model.populations.get(pid)
+    if pop is None:
+        _err(where, f"{pid!r} is not a population of {model.lab}")
+    from .tenancy import matrix_clients  # noqa: PLC0415
+
+    want = matrix_clients(model).get(pid)
+    name = want if want in model.nodes else next((x for x in pop.clients if x in model.nodes), None)
+    if name is None:
+        _err(where, f"population {pid} has no client in this lab")
+    return pop, model.nodes[name]
+
+
+def _p3_flow(model: Model, v, c: Host, dst: str, port: int, sport: int, where: str) -> dict:
+    """One connect's plan: the path's outcome, and the capture points it must and must not reach."""
+    p = _p3_path(model, v, c, dst, port, where)
+    local = any(h.get("row") is None and h.get("device") == c.name for h in p["hops"])
+    out = {"address": dst, "port": port, "sport": sport, "outcome": p["outcome"], "local": local,
+           "at": p.get("at"), "rule": p.get("rule"), "nat_rule": p.get("nat_rule"), "from_zone": p.get("from_zone"),
+           "to_zone": p.get("to_zone"), "device": p.get("device"), "drop": p.get("drop"), "hops": [h.get("what") for h in p["hops"]]}
+    if p["outcome"] == "log-line":
+        out["action"] = p.get("action")
+    return out
+
+
+DNS_KEYS = {"populations", "name", "sport"}
+
+
+def dns_plan(model: Model, raw: dict) -> dict:
+    """Chapter 9: each population's lookup of one name captured at its own resolver, then its SYN
+    toward the answer, where the firewall's render says it goes."""
+    where = "chapter.yaml trace.dns"
+    if not isinstance(raw, dict) or set(raw) - DNS_KEYS:
+        _err(where, f"a mapping of {', '.join(sorted(DNS_KEYS))}")
+    v = _p3_view(model, where)
+    fqdn = model.org.fqdn(str(raw.get("name") or "llm"))
+    base = int(_num(raw.get("sport", 42900), f"{where}.sport"))
+    from .dns import client_view  # noqa: PLC0415
+
+    rows, points = [], {}
+    for k, pid in enumerate(raw.get("populations") or []):
+        pop, c = _p3_population(model, str(pid), f"{where}.populations")
+        res = model.nodes.get(c.resolver or "")
+        if not isinstance(res, Host):
+            _err(f"{where}.populations", f"{c.name}'s resolver {c.resolver} is not in this lab")
+        _r, cv = client_view(model, c)
+        if cv is None or fqdn not in model.dns.names_of(cv):
+            _err(f"{where}.populations", f"no view answers {c.name} for {fqdn}")
+        r = model.dns.resolver_of(res.name)
+        auth = []
+        for a in (r.to if r is not None else ()):
+            an = model.nodes.get(a)
+            if isinstance(an, Host) and an.primary:
+                auth.append(an.primary)
+        reth = "bond0" if res.bond is not None else next((x.eth for x in res.ifaces if x.address), "eth1")
+        rp = {"id": f"0-{res.name}-{reth}", "node": res.name, "eth": reth, "role": "resolver"}
+        points[rp["id"]] = dict(rp, filter=_vlan_aware("port 53"))
+        f = _p3_flow(model, v, c, cv.answer_address, 443, base + k, f"{where}.populations[{pid}]")
+        seen, unseen, seen_any = [], [], []
+        if f["local"]:
+            for x in _p3_local_ports(c):
+                points[x["id"]] = dict(x, filter=_vlan_aware(P3_FILTER_TCP))
+                unseen.append(x["id"])
+        else:
+            e = _p3_entry(model, c)
+            if e is not None:
+                points[e["id"]] = dict(e, filter=_vlan_aware(P3_FILTER_TCP))
+                (seen if f["outcome"] != "silence" or f.get("device") == model.firewall.name else unseen).append(e["id"])
+            legs, _tag = _p3_legs(model, v, _gw_vip(model), where)
+            for x in legs:
+                points[x["id"]] = dict(x, filter=_vlan_aware(P3_FILTER_TCP))
+            if f["outcome"] == "reached":
+                seen_any = [x["id"] for x in legs]
+            else:
+                unseen += [x["id"] for x in legs]
+        rows.append({"population": pop.name, "client": c.name, "kind": c.kind, "client_addr": c.primary, "resolver": res.name,
+                     "resolver_addr": res.primary, "view": cv.name, "name": fqdn, "answer": cv.answer_address, "authorities": auth,
+                     "dns_point": rp["id"], "syn": dict(f, seen=seen, unseen=unseen, seen_any=seen_any)})
+    if not rows:
+        _err(f"{where}.populations", "names no population")
+    return {"schema": SCHEMA, "lab": model.lab, "kind": "dns", "name": fqdn, "rows": rows,
+            "points": [points[k] for k in sorted(points)], "snaplen": 256}
+
+
+def _gw_vip(model: Model) -> str:
+    return next(iter(model.gateways.values())).vip
+
+
+NAT_KEYS = {"populations", "hold_s", "sport", "hostname", "path"}
+
+
+def nat_plan(model: Model, raw: dict) -> dict:
+    """Chapter 10: one held HTTPS request per population to its own Gateway, at the answer its
+    resolver gives it, as chapter 4's sessions (lib-fwtrace.sh), each with its capture pair: the
+    point outside the firewall (the ISP router's link, the staff's firewall port; none for the
+    operator, whose uplink carries ESP) and both legs of the bundle, found by capturing both."""
+    where = "chapter.yaml trace.nat"
+    if not isinstance(raw, dict) or set(raw) - NAT_KEYS:
+        _err(where, f"a mapping of {', '.join(sorted(NAT_KEYS))}")
+    v = _p3_view(model, where)
+    hold = _num(raw.get("hold_s", 20), f"{where}.hold_s")
+    base = int(_num(raw.get("sport", 42950), f"{where}.sport"))
+    label = str(raw.get("hostname") or "llm")
+    from . import k8s  # noqa: PLC0415
+
+    tb = k8s.test_backend_settings(model) or {}
+    path = str(raw.get("path") or f"{tb.get('path') or '/echo'}?msg=sfab-trace-nat")
+    sessions, points = [], {}
+    for k, pid in enumerate(raw.get("populations") or []):
+        pop, c = _p3_population(model, str(pid), f"{where}.populations")
+        if c.kind != "client":
+            _err(f"{where}.populations", f"{c.name} must be a client container (hold_request.py runs in its python3)")
+        aud = model.audiences.get(pop.audience)
+        g = model.gateways.get(aud.gateway if aud is not None else "")
+        if g is None:
+            _err(f"{where}.populations", f"population {pop.name} has no Gateway")
+        dst = pop.answer_address
+        f = _p3_flow(model, v, c, dst, 443, base + k, f"{where}.populations[{pid}]")
+        if f["outcome"] != "reached" or f["at"] != g.vip:
+            _err(f"{where}.populations", f"{c.name} does not reach {g.name} at {dst}: {f['outcome']}")
+        legs, tag = _p3_legs(model, v, g.vip, where)
+        pts = []
+        e = _p3_entry(model, c)
+        if e is not None:
+            points[e["id"]] = dict(e, filter=_vlan_aware(P3_FILTER_TCP))
+            pts.append(e["id"])
+        for x in legs:
+            points[x["id"]] = dict(x, filter=_vlan_aware(P3_FILTER_TCP))
+            pts.append(x["id"])
+        resolver_in = bool(c.resolver and c.resolver in model.nodes)
+        m = re.search(r"[?&]msg=([^&]+)", path)
+        sessions.append({
+            "id": pop.name, "client": c.name, "client_addr": c.primary, "gateway": g.name, "vip": g.vip, "dst_addr": dst, "port": 443,
+            "translated_addr": f["at"] if f["at"] != dst else None, "fqdn": model.org.fqdn(label), "path": path,
+            "msg": m.group(1) if m else None, "sport": base + k, "hold_s": hold, "pin": not resolver_in,
+            "resolver": c.resolver if resolver_in else None, "ca_root": CA_ROOT,
+            "expect": {"status": 200, "rule": f["rule"], "nat_rule": f["nat_rule"], "from_zone": f["from_zone"], "to_zone": f["to_zone"]},
+            "points": pts, "entry": e["id"] if e else None, "legs": [x["id"] for x in legs], "vlan": tag, "hops": f["hops"]})
+    if not sessions:
+        _err(f"{where}.populations", "names no population")
+    return {"schema": SCHEMA, "lab": model.lab, "kind": "nat", "sessions": sessions, "points": [points[k] for k in sorted(points)],
+            "snaplen": 256}
+
+
+LADDER_KEYS = {"sport", "tries"}
+
+
+def ladder_plan(model: Model, raw: dict) -> dict:
+    """Chapter 11: the capture ladder. Every population of the matrix connects to each Gateway's VIP
+    (at its own answer where that lands on the Gateway after translation), tries times from its own
+    source ports, while every rung captures: the ISP router's link, the staff's firewall port, both
+    legs of the bundle, the pair's ports facing the ingress nodes and each ingress node's VLAN 110
+    unit. Each flow carries the matrix's mode for its cell and the rungs it may reach; a forbidden
+    flow's SYNs past the device that refuses it are its tally, which must be zero."""
+    where = "chapter.yaml trace.ladder"
+    if not isinstance(raw, dict) or set(raw) - LADDER_KEYS:
+        _err(where, f"a mapping of {', '.join(sorted(LADDER_KEYS))}")
+    from . import decisions, k8s  # noqa: PLC0415
+
+    if not decisions.on(model):
+        _err(where, "the ladder runs the matrix's Gateway cells: chapter.yaml needs decisions: true")
+    v = _p3_view(model, where)
+    mx = decisions.matrix(model)
+    tries = int(_num(raw.get("tries", 3), f"{where}.tries"))
+    base = int(_num(raw.get("sport", 42970), f"{where}.sport"))
+    gws = {g.name: g for g in model.gateways.values()}
+    vips = {g.vip: g.name for g in gws.values()}
+    legs, tag = _p3_legs(model, v, next(iter(gws.values())).vip, where)
+    points = {}
+    for x in legs:
+        points[x["id"]] = dict(x, filter=_vlan_aware(P3_FILTER_TCP), rung=3)
+    ingress = [h for h in model.by_group("ingress") if isinstance(h, Host)]
+    if not ingress:
+        ingress = [h for h in model.nodes.values() if isinstance(h, Host) and h.bond is not None
+                   and any(u.vlan == tag for u in getattr(h.bond, "vlan_ifs", ()) or ())]
+    for h in ingress:
+        for n in h.nics:
+            if n.role != "bond-member" or n.peer is None:
+                continue
+            sw = model.nodes.get(n.peer.node)
+            nat_ = sw.nic(n.peer.eth).native if sw is not None and sw.nic(n.peer.eth) is not None else n.peer.eth
+            pid = f"4-{n.peer.node}-{nat_}"
+            points[pid] = {"id": pid, "node": n.peer.node, "eth": n.peer.eth, "native": nat_, "faces": h.name, "role": "pair-port",
+                           "filter": _vlan_aware(P3_FILTER_TCP), "rung": 4}
+        unit = next((u for u in getattr(h.bond, "vlan_ifs", ()) or () if u.vlan == tag), None)
+        if unit is not None:
+            pid = f"5-{h.name}-{unit.name}"
+            points[pid] = {"id": pid, "node": h.name, "iface": unit.name, "role": "holder", "guest": True, "filter": P3_FILTER_TCP,
+                           "rung": 5}
+    rows = {r["id"]: r for r in mx["rows"]}
+    flows, k = [], 0
+    for cell in mx["cells"]:
+        col = next(x for x in mx["columns"] if x["id"] == cell["column"])
+        if col["kind"] != "connect" or not str(col.get("ref", "")).startswith("vip:"):
+            continue
+        r = rows[cell["row"]]
+        c = model.nodes[r["client"]]
+        if not isinstance(c, Host):
+            continue
+        g = gws[col["ref"].split(":", 1)[1]]
+        f = _p3_flow(model, v, c, cell["address"], int(cell["port"]), base + k * tries, f"{where} {cell['id']}")
+        e = None if f["local"] else _p3_entry(model, c)
+        if e is not None:
+            points[e["id"]] = dict(e, filter=_vlan_aware(P3_FILTER_TCP), rung=int(e["id"].split("-")[0]))
+        # the rungs the flow may reach: up to its refusal; past it, its tally
+        if f["local"]:
+            may, refused_at = [], c.name
+        elif f["outcome"] == "silence" and f.get("device") != model.firewall.name:
+            may, refused_at = [], f.get("device")
+        elif f["outcome"] in ("log-line", "silence"):
+            may, refused_at = ([e["id"]] if e else []), model.firewall.name
+        else:
+            may, refused_at = ([e["id"]] if e else []) + ["legs", "pair", "holder"], None
+        flows.append({"id": cell["id"], "population": r["id"], "client": c.name, "kind": c.kind, "client_addr": c.primary,
+                      "gateway": g.name, "vip": g.vip, "address": cell["address"], "port": int(cell["port"]),
+                      "post_nat": f["at"] if f["outcome"] == "reached" else None, "mode": cell["mode"], "allowed": cell["mode"] == "allowed",
+                      "local": f["local"], "entry": e["id"] if e else None, "may": may, "refused_at": refused_at,
+                      "sport": base + k * tries, "tries": 1 if cell["mode"] == "allowed" else tries,
+                      "lease": f"{k8s.SYSTEM_NS}/{k8s.l2_lease(model, g)}"})
+        k += 1
+    if not flows:
+        _err(where, "the matrix holds no Gateway connect cell")
+    return {"schema": SCHEMA, "lab": model.lab, "kind": "ladder", "flows": flows, "points": [points[x] for x in sorted(points)],
+            "vlan": tag, "pair": sorted({p["node"] for p in points.values() if p["role"] == "pair-port"}),
+            "ingress": [{"node": h.name, "mac": h.bond.mac if h.bond else None} for h in ingress], "snaplen": 128,
+            "vips": vips, "timeout_s": 4}
+
+
 def render(model: Model, ctx) -> dict:
     ch = model.meta.chapter
     raw = getattr(ch, "trace", None) if ch is not None else None
@@ -869,6 +1205,11 @@ def render(model: Model, ctx) -> dict:
         if set(raw) - {"rails"}:
             _err("chapter.yaml trace", "a rails trace holds rails: only")
         return {"gen/trace.json": dumps(rails_plan(model, raw["rails"]))}
+    for form, fn in (("dns", dns_plan), ("nat", nat_plan), ("ladder", ladder_plan)):
+        if raw and form in raw:
+            if set(raw) - {form}:
+                _err("chapter.yaml trace", f"a {form} trace holds {form}: only")
+            return {"gen/trace.json": dumps(fn(model, raw[form]))}
     if not raw or not ("sessions" in raw or "pull" in raw):
         return {}
     return {"gen/trace.json": dumps(plan(model, raw))}

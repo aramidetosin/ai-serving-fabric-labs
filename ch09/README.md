@@ -2,7 +2,7 @@
 
 Lab `sfab-ch09`, the companion lab of the book's Chapter 9, "Split-Horizon DNS". It runs build A's state many at step 9: chapter 8's deployment with the internet side. Everyone types `llm.ai.tarnwick.example`: the staff get the users' VIP, the nodes the internal VIP, internet users the firewall's published address, and the operator's tools name the internal VIP through its tunnel.
 
-Status: rendered and unit-tested (`common/sfab/tests/test_part3_render.py`); not deployed or recorded yet. Part III's own audit groups, trace forms and drills land with the record stage; until then `audit.sh` and `trace.sh` run chapter 7's groups and chapter 7's keyed trace on this render.
+Status: rendered, unit-tested (`common/sfab/tests/test_part3_render.py`, `test_part3_tools_render.py`) and run against the stand-ins (`common/tests/test_part3_labs.py`); not deployed or recorded yet. The answers dnsmasq 2.90-r3 and BIND 9.18 give each probe are read from the recording, never assumed.
 
 | Selection | Value |
 |---|---|
@@ -32,6 +32,11 @@ Lab simplifications on the internet side: one public authoritative server, on a 
 
 Chapter 7's lab's (`ch07/README.md`), and `sfab/keys:4` built on the lab host (`make -C images keys`, from `images/keys` and the pinned PyYAML wheel already in the vendor directory) and pushed into the in-lab registry with the rest (`make -C images registry-seed`; preflight checks that the registry holds the key image `serving.env` names). Memory: the inventory's budget is 163.75 GiB for 30 nodes, and preflight wants MemAvailable to cover it plus the 16 GiB floor, 179.75 GiB in all; on a shared lab host the author's rule keeps about 40 GiB beyond that free before `make up`. containerlab 0.82.0, the host tick at 10000 (read and recorded, never refused on), and no other `sfab-` lab running.
 
+## The audit and the trace
+
+- `audit.sh` runs chapter 8's, then the `split-horizon` group: `inet-dns-auth` answers exactly the spec's public names (no admin, internal, identity or infrastructure name, no wildcard, recursion refused); `inet-dns-res` recurses for its customers and refuses `isp-rtr`'s link address (`common/trace/dnsq.py`, since the router holds no dig); every population's typed names answered A and AAAA NODATA through its own resolver; `ops-dns` holds no platform name; `isp-rtr` holds no route into 10.0.0.0/8; the internet client's connect to 198.51.100.10 logged by `deny-all-log` from `isp` to `isp`; Cilium's copies of the Gateway certificates recorded.
+- `trace.sh` (`chapter.yaml` `trace.dns`, `common/trace/lib-p3trace.sh`): each population's lookup of `llm` captured at its own resolver, then its connect toward the answer, at the rungs the firewall's render says it reaches.
+
 ## Running it
 
 ```
@@ -39,7 +44,7 @@ cd ch09
 make render
 make up
 make audit
-make trace
+make trace           # audits/sfab-ch09_trace_<UTC>/ (the split-horizon trace)
 make break-9a        # Exercise 4
 make heal-9a
 make down

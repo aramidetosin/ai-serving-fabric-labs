@@ -17,17 +17,25 @@ prints: []
 extends: ch09
 variants: {}
 
-# The keyed trace (trace.sh, common/trace/lib-servetrace.sh; rendered to gen/trace.json): chapter 7's
-# form, kept until Part III's own forms land (the record stage): one request from the staff client to
-# staff's path through the users' Gateway with helpdesk's key, every key replaced by its keyed mark,
-# then an admin hostname the users' Gateway does not carry, answered 404 there with no API gateway
-# line.
+# The zone-keyed NAT trace (trace.sh, common/trace/lib-nattrace.sh; rendered to gen/trace.json): one
+# held HTTPS request per population to its own Gateway at the answer its resolver gives it, as
+# chapter 4's sessions (the connection held after the reply while the firewall's session table is
+# read), each with its capture pair: the ISP router's link and the bundle's legs for the internet
+# users (translated from the published address to the internet Gateway's VIP), the firewall's
+# enterprise port and the legs for the staff (routed, untranslated), the legs alone for the operator
+# (its uplink carries ESP; untranslated through its tunnel). The judge follows each SYN by its
+# sequence number from the outside point to the one leg that carries it.
 trace:
-  serving:
-    client: ent-client
-    gateway: gw-users
-    model: staff
-    max_tokens: 16
+  nat:
+    populations: [internet, enterprise, operator]
+    hold_s: 20
     sport: 42936
-    keys: true
-    refuse: {hostname: admin, path: /echo, sport: 42937}
+
+# The held connections (hold.sh, common/trace/lib-hold.sh, and the audit's zone-nat group; rendered to
+# gen/tenancy.json): 8 keep-alive HTTPS connections a population (the staff, the operator, the
+# internet users, each from its own client to its own Gateway's /echo), each used again every 20 s
+# and held 120 s, plus one chat completion a population with its own caller's key. The firewall
+# counts each zone's sessions to its Gateway while they are held: 8, up to the chat request and a
+# slack of 2 more.
+tenancy:
+  hold: {n: 8, hold_s: 120, every_s: 20, sport: 44500, slack: 2}

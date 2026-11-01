@@ -1,143 +1,473 @@
 {
-  "api_gateway": {
-    "name": "api-gateway",
-    "namespace": "inference",
-    "port": 9080,
-    "selector": "app.kubernetes.io/name=api-gateway"
-  },
-  "client": {
-    "address": "10.24.10.10",
-    "ca_root": "/shared/ca/root.crt",
-    "node": "ent-client",
-    "pin": false,
-    "resolve": null,
-    "resolver": "ent-dns"
-  },
-  "copies": [
+  "flows": [
     {
-      "copy": "a",
-      "nad": "rail4",
-      "rail": 4,
-      "server": {
-        "address": "10.21.4.100",
-        "node": "k8s-gpu1",
-        "pod": "staff-a-server-0"
-      },
-      "service": "staff-a",
-      "spans": false,
-      "switch": "rail-sw2",
-      "switch_ports": [
-        {
-          "eth": "eth2",
-          "faces": "k8s-gpu1",
-          "id": "6-rail-sw2-Ethernet1",
-          "native": "Ethernet1",
-          "node": "rail-sw2"
-        }
+      "address": "10.20.11.200",
+      "allowed": false,
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "entry": "2-fw-ethernet1-4",
+      "gateway": "gw-internal",
+      "id": "enterprise/gw-internal",
+      "kind": "client",
+      "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-internal",
+      "local": false,
+      "may": [
+        "2-fw-ethernet1-4"
       ],
-      "workers": [
-        {
-          "address": "10.21.4.101",
-          "node": "k8s-gpu1",
-          "pod": "staff-a-worker0-0",
-          "remote": false
-        }
-      ]
+      "mode": "log-line",
+      "population": "enterprise",
+      "port": 443,
+      "post_nat": null,
+      "refused_at": "fw",
+      "sport": 44100,
+      "tries": 3,
+      "vip": "10.20.11.200"
     },
     {
-      "copy": "b",
-      "nad": "rail5",
-      "rail": 5,
-      "server": {
-        "address": "10.21.5.100",
-        "node": "k8s-gpu2",
-        "pod": "staff-b-server-0"
-      },
-      "service": "staff-b",
-      "spans": false,
-      "switch": "rail-sw1",
-      "switch_ports": [
-        {
-          "eth": "eth7",
-          "faces": "k8s-gpu2",
-          "id": "6-rail-sw1-Ethernet6",
-          "native": "Ethernet6",
-          "node": "rail-sw1"
-        }
+      "address": "10.20.11.210",
+      "allowed": true,
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "entry": "2-fw-ethernet1-4",
+      "gateway": "gw-users",
+      "id": "enterprise/gw-users",
+      "kind": "client",
+      "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-users",
+      "local": false,
+      "may": [
+        "2-fw-ethernet1-4",
+        "legs",
+        "pair",
+        "holder"
       ],
-      "workers": [
-        {
-          "address": "10.21.5.101",
-          "node": "k8s-gpu2",
-          "pod": "staff-b-worker0-0",
-          "remote": false
-        }
-      ]
+      "mode": "allowed",
+      "population": "enterprise",
+      "port": 443,
+      "post_nat": "10.20.11.210",
+      "refused_at": null,
+      "sport": 44103,
+      "tries": 1,
+      "vip": "10.20.11.210"
+    },
+    {
+      "address": "10.20.11.220",
+      "allowed": false,
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "entry": "2-fw-ethernet1-4",
+      "gateway": "gw-inet",
+      "id": "enterprise/gw-inet",
+      "kind": "client",
+      "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-inet",
+      "local": false,
+      "may": [
+        "2-fw-ethernet1-4"
+      ],
+      "mode": "log-line",
+      "population": "enterprise",
+      "port": 443,
+      "post_nat": null,
+      "refused_at": "fw",
+      "sport": 44106,
+      "tries": 3,
+      "vip": "10.20.11.220"
+    },
+    {
+      "address": "10.20.11.200",
+      "allowed": true,
+      "client": "ops-client",
+      "client_addr": "192.0.2.2",
+      "entry": null,
+      "gateway": "gw-internal",
+      "id": "operator/gw-internal",
+      "kind": "client",
+      "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-internal",
+      "local": false,
+      "may": [
+        "legs",
+        "pair",
+        "holder"
+      ],
+      "mode": "allowed",
+      "population": "operator",
+      "port": 443,
+      "post_nat": "10.20.11.200",
+      "refused_at": null,
+      "sport": 44109,
+      "tries": 1,
+      "vip": "10.20.11.200"
+    },
+    {
+      "address": "10.20.11.210",
+      "allowed": false,
+      "client": "ops-client",
+      "client_addr": "192.0.2.2",
+      "entry": null,
+      "gateway": "gw-users",
+      "id": "operator/gw-users",
+      "kind": "client",
+      "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-users",
+      "local": false,
+      "may": [],
+      "mode": "log-line",
+      "population": "operator",
+      "port": 443,
+      "post_nat": null,
+      "refused_at": "fw",
+      "sport": 44112,
+      "tries": 3,
+      "vip": "10.20.11.210"
+    },
+    {
+      "address": "10.20.11.220",
+      "allowed": false,
+      "client": "ops-client",
+      "client_addr": "192.0.2.2",
+      "entry": null,
+      "gateway": "gw-inet",
+      "id": "operator/gw-inet",
+      "kind": "client",
+      "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-inet",
+      "local": false,
+      "may": [],
+      "mode": "log-line",
+      "population": "operator",
+      "port": 443,
+      "post_nat": null,
+      "refused_at": "fw",
+      "sport": 44115,
+      "tries": 3,
+      "vip": "10.20.11.220"
+    },
+    {
+      "address": "10.20.11.200",
+      "allowed": true,
+      "client": "k8s-cp2",
+      "client_addr": "10.20.1.12",
+      "entry": null,
+      "gateway": "gw-internal",
+      "id": "nodes/gw-internal",
+      "kind": "vm-node",
+      "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-internal",
+      "local": true,
+      "may": [],
+      "mode": "allowed",
+      "population": "nodes",
+      "port": 443,
+      "post_nat": "10.20.11.200",
+      "refused_at": "k8s-cp2",
+      "sport": 44118,
+      "tries": 1,
+      "vip": "10.20.11.200"
+    },
+    {
+      "address": "10.20.11.210",
+      "allowed": true,
+      "client": "k8s-cp2",
+      "client_addr": "10.20.1.12",
+      "entry": null,
+      "gateway": "gw-users",
+      "id": "nodes/gw-users",
+      "kind": "vm-node",
+      "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-users",
+      "local": true,
+      "may": [],
+      "mode": "allowed",
+      "population": "nodes",
+      "port": 443,
+      "post_nat": "10.20.11.210",
+      "refused_at": "k8s-cp2",
+      "sport": 44121,
+      "tries": 1,
+      "vip": "10.20.11.210"
+    },
+    {
+      "address": "10.20.11.220",
+      "allowed": true,
+      "client": "k8s-cp2",
+      "client_addr": "10.20.1.12",
+      "entry": null,
+      "gateway": "gw-inet",
+      "id": "nodes/gw-inet",
+      "kind": "vm-node",
+      "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-inet",
+      "local": true,
+      "may": [],
+      "mode": "allowed",
+      "population": "nodes",
+      "port": 443,
+      "post_nat": "10.20.11.220",
+      "refused_at": "k8s-cp2",
+      "sport": 44124,
+      "tries": 1,
+      "vip": "10.20.11.220"
+    },
+    {
+      "address": "10.20.11.200",
+      "allowed": false,
+      "client": "web-client",
+      "client_addr": "192.0.2.18",
+      "entry": "1-uplink-rtr-eth1",
+      "gateway": "gw-internal",
+      "id": "web/gw-internal",
+      "kind": "client",
+      "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-internal",
+      "local": false,
+      "may": [
+        "1-uplink-rtr-eth1"
+      ],
+      "mode": "log-line",
+      "population": "web",
+      "port": 443,
+      "post_nat": null,
+      "refused_at": "fw",
+      "sport": 44127,
+      "tries": 3,
+      "vip": "10.20.11.200"
+    },
+    {
+      "address": "10.20.11.210",
+      "allowed": false,
+      "client": "web-client",
+      "client_addr": "192.0.2.18",
+      "entry": "1-uplink-rtr-eth1",
+      "gateway": "gw-users",
+      "id": "web/gw-users",
+      "kind": "client",
+      "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-users",
+      "local": false,
+      "may": [
+        "1-uplink-rtr-eth1"
+      ],
+      "mode": "log-line",
+      "population": "web",
+      "port": 443,
+      "post_nat": null,
+      "refused_at": "fw",
+      "sport": 44130,
+      "tries": 3,
+      "vip": "10.20.11.210"
+    },
+    {
+      "address": "10.20.11.220",
+      "allowed": false,
+      "client": "web-client",
+      "client_addr": "192.0.2.18",
+      "entry": "1-uplink-rtr-eth1",
+      "gateway": "gw-inet",
+      "id": "web/gw-inet",
+      "kind": "client",
+      "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-inet",
+      "local": false,
+      "may": [
+        "1-uplink-rtr-eth1"
+      ],
+      "mode": "log-line",
+      "population": "web",
+      "port": 443,
+      "post_nat": null,
+      "refused_at": "fw",
+      "sport": 44133,
+      "tries": 3,
+      "vip": "10.20.11.220"
+    },
+    {
+      "address": "10.20.11.200",
+      "allowed": false,
+      "client": "inet-client",
+      "client_addr": "203.0.113.2",
+      "entry": "1-isp-rtr-eth1",
+      "gateway": "gw-internal",
+      "id": "internet/gw-internal",
+      "kind": "client",
+      "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-internal",
+      "local": false,
+      "may": [],
+      "mode": "silence",
+      "population": "internet",
+      "port": 443,
+      "post_nat": null,
+      "refused_at": "isp-rtr",
+      "sport": 44136,
+      "tries": 3,
+      "vip": "10.20.11.200"
+    },
+    {
+      "address": "10.20.11.210",
+      "allowed": false,
+      "client": "inet-client",
+      "client_addr": "203.0.113.2",
+      "entry": "1-isp-rtr-eth1",
+      "gateway": "gw-users",
+      "id": "internet/gw-users",
+      "kind": "client",
+      "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-users",
+      "local": false,
+      "may": [],
+      "mode": "silence",
+      "population": "internet",
+      "port": 443,
+      "post_nat": null,
+      "refused_at": "isp-rtr",
+      "sport": 44139,
+      "tries": 3,
+      "vip": "10.20.11.210"
+    },
+    {
+      "address": "198.51.100.10",
+      "allowed": true,
+      "client": "inet-client",
+      "client_addr": "203.0.113.2",
+      "entry": "1-isp-rtr-eth1",
+      "gateway": "gw-inet",
+      "id": "internet/gw-inet",
+      "kind": "client",
+      "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-inet",
+      "local": false,
+      "may": [
+        "1-isp-rtr-eth1",
+        "legs",
+        "pair",
+        "holder"
+      ],
+      "mode": "allowed",
+      "population": "internet",
+      "port": 443,
+      "post_nat": "10.20.11.220",
+      "refused_at": null,
+      "sport": 44142,
+      "tries": 1,
+      "vip": "10.20.11.220"
     }
   ],
-  "expect": {
-    "api_base": "http://staff.serving.svc.cluster.local:8080/v1",
-    "model_name": "openai/staff",
-    "status": 200
-  },
-  "gateway": {
-    "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-users",
-    "name": "gw-users",
-    "port": 443,
-    "route": "models-gw-users",
-    "service": "cilium-gateway-gw-users",
-    "vip": "10.20.11.210"
-  },
-  "hostname": "llm.ai.tarnwick.example",
-  "keys": {
-    "backend": {
-      "field": "key",
-      "secret": "backend-key"
+  "ingress": [
+    {
+      "mac": "02:5a:68:00:00:01",
+      "node": "k8s-ingress1"
     },
-    "capture": true,
-    "master": {
-      "field": "key",
-      "secret": "router-master-key"
-    },
-    "model": "staff",
-    "namespace": "inference",
-    "router_path": "/engines/staff/chat/completions",
-    "secret": "api-keys"
-  },
-  "kind": "serving",
+    {
+      "mac": "02:5a:69:00:00:01",
+      "node": "k8s-ingress2"
+    }
+  ],
+  "kind": "ladder",
   "lab": "sfab-ch11",
-  "max_tokens": 16,
-  "model": "staff",
-  "path": "/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions",
-  "pin": null,
-  "refuse": {
-    "expect": 404,
-    "hostname": "admin.ai.tarnwick.example",
-    "path": "/echo",
-    "resolve": "admin.ai.tarnwick.example:443:10.20.11.210",
-    "sport": 42967,
-    "url": "https://admin.ai.tarnwick.example/echo?msg=sfab-trace-refused"
-  },
-  "route_id": "8242d5c4-9bce-5497-8414-f5bad94fdd84",
-  "router": {
-    "name": "router",
-    "namespace": "inference",
-    "port": 4000,
-    "selector": "app.kubernetes.io/name=router"
-  },
+  "pair": [
+    "fe-sw1",
+    "fe-sw2"
+  ],
+  "points": [
+    {
+      "eth": "eth1",
+      "filter": "(tcp port 443) or (vlan and (tcp port 443))",
+      "id": "1-isp-rtr-eth1",
+      "node": "isp-rtr",
+      "role": "router-uplink",
+      "rung": 1
+    },
+    {
+      "eth": "eth1",
+      "filter": "(tcp port 443) or (vlan and (tcp port 443))",
+      "id": "1-uplink-rtr-eth1",
+      "node": "uplink-rtr",
+      "role": "router-uplink",
+      "rung": 1
+    },
+    {
+      "eth": "eth4",
+      "filter": "(tcp port 443) or (vlan and (tcp port 443))",
+      "id": "2-fw-ethernet1-4",
+      "ifname": "ethernet1/4",
+      "node": "fw",
+      "role": "fw-ingress",
+      "rung": 2
+    },
+    {
+      "eth": "eth1",
+      "filter": "(tcp port 443) or (vlan and (tcp port 443))",
+      "id": "3-fw-ae1-leg1",
+      "ifname": "ethernet1/1",
+      "leg": 1,
+      "node": "fw",
+      "role": "leg",
+      "rung": 3
+    },
+    {
+      "eth": "eth2",
+      "filter": "(tcp port 443) or (vlan and (tcp port 443))",
+      "id": "3-fw-ae1-leg2",
+      "ifname": "ethernet1/2",
+      "leg": 2,
+      "node": "fw",
+      "role": "leg",
+      "rung": 3
+    },
+    {
+      "eth": "eth14",
+      "faces": "k8s-ingress1",
+      "filter": "(tcp port 443) or (vlan and (tcp port 443))",
+      "id": "4-fe-sw1-Ethernet13",
+      "native": "Ethernet13",
+      "node": "fe-sw1",
+      "role": "pair-port",
+      "rung": 4
+    },
+    {
+      "eth": "eth15",
+      "faces": "k8s-ingress2",
+      "filter": "(tcp port 443) or (vlan and (tcp port 443))",
+      "id": "4-fe-sw1-Ethernet14",
+      "native": "Ethernet14",
+      "node": "fe-sw1",
+      "role": "pair-port",
+      "rung": 4
+    },
+    {
+      "eth": "eth14",
+      "faces": "k8s-ingress1",
+      "filter": "(tcp port 443) or (vlan and (tcp port 443))",
+      "id": "4-fe-sw2-Ethernet13",
+      "native": "Ethernet13",
+      "node": "fe-sw2",
+      "role": "pair-port",
+      "rung": 4
+    },
+    {
+      "eth": "eth15",
+      "faces": "k8s-ingress2",
+      "filter": "(tcp port 443) or (vlan and (tcp port 443))",
+      "id": "4-fe-sw2-Ethernet14",
+      "native": "Ethernet14",
+      "node": "fe-sw2",
+      "role": "pair-port",
+      "rung": 4
+    },
+    {
+      "filter": "tcp port 443",
+      "guest": true,
+      "id": "5-k8s-ingress1-bond0.110",
+      "iface": "bond0.110",
+      "node": "k8s-ingress1",
+      "role": "holder",
+      "rung": 5
+    },
+    {
+      "filter": "tcp port 443",
+      "guest": true,
+      "id": "5-k8s-ingress2-bond0.110",
+      "iface": "bond0.110",
+      "node": "k8s-ingress2",
+      "role": "holder",
+      "rung": 5
+    }
+  ],
   "schema": 1,
-  "serving": {
-    "http_port": 8080,
-    "namespace": "serving",
-    "rail_probe_port": 50053,
-    "rpc_port": 50052
+  "snaplen": 128,
+  "timeout_s": 4,
+  "vips": {
+    "10.20.11.200": "gw-internal",
+    "10.20.11.210": "gw-users",
+    "10.20.11.220": "gw-inet"
   },
-  "snaplen": {
-    "http": 66,
-    "keyed": 2048,
-    "rail": 128,
-    "vip": 96
-  },
-  "sport": 42966,
-  "url": "https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions"
+  "vlan": 110
 }

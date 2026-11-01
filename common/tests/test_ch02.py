@@ -170,7 +170,8 @@ class Plan(unittest.TestCase):
         reqs = MX.requests(PLAN)
         self.assertEqual(len(reqs), 44 + 6)
         self.assertEqual(len({r[8] for r in reqs}), len(reqs), "every request its own source port")
-        self.assertTrue(all(len(r) == 16 for r in reqs), "the request columns, the pin last")
+        self.assertTrue(all(len(r) == 17 for r in reqs), "the request columns, the pin, then the cell's own caller (Part III)")
+        self.assertTrue(all(r[16] == "-" for r in reqs), "chapter 2's cells name no own caller: the model's first key")
         op = next(r for r in reqs if r[0] == "operator/gw-internal")
         self.assertEqual(op[6], "10.20.11.200", "the operator asks the internal VIP through the tunnel")
         names = {(r[0], r[3]) for r in MX.lookups(PLAN)}

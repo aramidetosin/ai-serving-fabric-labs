@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
-# ch10/trace.sh: the keyed trace (FRAMEWORK.md 4.5), recorded as audits/sfab-ch10_trace_<UTC>/ with
-# TRACE.md, verdict.txt, cluster/, request/ and captures/.
+# ch10/trace.sh: Part III's trace (FRAMEWORK.md 4.5), recorded as audits/sfab-ch10_trace_<UTC>/ with
+# TRACE.md, verdict.txt and captures/ (common/trace/lib-p3trace.sh, judged by common/trace/p3trace.py).
 #
-# Chapter 7's serving trace, keyed (chapter.yaml trace.serving): one request from the staff client to
-# staff's path through the users' Gateway with helpdesk's key (a 0600 header file, never printed), the
-# API gateway's and the router's cluster interfaces captured whole with every Authorization value
-# replaced by its keyed mark, then an admin hostname the users' Gateway does not carry, answered 404
-# there, which no API gateway pod sees. Part III's own trace forms land with
-# the record stage. Changes nothing on any device; every process it starts it
-# stops.
+# The zone-keyed NAT trace (chapter.yaml trace.nat): one held HTTPS request per population to its
+# own Gateway (chapter 4's held session: the firewall's session table read while it is held, the
+# traffic log after it closes), each SYN followed by its sequence number from the point outside the
+# firewall to the one leg of the bundle that carried it: the internet users' destination rewritten
+# from the published address to the internet Gateway's VIP, the staff's and the operator's as sent.
+# Changes nothing on any device; every process it starts it stops.
 set -euo pipefail
 # shellcheck source=common/lib.sh
 . "$(dirname "$0")/../common/lib.sh"
 sfab_init trace "$@"
-# shellcheck source=common/trace/lib-servetrace.sh
-. "$SFAB_COMMON/trace/lib-servetrace.sh"
-servetrace_run
+# shellcheck source=common/trace/lib-p3trace.sh
+. "$SFAB_COMMON/trace/lib-p3trace.sh"
+p3trace_run

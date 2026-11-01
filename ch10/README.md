@@ -2,7 +2,7 @@
 
 Lab `sfab-ch10`, the companion lab of the book's Chapter 10, "Tenant Isolation on the Firewall". It runs build A's state many at step 10: chapter 9's deployment with the internet users' translation and rule. Three populations share one firewall and one routing table, and the zone each arrives in keeps them apart: internet users translated, the staff routed, the operator tunneled.
 
-Status: rendered and unit-tested (`common/sfab/tests/test_part3_render.py`); not deployed or recorded yet. Part III's own audit groups, trace forms and drills land with the record stage; until then `audit.sh` and `trace.sh` run chapter 7's groups and chapter 7's keyed trace on this render.
+Status: rendered, unit-tested (`common/sfab/tests/test_part3_render.py`, `test_part3_tools_render.py`) and run against the stand-ins (`common/tests/test_part3_labs.py`); not deployed or recorded yet. The formats of `show session info` and `show session all ... count yes` on the pinned PA-VM are the documented shapes until a deploy records them.
 
 | Selection | Value |
 |---|---|
@@ -24,6 +24,12 @@ Everything chapter 9's lab renders (`ch09/README.md`), and from step 10 on the f
 
 Chapter 7's lab's (`ch07/README.md`), and `sfab/keys:4` built on the lab host (`make -C images keys`, from `images/keys` and the pinned PyYAML wheel already in the vendor directory) and pushed into the in-lab registry with the rest (`make -C images registry-seed`; preflight checks that the registry holds the key image `serving.env` names). Memory: the inventory's budget is 163.75 GiB for 30 nodes, and preflight wants MemAvailable to cover it plus the 16 GiB floor, 179.75 GiB in all; on a shared lab host the author's rule keeps about 40 GiB beyond that free before `make up`. containerlab 0.82.0, the host tick at 10000 (read and recorded, never refused on), and no other `sfab-` lab running.
 
+## The audit, the trace and the measurement
+
+- `audit.sh` runs chapter 9's, then the `zone-nat` group: both rulebases in the rendered order, the `isp` zone's one translation and one rule, the published address refused from every inside zone (`deny-all-log` from the population's own zone to `isp`, or silence at the uplink router), and each zone's session count under the held connections within the plan's bound.
+- `trace.sh` (`chapter.yaml` `trace.nat`): one held HTTPS request per population with its capture pair, each SYN followed by its sequence number to the one leg that carries it.
+- `hold.sh` (`make hold`, `chapter.yaml` `tenancy.hold`, `common/trace/lib-hold.sh`): 8 keep-alive connections a population held 120 s, each zone's session count and `show session info` before, while held, after a chat request per population with its own caller's key and after the stop; `HOLD.md` with Little's law per zone. `HOLD_FACTOR=2` doubles the connections.
+
 ## Running it
 
 ```
@@ -31,7 +37,8 @@ cd ch10
 make render
 make up
 make audit
-make trace
+make trace           # audits/sfab-ch10_trace_<UTC>/ (the zone-keyed NAT trace)
+make hold            # audits/sfab-ch10_hold_<UTC>/ (the sessions under held connections)
 make break-10a       # Exercise 5
 make heal-10a
 make down

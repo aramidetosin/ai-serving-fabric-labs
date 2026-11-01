@@ -1,0 +1,332 @@
+{
+  "audiences": {
+    "callers": [
+      {
+        "audience": "enterprise",
+        "audience_models": [
+          "chat",
+          "staff"
+        ],
+        "id": "batch",
+        "kind": "application",
+        "models": [
+          "chat"
+        ]
+      },
+      {
+        "audience": "enterprise",
+        "audience_models": [
+          "chat",
+          "staff"
+        ],
+        "id": "helpdesk",
+        "kind": "application",
+        "models": [
+          "staff"
+        ]
+      },
+      {
+        "audience": "enterprise",
+        "audience_models": [
+          "chat",
+          "staff"
+        ],
+        "id": "staff",
+        "kind": "people",
+        "models": [
+          "chat",
+          "staff"
+        ]
+      },
+      {
+        "audience": "internet",
+        "audience_models": [
+          "chat"
+        ],
+        "id": "inetapp",
+        "kind": "application",
+        "models": [
+          "chat"
+        ]
+      }
+    ],
+    "gateway_namespace": "gateways",
+    "gateways": {
+      "gw-inet": {
+        "admin": [],
+        "audience": "internet",
+        "bare_prefix": false,
+        "idp": false,
+        "label": "routes.tarnwick.example/gw-inet",
+        "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-inet",
+        "models": [
+          "chat"
+        ],
+        "namespaces": [
+          "echo",
+          "inference"
+        ],
+        "policy": "gateways-internet",
+        "pool": [
+          "10.20.11.220",
+          "10.20.11.224"
+        ],
+        "route": "models-gw-inet",
+        "secret": "gw-inet-tls",
+        "service": "cilium-gateway-gw-inet",
+        "vip": "10.20.11.220"
+      },
+      "gw-internal": {
+        "admin": [
+          "admin.ai.tarnwick.example",
+          "grafana.ai.tarnwick.example"
+        ],
+        "audience": "internal",
+        "bare_prefix": true,
+        "idp": true,
+        "label": "routes.tarnwick.example/gw-internal",
+        "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-internal",
+        "models": [
+          "chat",
+          "staff"
+        ],
+        "namespaces": [
+          "echo",
+          "identity",
+          "inference",
+          "serving"
+        ],
+        "policy": "gateways-internal",
+        "pool": [
+          "10.20.11.200",
+          "10.20.11.209"
+        ],
+        "route": "models-gw-internal",
+        "secret": "gw-internal-tls",
+        "service": "cilium-gateway-gw-internal",
+        "vip": "10.20.11.200"
+      },
+      "gw-users": {
+        "admin": [],
+        "audience": "enterprise",
+        "bare_prefix": false,
+        "idp": true,
+        "label": "routes.tarnwick.example/gw-users",
+        "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-users",
+        "models": [
+          "chat",
+          "staff"
+        ],
+        "namespaces": [
+          "echo",
+          "identity",
+          "inference"
+        ],
+        "policy": "gateways-enterprise",
+        "pool": [
+          "10.20.11.210",
+          "10.20.11.214"
+        ],
+        "route": "models-gw-users",
+        "secret": "gw-users-tls",
+        "service": "cilium-gateway-gw-users",
+        "vip": "10.20.11.210"
+      }
+    },
+    "holder_role": "ingress",
+    "idp_hostname": "id.ai.tarnwick.example",
+    "ingress_nodes": [
+      "k8s-ingress1",
+      "k8s-ingress2"
+    ],
+    "interfaces": [
+      "^bond0\\.110$"
+    ],
+    "keys": {
+      "namespace": "inference",
+      "secret": "api-keys"
+    },
+    "lease": {
+      "client_qps": 50,
+      "config": {
+        "l2-announcements-lease-duration": "3s",
+        "l2-announcements-renew-deadline": "1s",
+        "l2-announcements-retry-period": "200ms"
+      },
+      "duration": "3s",
+      "failover_ms": [
+        2000,
+        4000
+      ],
+      "renew_deadline": "1s",
+      "renew_qps": 3.0,
+      "retry_period": "200ms",
+      "services": 3,
+      "tuned": true
+    },
+    "models": [
+      "chat",
+      "staff"
+    ],
+    "policy_mode": "per-audience",
+    "refused_mint": {
+      "audience": "internet",
+      "audience_models": [
+        "chat"
+      ],
+      "caller": "inetapp",
+      "id": "fe000000",
+      "model": "staff"
+    }
+  },
+  "dns": {
+    "aaaa": [
+      {
+        "answer": "10.20.11.210",
+        "client": "ent-client",
+        "kind": "client",
+        "names": [
+          "llm.ai.tarnwick.example",
+          "id.ai.tarnwick.example"
+        ],
+        "population": "enterprise",
+        "resolver": "ent-dns",
+        "server": "10.24.10.53",
+        "view": "enterprise"
+      },
+      {
+        "answer": "198.51.100.10",
+        "client": "inet-client",
+        "kind": "client",
+        "names": [
+          "llm.ai.tarnwick.example"
+        ],
+        "population": "internet",
+        "resolver": "inet-dns-res",
+        "server": "203.0.113.10",
+        "view": "public-internet"
+      },
+      {
+        "answer": "10.20.11.200",
+        "client": "k8s-cp2",
+        "kind": "vm-node",
+        "names": [
+          "llm.ai.tarnwick.example",
+          "admin.ai.tarnwick.example",
+          "grafana.ai.tarnwick.example",
+          "serve.ai.tarnwick.example",
+          "id.ai.tarnwick.example"
+        ],
+        "population": "nodes",
+        "resolver": "dns-res1",
+        "server": "10.20.13.21",
+        "view": "internal"
+      },
+      {
+        "answer": "198.51.100.2",
+        "client": "ops-client",
+        "kind": "client",
+        "names": [],
+        "population": "operator",
+        "resolver": "ops-dns",
+        "server": "192.0.2.10",
+        "view": "public-operator"
+      }
+    ],
+    "envoy_certs": {
+      "namespace": "cilium-secrets",
+      "secrets": [
+        "gateways-gw-inet-tls",
+        "gateways-gw-internal-tls",
+        "gateways-gw-users-tls"
+      ]
+    },
+    "internet_syn": {
+      "action": "deny",
+      "address": "198.51.100.10",
+      "client": "inet-client",
+      "device": "fw",
+      "from_zone": "isp",
+      "hops": [
+        "198.51.100.8/30 connected on eth1",
+        "in on ethernet1/6 (zone isp): 198.51.100.10 is the firewall's own address on ethernet1/6, zone isp",
+        "no NAT rule from zone isp: no translation",
+        "deny-all-log: deny, zone isp to isp"
+      ],
+      "layer": "policy",
+      "outcome": "log-line",
+      "port": 443,
+      "rule": "deny-all-log",
+      "sport": 42390,
+      "to_zone": "isp"
+    },
+    "isp": {
+      "address": "203.0.113.10",
+      "answer": "198.51.100.10",
+      "clients": [
+        "203.0.113.0/26"
+      ],
+      "from": "inet-client",
+      "name": "llm.ai.tarnwick.example",
+      "outside": {
+        "node": "isp-rtr",
+        "source": "198.51.100.9"
+      },
+      "server": "inet-dns-res",
+      "to": [
+        "inet-dns-auth"
+      ]
+    },
+    "isp_router": {
+      "inside": [
+        "10.0.0.0/8"
+      ],
+      "node": "isp-rtr"
+    },
+    "ops": {
+      "address": "192.0.2.10",
+      "names": [
+        "llm.ai.tarnwick.example",
+        "admin.ai.tarnwick.example",
+        "grafana.ai.tarnwick.example",
+        "id.ai.tarnwick.example"
+      ],
+      "server": "ops-dns",
+      "view": "public-operator"
+    },
+    "public": {
+      "absent": [
+        "admin.ai.tarnwick.example",
+        "grafana.ai.tarnwick.example",
+        "serve.ai.tarnwick.example",
+        "id.ai.tarnwick.example",
+        "bastion.ai.tarnwick.example",
+        "dns-auth1.ai.tarnwick.example",
+        "dns-auth2.ai.tarnwick.example",
+        "dns-res1.ai.tarnwick.example",
+        "dns-res2.ai.tarnwick.example",
+        "k8s-cp1.ai.tarnwick.example",
+        "k8s-cp2.ai.tarnwick.example",
+        "k8s-cp3.ai.tarnwick.example",
+        "k8s-gpu1.ai.tarnwick.example",
+        "k8s-gpu2.ai.tarnwick.example",
+        "k8s-ingress1.ai.tarnwick.example",
+        "k8s-ingress2.ai.tarnwick.example",
+        "k8s.ai.tarnwick.example"
+      ],
+      "address": "203.0.113.6",
+      "from": "inet-client",
+      "names": {
+        "llm.ai.tarnwick.example": "198.51.100.10"
+      },
+      "recursion_name": "registry.k8s.io",
+      "server": "inet-dns-auth",
+      "view": "public-internet",
+      "wildcard": "sfab-nowhere.ai.tarnwick.example"
+    },
+    "zone": "ai.tarnwick.example"
+  },
+  "lab": "sfab-ch09",
+  "schema": 1,
+  "step": 9
+}

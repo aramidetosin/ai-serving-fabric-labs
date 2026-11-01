@@ -375,6 +375,7 @@ class Chapter:
     trace: dict
     drills: dict = field(default_factory=dict)
     decisions: bool = False
+    tenancy: dict = field(default_factory=dict)
     path: str | None = None
     sha256: str | None = None
     raw: dict = field(default_factory=dict)
@@ -397,7 +398,7 @@ def chapter_from_dict(raw: dict) -> Chapter:
     if not isinstance(raw, dict):
         raise SpecError("chapter.yaml must be a mapping")
     known_keys = {"lab", "profile", "state", "chapter", "step", "slice", "features", "prints",
-                  "extends", "variants", "trace", "drills", "decisions", "description"}
+                  "extends", "variants", "trace", "drills", "decisions", "tenancy", "description"}
     extra = set(raw) - known_keys
     if extra:
         raise SpecError(f"chapter.yaml: unknown keys {sorted(extra)}")
@@ -427,11 +428,16 @@ def chapter_from_dict(raw: dict) -> Chapter:
     decisions = raw.get("decisions", False)
     if not isinstance(decisions, bool):
         raise SpecError("chapter.yaml: decisions: must be true or false")
+    # tenancy: Part III's tool plans beside the audit's (sfab.render.tenancy): hold, the held
+    # connections; isolation, Chapter 11's negative checks
+    tenancy = raw.get("tenancy") or {}
+    if not isinstance(tenancy, dict):
+        raise SpecError("chapter.yaml: tenancy: must be a mapping")
     return Chapter(lab=lab, profile=str(raw["profile"]), state=str(raw["state"]),
                    chapter=chapter, step=raw.get("step"), slice_nodes=nodes, slice_except=exc,
                    features=dict(feats), prints=tuple(str(x) for x in (raw.get("prints") or [])),
                    extends=raw.get("extends"), variants=variants, trace=raw.get("trace") or {},
-                   drills=drills, decisions=decisions, raw=raw)
+                   drills=drills, decisions=decisions, tenancy=tenancy, raw=raw)
 
 
 # --------------------------------------------------------------------------------------------

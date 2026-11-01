@@ -16,6 +16,8 @@
 #                                live objects, every cell of the matrix, a member through SONiC's DBs
 #   rpf attach                   the lab's rpf.sh and attach.sh: rp_filter's all and per-interface
 #                                values (chapter 5), a server pod's two networks (chapter 6)
+#   hold                         the lab's hold.sh: the held connections and the firewall's sessions
+#                                per zone under them (chapter 10)
 #   record                       audit, trace, label and matrix (each the lab has), then
 #                                common/audit/gate.sh on the new sets
 #   break-<id> heal-<id> heal-all  common/breakheal.py
@@ -54,7 +56,7 @@ else
 RUNUP = $(RUN)
 endif
 
-.PHONY: render check lint show ca ca-status up deploy boot finish recover audit trace label matrix dbs rpf attach drills accept record \
+.PHONY: render check lint show ca ca-status up deploy boot finish recover audit trace label matrix dbs rpf attach hold drills accept record \
         heal-all load serve client status stop down wipe namecheck help
 
 help:
@@ -102,7 +104,7 @@ audit:
 trace:
 	$(RUN) trace
 
-label matrix dbs rpf attach:
+label matrix dbs rpf attach hold:
 	@test -x $(LABDIR)/$@.sh || { echo "$(LAB) has no $@.sh"; exit 1; }
 	$(RUN) $@
 

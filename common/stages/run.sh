@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # run.sh STAGE...: run a lab's stages in order (FRAMEWORK.md section 3).
 #
-# Stages: preflight up boot finish audit trace label matrix dbs rpf attach stop down down-fast wipe, and
-# recover (boot then finish); label, matrix, dbs, rpf and attach run the lab's script of that name. status
+# Stages: preflight up boot finish audit trace label matrix dbs rpf attach hold stop down down-fast wipe, and
+# recover (boot then finish); label, matrix, dbs, rpf, attach and hold run the lab's script of that name. status
 # prints the lab's containers and markers and takes no lock. Run from the lab directory (make does),
 # or with SFAB_LABDIR set; VARIANT selects a variant lab.
 #
@@ -14,7 +14,7 @@
 set -euo pipefail
 # shellcheck source=common/lib.sh
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/lib.sh"
-[ $# -gt 0 ] || die "usage: run.sh STAGE... (preflight up boot finish audit trace label matrix dbs rpf attach stop down down-fast wipe recover status)"
+[ $# -gt 0 ] || die "usage: run.sh STAGE... (preflight up boot finish audit trace label matrix dbs rpf attach hold stop down down-fast wipe recover status)"
 sfab_init run
 
 status() {
@@ -48,7 +48,7 @@ for s in "$@"; do
   case "$s" in
     recover) stages+=(boot finish) ;;
     status) status; exit 0 ;;
-    preflight|up|boot|finish|audit|trace|label|matrix|dbs|rpf|attach|stop|down|down-fast|wipe) stages+=("$s") ;;
+    preflight|up|boot|finish|audit|trace|label|matrix|dbs|rpf|attach|hold|stop|down|down-fast|wipe) stages+=("$s") ;;
     *) die "unknown stage $s" ;;
   esac
 done
@@ -81,7 +81,7 @@ for st in "${stages[@]}"; do
     down) cmd=("$SFAB_COMMON/stages/down.sh") ;;
     down-fast) cmd=("$SFAB_COMMON/stages/down.sh"); args=(fast) ;;
     wipe) cmd=("$SFAB_COMMON/stages/down.sh"); args=(wipe) ;;
-    audit|trace|label|matrix|dbs|rpf|attach)
+    audit|trace|label|matrix|dbs|rpf|attach|hold)
       [ -x "$LABDIR/$st.sh" ] || die "$LABDIR/$st.sh is not present"
       cmd=("$LABDIR/$st.sh") ;;
   esac

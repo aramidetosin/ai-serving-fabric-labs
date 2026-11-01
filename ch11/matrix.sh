@@ -9,7 +9,9 @@
 # (the layers that would refuse it if every earlier layer let it through). Chapter 2's runner
 # (common/matrix/matrix.sh and matrix.py) tries each cell from the population's own client and asserts
 # its mode with its evidence. The internet users' chat cell names its own caller (key_caller inetapp
-# in gen/matrix.json); the runner's use of it, and the depth's evidence, land with the record stage.
+# in gen/matrix.json): its own request carries inetapp's key, and the judge wants the API gateway's
+# access log to name that caller. MATRIX.md prints each cell's depth and its layers beside its
+# evidence, and the judge checks the cells' depth counts against the plan's.
 set -euo pipefail
 # shellcheck source=common/lib.sh
 . "$(dirname "$0")/../common/lib.sh"

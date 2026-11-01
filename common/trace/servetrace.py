@@ -59,6 +59,12 @@ hop carried, from the payload decodes:
 and with the plan's refuse, the request to a hostname the Gateway does not carry: the Gateway's 404
 (server envoy), the client's SYN at the lease holder, and no request for that hostname at any API
 gateway pod, which received exactly the keyed request.
+
+Part III (chapter 8) adds a node of the cluster as the client (the plan's client.local): its request
+names the VIP with curl --resolve, the node's own datapath answers the VIP, so the node's own ports
+are captured to show no SYN to the VIP leaves it, in place of the lease holder's bond0; and the
+plan's also, the same key and path sent to another Gateway (refuse.gateway, a hostname there): that
+Gateway's 404 with no request for it at any API gateway pod.
 """
 
 from __future__ import annotations
@@ -165,7 +171,15 @@ def point_rows(plan: dict, rs: Path) -> list:
     rows = []
     holder = lease_holder(rs)
     gw = plan["gateway"]
-    if holder:
+    if (plan["client"] or {}).get("local"):
+        # a node of the cluster answers its own Gateways' VIPs (Part III, chapter 8): its own ports are
+        # captured, as the wire carries them, to show no SYN to a VIP leaves it
+        vips = " or ".join(f"host {x}" for x in [gw["vip"]] + [a["vip"] for a in plan.get("also") or []]
+                           + ([plan["refuse"]["vip"]] if (plan.get("refuse") or {}).get("vip") else []))
+        filt = f"tcp port {gw['port']} and ({vips})"
+        for x in plan["client"]["ports"]:
+            rows.append((x["id"], "host", x["node"], "-", "-", x["eth"], f"({filt}) or (vlan and ({filt}))", sn["vip"], 0))
+    elif holder:
         rows.append((pid(plan, 1, f"{holder}-bond0"), "guest", holder, "-", "-", "bond0", f"tcp port {gw['port']} and host {gw['vip']}",
                      sn["vip"], 0))
     pi = pods(rs, plan["api_gateway"]["namespace"])
@@ -353,9 +367,10 @@ def judge(a) -> int:
     decs = {r[0]: frames(read(rs / "captures" / f"{r[0]}.txt")) for r in rows}
     j = judge_serving(v, rs, plan, rows, decs)
     keyhops = judge_keys(v, rs, plan, rows, j["pi"], j["agp"], j["rop"], j["srv_ip"]) if (plan.get("keys") or {}).get("capture") else []
+    also = judge_also(v, rs, plan, rows) if plan.get("also") else []
     refused = judge_refuse(v, rs, plan, rows, decs, j["pi"]) if plan.get("refuse") else None
     counts = vocab.counts_of(os.environ["SFAB_VERDICT"]) if os.environ.get("SFAB_VERDICT") else v.counts()
-    write_md(rs, inv, plan, rows, decs, j["hops"], j["copy"], j["status"], j["headers"], counts, a.stamp, keyhops, refused)
+    write_md(rs, inv, plan, rows, decs, j["hops"], j["copy"], j["status"], j["headers"], counts, a.stamp, keyhops, refused, also)
     return 1 if v.counts()["fail"] else 0
 
 
@@ -382,7 +397,15 @@ def judge_serving(v, rs: Path, plan: dict, rows: list, decs: dict) -> dict:
     v.sec("the users' VIP")
     holder = lease_holder(rs)
     vip_id = pid(plan, 1, f"{holder}-bond0") if holder else None
-    if vip_id is None:
+    if (plan["client"] or {}).get("local"):
+        ports = [r[0] for r in rows if r[0].startswith("0-")]
+        out_ = [f for r in ports for f in decs.get(r) or [] if f["dst"] == gw["vip"] and f["dport"] == gw["port"] and "S" in f["flags"]]
+        v.check(f"{plan['client']['node']} answers {gw['name']}'s VIP {gw['vip']} itself: no SYN to it left the node on its "
+                f"{len(ports)} port(s) ({', '.join(ports)}), so the lease holder ({holder or 'unread'}) never saw the request",
+                bool(ports) and not out_, f"{len(out_)} SYN(s) on the node's ports")
+        hops.append({"hop": "Gateway VIP (answered on the node)", "point": ports[0] if ports else "-", "node": plan["client"]["node"],
+                     "address": f"{gw['vip']}:{gw['port']}", "first": None})
+    elif vip_id is None:
         v.bad(f"the node holding {gw['lease']}", "the lease was not read")
     else:
         fr = decs.get(vip_id) or []
@@ -583,10 +606,18 @@ def judge_refuse(v, rs: Path, plan: dict, rows: list, decs: dict, pi: dict) -> d
     v.check(f"GET {rf['url']} from {plan['client']['node']}: HTTP {rf['expect']} from the Gateway (server {srv or 'none'})",
             status == rf["expect"] and "envoy" in srv.lower(), f"HTTP {status or 'none'}, server {srv or 'none'}")
     holder = lease_holder(rs)
-    fr = decs.get(pid(plan, 1, f"{holder}-bond0")) or [] if holder else []
-    syn = [f for f in fr if f["src"] == plan["client"]["address"] and f["sport"] == rf["sport"] and f["dst"] == gw["vip"] and "S" in f["flags"]
-           and "." not in f["flags"]]
-    v.check(f"{holder or 'the lease holder'}: the client's SYN from port {rf['sport']} to {gw['vip']}:{gw['port']}", bool(syn), f"{len(syn)} SYNs")
+    rvip = rf.get("vip") or gw["vip"]
+    syn = []
+    if (plan["client"] or {}).get("local"):
+        ports = [r[0] for r in rows if r[0].startswith("0-")]
+        out_ = [f for r in ports for f in decs.get(r) or [] if f["dst"] == rvip and f["sport"] == rf["sport"] and "S" in f["flags"]]
+        v.check(f"{plan['client']['node']} answered it itself: no SYN from port {rf['sport']} to {rvip} left the node", not out_,
+                f"{len(out_)} SYN(s) on the node's ports")
+    else:
+        fr = decs.get(pid(plan, 1, f"{holder}-bond0")) or [] if holder else []
+        syn = [f for f in fr if f["src"] == plan["client"]["address"] and f["sport"] == rf["sport"] and f["dst"] == gw["vip"] and "S" in f["flags"]
+               and "." not in f["flags"]]
+        v.check(f"{holder or 'the lease holder'}: the client's SYN from port {rf['sport']} to {gw['vip']}:{gw['port']}", bool(syn), f"{len(syn)} SYNs")
     reqs = {r[0]: http_requests(read(rs / "captures" / f"{r[0]}-payload.txt")) for r in rows if r[0].startswith(pid(plan, 2, "")) and len(r) > 8 and r[8]}
     seen = [(pid, r) for pid, rr in reqs.items() for r in rr if (r["host"] or "").split(":")[0] == rf["hostname"] or "sfab-trace-refused" in r["path"]]
     inbound = [(pid, r) for pid, rr in reqs.items() for r in rr if r["dport"] == ag["port"]]
@@ -596,8 +627,31 @@ def judge_refuse(v, rs: Path, plan: dict, rows: list, decs: dict, pi: dict) -> d
     return {"status": status, "server": srv, "syn": (syn or [None])[0], "holder": holder}
 
 
+def judge_also(v, rs: Path, plan: dict, rows: list) -> list:
+    """Part III (chapter 8): the same key on the same path sent to another Gateway, whose route set
+    does not carry the model: that Gateway's 404, and no request with its marker at any API gateway
+    pod (the keyed captures hold every request they received)."""
+    out = []
+    reqs = {r[0]: http_requests(read(rs / "captures" / f"{r[0]}-payload.txt")) for r in rows if r[0].startswith(pid(plan, 2, "")) and len(r) > 8 and r[8]}
+    for a in plan.get("also") or []:
+        v.sec(f"the same key and path through {a['gateway']}, whose route set does not carry {plan['model']}")
+        tag = f"also-{a['gateway']}"
+        res = read(rs / "request" / f"{tag}-result.txt").split()
+        status = int(res[0]) if res and res[0].isdigit() else 0
+        h = headers(read(rs / "request" / f"{tag}-headers.txt"))
+        srv = h.get("server", "")
+        v.check(f"POST {a['url']} from {plan['client']['node']} through {a['gateway']} ({a['vip']}) with {plan['model']}'s key: HTTP "
+                f"{a['expect']} from the Gateway (server {srv or 'none'})", status == a["expect"] and "envoy" in srv.lower(),
+                f"HTTP {status or 'none'}, server {srv or 'none'}")
+        seen = [(p_, r) for p_, rr in reqs.items() for r in rr if a["marker"] in r["path"]]
+        v.check(f"no API gateway pod saw it: no request carrying {a['marker']} at {len(reqs)} API gateway pods (so no API gateway "
+                "line names it)", bool(reqs) and not seen, f"{len(seen)} request(s)" if reqs else "no keyed capture read")
+        out.append({"gateway": a["gateway"], "status": status, "server": srv})
+    return out
+
+
 def write_md(rs: Path, inv: dict, plan: dict, rows: list, decs: dict, hops: list, copy, status: int, h: dict, counts: dict, stamp,
-             keyhops: list | None = None, refused: dict | None = None) -> None:
+             keyhops: list | None = None, refused: dict | None = None, also: list | None = None) -> None:
     try:
         run = load(rs / "RUN.json")
     except (OSError, ValueError):
@@ -633,11 +687,15 @@ def write_md(rs: Path, inv: dict, plan: dict, rows: list, decs: dict, hops: list
             r = x["request"]
             L.append(f"| {x['hop']} | `{x['point']}` | {r['method']} `{r['path']}` | `{x['mark']}` | {x['key']} | "
                      f"`captures/{x['point']}-payload.txt:{r.get('auth_line') or r['line']}` |")
+    for x, a in zip(also or [], plan.get("also") or []):
+        L += ["", f"## The same key through {a['gateway']}", "",
+              f"`{a['url']}` from {plan['client']['node']} (source port {a['sport']}) to {a['gateway']} ({a['vip']}), with "
+              f"{plan['model']}'s key: HTTP {x['status'] or 'none'}, server {x['server'] or 'none'}; no API gateway pod saw it."]
     if refused:
         rf = plan["refuse"]
         L += ["", "## The refusal", "",
-              f"`{rf['url']}` from {plan['client']['node']} (source port {rf['sport']}) to {plan['gateway']['name']}: HTTP {refused['status'] or 'none'}, "
-              f"server {refused['server'] or 'none'}; no API gateway pod saw it."]
+              f"`{rf['url']}` from {plan['client']['node']} (source port {rf['sport']}) to {rf.get('gateway') or plan['gateway']['name']}: "
+              f"HTTP {refused['status'] or 'none'}, server {refused['server'] or 'none'}; no API gateway pod saw it."]
     L += ["", "## Verdict", "", "```"] + [l for l in verdict.splitlines() if l.strip()] + ["```", ""]
     L += ["## Frames per point", "", "| Point | Kind | Node | Interface | Filter | Frames | Data segments |", "|---|---|---|---|---|---|---|"]
     for r in rows:

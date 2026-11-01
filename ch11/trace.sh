@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
-# ch11/trace.sh: the keyed trace (FRAMEWORK.md 4.5), recorded as audits/sfab-ch11_trace_<UTC>/ with
-# TRACE.md, verdict.txt, cluster/, request/ and captures/.
+# ch11/trace.sh: Part III's trace (FRAMEWORK.md 4.5), recorded as audits/sfab-ch11_trace_<UTC>/ with
+# TRACE.md, verdict.txt and captures/ (common/trace/lib-p3trace.sh, judged by common/trace/p3trace.py).
 #
-# Chapter 7's serving trace, keyed (chapter.yaml trace.serving): one request from the staff client to
-# staff's path through the users' Gateway with helpdesk's key (a 0600 header file, never printed), the
-# API gateway's and the router's cluster interfaces captured whole with every Authorization value
-# replaced by its keyed mark, then an admin hostname the users' Gateway does not carry, answered 404
-# there, which no API gateway pod sees. Part III's own trace forms land with
-# the record stage. Changes nothing on any device; every process it starts it
-# stops.
+# The capture ladder (chapter.yaml trace.ladder): every population of the matrix connects to each
+# Gateway's VIP, a forbidden cell three times from its own source ports, while every rung captures
+# (the ISP router's link, the staff's firewall port, both legs, the pair's ports facing the ingress
+# nodes, each ingress node's VLAN 110 unit). A warm-up connect a population first; the pair's ports
+# facing each lease holder read from the MAC tables by the holder's MAC. Per rung, each flow's SYNs by
+# distinct sequence number, and each forbidden flow's tally past the device that refuses it, zero.
+# Changes nothing on any device; every process it starts it stops.
 set -euo pipefail
 # shellcheck source=common/lib.sh
 . "$(dirname "$0")/../common/lib.sh"
 sfab_init trace "$@"
-# shellcheck source=common/trace/lib-servetrace.sh
-. "$SFAB_COMMON/trace/lib-servetrace.sh"
-servetrace_run
+# shellcheck source=common/trace/lib-p3trace.sh
+. "$SFAB_COMMON/trace/lib-p3trace.sh"
+p3trace_run
