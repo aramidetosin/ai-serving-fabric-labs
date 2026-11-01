@@ -134,7 +134,7 @@ QUICK = [
     # the serving recipe and the key tool, and the labs that run them
     (r"serving-layer/", "serving generator:sfab.tests.test_serving_render generator:sfab.tests.test_ch02_render harness:test_ch06 harness:test_ch07"),
     (r"images/keys/", "keys generator:sfab.tests.test_serving_render generator:sfab.tests.test_ch06_render "
-                      "generator:sfab.tests.test_ch07_render harness:test_ch07"),
+                      "generator:sfab.tests.test_ch07_render generator:sfab.tests.test_part3_render harness:test_ch07"),
     # the generator and the spec it reads: every render, and the labs' harness tests render too
     (r"common/sfab/|common/bin/sfab$|spec/", "make test"),
     # the harness's tools
@@ -150,7 +150,7 @@ QUICK = [
     # chapter 5's rp_filter stage and chapter 6's attachment reads
     (r"common/reads/", "harness:test_reads harness:test_ch05 harness:test_ch06"),
     (r"common/(?:trace|drill|break)/|common/breakheal\.py$", LABS + " generator:sfab.tests.test_drills_render "
-     "generator:sfab.tests.test_ch07_render harness:test_repostate harness:test_setsize"),
+     "generator:sfab.tests.test_ch07_render generator:sfab.tests.test_part3_render harness:test_repostate harness:test_setsize"),
     (r"common/stages/", STAGES + " harness:test_platform generator:sfab.tests.test_ch04_render"),
     (r"common/(?:fw|klish|host|storage)/", "generator " + LABS + " harness:test_stages"),
     (r"common/(?:mk/|lib\.sh$)", "harness:test_repostate harness:test_harness " + LABS + " harness:test_stages"),
@@ -162,6 +162,8 @@ QUICK = [
     (r"ch02/", "harness:test_ch02 harness:test_platform generator:sfab.tests.test_ch02_render"),
     (r"ch03/", "harness:test_ch03 harness:test_platform"),
     (r"ch0([4-7])/", "harness:test_ch0{0} harness:test_platform generator:sfab.tests.test_ch0{0}_render"),
+    # Part III's labs (chapters 8 to 11): their render tests, and the pages that name them
+    (r"ch(?:0[89]|1[01])/", "harness:test_platform generator:sfab.tests.test_part3_render"),
     (r"dev/m2/", "harness:test_m2 harness:test_platform generator:sfab.tests.test_k8s generator:sfab.tests.test_storage"),
     (r"dev/m1/", "harness:test_stages harness:test_platform generator:sfab.tests.test_integration "
                  "generator:sfab.tests.test_switches generator:sfab.tests.test_firewall generator:sfab.tests.test_hosts"),

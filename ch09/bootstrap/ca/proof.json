@@ -1,0 +1,255 @@
+{
+  "constraints": {
+    "internet": {
+      "dns": [
+        "upstream.example"
+      ],
+      "ip": [
+        "192.0.2.0/24"
+      ]
+    },
+    "kubernetes": {
+      "dns": [
+        "ai.tarnwick.example",
+        "kubernetes",
+        "kubernetes.default",
+        "kubernetes.default.svc",
+        "cluster.local",
+        "k8s-cp1",
+        "k8s-cp2",
+        "k8s-cp3"
+      ],
+      "ip": [
+        "10.20.1.0/24",
+        "10.23.0.0/16"
+      ]
+    },
+    "platform": {
+      "dns": [
+        "ai.tarnwick.example"
+      ],
+      "ip": [
+        "10.20.0.0/14",
+        "10.24.10.0/24"
+      ]
+    }
+  },
+  "intermediates": [
+    "platform",
+    "kubernetes",
+    "internet"
+  ],
+  "kubeadm": true,
+  "lab": "sfab-ch09",
+  "leaves": [
+    {
+      "ca": "platform",
+      "expect": "verify",
+      "id": "platform-inside-1",
+      "san": [
+        "DNS:llm.ai.tarnwick.example"
+      ],
+      "source": "the spec's ca.proof.inside"
+    },
+    {
+      "ca": "platform",
+      "expect": "verify",
+      "id": "platform-inside-cert-gw-internal",
+      "san": [
+        "DNS:*.ai.tarnwick.example"
+      ],
+      "source": "the gw-internal certificate cert-manager issues (secret gw-internal-tls)"
+    },
+    {
+      "ca": "platform",
+      "expect": "verify",
+      "id": "platform-inside-cert-gw-users",
+      "san": [
+        "DNS:*.ai.tarnwick.example"
+      ],
+      "source": "the gw-users certificate cert-manager issues (secret gw-users-tls)"
+    },
+    {
+      "ca": "platform",
+      "expect": "verify",
+      "id": "platform-inside-cert-gw-inet",
+      "san": [
+        "DNS:*.ai.tarnwick.example"
+      ],
+      "source": "the gw-inet certificate cert-manager issues (secret gw-inet-tls)"
+    },
+    {
+      "ca": "platform",
+      "expect": "reject",
+      "id": "platform-outside-1",
+      "san": [
+        "DNS:llm.corvane.example"
+      ],
+      "source": "the spec's ca.proof.outside"
+    },
+    {
+      "ca": "platform",
+      "expect": "reject",
+      "id": "platform-outside-public",
+      "san": [
+        "IP:198.51.100.2"
+      ],
+      "source": "the firewall's public address, which no lab certificate may name"
+    },
+    {
+      "ca": "kubernetes",
+      "expect": "verify",
+      "id": "kubernetes-inside-1",
+      "san": [
+        "DNS:llm.ai.tarnwick.example"
+      ],
+      "source": "the spec's ca.proof.inside"
+    },
+    {
+      "ca": "kubernetes",
+      "expect": "verify",
+      "id": "kubernetes-inside-apiserver-k8s-cp1",
+      "san": [
+        "DNS:kubernetes",
+        "DNS:kubernetes.default",
+        "DNS:kubernetes.default.svc",
+        "DNS:kubernetes.default.svc.cluster.local",
+        "DNS:k8s-cp1",
+        "DNS:k8s.ai.tarnwick.example",
+        "IP:10.23.0.1",
+        "IP:10.20.1.11",
+        "IP:10.20.1.10"
+      ],
+      "source": "kubeadm's API server certificate on k8s-cp1"
+    },
+    {
+      "ca": "kubernetes",
+      "expect": "verify",
+      "id": "kubernetes-inside-apiserver-k8s-cp2",
+      "san": [
+        "DNS:kubernetes",
+        "DNS:kubernetes.default",
+        "DNS:kubernetes.default.svc",
+        "DNS:kubernetes.default.svc.cluster.local",
+        "DNS:k8s-cp2",
+        "DNS:k8s.ai.tarnwick.example",
+        "IP:10.23.0.1",
+        "IP:10.20.1.12",
+        "IP:10.20.1.10"
+      ],
+      "source": "kubeadm's API server certificate on k8s-cp2"
+    },
+    {
+      "ca": "kubernetes",
+      "expect": "verify",
+      "id": "kubernetes-inside-apiserver-k8s-cp3",
+      "san": [
+        "DNS:kubernetes",
+        "DNS:kubernetes.default",
+        "DNS:kubernetes.default.svc",
+        "DNS:kubernetes.default.svc.cluster.local",
+        "DNS:k8s-cp3",
+        "DNS:k8s.ai.tarnwick.example",
+        "IP:10.23.0.1",
+        "IP:10.20.1.13",
+        "IP:10.20.1.10"
+      ],
+      "source": "kubeadm's API server certificate on k8s-cp3"
+    },
+    {
+      "ca": "kubernetes",
+      "expect": "reject",
+      "id": "kubernetes-outside-1",
+      "san": [
+        "DNS:llm.corvane.example"
+      ],
+      "source": "the spec's ca.proof.outside"
+    },
+    {
+      "ca": "kubernetes",
+      "expect": "reject",
+      "id": "kubernetes-outside-public",
+      "san": [
+        "IP:198.51.100.2"
+      ],
+      "source": "the firewall's public address, which no lab certificate may name"
+    },
+    {
+      "ca": "internet",
+      "expect": "verify",
+      "id": "internet-inside-1",
+      "san": [
+        "DNS:registry.upstream.example"
+      ],
+      "source": "the spec's ca.intermediates.internet.proof.inside"
+    },
+    {
+      "ca": "internet",
+      "expect": "verify",
+      "id": "internet-inside-leaf-inet-registry",
+      "san": [
+        "DNS:registry.upstream.example",
+        "IP:192.0.2.6"
+      ],
+      "source": "the inet-registry leaf inet-registry serves"
+    },
+    {
+      "ca": "internet",
+      "expect": "verify",
+      "id": "internet-inside-leaf-inet-ntp",
+      "san": [
+        "DNS:ntp.upstream.example",
+        "IP:192.0.2.14"
+      ],
+      "source": "the inet-ntp leaf inet-ntp serves"
+    },
+    {
+      "ca": "internet",
+      "expect": "reject",
+      "id": "internet-outside-1",
+      "san": [
+        "DNS:llm.ai.tarnwick.example"
+      ],
+      "source": "the spec's ca.intermediates.internet.proof.outside"
+    },
+    {
+      "ca": "internet",
+      "expect": "reject",
+      "id": "internet-outside-2",
+      "san": [
+        "IP:10.20.11.200"
+      ],
+      "source": "the spec's ca.intermediates.internet.proof.outside"
+    },
+    {
+      "ca": "internet",
+      "expect": "reject",
+      "id": "internet-outside-public",
+      "san": [
+        "IP:198.51.100.2"
+      ],
+      "source": "the firewall's public address, which no lab certificate may name"
+    }
+  ],
+  "node_leaves": [
+    {
+      "ca": "internet",
+      "dir": "state/tls/inet-registry",
+      "id": "inet-registry",
+      "node": "inet-registry"
+    },
+    {
+      "ca": "internet",
+      "dir": "state/tls/inet-ntp",
+      "id": "inet-ntp",
+      "node": "inet-ntp"
+    }
+  ],
+  "roles": {
+    "internet": "upstream",
+    "kubernetes": "kubeadm",
+    "platform": "gateways"
+  },
+  "root": "root",
+  "schema": 2
+}

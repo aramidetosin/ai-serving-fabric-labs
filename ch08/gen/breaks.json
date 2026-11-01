@@ -1,0 +1,102 @@
+{
+  "breaks": {
+    "8a": {
+      "break": [
+        {
+          "gateway": "gw-inet",
+          "kind": "k8s_patch",
+          "name": "gateways-internet",
+          "namespace": null,
+          "patch": {
+            "spec": {
+              "interfaces": [
+                "^bond0\\.111$"
+              ]
+            }
+          },
+          "rendered": false,
+          "resource": "ciliuml2announcementpolicies.cilium.io",
+          "summary": "policy gateways-internet (the internet audience's, gw-inet) names interfaces ^bond0\\.111$ (rendered ^bond0\\.110$)",
+          "what": "l2_policy"
+        }
+      ],
+      "exercise": 5,
+      "expect_broken": [],
+      "expect_healed": [],
+      "heal": [
+        {
+          "gateway": "gw-inet",
+          "kind": "k8s_patch",
+          "name": "gateways-internet",
+          "namespace": null,
+          "patch": {
+            "spec": {
+              "interfaces": [
+                "^bond0\\.110$"
+              ]
+            }
+          },
+          "rendered": true,
+          "resource": "ciliuml2announcementpolicies.cilium.io",
+          "summary": "policy gateways-internet (the internet audience's, gw-inet) names interfaces ^bond0\\.110$ (rendered)",
+          "what": "l2_policy"
+        }
+      ],
+      "id": "8a",
+      "note": null,
+      "record": [
+        {
+          "kind": "k8s_read",
+          "objects": [
+            {
+              "id": "l2_policy:gw-inet",
+              "name": "gateways-internet",
+              "namespace": null,
+              "resource": "ciliuml2announcementpolicies.cilium.io"
+            },
+            {
+              "id": "lease:gw-inet",
+              "name": "cilium-l2announce-gateways-cilium-gateway-gw-inet",
+              "namespace": "kube-system",
+              "resource": "leases.coordination.k8s.io"
+            },
+            {
+              "id": "gateway:gw-inet",
+              "name": "gw-inet",
+              "namespace": "gateways",
+              "resource": "gateways.gateway.networking.k8s.io"
+            },
+            {
+              "id": "service:gw-inet",
+              "name": "cilium-gateway-gw-inet",
+              "namespace": "gateways",
+              "resource": "services"
+            },
+            {
+              "id": "l2_policy:gw-users",
+              "name": "gateways-enterprise",
+              "namespace": null,
+              "resource": "ciliuml2announcementpolicies.cilium.io"
+            },
+            {
+              "id": "lease:gw-users",
+              "name": "cilium-l2announce-gateways-cilium-gateway-gw-users",
+              "namespace": "kube-system",
+              "resource": "leases.coordination.k8s.io"
+            }
+          ]
+        },
+        {
+          "kind": "fw_show",
+          "lines": [
+            "show arp all"
+          ],
+          "node": "fw"
+        }
+      ],
+      "title": "the internet audience's announcement policy names an interface no ingress node has"
+    }
+  },
+  "lab": "sfab-ch08",
+  "schema": 1
+}

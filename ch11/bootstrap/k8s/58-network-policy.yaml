@@ -1,0 +1,72 @@
+# sfab-ch11 network policy: the test backend and the IdP: rendered from spec/profile-a.yaml by render/k8s.py; edit the spec and run make render
+# Each namespace: one CiliumNetworkPolicy that denies every pod all ingress and egress, then the allows its
+# paths need. Cilium's ingress identity is the Gateways' Envoy.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: default-deny
+  namespace: echo
+spec:
+  description: "every pod in echo: no ingress and no egress but what an allow names"
+  endpointSelector: {}
+  ingress:
+  - {}
+  egress:
+  - {}
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-gateways-to-backend
+  namespace: echo
+spec:
+  description: "the Gateways' Envoy to the test backend"
+  endpointSelector:
+    matchLabels:
+      k8s:app.kubernetes.io/name: echo
+  ingress:
+  - fromEntities:
+    - ingress
+    toPorts:
+    - ports:
+      - port: "8080"
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: default-deny
+  namespace: identity
+spec:
+  description: "every pod in identity: no ingress and no egress but what an allow names"
+  endpointSelector: {}
+  ingress:
+  - {}
+  egress:
+  - {}
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-to-idp
+  namespace: identity
+spec:
+  description: "the Gateways' Envoy (people signing in) and the API gateway (the signing keys) to the IdP"
+  endpointSelector:
+    matchLabels:
+      k8s:app.kubernetes.io/name: idp
+  ingress:
+  - fromEntities:
+    - ingress
+    toPorts:
+    - ports:
+      - port: "5556"
+        protocol: TCP
+  - fromEndpoints:
+    - matchLabels:
+        k8s:app.kubernetes.io/name: api-gateway
+        k8s:io.kubernetes.pod.namespace: inference
+    toPorts:
+    - ports:
+      - port: "5556"
+        protocol: TCP

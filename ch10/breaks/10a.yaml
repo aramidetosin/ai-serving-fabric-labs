@@ -1,0 +1,39 @@
+# break-10a (Chapter 10, exercise 5): the internet users' security rule written with the translated
+# destination.
+#
+# PAN-OS matches a security rule on the pre-NAT addresses and the post-NAT zone ("NAT Policy Rules",
+# Chapter 4). isp-to-internet-gateway names the published address, the firewall's own isp address
+# 198.51.100.10, and zone ingress; the break writes the internet Gateway's VIP, 10.20.11.220, the
+# address after dnat-internet-gateway, in its place. The NAT rule is untouched and still translates;
+# no rule then matches the internet users' sessions, which meet deny-all-log. The staff (rule 1, the
+# users' VIP, untranslated) and the operator (through its tunnel, untranslated) are unaffected.
+#
+# record: requests from the internet client to llm.ai.tarnwick.example (its resolver answers the
+# published address) and from the staff client to the same name (the users' VIP); connects from the
+# internet client to the published address from pinned ports, captured on the ISP router's link and
+# on both legs of the bundle; and the running security and NAT rulebases. The heal writes the
+# rendered destination back.
+title: the internet users' rule names the translated destination instead of the published address
+exercise: 5
+since: 10
+break:
+  - panos_api: {edit: security, rule: isp-to-internet-gateway, destination: ["10.20.11.220"]}
+record:
+  - probe_http: {id: internet, from: inet-client, hostname: llm, path: "/echo?msg=sfab-break-10a", count: 10, interval_s: 0.5, timeout_s: 5, passes: 1}
+  - probe_http: {id: staff, from: ent-client, hostname: llm, path: "/echo?msg=sfab-break-10a", count: 10, interval_s: 0.5, timeout_s: 5, passes: 1}
+  - probe_syn: {id: syn, from: inet-client, to: "198.51.100.10", port: 443, count: 3, sport: 42310, timeout_s: 5, passes: 1, capture: ["isp-rtr:eth1", "fw:eth1", "fw:eth2"]}
+  - fw_show: {lines: [show running security-policy, show running nat-policy]}
+expect_broken:
+  - probe_share: {probe: internet, failing: all}
+  - probe_share: {probe: staff, failing: none}
+  - probe_share: {probe: syn, failing: all}
+  - syn_at: {probe: syn, seen: ["isp-rtr:eth1"], unseen: ["fw:eth1", "fw:eth2"]}
+  - tlog_rule: {probe: syn, rule: deny-all-log, action: deny}
+heal:
+  - panos_api: {edit: security, rule: isp-to-internet-gateway, destination: rendered}
+expect_healed:
+  - probe_share: {probe: internet, failing: none}
+  - probe_share: {probe: staff, failing: none}
+  - probe_share: {probe: syn, failing: none}
+  - syn_at: {probe: syn, seen: ["isp-rtr:eth1"], seen_any: ["fw:eth1", "fw:eth2"]}
+  - tlog_rule: {probe: syn, rule: isp-to-internet-gateway, action: allow}

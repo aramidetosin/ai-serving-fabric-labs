@@ -1,0 +1,151 @@
+{
+  "breaks": {
+    "11a": {
+      "break": [
+        {
+          "gateway": "gw-inet",
+          "kind": "k8s_patch",
+          "models": [
+            "chat",
+            "staff"
+          ],
+          "name": "models-gw-inet",
+          "namespace": "inference",
+          "patch": {
+            "spec": {
+              "rules": [
+                {
+                  "backendRefs": [
+                    {
+                      "name": "api-gateway",
+                      "port": 9080
+                    }
+                  ],
+                  "matches": [
+                    {
+                      "path": {
+                        "type": "PathPrefix",
+                        "value": "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7"
+                      }
+                    }
+                  ],
+                  "timeouts": {
+                    "backendRequest": "620s",
+                    "request": "620s"
+                  }
+                },
+                {
+                  "backendRefs": [
+                    {
+                      "name": "api-gateway",
+                      "port": 9080
+                    }
+                  ],
+                  "matches": [
+                    {
+                      "path": {
+                        "type": "PathPrefix",
+                        "value": "/models/8242d5c4-9bce-5497-8414-f5bad94fdd84"
+                      }
+                    }
+                  ],
+                  "timeouts": {
+                    "backendRequest": "620s",
+                    "request": "620s"
+                  }
+                }
+              ]
+            }
+          },
+          "rendered": false,
+          "resource": "httproutes.gateway.networking.k8s.io",
+          "summary": "HTTPRoute inference/models-gw-inet (gw-inet) carries the rules of chat, staff (rendered chat)",
+          "what": "route_rules"
+        }
+      ],
+      "exercise": 4,
+      "expect_broken": [],
+      "expect_healed": [
+        {
+          "cell": "internet/staff",
+          "kind": "cell_mode",
+          "mode": "404",
+          "probe": "cells"
+        },
+        {
+          "cell": "internet/chat",
+          "kind": "cell_mode",
+          "mode": "allowed",
+          "probe": "cells"
+        }
+      ],
+      "heal": [
+        {
+          "gateway": "gw-inet",
+          "kind": "k8s_patch",
+          "models": [
+            "chat"
+          ],
+          "name": "models-gw-inet",
+          "namespace": "inference",
+          "patch": {
+            "spec": {
+              "rules": [
+                {
+                  "backendRefs": [
+                    {
+                      "name": "api-gateway",
+                      "port": 9080
+                    }
+                  ],
+                  "matches": [
+                    {
+                      "path": {
+                        "type": "PathPrefix",
+                        "value": "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7"
+                      }
+                    }
+                  ],
+                  "timeouts": {
+                    "backendRequest": "620s",
+                    "request": "620s"
+                  }
+                }
+              ]
+            }
+          },
+          "rendered": true,
+          "resource": "httproutes.gateway.networking.k8s.io",
+          "summary": "HTTPRoute inference/models-gw-inet (gw-inet) carries the rules of chat (rendered)",
+          "what": "route_rules"
+        }
+      ],
+      "id": "11a",
+      "note": null,
+      "record": [
+        {
+          "kind": "k8s_read",
+          "objects": [
+            {
+              "id": "route:models-gw-inet",
+              "name": "models-gw-inet",
+              "namespace": "inference",
+              "resource": "httproutes.gateway.networking.k8s.io"
+            }
+          ]
+        },
+        {
+          "cells": [
+            "internet/staff",
+            "internet/chat"
+          ],
+          "id": "cells",
+          "kind": "matrix_cells"
+        }
+      ],
+      "title": "the internet Gateway's model route carries staff's path beside chat's"
+    }
+  },
+  "lab": "sfab-ch11",
+  "schema": 1
+}

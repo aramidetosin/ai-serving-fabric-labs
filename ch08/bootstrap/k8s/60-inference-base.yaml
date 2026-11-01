@@ -1,0 +1,121 @@
+# sfab-ch08 inference: namespace and the key Job's roles: rendered from spec/profile-a.yaml by render/k8s.py; edit the spec and run make render
+# The API gateway's and the router's namespace, and the account of the key Job (61): get and patch on the three
+# Secrets it keeps and create here, and get on the serving recipe's key Secret in serving, which it copies.
+# The per-pod key probe's account, key-probe, may get and list this namespace's pods.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: inference
+  labels:
+    app.kubernetes.io/part-of: inference
+    pod-security.kubernetes.io/enforce: restricted
+    routes.tarnwick.example/gw-inet: "true"
+    routes.tarnwick.example/gw-internal: "true"
+    routes.tarnwick.example/gw-users: "true"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: inference-keys
+  namespace: inference
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: inference-keys
+  namespace: inference
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  resourceNames:
+  - router-master-key
+  - api-keys
+  - backend-key
+  verbs:
+  - get
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: inference-keys
+  namespace: inference
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: inference-keys
+subjects:
+- kind: ServiceAccount
+  name: inference-keys
+  namespace: inference
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: inference-backend-key
+  namespace: serving
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  resourceNames:
+  - llm-api-key
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: inference-backend-key
+  namespace: serving
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: inference-backend-key
+subjects:
+- kind: ServiceAccount
+  name: inference-keys
+  namespace: inference
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: key-probe
+  namespace: inference
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: key-probe
+  namespace: inference
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: key-probe
+  namespace: inference
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: key-probe
+subjects:
+- kind: ServiceAccount
+  name: key-probe
+  namespace: inference

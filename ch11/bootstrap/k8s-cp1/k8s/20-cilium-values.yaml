@@ -1,0 +1,59 @@
+# sfab-ch11 Cilium values: rendered from spec/profile-a.yaml by render/k8s.py; edit the spec and run make render
+# helm upgrade --install cilium oci://192.0.2.6:5000/charts/cilium --version 1.19.7 -n kube-system,
+# run by cluster-bootstrap.sh on the init node after the Gateway API CRDs. The finish stage compares
+# devices with the running cilium-config and every agent's start time (the agents read it only at start).
+# Every image is pinned by digest (spec/versions.yaml); the in-lab registry serves them.
+# Envoy's stream idle timeout stays at the chart's default here (chapter 7 records it before raising it).
+k8sServiceHost: "10.20.1.10"
+k8sServicePort: 6443
+kubeProxyReplacement: true
+devices:
+- bond0
+- bond0.110
+routingMode: tunnel
+tunnelProtocol: geneve
+ipam:
+  mode: cluster-pool
+  operator:
+    clusterPoolIPv4PodCIDRList:
+    - "10.22.0.0/16"
+    clusterPoolIPv4MaskSize: 24
+bpf:
+  masquerade: false
+  hostLegacyRouting: true
+  vlanBypass:
+  - 110
+  - 120
+cni:
+  exclusive: false
+l2announcements:
+  enabled: true
+  leaseDuration: "3s"
+  leaseRenewDeadline: "1s"
+  leaseRetryPeriod: "200ms"
+k8sClientRateLimit:
+  qps: 50
+  burst: 100
+gatewayAPI:
+  enabled: true
+  gatewayClass:
+    create: "true"
+envoy:
+  enabled: true
+  image:
+    override: quay.io/cilium/cilium-envoy:v1.36.9-1786864149-07e8503ff34b9190d7bbe4e57d4e185c4ef8b1de@sha256:beccdf3c119f299cf696885188584bbd0531d74bca08096113207999aff95e87
+operator:
+  replicas: 2
+  image:
+    override: quay.io/cilium/operator-generic:v1.19.7@sha256:61e773bfc25a448f1ad3ead605af94b3ef176ba2925cf4bd1b11e09794b72bed
+hubble:
+  enabled: true
+  relay:
+    enabled: false
+  ui:
+    enabled: false
+image:
+  override: quay.io/cilium/cilium:v1.19.7@sha256:1b58bcb81c723cf130a0dd2fb2e1132c57f8fbc2ef7bdb85519cfcc36111c77e
+encryption:
+  enabled: true
+  type: wireguard

@@ -1,0 +1,143 @@
+{
+  "api_gateway": {
+    "name": "api-gateway",
+    "namespace": "inference",
+    "port": 9080,
+    "selector": "app.kubernetes.io/name=api-gateway"
+  },
+  "client": {
+    "address": "10.24.10.10",
+    "ca_root": "/shared/ca/root.crt",
+    "node": "ent-client",
+    "pin": false,
+    "resolve": null,
+    "resolver": "ent-dns"
+  },
+  "copies": [
+    {
+      "copy": "a",
+      "nad": "rail4",
+      "rail": 4,
+      "server": {
+        "address": "10.21.4.100",
+        "node": "k8s-gpu1",
+        "pod": "staff-a-server-0"
+      },
+      "service": "staff-a",
+      "spans": false,
+      "switch": "rail-sw2",
+      "switch_ports": [
+        {
+          "eth": "eth2",
+          "faces": "k8s-gpu1",
+          "id": "6-rail-sw2-Ethernet1",
+          "native": "Ethernet1",
+          "node": "rail-sw2"
+        }
+      ],
+      "workers": [
+        {
+          "address": "10.21.4.101",
+          "node": "k8s-gpu1",
+          "pod": "staff-a-worker0-0",
+          "remote": false
+        }
+      ]
+    },
+    {
+      "copy": "b",
+      "nad": "rail5",
+      "rail": 5,
+      "server": {
+        "address": "10.21.5.100",
+        "node": "k8s-gpu2",
+        "pod": "staff-b-server-0"
+      },
+      "service": "staff-b",
+      "spans": false,
+      "switch": "rail-sw1",
+      "switch_ports": [
+        {
+          "eth": "eth7",
+          "faces": "k8s-gpu2",
+          "id": "6-rail-sw1-Ethernet6",
+          "native": "Ethernet6",
+          "node": "rail-sw1"
+        }
+      ],
+      "workers": [
+        {
+          "address": "10.21.5.101",
+          "node": "k8s-gpu2",
+          "pod": "staff-b-worker0-0",
+          "remote": false
+        }
+      ]
+    }
+  ],
+  "expect": {
+    "api_base": "http://staff.serving.svc.cluster.local:8080/v1",
+    "model_name": "openai/staff",
+    "status": 200
+  },
+  "gateway": {
+    "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-users",
+    "name": "gw-users",
+    "port": 443,
+    "route": "models-gw-users",
+    "service": "cilium-gateway-gw-users",
+    "vip": "10.20.11.210"
+  },
+  "hostname": "llm.ai.tarnwick.example",
+  "keys": {
+    "backend": {
+      "field": "key",
+      "secret": "backend-key"
+    },
+    "capture": true,
+    "master": {
+      "field": "key",
+      "secret": "router-master-key"
+    },
+    "model": "staff",
+    "namespace": "inference",
+    "router_path": "/engines/staff/chat/completions",
+    "secret": "api-keys"
+  },
+  "kind": "serving",
+  "lab": "sfab-ch11",
+  "max_tokens": 16,
+  "model": "staff",
+  "path": "/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions",
+  "pin": null,
+  "refuse": {
+    "expect": 404,
+    "hostname": "admin.ai.tarnwick.example",
+    "path": "/echo",
+    "resolve": "admin.ai.tarnwick.example:443:10.20.11.210",
+    "sport": 42967,
+    "url": "https://admin.ai.tarnwick.example/echo?msg=sfab-trace-refused"
+  },
+  "route_id": "8242d5c4-9bce-5497-8414-f5bad94fdd84",
+  "router": {
+    "name": "router",
+    "namespace": "inference",
+    "port": 4000,
+    "selector": "app.kubernetes.io/name=router"
+  },
+  "schema": 1,
+  "serving": {
+    "http_port": 8080,
+    "namespace": "serving",
+    "rail_probe_port": 50053,
+    "rpc_port": 50052
+  },
+  "snaplen": {
+    "http": 66,
+    "keyed": 2048,
+    "rail": 128,
+    "vip": 96
+  },
+  "sport": 42966,
+  "url": "https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions"
+}

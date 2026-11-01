@@ -1,0 +1,33 @@
+# break-9a (Chapter 9, exercise 4): the corporate resolver pins the platform's names and stops
+# forwarding the zone.
+#
+# The corporate DNS team, during a change, replaces ent-dns's forwarding of ai.tarnwick.example to the
+# platform's authoritative pair (server=/ai.tarnwick.example/...) with address= pins for llm and id,
+# the users' Gateway's VIP the enterprise view answers. dnsmasq answers A for a pinned name itself and,
+# from 2.86, sends every other type upstream (dnsmasq man page); with the zone's forwarding gone the
+# AAAA query has nowhere to go. The render's local=/tarnwick.example/ (the corporate domain) stays, as
+# the corporate team would leave it.
+#
+# record: the staff client's lookups of llm.ai.tarnwick.example by each stub it has: dig for A and for
+# AAAA, python3's getaddrinfo (musl) and curl (its own resolver library, c-ares on Alpine), each
+# timed, with ent-client's resolv.conf. The broken state is checked for the A answer only: the AAAA
+# status and what each stub makes of it are recorded before the exercise text names them.
+# The heal installs the rendered dnsmasq.conf again (restore),
+# and every lookup is checked: A answered, AAAA NODATA (NOERROR with no record), both stubs resolve
+# and curl connects.
+title: the corporate resolver pins llm and id with address= and stops forwarding the platform's zone
+exercise: 4
+since: 9
+break:
+  - dnsmasq_pin: {node: ent-dns, names: [llm, id]}
+record:
+  - probe_lookup: {id: staff, from: ent-client, name: llm, path: "/echo?msg=sfab-break-9a", timeout_s: 90}
+expect_broken:
+  - lookup_answer: {probe: staff, type: A, rcode: NOERROR, answers: 1}
+heal:
+  - restore: ent-dns
+expect_healed:
+  - lookup_answer: {probe: staff, type: A, rcode: NOERROR, answers: 1}
+  - lookup_answer: {probe: staff, type: AAAA, rcode: NOERROR, answers: 0}
+  - lookup_answer: {probe: staff, tool: getaddrinfo, ok: true}
+  - lookup_answer: {probe: staff, tool: curl, ok: true}

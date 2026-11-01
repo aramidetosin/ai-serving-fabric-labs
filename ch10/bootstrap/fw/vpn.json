@@ -1,0 +1,39 @@
+{
+  "firewall": "fw",
+  "lab": "sfab-ch10",
+  "steps": [
+    {
+      "element": "<entry name=\"ops-gw\">\n  <authentication>\n    <pre-shared-key>\n      <key>@@SFAB_PSK@@</key>\n    </pre-shared-key>\n  </authentication>\n  <protocol>\n    <ikev2>\n      <dpd>\n        <enable>yes</enable>\n      </dpd>\n      <ike-crypto-profile>op-ike</ike-crypto-profile>\n    </ikev2>\n    <version>ikev2</version>\n  </protocol>\n  <local-address>\n    <interface>ethernet1/5</interface>\n    <ip>198.51.100.2/29</ip>\n  </local-address>\n  <peer-address>\n    <ip>192.0.2.22</ip>\n  </peer-address>\n  <local-id>\n    <id>198.51.100.2</id>\n    <type>ipaddr</type>\n  </local-id>\n  <peer-id>\n    <id>192.0.2.22</id>\n    <type>ipaddr</type>\n  </peer-id>\n</entry>",
+      "placeholder": "@@SFAB_PSK@@",
+      "psk": "ops-gw",
+      "what": "IKE gateway ops-gw",
+      "xpath": "/config/devices/entry[@name='localhost.localdomain']/network/ike/gateway"
+    },
+    {
+      "element": "<entry name=\"ops-gw\">\n  <auto-key>\n    <ike-gateway>\n      <entry name=\"ops-gw\"/>\n    </ike-gateway>\n    <ipsec-crypto-profile>op-esp</ipsec-crypto-profile>\n    <proxy-id>\n      <entry name=\"ingress\">\n        <local>10.20.11.0/24</local>\n        <remote>192.0.2.0/30</remote>\n        <protocol>\n          <any/>\n        </protocol>\n      </entry>\n      <entry name=\"bastion\">\n        <local>10.20.3.0/24</local>\n        <remote>192.0.2.0/30</remote>\n        <protocol>\n          <any/>\n        </protocol>\n      </entry>\n    </proxy-id>\n  </auto-key>\n  <tunnel-interface>tunnel.1</tunnel-interface>\n</entry>",
+      "what": "IPsec tunnel ops-gw",
+      "xpath": "/config/devices/entry[@name='localhost.localdomain']/network/tunnel/ipsec"
+    }
+  ],
+  "tunnels": [
+    {
+      "gateway": "ops-gw",
+      "name": "ops-gw",
+      "peer": "192.0.2.22",
+      "peer_node": "ops-gw",
+      "proxy_ids": [
+        [
+          "ingress",
+          "10.20.11.0/24",
+          "192.0.2.0/30"
+        ],
+        [
+          "bastion",
+          "10.20.3.0/24",
+          "192.0.2.0/30"
+        ]
+      ],
+      "psk": "ops-gw"
+    }
+  ]
+}

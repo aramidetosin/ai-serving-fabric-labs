@@ -1,0 +1,26 @@
+# break-11a (Chapter 11, exercise 4): the internet Gateway's model route gains staff's path.
+#
+# models-gw-inet carries one rule, chat's path, the internet audience's one model. The break patches
+# the route's rules to add staff's path beside it, as a copy-paste from the users' Gateway's route
+# would. Every network layer is unchanged: the firewall, the routes and the zones hold every cell of
+# the matrix as before, so every packet tally of the ladder stays zero, and the request for staff's
+# path now reaches the API gateway, whose consumer restriction still refuses an internet caller's key
+# (inetapp is not in staff's group). The layer that should have refused it is the route set, and the
+# audit's route-set check (each Gateway's routes equal its audience's row) is what catches it.
+#
+# record: the route read whole, and the internet users' cells for chat and staff tried as matrix.sh
+# tries them. The modes the broken route gives are recorded before the exercise text names them;
+# the heal patches the rendered rules back, and the cells are checked against the render.
+title: the internet Gateway's model route carries staff's path beside chat's
+exercise: 4
+since: 11
+break:
+  - route_rules: {route: models-gw-inet, add: [staff]}
+record:
+  - k8s_read: {objects: ["route:models-gw-inet"]}
+  - matrix_cells: {id: cells, cells: [internet/staff, internet/chat]}
+heal:
+  - route_rules: {route: models-gw-inet, add: rendered}
+expect_healed:
+  - cell_mode: {probe: cells, cell: internet/staff, mode: "404"}
+  - cell_mode: {probe: cells, cell: internet/chat, mode: allowed}

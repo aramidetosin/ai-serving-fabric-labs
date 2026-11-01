@@ -1,0 +1,13 @@
+; sfab-ch10 inet-dns-auth, view public-internet, zone ai.tarnwick.example: rendered from spec/profile-a.yaml by render/dns.py; edit the spec and run make render
+; decision dec-view-public
+$ORIGIN ai.tarnwick.example.
+$TTL 300
+@ IN SOA inet-dns-auth.ai.tarnwick.example. hostmaster.ai.tarnwick.example. (
+    469659643 ; serial, from the zone's data
+    3600 ; refresh
+    600 ; retry
+    86400 ; expire
+    60 ) ; negative answers
+@             IN NS  inet-dns-auth.ai.tarnwick.example.
+inet-dns-auth IN A   203.0.113.6 ; name server
+llm           IN A   198.51.100.10 ; a name users type

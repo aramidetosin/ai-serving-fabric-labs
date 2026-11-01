@@ -1,0 +1,55 @@
+# sfab-ch09 inference: the key Job: rendered from spec/profile-a.yaml by render/k8s.py; edit the spec and run make render
+# Run once by finish after the serving recipe and removed after: the router's master key, one key per model (the
+# first only: --if-none) and the recipe's key copied for the router. Every key is made or copied here and never
+# printed; the Job's log names each by its fingerprint.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: inference-keys
+  namespace: inference
+  labels:
+    app.kubernetes.io/part-of: inference
+    app.kubernetes.io/component: keys
+spec:
+  backoffLimit: 2
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/part-of: inference
+        app.kubernetes.io/component: keys
+    spec:
+      serviceAccountName: inference-keys
+      restartPolicy: Never
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: keys
+        image: "192.0.2.6:5000/sfab/keys:4"
+        imagePullPolicy: IfNotPresent
+        command:
+        - sh
+        - "-c"
+        - |
+          set -e
+          sfab-keys ensure --namespace inference --secret router-master-key --field key --prefix sk-tw-router
+          sfab-keys mint --namespace inference --secret api-keys --prefix sk-tw --model batch --if-none --for chat --audience enterprise --audience-models chat,staff
+          sfab-keys mint --namespace inference --secret api-keys --prefix sk-tw --model helpdesk --if-none --for staff --audience enterprise --audience-models chat,staff
+          sfab-keys mint --namespace inference --secret api-keys --prefix sk-tw --model inetapp --if-none --for chat --audience internet --audience-models chat
+          sfab-keys copy --from-namespace serving --from-secret llm-api-key --field key --namespace inference --secret backend-key
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "32Mi"
+          limits:
+            memory: "128Mi"
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL

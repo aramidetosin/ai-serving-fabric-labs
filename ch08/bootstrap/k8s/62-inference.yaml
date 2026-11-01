@@ -1,0 +1,878 @@
+# sfab-ch08 inference: the API gateway, the router and the model routes: rendered from spec/profile-a.yaml by render/k8s.py; edit the spec and run make render
+# Router attempts of 280 s, 60 s of silence in a stream (1 retry) inside the API gateway's read of 600 s, inside backendRequest 620 s, inside request 620 s.
+# Each caller is a consumer group: an application's keys are consumers composed into each API gateway pod from the mounted Secret, a person a consumer matched on the verified email of an OIDC token; each model's route admits the groups that may call it.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-gateway-plugins
+  namespace: inference
+  labels:
+    app.kubernetes.io/name: api-gateway
+    app.kubernetes.io/part-of: inference
+    app.kubernetes.io/component: api-gateway
+data:
+  oidc-consumer.lua: |
+    --
+    -- oidc-consumer: an APISIX authentication plugin that maps a caller's OpenID Connect token onto
+    -- a consumer, so a person signed in to the identity provider is a consumer as an application
+    -- holding a key is one (consumer groups, consumer restriction, rate limits and logs then treat
+    -- both alike). The lab's API gateway runs it beside key-auth under multi-auth.
+    --
+    -- APISIX 3.9's own plugins do not do this: openid-connect verifies a bearer token but attaches
+    -- no consumer (and with a public key or JWKS checks no issuer or audience), and jwt-auth finds
+    -- its consumer by a `key` claim an identity provider does not issue. This plugin uses the
+    -- libraries APISIX ships for openid-connect (lua-resty-openidc and lua-resty-jwt) to check the
+    -- signature against the provider's published keys (RS256 only; a key id it has not seen makes it
+    -- read the key set again), then checks the claims itself:
+    --   exp and nbf      lua-resty-jwt's own checks, with iat_slack seconds of leeway
+    --   iss              equal to the configured issuer
+    --   aud              equal to, or a list holding, the configured audience: the API gateway's own
+    --                    client id, which the provider writes into a token only when the requesting
+    --                    client asked for it and the API gateway trusts that client
+    --   the subject      the configured claim (email by default) present, and, for email,
+    --                    email_verified true
+    -- and attaches the consumer whose oidc-consumer subject equals that claim. Every refusal is 401
+    -- with one message, so a caller learns nothing about which check failed. A verified token is
+    -- never cached across configurations (jwt_verification_cache_ignore), so a token one route
+    -- accepted is checked again by another.
+    --
+    -- Route configuration:  {issuer, jwks_uri, audience, claim?, timeout_s?, jwk_expires_in?, hide_credentials?}
+    -- Consumer:             {subject}
+    --
+    local core         = require("apisix.core")
+    local consumer_mod = require("apisix.consumer")
+    local openidc      = require("resty.openidc")
+    local ngx_re       = require("ngx.re")
+    local type         = type
+    local ipairs       = ipairs
+    local tostring     = tostring
+
+    local plugin_name = "oidc-consumer"
+    local REFUSED = "Authorization Failed"
+
+    local schema = {
+        type = "object",
+        properties = {
+            issuer = {type = "string", minLength = 1},
+            jwks_uri = {type = "string", minLength = 1},
+            audience = {type = "string", minLength = 1},
+            claim = {type = "string", default = "email"},
+            timeout_s = {type = "integer", minimum = 1, default = 3},
+            jwk_expires_in = {type = "integer", minimum = 1, default = 300},
+            iat_slack = {type = "integer", minimum = 0, default = 60},
+            hide_credentials = {type = "boolean", default = true},
+        },
+        required = {"issuer", "jwks_uri", "audience"},
+    }
+
+    local consumer_schema = {
+        type = "object",
+        properties = {
+            subject = {type = "string", minLength = 1},
+        },
+        required = {"subject"},
+    }
+
+    local _M = {
+        version = 0.1,
+        priority = 2505,
+        type = "auth",
+        name = plugin_name,
+        schema = schema,
+        consumer_schema = consumer_schema,
+    }
+
+
+    function _M.check_schema(conf, schema_type)
+        if schema_type == core.schema.TYPE_CONSUMER then
+            return core.schema.check(consumer_schema, conf)
+        end
+        return core.schema.check(schema, conf)
+    end
+
+
+    local function bearer(ctx)
+        local h = core.request.header(ctx, "Authorization")
+        if not h then
+            return nil
+        end
+        local m = ngx_re.split(h, " ", nil, nil, 2)
+        if not m or #m ~= 2 or m[1]:lower() ~= "bearer" or m[2] == "" then
+            return nil
+        end
+        return m[2]
+    end
+
+
+    local function has_audience(aud, want)
+        if type(aud) == "string" then
+            return aud == want
+        end
+        if type(aud) == "table" then
+            for _, a in ipairs(aud) do
+                if a == want then
+                    return true
+                end
+            end
+        end
+        return false
+    end
+
+
+    -- multi-auth calls rewrite with the configuration as written, never through the schema, so the
+    -- defaults are applied here too
+    local DEFAULTS = {claim = "email", timeout_s = 3, jwk_expires_in = 300, iat_slack = 60, hide_credentials = true}
+
+    local function setting(conf, k)
+        if conf[k] == nil then
+            return DEFAULTS[k]
+        end
+        return conf[k]
+    end
+
+
+    function _M.rewrite(conf, ctx)
+        local token = bearer(ctx)
+        -- a key (sk-...) is not a JWT: three dot-separated parts are the least a token has
+        if not token or not token:find("^[%w_-]+%.[%w_-]+%.[%w_-]+$") then
+            return 401, {message = REFUSED}
+        end
+        local opts = {
+            discovery = {issuer = conf.issuer, jwks_uri = conf.jwks_uri},
+            token_signing_alg_values_expected = {"RS256"},
+            accept_none_alg = false,
+            jwt_verification_cache_ignore = true,
+            jwk_expires_in = setting(conf, "jwk_expires_in"),
+            timeout = setting(conf, "timeout_s") * 1000,
+            iat_slack = setting(conf, "iat_slack"),
+            ssl_verify = "yes",
+        }
+        local claims, err = openidc.jwt_verify(token, opts)
+        if err or type(claims) ~= "table" then
+            core.log.warn("oidc-consumer: token refused: ", err or "no claims")
+            return 401, {message = REFUSED}
+        end
+        if claims.iss ~= conf.issuer then
+            core.log.warn("oidc-consumer: token refused: issuer ", tostring(claims.iss))
+            return 401, {message = REFUSED}
+        end
+        if not has_audience(claims.aud, conf.audience) then
+            core.log.warn("oidc-consumer: token refused: the audience does not name ", conf.audience)
+            return 401, {message = REFUSED}
+        end
+        local claim = setting(conf, "claim")
+        local subject = claims[claim]
+        if type(subject) ~= "string" or subject == "" or (claim == "email" and claims.email_verified ~= true) then
+            core.log.warn("oidc-consumer: token refused: no verified ", claim)
+            return 401, {message = REFUSED}
+        end
+        local consumer_conf = consumer_mod.plugin(plugin_name)
+        if not consumer_conf then
+            return 401, {message = REFUSED}
+        end
+        local consumers = consumer_mod.consumers_kv(plugin_name, consumer_conf, "subject")
+        local consumer = consumers[subject]
+        if not consumer then
+            core.log.warn("oidc-consumer: token refused: no consumer for the subject")
+            return 401, {message = REFUSED}
+        end
+        if setting(conf, "hide_credentials") then
+            core.request.set_header(ctx, "Authorization", nil)
+        end
+        consumer_mod.attach_consumer(ctx, consumer, consumer_conf)
+    end
+
+
+    return _M
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-gateway-config
+  namespace: inference
+  labels:
+    app.kubernetes.io/name: api-gateway
+    app.kubernetes.io/part-of: inference
+    app.kubernetes.io/component: api-gateway
+data:
+  config.yaml: |
+    deployment:
+      role: data_plane
+      role_data_plane:
+        config_provider: yaml
+    apisix:
+      node_listen: 9080
+      enable_admin: false
+      enable_control: false
+      enable_server_tokens: false
+      enable_ipv6: false
+    nginx_config:
+      error_log: /dev/stderr
+      error_log_level: warn
+      worker_processes: 2
+      envs:
+      - ROUTER_MASTER_KEY
+      http:
+        access_log: /dev/stdout
+    plugins:
+    - multi-auth
+    - key-auth
+    - oidc-consumer
+    - consumer-restriction
+    - proxy-rewrite
+    - limit-count
+    - response-rewrite
+    - file-logger
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-gateway-routes
+  namespace: inference
+  labels:
+    app.kubernetes.io/name: api-gateway
+    app.kubernetes.io/part-of: inference
+    app.kubernetes.io/component: api-gateway
+data:
+  apisix.yaml: |
+    routes:
+    - id: chat
+      name: chat
+      uris:
+      - /models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions
+      - /models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/completions
+      methods:
+      - POST
+      upstream_id: router
+      plugins:
+        multi-auth:
+          auth_plugins:
+          - key-auth:
+              header: Authorization
+              hide_credentials: true
+          - oidc-consumer:
+              issuer: https://id.ai.tarnwick.example
+              jwks_uri: http://idp.identity.svc.cluster.local:5556/keys
+              audience: ai-gateway
+              claim: email
+        consumer-restriction:
+          type: consumer_group_id
+          whitelist:
+          - batch
+          - staff
+          - inetapp
+          rejected_code: 401
+          rejected_msg: "Authorization Failed"
+        proxy-rewrite:
+          regex_uri:
+          - "^/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/(chat/completions|completions)$"
+          - "/engines/chat/$1"
+          headers:
+            set:
+              Authorization: "Bearer ${{ROUTER_MASTER_KEY}}"
+        response-rewrite:
+          headers:
+            set:
+              WWW-Authenticate: "Bearer realm=\"llm.ai.tarnwick.example\""
+          vars:
+          - - status
+            - "=="
+            - 401
+        file-logger:
+          path: /dev/stdout
+          log_format:
+            time: "$time_iso8601"
+            client: "$remote_addr"
+            host: "$host"
+            route: "$route_id"
+            request: "$request_method $uri"
+            status: "$status"
+            consumer: "$consumer_name"
+            caller: "$consumer_group_id"
+            upstream_status: "$upstream_status"
+            request_time: "$request_time"
+    - id: staff
+      name: staff
+      uris:
+      - /models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions
+      - /models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/completions
+      methods:
+      - POST
+      upstream_id: router
+      plugins:
+        multi-auth:
+          auth_plugins:
+          - key-auth:
+              header: Authorization
+              hide_credentials: true
+          - oidc-consumer:
+              issuer: https://id.ai.tarnwick.example
+              jwks_uri: http://idp.identity.svc.cluster.local:5556/keys
+              audience: ai-gateway
+              claim: email
+        consumer-restriction:
+          type: consumer_group_id
+          whitelist:
+          - helpdesk
+          - staff
+          rejected_code: 401
+          rejected_msg: "Authorization Failed"
+        proxy-rewrite:
+          regex_uri:
+          - "^/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/(chat/completions|completions)$"
+          - "/engines/staff/$1"
+          headers:
+            set:
+              Authorization: "Bearer ${{ROUTER_MASTER_KEY}}"
+        response-rewrite:
+          headers:
+            set:
+              WWW-Authenticate: "Bearer realm=\"llm.ai.tarnwick.example\""
+          vars:
+          - - status
+            - "=="
+            - 401
+        file-logger:
+          path: /dev/stdout
+          log_format:
+            time: "$time_iso8601"
+            client: "$remote_addr"
+            host: "$host"
+            route: "$route_id"
+            request: "$request_method $uri"
+            status: "$status"
+            consumer: "$consumer_name"
+            caller: "$consumer_group_id"
+            upstream_status: "$upstream_status"
+            request_time: "$request_time"
+    upstreams:
+    - id: router
+      type: roundrobin
+      scheme: http
+      pass_host: pass
+      nodes:
+      - host: router.inference.svc.cluster.local
+        port: 4000
+        weight: 1
+      timeout:
+        connect: 5
+        send: 600
+        read: 600
+    consumer_groups:
+    - id: batch
+      desc: "application batch (owner data-platform, keys expire 2027-04-30); may call chat"
+      plugins:
+        limit-count:
+          count: 3000
+          time_window: 60
+          key_type: var
+          key: consumer_group_id
+          rejected_code: 429
+          policy: local
+    - id: helpdesk
+      desc: "application helpdesk (owner service-desk, keys expire 2027-04-30); may call staff"
+      plugins:
+        limit-count:
+          count: 3000
+          time_window: 60
+          key_type: var
+          key: consumer_group_id
+          rejected_code: 429
+          policy: local
+    - id: staff
+      desc: "people: ent-client; may call chat, staff"
+      plugins:
+        limit-count:
+          count: 600
+          time_window: 60
+          key_type: var
+          key: consumer_group_id
+          rejected_code: 429
+          policy: local
+    - id: inetapp
+      desc: "application inetapp (owner partner-apps, keys expire 2027-04-30); may call chat"
+      plugins:
+        limit-count:
+          count: 600
+          time_window: 60
+          key_type: var
+          key: consumer_group_id
+          rejected_code: 429
+          policy: local
+    consumers:
+    - username: staff_ent_client
+      group_id: staff
+      plugins:
+        oidc-consumer:
+          subject: ent-client@tarnwick.example
+    #END
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  namespace: inference
+  labels:
+    app.kubernetes.io/name: api-gateway
+    app.kubernetes.io/part-of: inference
+    app.kubernetes.io/component: api-gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: api-gateway
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: api-gateway
+        app.kubernetes.io/part-of: inference
+        app.kubernetes.io/component: api-gateway
+      annotations:
+        tarnwick.example/config: "6ba71a20f71868e8"
+    spec:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      terminationGracePeriodSeconds: 10
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 636
+        runAsGroup: 636
+        fsGroup: 636
+        seccompProfile:
+          type: RuntimeDefault
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: api-gateway
+      dnsConfig:
+        options:
+        - name: ndots
+          value: "1"
+      initContainers:
+      - name: compose
+        image: "192.0.2.6:5000/sfab/keys:4"
+        imagePullPolicy: IfNotPresent
+        command:
+        - sfab-keys
+        - compose
+        - "--base"
+        - /base/apisix.yaml
+        - "--keys"
+        - /keys
+        - "--out"
+        - /standalone/apisix.yaml
+        - "--format"
+        - "Bearer {key}"
+        - "--once"
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "32Mi"
+          limits:
+            memory: "128Mi"
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: base
+          mountPath: /base
+          readOnly: true
+        - name: keys
+          mountPath: /keys
+          readOnly: true
+        - name: standalone
+          mountPath: /standalone
+      containers:
+      - name: apisix
+        image: docker.io/apache/apisix@sha256:57a4001b6fb865d844c5f099069423c98b469f876bfba7ae88bbafc6ddd3748b
+        imagePullPolicy: IfNotPresent
+        command:
+        - /bin/sh
+        - "-c"
+        - "/usr/bin/apisix init && exec /usr/local/openresty/bin/openresty -p /usr/local/apisix -g 'daemon off;'"
+        env:
+        - name: ROUTER_MASTER_KEY
+          valueFrom:
+            secretKeyRef:
+              name: router-master-key
+              key: key
+        ports:
+        - name: http
+          containerPort: 9080
+          protocol: TCP
+        readinessProbe:
+          tcpSocket:
+            port: http
+          periodSeconds: 5
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            memory: "512Mi"
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: config
+          mountPath: /usr/local/apisix/conf/config.yaml
+          subPath: config.yaml
+          readOnly: true
+        - name: standalone
+          mountPath: /usr/local/apisix/conf/apisix.yaml
+          subPath: apisix.yaml
+        - name: plugins
+          mountPath: /usr/local/apisix/apisix/plugins/oidc-consumer.lua
+          subPath: oidc-consumer.lua
+          readOnly: true
+      - name: keys
+        image: "192.0.2.6:5000/sfab/keys:4"
+        imagePullPolicy: IfNotPresent
+        command:
+        - sfab-keys
+        - compose
+        - "--base"
+        - /base/apisix.yaml
+        - "--keys"
+        - /keys
+        - "--out"
+        - /standalone/apisix.yaml
+        - "--format"
+        - "Bearer {key}"
+        - "--hold"
+        - /standalone/hold
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "32Mi"
+          limits:
+            memory: "128Mi"
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: base
+          mountPath: /base
+          readOnly: true
+        - name: keys
+          mountPath: /keys
+          readOnly: true
+        - name: standalone
+          mountPath: /standalone
+      volumes:
+      - name: config
+        configMap:
+          name: api-gateway-config
+      - name: base
+        configMap:
+          name: api-gateway-routes
+      - name: keys
+        secret:
+          secretName: api-keys
+          defaultMode: 288
+      - name: standalone
+        emptyDir: {}
+      - name: plugins
+        configMap:
+          name: api-gateway-plugins
+      nodeSelector:
+        node-role.tarnwick.example/ingress: ""
+      tolerations:
+      - key: node-role.tarnwick.example/ingress
+        operator: Exists
+        effect: NoSchedule
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway
+  namespace: inference
+  labels:
+    app.kubernetes.io/name: api-gateway
+    app.kubernetes.io/part-of: inference
+    app.kubernetes.io/component: api-gateway
+spec:
+  selector:
+    app.kubernetes.io/name: api-gateway
+  ports:
+  - name: http
+    port: 9080
+    targetPort: http
+    protocol: TCP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: router-config
+  namespace: inference
+  labels:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/part-of: inference
+    app.kubernetes.io/component: router
+data:
+  config.yaml: |
+    model_list:
+    - model_name: chat
+      litellm_params:
+        model: openai/chat
+        api_base: http://chat.serving.svc.cluster.local:8080/v1
+        api_key: os.environ/SERVING_KEY
+        timeout: 280
+        stream_timeout: 60
+        max_retries: 0
+    - model_name: staff
+      litellm_params:
+        model: openai/staff
+        api_base: http://staff.serving.svc.cluster.local:8080/v1
+        api_key: os.environ/SERVING_KEY
+        timeout: 280
+        stream_timeout: 60
+        max_retries: 0
+    router_settings:
+      routing_strategy: simple-shuffle
+      num_retries: 1
+      timeout: 280
+      retry_after: 0
+    litellm_settings:
+      num_retries: 1
+      request_timeout: 280
+      drop_params: true
+      telemetry: false
+    general_settings:
+      master_key: os.environ/ROUTER_MASTER_KEY
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: router
+  namespace: inference
+  labels:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/part-of: inference
+    app.kubernetes.io/component: router
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: router
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: router
+        app.kubernetes.io/part-of: inference
+        app.kubernetes.io/component: router
+      annotations:
+        tarnwick.example/config: b319f282246d1425
+    spec:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      terminationGracePeriodSeconds: 10
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: router
+      dnsConfig:
+        options:
+        - name: ndots
+          value: "1"
+      containers:
+      - name: router
+        image: ghcr.io/berriai/litellm@sha256:5ce1ebf7f26ed82501b598e0ebecd4fe63d0e61817178427d4df86f2a16729ec
+        imagePullPolicy: IfNotPresent
+        args:
+        - "--config"
+        - /etc/router/config.yaml
+        - "--port"
+        - "4000"
+        env:
+        - name: ROUTER_MASTER_KEY
+          valueFrom:
+            secretKeyRef:
+              name: router-master-key
+              key: key
+        - name: SERVING_KEY
+          valueFrom:
+            secretKeyRef:
+              name: backend-key
+              key: key
+        - name: HOME
+          value: /tmp
+        - name: LITELLM_LOCAL_MODEL_COST_MAP
+          value: "True"
+        - name: DISABLE_ADMIN_UI
+          value: "True"
+        ports:
+        - name: http
+          containerPort: 4000
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /health/readiness
+            port: http
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "512Mi"
+          limits:
+            memory: "2Gi"
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: config
+          mountPath: /etc/router
+          readOnly: true
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: config
+        configMap:
+          name: router-config
+      - name: tmp
+        emptyDir: {}
+      nodeSelector:
+        node-role.tarnwick.example/ingress: ""
+      tolerations:
+      - key: node-role.tarnwick.example/ingress
+        operator: Exists
+        effect: NoSchedule
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: router
+  namespace: inference
+  labels:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/part-of: inference
+    app.kubernetes.io/component: router
+spec:
+  selector:
+    app.kubernetes.io/name: router
+  ports:
+  - name: http
+    port: 4000
+    targetPort: http
+    protocol: TCP
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: models-gw-internal
+  namespace: inference
+  labels:
+    tarnwick.example/audience: internal
+    decision.tarnwick.example/id: dec-routeset-internal
+spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: gw-internal
+    namespace: gateways
+    sectionName: https
+  hostnames:
+  - llm.ai.tarnwick.example
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /models
+    backendRefs:
+    - name: api-gateway
+      port: 9080
+    timeouts:
+      request: "620s"
+      backendRequest: "620s"
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: models-gw-users
+  namespace: inference
+  labels:
+    tarnwick.example/audience: enterprise
+    decision.tarnwick.example/id: dec-routeset-enterprise
+spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: gw-users
+    namespace: gateways
+    sectionName: https
+  hostnames:
+  - llm.ai.tarnwick.example
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7
+    backendRefs:
+    - name: api-gateway
+      port: 9080
+    timeouts:
+      request: "620s"
+      backendRequest: "620s"
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /models/8242d5c4-9bce-5497-8414-f5bad94fdd84
+    backendRefs:
+    - name: api-gateway
+      port: 9080
+    timeouts:
+      request: "620s"
+      backendRequest: "620s"
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: models-gw-inet
+  namespace: inference
+  labels:
+    tarnwick.example/audience: internet
+    decision.tarnwick.example/id: dec-routeset-internet
+spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: gw-inet
+    namespace: gateways
+    sectionName: https
+  hostnames:
+  - llm.ai.tarnwick.example
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7
+    backendRefs:
+    - name: api-gateway
+      port: 9080
+    timeouts:
+      request: "620s"
+      backendRequest: "620s"

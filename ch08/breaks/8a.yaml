@@ -1,0 +1,24 @@
+# break-8a (Chapter 8, exercise 5): the internet audience's announcement policy names an interface no
+# ingress node has.
+#
+# From chapter 8 each audience has its own CiliumL2AnnouncementPolicy (gateways-<audience>, the spec's
+# k8s.l2_announce.policies per-audience), so a fault in one touches one audience. The break patches
+# the internet audience's policy, gateways-internet, to name the interface ^bond0\.111$ (VLAN 111
+# exists nowhere) in place of ^bond0\.110$. The Gateway stays programmed and its Service keeps its
+# VIP, but no ingress node holds a device the policy names, so no agent answers ARP for 10.20.11.220;
+# the internal and the users' Gateways keep theirs.
+#
+# record: the policy, the internet Gateway's lease and the Gateway with its Service, each read whole,
+# and the firewall's ARP table. What the lease shows while the policy matches no device (present,
+# its holder, renewed or not) is recorded before the exercise text names it; the expectations here are only what the render knows. The heal patches the rendered
+# interfaces back.
+title: the internet audience's announcement policy names an interface no ingress node has
+exercise: 5
+since: 8
+break:
+  - l2_policy: {gateway: gw-inet, interfaces: ["^bond0\\.111$"]}
+record:
+  - k8s_read: {objects: ["l2_policy:gw-inet", "lease:gw-inet", "gateway:gw-inet", "l2_policy:gw-users", "lease:gw-users"]}
+  - fw_show: {lines: [show arp all]}
+heal:
+  - l2_policy: {gateway: gw-inet, interfaces: rendered}

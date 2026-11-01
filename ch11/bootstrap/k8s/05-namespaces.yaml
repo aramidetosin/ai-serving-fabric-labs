@@ -1,0 +1,21 @@
+# sfab-ch11 namespaces: rendered from spec/profile-a.yaml by render/k8s.py; edit the spec and run make render
+# Made first, so the lab host can write cert-manager's CA Secret before the chart and the certificate land.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gateways
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cert-manager
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: echo
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    routes.tarnwick.example/gw-inet: "true"
+    routes.tarnwick.example/gw-internal: "true"
+    routes.tarnwick.example/gw-users: "true"

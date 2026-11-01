@@ -1,0 +1,36 @@
+# Chapter 11, "Validating Tenant Isolation", lab sfab-ch11.
+#
+# Build A's state many at step 11, with the decision table and the matrix (decisions: true, as
+# chapter 2's lab): chapter 10's lab plus web-client (the matrix's internet host row) and TrueNAS
+# (the matrix's two storage columns need the storage system, as in chapter 2's lab, so storage_setup
+# is on here, unlike chapters 8 to 10). The
+# matrix holds five rows (Staff, Operator, Nodes, Internet host, Internet users) and twelve columns
+# (chapter 2's eleven and the internet Gateway): 60 cells, each with its isolation depth (the layers
+# that would refuse it if every earlier layer let it through) and each model cell's own key chosen per
+# population (inetapp for the internet users). make up deploys the whole step from wiped disks. It
+# extends chapter 10's lab (metadata only).
+lab: sfab-ch11
+profile: a
+state: many
+slice:
+  nodes: [fe, rail, oob, fw, k8s-gpu1, k8s-gpu2, k8s-cp1, k8s-cp2, k8s-cp3, bastion, inet-registry, uplink-rtr, ops-client, web-client, ops-dns, ent-client, truenas1, isp-rtr, inet-client, inet-dns-auth, inet-dns-res]
+features: {k8s: true, serving: true, storage_setup: true}
+prints: []
+extends: ch10
+variants: {}
+decisions: true
+
+# The keyed trace (trace.sh, common/trace/lib-servetrace.sh; rendered to gen/trace.json): chapter 7's
+# form, kept until Part III's own forms land (the record stage): one request from the staff client to
+# staff's path through the users' Gateway with helpdesk's key, every key replaced by its keyed mark,
+# then an admin hostname the users' Gateway does not carry, answered 404 there with no API gateway
+# line.
+trace:
+  serving:
+    client: ent-client
+    gateway: gw-users
+    model: staff
+    max_tokens: 16
+    sport: 42966
+    keys: true
+    refuse: {hostname: admin, path: /echo, sport: 42967}

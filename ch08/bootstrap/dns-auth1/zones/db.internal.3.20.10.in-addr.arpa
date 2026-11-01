@@ -1,0 +1,13 @@
+; sfab-ch08 dns-auth1, view internal, zone 3.20.10.in-addr.arpa: rendered from spec/profile-a.yaml by render/dns.py; edit the spec and run make render
+; decision dec-view-internal
+$ORIGIN 3.20.10.in-addr.arpa.
+$TTL 300
+@ IN SOA dns-auth1.ai.tarnwick.example. hostmaster.ai.tarnwick.example. (
+    1388176740 ; serial, from the zone's data
+    3600 ; refresh
+    600 ; retry
+    86400 ; expire
+    60 ) ; negative answers
+@  IN NS  dns-auth1.ai.tarnwick.example.
+@  IN NS  dns-auth2.ai.tarnwick.example.
+10 IN PTR bastion.ai.tarnwick.example.

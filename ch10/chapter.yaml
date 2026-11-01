@@ -1,0 +1,33 @@
+# Chapter 10, "Tenant Isolation on the Firewall", lab sfab-ch10.
+#
+# Build A's state many at step 10: chapter 9's lab plus the internet users' translation and rule,
+# which the spec adds from step 10: NAT dnat-internet-gateway (from isp to isp, the firewall's own isp
+# address 198.51.100.10 on tcp/443, to the internet Gateway's VIP 10.20.11.220; first of the NAT
+# rulebase) and security rule isp-to-internet-gateway (from isp to ingress, the pre-NAT address, ssl;
+# rule 24, deny-all-log rule 25). Internet users arrive translated, the staff routed and the operator
+# tunneled, both untranslated, keyed on the zone each arrives in. No node is added (30). make up
+# deploys the whole step from wiped disks. It extends chapter 9's lab (metadata only).
+lab: sfab-ch10
+profile: a
+state: many
+slice:
+  nodes: [fe, rail, oob, fw, k8s-gpu1, k8s-gpu2, k8s-cp1, k8s-cp2, k8s-cp3, bastion, inet-registry, uplink-rtr, ops-client, ops-dns, ent-client, isp-rtr, inet-client, inet-dns-auth, inet-dns-res]
+features: {k8s: true, serving: true, storage_setup: false}
+prints: []
+extends: ch09
+variants: {}
+
+# The keyed trace (trace.sh, common/trace/lib-servetrace.sh; rendered to gen/trace.json): chapter 7's
+# form, kept until Part III's own forms land (the record stage): one request from the staff client to
+# staff's path through the users' Gateway with helpdesk's key, every key replaced by its keyed mark,
+# then an admin hostname the users' Gateway does not carry, answered 404 there with no API gateway
+# line.
+trace:
+  serving:
+    client: ent-client
+    gateway: gw-users
+    model: staff
+    max_tokens: 16
+    sport: 42936
+    keys: true
+    refuse: {hostname: admin, path: /echo, sport: 42937}

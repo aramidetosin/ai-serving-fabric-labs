@@ -1,0 +1,39 @@
+# Chapter 8, "Multi-Tenant Inference Gateways", lab sfab-ch08.
+#
+# Build A's state many at step 8, with serving on: chapter 7's lab (every switch, the firewall, the
+# cluster with its ingress and GPU nodes, the bastion, the platform's DNS and time servers, the
+# registry, the uplink side and the staff client; TrueNAS left out) plus the internet audience's
+# Gateway layer, which the spec adds from step 8: Gateway gw-inet at 10.20.11.220 (pool .220 to
+# .224) with its own certificate (gw-inet-tls), one route for chat's path and the test backend's
+# /echo, the namespaces echo and inference labelled for it, one announcement policy per audience
+# (gateways-internal, gateways-enterprise, gateways-internet) and Cilium's tuned lease timers (3 s,
+# 1 s, 200 ms; the spec's k8s.l2_announce.lease, one switch), every caller labelled with its audience
+# and the internet audience's caller inetapp, and the key tool sfab/keys:4, whose mint refuses a key
+# for a model outside the caller's audience. No node, zone, rule, NAT or DNS record is added: the
+# internet population has no path until chapter 10, so the chapter's requests run from k8s-cp2, whose
+# own datapath answers every Gateway VIP. make up deploys the whole step from wiped disks. It extends
+# chapter 7's lab (metadata only: the lab ships complete).
+lab: sfab-ch08
+profile: a
+state: many
+slice:
+  nodes: [fe, rail, oob, fw, k8s-gpu1, k8s-gpu2, k8s-cp1, k8s-cp2, k8s-cp3, bastion, inet-registry, uplink-rtr, ops-client, ops-dns, ent-client]
+features: {k8s: true, serving: true, storage_setup: false}
+prints: []
+extends: ch07
+variants: {}
+
+# The keyed trace (trace.sh, common/trace/lib-servetrace.sh; rendered to gen/trace.json): chapter 7's
+# form, kept until Part III's own forms land (the record stage): one request from the staff client to
+# staff's path through the users' Gateway with helpdesk's key, every key replaced by its keyed mark,
+# then an admin hostname the users' Gateway does not carry, answered 404 there with no API gateway
+# line.
+trace:
+  serving:
+    client: ent-client
+    gateway: gw-users
+    model: staff
+    max_tokens: 16
+    sport: 42806
+    keys: true
+    refuse: {hostname: admin, path: /echo, sport: 42807}

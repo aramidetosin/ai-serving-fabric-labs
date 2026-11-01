@@ -1,0 +1,24 @@
+# sfab-ch11 lab CA, the kubernetes intermediate: rendered from spec/profile-a.yaml by render/ca.py; edit the spec and run make render
+# sfab-ca signs it with the root. Its name constraints are the only names and
+# addresses any certificate under it can verify for.
+# Role kubeadm: the init node's kubeadm signs the cluster's certificates with it.
+[sfab]
+key = rsa-2048
+days = 1826
+renew_days = 90
+role = kubeadm
+
+[req]
+prompt = no
+distinguished_name = dn
+
+[dn]
+O = Tarnwick
+CN = Tarnwick Kubernetes CA
+
+[ext]
+basicConstraints = critical,CA:TRUE,pathlen:0
+keyUsage = critical,keyCertSign,cRLSign,digitalSignature
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always
+nameConstraints = critical,permitted;DNS:ai.tarnwick.example,permitted;DNS:kubernetes,permitted;DNS:kubernetes.default,permitted;DNS:kubernetes.default.svc,permitted;DNS:cluster.local,permitted;DNS:k8s-cp1,permitted;DNS:k8s-cp2,permitted;DNS:k8s-cp3,permitted;IP:10.20.1.0/255.255.255.0,permitted;IP:10.23.0.0/255.255.0.0

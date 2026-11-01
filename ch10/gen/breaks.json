@@ -1,0 +1,244 @@
+{
+  "breaks": {
+    "10a": {
+      "break": [
+        {
+          "element": "<destination><member>10.20.11.220</member></destination>",
+          "field": "destination",
+          "kind": "panos_api",
+          "members": [
+            "10.20.11.220"
+          ],
+          "node": "fw",
+          "op": "edit",
+          "order": [
+            "staff-to-users-gateway",
+            "ent-dns-to-platform-dns",
+            "staff-to-enterprise-dns",
+            "admins-to-bastion",
+            "bastion-to-firewall-admin",
+            "bastion-to-nodes",
+            "bastion-to-api",
+            "bastion-to-internal-gateway",
+            "bastion-to-stor-mgmt",
+            "bastion-to-bmc",
+            "bastion-to-services-admin",
+            "inside-to-gateway-ping",
+            "inside-to-resolvers",
+            "inside-to-ntp",
+            "resolvers-to-auth",
+            "auth-zone-transfer",
+            "ntp-upstream",
+            "nts-ke-upstream",
+            "nodes-to-registry",
+            "nodes-to-internal-gateway",
+            "csi-to-storage-api",
+            "operator-ike",
+            "operator-to-internal-gateway",
+            "isp-to-internet-gateway",
+            "deny-all-log"
+          ],
+          "rendered": [
+            "198.51.100.10"
+          ],
+          "rule": "isp-to-internet-gateway",
+          "table": "security",
+          "xpath": "/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/security/rules/entry[@name='isp-to-internet-gateway']/destination"
+        }
+      ],
+      "exercise": 5,
+      "expect_broken": [
+        {
+          "failing": "all",
+          "kind": "probe_share",
+          "probe": "internet"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "staff"
+        },
+        {
+          "failing": "all",
+          "kind": "probe_share",
+          "probe": "syn"
+        },
+        {
+          "kind": "syn_at",
+          "probe": "syn",
+          "seen": [
+            "isp-rtr-eth1"
+          ],
+          "seen_any": [],
+          "unseen": [
+            "fw-ethernet1-1",
+            "fw-ethernet1-2"
+          ]
+        },
+        {
+          "action": "deny",
+          "kind": "tlog_rule",
+          "node": "fw",
+          "probe": "syn",
+          "rule": "deny-all-log"
+        }
+      ],
+      "expect_healed": [
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "internet"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "staff"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "syn"
+        },
+        {
+          "kind": "syn_at",
+          "probe": "syn",
+          "seen": [
+            "isp-rtr-eth1"
+          ],
+          "seen_any": [
+            "fw-ethernet1-1",
+            "fw-ethernet1-2"
+          ],
+          "unseen": []
+        },
+        {
+          "action": "allow",
+          "kind": "tlog_rule",
+          "node": "fw",
+          "probe": "syn",
+          "rule": "isp-to-internet-gateway"
+        }
+      ],
+      "heal": [
+        {
+          "element": "<destination><member>198.51.100.10</member></destination>",
+          "field": "destination",
+          "kind": "panos_api",
+          "members": [
+            "198.51.100.10"
+          ],
+          "node": "fw",
+          "op": "edit",
+          "order": [
+            "staff-to-users-gateway",
+            "ent-dns-to-platform-dns",
+            "staff-to-enterprise-dns",
+            "admins-to-bastion",
+            "bastion-to-firewall-admin",
+            "bastion-to-nodes",
+            "bastion-to-api",
+            "bastion-to-internal-gateway",
+            "bastion-to-stor-mgmt",
+            "bastion-to-bmc",
+            "bastion-to-services-admin",
+            "inside-to-gateway-ping",
+            "inside-to-resolvers",
+            "inside-to-ntp",
+            "resolvers-to-auth",
+            "auth-zone-transfer",
+            "ntp-upstream",
+            "nts-ke-upstream",
+            "nodes-to-registry",
+            "nodes-to-internal-gateway",
+            "csi-to-storage-api",
+            "operator-ike",
+            "operator-to-internal-gateway",
+            "isp-to-internet-gateway",
+            "deny-all-log"
+          ],
+          "rendered": [
+            "198.51.100.10"
+          ],
+          "rule": "isp-to-internet-gateway",
+          "table": "security",
+          "xpath": "/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/security/rules/entry[@name='isp-to-internet-gateway']/destination"
+        }
+      ],
+      "id": "10a",
+      "note": null,
+      "record": [
+        {
+          "client_addr": "203.0.113.2",
+          "count": 10,
+          "id": "internet",
+          "interval_s": 0.5,
+          "kind": "probe_http",
+          "node": "inet-client",
+          "passes": 1,
+          "timeout_s": 5,
+          "url": "https://llm.ai.tarnwick.example/echo?msg=sfab-break-10a"
+        },
+        {
+          "client_addr": "10.24.10.10",
+          "count": 10,
+          "id": "staff",
+          "interval_s": 0.5,
+          "kind": "probe_http",
+          "node": "ent-client",
+          "passes": 1,
+          "timeout_s": 5,
+          "url": "https://llm.ai.tarnwick.example/echo?msg=sfab-break-10a"
+        },
+        {
+          "capture": [
+            {
+              "eth": "eth1",
+              "id": "isp-rtr-eth1",
+              "ifname": null,
+              "node": "isp-rtr",
+              "peer": "fw:eth6"
+            },
+            {
+              "eth": "eth1",
+              "id": "fw-ethernet1-1",
+              "ifname": "ethernet1/1",
+              "node": "fw",
+              "peer": "fe-sw1:eth3"
+            },
+            {
+              "eth": "eth2",
+              "id": "fw-ethernet1-2",
+              "ifname": "ethernet1/2",
+              "node": "fw",
+              "peer": "fe-sw2:eth3"
+            }
+          ],
+          "client_addr": "203.0.113.2",
+          "count": 3,
+          "dst_addr": "198.51.100.10",
+          "filter": "(host 203.0.113.2 and host 198.51.100.10 and tcp port 443) or (vlan and (host 203.0.113.2 and host 198.51.100.10 and tcp port 443))",
+          "id": "syn",
+          "kind": "probe_syn",
+          "node": "inet-client",
+          "passes": 1,
+          "port": 443,
+          "snaplen": 96,
+          "sport": 42310,
+          "timeout_s": 5,
+          "to": "198.51.100.10"
+        },
+        {
+          "kind": "fw_show",
+          "lines": [
+            "show running security-policy",
+            "show running nat-policy"
+          ],
+          "node": "fw"
+        }
+      ],
+      "title": "the internet users' rule names the translated destination instead of the published address"
+    }
+  },
+  "lab": "sfab-ch10",
+  "schema": 1
+}

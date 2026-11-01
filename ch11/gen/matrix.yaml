@@ -1,0 +1,2911 @@
+# sfab-ch11 matrix: rendered from spec/profile-a.yaml by render/decisions.py; edit the spec and run make render
+# The population and endpoint matrix (Table 2-2): every cell's mode as the request meets the layers, with the
+# requests matrix.sh makes and the evidence each mode leaves. matrix.sh reads gen/matrix.json, the same data.
+schema: 1
+lab: sfab-ch11
+rows:
+- id: enterprise
+  label: Staff
+  client: ent-client
+  kind: client
+  address: "10.24.10.10"
+  resolver: ent-dns
+  resolver_address: "10.24.10.53"
+  view: enterprise
+  view_decision: dec-view-enterprise
+  answer: "10.20.11.210"
+  zones:
+  - enterprise
+  translated: false
+- id: operator
+  label: Operator
+  client: ops-client
+  kind: client
+  address: "192.0.2.2"
+  resolver: ops-dns
+  resolver_address: "192.0.2.10"
+  view: public-operator
+  view_decision: dec-view-public
+  answer: "10.20.11.200"
+  zones:
+  - operator-vpn
+  translated: false
+- id: nodes
+  label: Nodes
+  client: k8s-cp2
+  kind: vm-node
+  address: "10.20.1.12"
+  resolver: dns-res1
+  resolver_address: "10.20.13.21"
+  view: internal
+  view_decision: dec-view-internal
+  answer: "10.20.11.200"
+  zones:
+  - k8s-nodes
+  - bastion
+  translated: false
+- id: web
+  label: "Internet host"
+  client: web-client
+  kind: client
+  address: "192.0.2.18"
+  resolver: ops-dns
+  resolver_address: "192.0.2.10"
+  view: public-operator
+  view_decision: dec-view-public
+  answer: "198.51.100.2"
+  zones:
+  - uplink
+  translated: false
+- id: internet
+  label: "Internet users"
+  client: inet-client
+  kind: client
+  address: "203.0.113.2"
+  resolver: inet-dns-res
+  resolver_address: "203.0.113.10"
+  view: public-internet
+  view_decision: dec-view-public
+  answer: "198.51.100.10"
+  zones:
+  - isp
+  translated: true
+columns:
+- id: gw-internal
+  label: "Internal Gateway"
+  kind: connect
+  ref: vip:gw-internal
+  address: "10.20.11.200"
+  what: "gw-internal's VIP"
+  port: 443
+- id: gw-users
+  label: "Users' Gateway"
+  kind: connect
+  ref: vip:gw-users
+  address: "10.20.11.210"
+  what: "gw-users's VIP"
+  port: 443
+- id: gw-inet
+  label: "Internet Gateway"
+  kind: connect
+  ref: vip:gw-inet
+  address: "10.20.11.220"
+  what: "gw-inet's VIP"
+  port: 443
+- id: chat
+  label: "Route to chat"
+  kind: model
+  model: chat
+  other: staff
+  hostname: llm.ai.tarnwick.example
+  path: /models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions
+  port: 443
+- id: staff
+  label: "Route to staff"
+  kind: model
+  model: staff
+  other: chat
+  hostname: llm.ai.tarnwick.example
+  path: /models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions
+  port: 443
+- id: admin
+  label: "Admin hostnames"
+  kind: name
+  hostname: admin.ai.tarnwick.example
+  path: /echo
+  port: 443
+- id: api-server
+  label: "API server"
+  kind: connect
+  ref: api
+  address: "10.20.1.10"
+  what: "the API server's VIP"
+  port: 6443
+- id: node
+  label: "A node, k8s-gpu1"
+  kind: connect
+  ref: node:k8s-gpu1
+  address: "10.20.1.21"
+  what: "k8s-gpu1's address"
+  port: 22
+- id: bmc
+  label: "A BMC, k8s-gpu1's"
+  kind: connect
+  ref: oob:k8s-gpu1
+  address: "10.20.9.21"
+  what: "k8s-gpu1's BMC address"
+  port: 443
+- id: stor-data
+  label: "Storage data"
+  kind: connect
+  ref: data:truenas1
+  address: "10.20.12.31"
+  what: "truenas1's data address"
+  port: 2049
+- id: stor-mgmt
+  label: "Storage management"
+  kind: connect
+  ref: mgmt:truenas1
+  address: "10.20.2.31"
+  what: "truenas1's management address"
+  port: 443
+- id: egress
+  label: "An internet host, web-client"
+  kind: connect
+  ref: node:web-client
+  address: "192.0.2.18"
+  what: "web-client's address"
+  port: 443
+cells:
+- id: enterprise/gw-internal
+  row: enterprise
+  column: gw-internal
+  kind: connect
+  client: ent-client
+  client_kind: client
+  client_addr: "10.24.10.10"
+  port: 443
+  sport: 43000
+  address: "10.20.11.200"
+  hops:
+  - row: routing
+    device: fw
+    what: "in on ethernet1/4 (zone enterprise): 10.20.11.0/24 connected on ae1.110, zone ingress"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone enterprise: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone enterprise to ingress"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: enterprise
+    to_zone: ingress
+    device: fw
+  fw:
+    rule: deny-all-log
+    from_zone: enterprise
+    to_zone: ingress
+  requests:
+  - id: connect
+    sport: 43000
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (enterprise to ingress)"
+    rule: deny-all-log
+- id: enterprise/gw-users
+  row: enterprise
+  column: gw-users
+  kind: connect
+  client: ent-client
+  client_kind: client
+  client_addr: "10.24.10.10"
+  port: 443
+  sport: 43004
+  address: "10.20.11.210"
+  hops:
+  - row: routing
+    device: fw
+    what: "in on ethernet1/4 (zone enterprise): 10.20.11.0/24 connected on ae1.110, zone ingress"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone enterprise: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "staff-to-users-gateway: allow, zone enterprise to ingress"
+    rule: staff-to-users-gateway
+  mode: allowed
+  layer: null
+  expect:
+    connect: connected
+  fw:
+    rule: staff-to-users-gateway
+    from_zone: enterprise
+    to_zone: ingress
+  requests:
+  - id: connect
+    sport: 43004
+  depth: 0
+  depth_layers: []
+- id: enterprise/gw-inet
+  row: enterprise
+  column: gw-inet
+  kind: connect
+  client: ent-client
+  client_kind: client
+  client_addr: "10.24.10.10"
+  port: 443
+  sport: 43008
+  address: "10.20.11.220"
+  hops:
+  - row: routing
+    device: fw
+    what: "in on ethernet1/4 (zone enterprise): 10.20.11.0/24 connected on ae1.110, zone ingress"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone enterprise: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone enterprise to ingress"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: enterprise
+    to_zone: ingress
+    device: fw
+  fw:
+    rule: deny-all-log
+    from_zone: enterprise
+    to_zone: ingress
+  requests:
+  - id: connect
+    sport: 43008
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (enterprise to ingress)"
+    rule: deny-all-log
+- id: enterprise/chat
+  row: enterprise
+  column: chat
+  kind: model
+  client: ent-client
+  client_kind: client
+  client_addr: "10.24.10.10"
+  port: 443
+  sport: 43012
+  hostname: llm.ai.tarnwick.example
+  address: "10.20.11.210"
+  lookup:
+    name: llm.ai.tarnwick.example
+    resolver: ent-dns
+    server: "10.24.10.53"
+    view: enterprise
+    answer: "10.20.11.210"
+  hops:
+  - row: view
+    device: ent-dns
+    what: "view enterprise: llm.ai.tarnwick.example A 10.20.11.210"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/4 (zone enterprise): 10.20.11.0/24 connected on ae1.110, zone ingress"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone enterprise: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "staff-to-users-gateway: allow, zone enterprise to ingress"
+    rule: staff-to-users-gateway
+  - row: routeset
+    device: gw-users
+    what: "HTTPRoute models-gw-users, /models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7: the API gateway (api-gateway)"
+    route: models-gw-users
+  - row: key
+    device: api-gateway
+    what: "chat's consumer group: its own key 200, staff's key 401"
+  fw:
+    rule: staff-to-users-gateway
+    from_zone: enterprise
+    to_zone: ingress
+  gateway: gw-users
+  route: models-gw-users
+  mode: allowed
+  layer: null
+  expect:
+    status: 200
+  requests:
+  - id: own
+    sport: 43012
+    method: POST
+    url: https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions
+    key: chat
+    body:
+      model: chat
+      max_tokens: 1
+      messages:
+      - role: user
+        content: "Say yes."
+    expect:
+      status: 200
+  - id: other
+    sport: 43014
+    method: POST
+    url: https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions
+    key: staff
+    body:
+      model: chat
+      max_tokens: 1
+      messages:
+      - role: user
+        content: "Say yes."
+    expect:
+      status: 401
+      message: "Authorization Failed"
+      layer: key
+  depth: 0
+  depth_layers: []
+- id: enterprise/staff
+  row: enterprise
+  column: staff
+  kind: model
+  client: ent-client
+  client_kind: client
+  client_addr: "10.24.10.10"
+  port: 443
+  sport: 43016
+  hostname: llm.ai.tarnwick.example
+  address: "10.20.11.210"
+  lookup:
+    name: llm.ai.tarnwick.example
+    resolver: ent-dns
+    server: "10.24.10.53"
+    view: enterprise
+    answer: "10.20.11.210"
+  hops:
+  - row: view
+    device: ent-dns
+    what: "view enterprise: llm.ai.tarnwick.example A 10.20.11.210"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/4 (zone enterprise): 10.20.11.0/24 connected on ae1.110, zone ingress"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone enterprise: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "staff-to-users-gateway: allow, zone enterprise to ingress"
+    rule: staff-to-users-gateway
+  - row: routeset
+    device: gw-users
+    what: "HTTPRoute models-gw-users, /models/8242d5c4-9bce-5497-8414-f5bad94fdd84: the API gateway (api-gateway)"
+    route: models-gw-users
+  - row: key
+    device: api-gateway
+    what: "staff's consumer group: its own key 200, chat's key 401"
+  fw:
+    rule: staff-to-users-gateway
+    from_zone: enterprise
+    to_zone: ingress
+  gateway: gw-users
+  route: models-gw-users
+  mode: allowed
+  layer: null
+  expect:
+    status: 200
+  requests:
+  - id: own
+    sport: 43016
+    method: POST
+    url: https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions
+    key: staff
+    body:
+      model: staff
+      max_tokens: 1
+      messages:
+      - role: user
+        content: "Say yes."
+    expect:
+      status: 200
+  - id: other
+    sport: 43018
+    method: POST
+    url: https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions
+    key: chat
+    body:
+      model: staff
+      max_tokens: 1
+      messages:
+      - role: user
+        content: "Say yes."
+    expect:
+      status: 401
+      message: "Authorization Failed"
+      layer: key
+  depth: 0
+  depth_layers: []
+- id: enterprise/admin
+  row: enterprise
+  column: admin
+  kind: name
+  client: ent-client
+  client_kind: client
+  client_addr: "10.24.10.10"
+  port: 443
+  sport: 43020
+  hostname: admin.ai.tarnwick.example
+  address: "10.20.11.210"
+  pin: true
+  lookup:
+    name: admin.ai.tarnwick.example
+    resolver: ent-dns
+    server: "10.24.10.53"
+    view: enterprise
+    answer: null
+    expect: nxdomain
+  note: "view enterprise holds no record for admin.ai.tarnwick.example: the request is pinned to 10.20.11.210, the population's answer for the users' hostname"
+  hops:
+  - row: view
+    device: ent-dns
+    what: "view enterprise: no record for admin.ai.tarnwick.example (NXDOMAIN); the request pinned to 10.20.11.210"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/4 (zone enterprise): 10.20.11.0/24 connected on ae1.110, zone ingress"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone enterprise: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "staff-to-users-gateway: allow, zone enterprise to ingress"
+    rule: staff-to-users-gateway
+  - row: routeset
+    device: gw-users
+    what: "no HTTPRoute for admin.ai.tarnwick.example and /echo: 404"
+  fw:
+    rule: staff-to-users-gateway
+    from_zone: enterprise
+    to_zone: ingress
+  mode: "404"
+  layer: routeset
+  gateway: gw-users
+  expect:
+    status: 404
+    gateway: gw-users
+    api_gateway_line: false
+  requests:
+  - id: request
+    sport: 43020
+    method: GET
+    url: "https://admin.ai.tarnwick.example/echo?msg=sfab-matrix-enterprise-admin"
+    marker: sfab-matrix-enterprise-admin
+    expect:
+      status: 404
+  depth: 1
+  depth_layers:
+  - row: routeset
+    device: gw-users
+    why: "no HTTPRoute for admin.ai.tarnwick.example and /echo"
+- id: enterprise/api-server
+  row: enterprise
+  column: api-server
+  kind: connect
+  client: ent-client
+  client_kind: client
+  client_addr: "10.24.10.10"
+  port: 6443
+  sport: 43024
+  address: "10.20.1.10"
+  hops:
+  - row: routing
+    device: fw
+    what: "in on ethernet1/4 (zone enterprise): 10.20.1.0/24 connected on ae1.100, zone k8s-nodes"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone enterprise: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone enterprise to k8s-nodes"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: enterprise
+    to_zone: k8s-nodes
+    device: fw
+  fw:
+    rule: deny-all-log
+    from_zone: enterprise
+    to_zone: k8s-nodes
+  requests:
+  - id: connect
+    sport: 43024
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (enterprise to k8s-nodes)"
+    rule: deny-all-log
+- id: enterprise/node
+  row: enterprise
+  column: node
+  kind: connect
+  client: ent-client
+  client_kind: client
+  client_addr: "10.24.10.10"
+  port: 22
+  sport: 43028
+  address: "10.20.1.21"
+  hops:
+  - row: routing
+    device: fw
+    what: "in on ethernet1/4 (zone enterprise): 10.20.1.0/24 connected on ae1.100, zone k8s-nodes"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone enterprise: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone enterprise to k8s-nodes"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: enterprise
+    to_zone: k8s-nodes
+    device: fw
+  fw:
+    rule: deny-all-log
+    from_zone: enterprise
+    to_zone: k8s-nodes
+  requests:
+  - id: connect
+    sport: 43028
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (enterprise to k8s-nodes)"
+    rule: deny-all-log
+- id: enterprise/bmc
+  row: enterprise
+  column: bmc
+  kind: connect
+  client: ent-client
+  client_kind: client
+  client_addr: "10.24.10.10"
+  port: 443
+  sport: 43032
+  address: "10.20.9.21"
+  hops:
+  - row: routing
+    device: fw
+    what: "in on ethernet1/4 (zone enterprise): 10.20.9.0/24 connected on ethernet1/3, zone oob"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone enterprise: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone enterprise to oob"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: enterprise
+    to_zone: oob
+    device: fw
+  fw:
+    rule: deny-all-log
+    from_zone: enterprise
+    to_zone: oob
+  requests:
+  - id: connect
+    sport: 43032
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (enterprise to oob)"
+    rule: deny-all-log
+- id: enterprise/stor-data
+  row: enterprise
+  column: stor-data
+  kind: connect
+  client: ent-client
+  client_kind: client
+  client_addr: "10.24.10.10"
+  port: 2049
+  sport: 43036
+  address: "10.20.12.31"
+  hops:
+  - row: routing
+    device: fw
+    what: "in on ethernet1/4 (zone enterprise): 10.0.0.0/8 discard (discard-10): dropped before policy"
+  mode: silence
+  layer: routing
+  expect:
+    connect: refused
+    device: fw
+  requests:
+  - id: connect
+    sport: 43036
+  depth: 1
+  depth_layers:
+  - row: routing
+    device: fw
+    why: "no route to 10.20.12.31"
+- id: enterprise/stor-mgmt
+  row: enterprise
+  column: stor-mgmt
+  kind: connect
+  client: ent-client
+  client_kind: client
+  client_addr: "10.24.10.10"
+  port: 443
+  sport: 43040
+  address: "10.20.2.31"
+  hops:
+  - row: routing
+    device: fw
+    what: "in on ethernet1/4 (zone enterprise): 10.20.2.0/24 connected on ae1.200, zone stor-mgmt"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone enterprise: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone enterprise to stor-mgmt"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: enterprise
+    to_zone: stor-mgmt
+    device: fw
+  fw:
+    rule: deny-all-log
+    from_zone: enterprise
+    to_zone: stor-mgmt
+  requests:
+  - id: connect
+    sport: 43040
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (enterprise to stor-mgmt)"
+    rule: deny-all-log
+- id: enterprise/egress
+  row: enterprise
+  column: egress
+  kind: connect
+  client: ent-client
+  client_kind: client
+  client_addr: "10.24.10.10"
+  port: 443
+  sport: 43044
+  address: "192.0.2.18"
+  hops:
+  - row: routing
+    device: fw
+    what: "in on ethernet1/4 (zone enterprise): 0.0.0.0/0 via 198.51.100.1 on ethernet1/5 (default-uplink), zone uplink"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone enterprise: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone enterprise to uplink"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: enterprise
+    to_zone: uplink
+    device: fw
+  fw:
+    rule: deny-all-log
+    from_zone: enterprise
+    to_zone: uplink
+  requests:
+  - id: connect
+    sport: 43044
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (enterprise to uplink)"
+    rule: deny-all-log
+- id: operator/gw-internal
+  row: operator
+  column: gw-internal
+  kind: connect
+  client: ops-client
+  client_kind: client
+  client_addr: "192.0.2.2"
+  port: 443
+  sport: 43048
+  address: "10.20.11.200"
+  hops:
+  - row: routing
+    device: ops-gw
+    what: "into the IPsec tunnel to the firewall (ops-gw, proxy ID ingress): 10.20.11.200 is in its remote selector"
+  - row: routing
+    device: fw
+    what: "in on tunnel.1 (zone operator-vpn): 10.20.11.0/24 connected on ae1.110, zone ingress"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone operator-vpn: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "operator-to-internal-gateway: allow, zone operator-vpn to ingress"
+    rule: operator-to-internal-gateway
+  mode: allowed
+  layer: null
+  expect:
+    connect: connected
+  fw:
+    rule: operator-to-internal-gateway
+    from_zone: operator-vpn
+    to_zone: ingress
+  requests:
+  - id: connect
+    sport: 43048
+  depth: 0
+  depth_layers: []
+- id: operator/gw-users
+  row: operator
+  column: gw-users
+  kind: connect
+  client: ops-client
+  client_kind: client
+  client_addr: "192.0.2.2"
+  port: 443
+  sport: 43052
+  address: "10.20.11.210"
+  hops:
+  - row: routing
+    device: ops-gw
+    what: "into the IPsec tunnel to the firewall (ops-gw, proxy ID ingress): 10.20.11.210 is in its remote selector"
+  - row: routing
+    device: fw
+    what: "in on tunnel.1 (zone operator-vpn): 10.20.11.0/24 connected on ae1.110, zone ingress"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone operator-vpn: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone operator-vpn to ingress"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: operator-vpn
+    to_zone: ingress
+    device: fw
+  fw:
+    rule: deny-all-log
+    from_zone: operator-vpn
+    to_zone: ingress
+  requests:
+  - id: connect
+    sport: 43052
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (operator-vpn to ingress)"
+    rule: deny-all-log
+- id: operator/gw-inet
+  row: operator
+  column: gw-inet
+  kind: connect
+  client: ops-client
+  client_kind: client
+  client_addr: "192.0.2.2"
+  port: 443
+  sport: 43056
+  address: "10.20.11.220"
+  hops:
+  - row: routing
+    device: ops-gw
+    what: "into the IPsec tunnel to the firewall (ops-gw, proxy ID ingress): 10.20.11.220 is in its remote selector"
+  - row: routing
+    device: fw
+    what: "in on tunnel.1 (zone operator-vpn): 10.20.11.0/24 connected on ae1.110, zone ingress"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone operator-vpn: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone operator-vpn to ingress"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: operator-vpn
+    to_zone: ingress
+    device: fw
+  fw:
+    rule: deny-all-log
+    from_zone: operator-vpn
+    to_zone: ingress
+  requests:
+  - id: connect
+    sport: 43056
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (operator-vpn to ingress)"
+    rule: deny-all-log
+- id: operator/chat
+  row: operator
+  column: chat
+  kind: model
+  client: ops-client
+  client_kind: client
+  client_addr: "192.0.2.2"
+  port: 443
+  sport: 43060
+  hostname: llm.ai.tarnwick.example
+  address: "10.20.11.200"
+  pin: true
+  lookup:
+    name: llm.ai.tarnwick.example
+    resolver: ops-dns
+    server: "192.0.2.10"
+    view: public-operator
+    answer: null
+    expect: nxdomain
+  note: "view public-operator holds no record for llm.ai.tarnwick.example: the request is pinned to 10.20.11.200, the population's answer for the users' hostname"
+  hops:
+  - row: view
+    device: ops-dns
+    what: "view public-operator: no record for llm.ai.tarnwick.example (NXDOMAIN); the request pinned to 10.20.11.200"
+  - row: routing
+    device: ops-gw
+    what: "into the IPsec tunnel to the firewall (ops-gw, proxy ID ingress): 10.20.11.200 is in its remote selector"
+  - row: routing
+    device: fw
+    what: "in on tunnel.1 (zone operator-vpn): 10.20.11.0/24 connected on ae1.110, zone ingress"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone operator-vpn: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "operator-to-internal-gateway: allow, zone operator-vpn to ingress"
+    rule: operator-to-internal-gateway
+  - row: routeset
+    device: gw-internal
+    what: "HTTPRoute models-gw-internal, /models: the API gateway (api-gateway)"
+    route: models-gw-internal
+  - row: key
+    device: api-gateway
+    what: "chat's consumer group: its own key 200, staff's key 401"
+  fw:
+    rule: operator-to-internal-gateway
+    from_zone: operator-vpn
+    to_zone: ingress
+  gateway: gw-internal
+  route: models-gw-internal
+  mode: allowed
+  layer: null
+  expect:
+    status: 200
+  requests:
+  - id: own
+    sport: 43060
+    method: POST
+    url: https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions
+    key: chat
+    body:
+      model: chat
+      max_tokens: 1
+      messages:
+      - role: user
+        content: "Say yes."
+    expect:
+      status: 200
+  - id: other
+    sport: 43062
+    method: POST
+    url: https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions
+    key: staff
+    body:
+      model: chat
+      max_tokens: 1
+      messages:
+      - role: user
+        content: "Say yes."
+    expect:
+      status: 401
+      message: "Authorization Failed"
+      layer: key
+  depth: 0
+  depth_layers: []
+- id: operator/staff
+  row: operator
+  column: staff
+  kind: model
+  client: ops-client
+  client_kind: client
+  client_addr: "192.0.2.2"
+  port: 443
+  sport: 43064
+  hostname: llm.ai.tarnwick.example
+  address: "10.20.11.200"
+  pin: true
+  lookup:
+    name: llm.ai.tarnwick.example
+    resolver: ops-dns
+    server: "192.0.2.10"
+    view: public-operator
+    answer: null
+    expect: nxdomain
+  note: "view public-operator holds no record for llm.ai.tarnwick.example: the request is pinned to 10.20.11.200, the population's answer for the users' hostname"
+  hops:
+  - row: view
+    device: ops-dns
+    what: "view public-operator: no record for llm.ai.tarnwick.example (NXDOMAIN); the request pinned to 10.20.11.200"
+  - row: routing
+    device: ops-gw
+    what: "into the IPsec tunnel to the firewall (ops-gw, proxy ID ingress): 10.20.11.200 is in its remote selector"
+  - row: routing
+    device: fw
+    what: "in on tunnel.1 (zone operator-vpn): 10.20.11.0/24 connected on ae1.110, zone ingress"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone operator-vpn: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "operator-to-internal-gateway: allow, zone operator-vpn to ingress"
+    rule: operator-to-internal-gateway
+  - row: routeset
+    device: gw-internal
+    what: "HTTPRoute models-gw-internal, /models: the API gateway (api-gateway)"
+    route: models-gw-internal
+  - row: key
+    device: api-gateway
+    what: "staff's consumer group: its own key 200, chat's key 401"
+  fw:
+    rule: operator-to-internal-gateway
+    from_zone: operator-vpn
+    to_zone: ingress
+  gateway: gw-internal
+  route: models-gw-internal
+  mode: allowed
+  layer: null
+  expect:
+    status: 200
+  requests:
+  - id: own
+    sport: 43064
+    method: POST
+    url: https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions
+    key: staff
+    body:
+      model: staff
+      max_tokens: 1
+      messages:
+      - role: user
+        content: "Say yes."
+    expect:
+      status: 200
+  - id: other
+    sport: 43066
+    method: POST
+    url: https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions
+    key: chat
+    body:
+      model: staff
+      max_tokens: 1
+      messages:
+      - role: user
+        content: "Say yes."
+    expect:
+      status: 401
+      message: "Authorization Failed"
+      layer: key
+  depth: 0
+  depth_layers: []
+- id: operator/admin
+  row: operator
+  column: admin
+  kind: name
+  client: ops-client
+  client_kind: client
+  client_addr: "192.0.2.2"
+  port: 443
+  sport: 43068
+  hostname: admin.ai.tarnwick.example
+  address: "10.20.11.200"
+  pin: true
+  lookup:
+    name: admin.ai.tarnwick.example
+    resolver: ops-dns
+    server: "192.0.2.10"
+    view: public-operator
+    answer: null
+    expect: nxdomain
+  note: "view public-operator holds no record for admin.ai.tarnwick.example: the request is pinned to 10.20.11.200, the population's answer for the users' hostname"
+  hops:
+  - row: view
+    device: ops-dns
+    what: "view public-operator: no record for admin.ai.tarnwick.example (NXDOMAIN); the request pinned to 10.20.11.200"
+  - row: routing
+    device: ops-gw
+    what: "into the IPsec tunnel to the firewall (ops-gw, proxy ID ingress): 10.20.11.200 is in its remote selector"
+  - row: routing
+    device: fw
+    what: "in on tunnel.1 (zone operator-vpn): 10.20.11.0/24 connected on ae1.110, zone ingress"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone operator-vpn: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "operator-to-internal-gateway: allow, zone operator-vpn to ingress"
+    rule: operator-to-internal-gateway
+  - row: routeset
+    device: gw-internal
+    what: "HTTPRoute echo-gw-internal, /echo: the test backend (echo)"
+    route: echo-gw-internal
+  fw:
+    rule: operator-to-internal-gateway
+    from_zone: operator-vpn
+    to_zone: ingress
+  gateway: gw-internal
+  route: echo-gw-internal
+  mode: allowed
+  layer: null
+  expect:
+    status: 200
+  requests:
+  - id: request
+    sport: 43068
+    method: GET
+    url: "https://admin.ai.tarnwick.example/echo?msg=sfab-matrix-operator-admin"
+    marker: sfab-matrix-operator-admin
+    expect:
+      status: 200
+  depth: 0
+  depth_layers: []
+- id: operator/api-server
+  row: operator
+  column: api-server
+  kind: connect
+  client: ops-client
+  client_kind: client
+  client_addr: "192.0.2.2"
+  port: 6443
+  sport: 43072
+  address: "10.20.1.10"
+  hops:
+  - row: routing
+    device: ops-gw
+    what: "10.20.1.10 is in no tunnel selector: out via 192.0.2.21"
+  - row: routing
+    device: uplink-rtr
+    what: "10.20.1.0/24 via 198.51.100.2 (inside-nodes)"
+    dest: "10.20.1.0/24"
+    via: "198.51.100.2"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/5 (zone uplink): the source 192.0.2.2 is routed by 192.0.2.0/30 out tunnel.1 (operator-site), not over ethernet1/5, so zone protection's strict IP check (zp-internet) drops it before any rule"
+  mode: silence
+  layer: routing
+  expect:
+    connect: refused
+    device: fw
+    drop: strict-ip
+    counter: flow_dos_pf_strictip
+    source_route: "by 192.0.2.0/30 out tunnel.1 (operator-site)"
+  requests:
+  - id: connect
+    sport: 43072
+  depth: 2
+  depth_layers:
+  - row: routing
+    device: fw
+    why: "strict IP check (zp-internet): 192.0.2.2 is routed by 192.0.2.0/30 out tunnel.1 (operator-site), not over ethernet1/5"
+  - row: policy
+    device: fw
+    why: "deny-all-log (uplink to k8s-nodes)"
+    rule: deny-all-log
+- id: operator/node
+  row: operator
+  column: node
+  kind: connect
+  client: ops-client
+  client_kind: client
+  client_addr: "192.0.2.2"
+  port: 22
+  sport: 43076
+  address: "10.20.1.21"
+  hops:
+  - row: routing
+    device: ops-gw
+    what: "10.20.1.21 is in no tunnel selector: out via 192.0.2.21"
+  - row: routing
+    device: uplink-rtr
+    what: "10.20.1.0/24 via 198.51.100.2 (inside-nodes)"
+    dest: "10.20.1.0/24"
+    via: "198.51.100.2"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/5 (zone uplink): the source 192.0.2.2 is routed by 192.0.2.0/30 out tunnel.1 (operator-site), not over ethernet1/5, so zone protection's strict IP check (zp-internet) drops it before any rule"
+  mode: silence
+  layer: routing
+  expect:
+    connect: refused
+    device: fw
+    drop: strict-ip
+    counter: flow_dos_pf_strictip
+    source_route: "by 192.0.2.0/30 out tunnel.1 (operator-site)"
+  requests:
+  - id: connect
+    sport: 43076
+  depth: 2
+  depth_layers:
+  - row: routing
+    device: fw
+    why: "strict IP check (zp-internet): 192.0.2.2 is routed by 192.0.2.0/30 out tunnel.1 (operator-site), not over ethernet1/5"
+  - row: policy
+    device: fw
+    why: "deny-all-log (uplink to k8s-nodes)"
+    rule: deny-all-log
+- id: operator/bmc
+  row: operator
+  column: bmc
+  kind: connect
+  client: ops-client
+  client_kind: client
+  client_addr: "192.0.2.2"
+  port: 443
+  sport: 43080
+  address: "10.20.9.21"
+  hops:
+  - row: routing
+    device: ops-gw
+    what: "10.20.9.21 is in no tunnel selector: out via 192.0.2.21"
+  - row: routing
+    device: uplink-rtr
+    what: "10.20.9.0/24 via 198.51.100.2 (inside-oob)"
+    dest: "10.20.9.0/24"
+    via: "198.51.100.2"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/5 (zone uplink): the source 192.0.2.2 is routed by 192.0.2.0/30 out tunnel.1 (operator-site), not over ethernet1/5, so zone protection's strict IP check (zp-internet) drops it before any rule"
+  mode: silence
+  layer: routing
+  expect:
+    connect: refused
+    device: fw
+    drop: strict-ip
+    counter: flow_dos_pf_strictip
+    source_route: "by 192.0.2.0/30 out tunnel.1 (operator-site)"
+  requests:
+  - id: connect
+    sport: 43080
+  depth: 2
+  depth_layers:
+  - row: routing
+    device: fw
+    why: "strict IP check (zp-internet): 192.0.2.2 is routed by 192.0.2.0/30 out tunnel.1 (operator-site), not over ethernet1/5"
+  - row: policy
+    device: fw
+    why: "deny-all-log (uplink to oob)"
+    rule: deny-all-log
+- id: operator/stor-data
+  row: operator
+  column: stor-data
+  kind: connect
+  client: ops-client
+  client_kind: client
+  client_addr: "192.0.2.2"
+  port: 2049
+  sport: 43084
+  address: "10.20.12.31"
+  hops:
+  - row: routing
+    device: ops-gw
+    what: "10.20.12.31 is in no tunnel selector: out via 192.0.2.21"
+  - row: routing
+    device: uplink-rtr
+    what: "no route to 10.20.12.31"
+  mode: silence
+  layer: routing
+  expect:
+    connect: refused
+    device: uplink-rtr
+  requests:
+  - id: connect
+    sport: 43084
+  depth: 3
+  depth_layers:
+  - row: routing
+    device: uplink-rtr
+    why: "no route to 10.20.12.31"
+  - row: routing
+    device: fw
+    why: "strict IP check (zp-internet): 192.0.2.2 is routed by 192.0.2.0/30 out tunnel.1 (operator-site), not over ethernet1/5"
+  - row: routing
+    device: fw
+    why: "no route to 10.20.12.31"
+- id: operator/stor-mgmt
+  row: operator
+  column: stor-mgmt
+  kind: connect
+  client: ops-client
+  client_kind: client
+  client_addr: "192.0.2.2"
+  port: 443
+  sport: 43088
+  address: "10.20.2.31"
+  hops:
+  - row: routing
+    device: ops-gw
+    what: "10.20.2.31 is in no tunnel selector: out via 192.0.2.21"
+  - row: routing
+    device: uplink-rtr
+    what: "10.20.2.0/24 via 198.51.100.2 (inside-stor-mgmt)"
+    dest: "10.20.2.0/24"
+    via: "198.51.100.2"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/5 (zone uplink): the source 192.0.2.2 is routed by 192.0.2.0/30 out tunnel.1 (operator-site), not over ethernet1/5, so zone protection's strict IP check (zp-internet) drops it before any rule"
+  mode: silence
+  layer: routing
+  expect:
+    connect: refused
+    device: fw
+    drop: strict-ip
+    counter: flow_dos_pf_strictip
+    source_route: "by 192.0.2.0/30 out tunnel.1 (operator-site)"
+  requests:
+  - id: connect
+    sport: 43088
+  depth: 2
+  depth_layers:
+  - row: routing
+    device: fw
+    why: "strict IP check (zp-internet): 192.0.2.2 is routed by 192.0.2.0/30 out tunnel.1 (operator-site), not over ethernet1/5"
+  - row: policy
+    device: fw
+    why: "deny-all-log (uplink to stor-mgmt)"
+    rule: deny-all-log
+- id: operator/egress
+  row: operator
+  column: egress
+  kind: connect
+  client: ops-client
+  client_kind: client
+  client_addr: "192.0.2.2"
+  port: 443
+  sport: 43092
+  address: "192.0.2.18"
+  hops:
+  - row: routing
+    device: ops-gw
+    what: "192.0.2.18 is in no tunnel selector: out via 192.0.2.21"
+  - row: routing
+    device: uplink-rtr
+    what: "192.0.2.16/30 connected on eth6"
+  mode: allowed
+  layer: null
+  expect:
+    connect: connected
+  requests:
+  - id: connect
+    sport: 43092
+  depth: 0
+  depth_layers: []
+- id: nodes/gw-internal
+  row: nodes
+  column: gw-internal
+  kind: connect
+  client: k8s-cp2
+  client_kind: vm-node
+  client_addr: "10.20.1.12"
+  port: 443
+  sport: 43096
+  address: "10.20.11.200"
+  hops:
+  - row: null
+    device: k8s-cp2
+    what: "10.20.11.200 is a LoadBalancer address of k8s-cp2's own cluster: Cilium translates it to a Gateway pod at connect(), so nothing to it leaves the node and no firewall sees it"
+  mode: allowed
+  layer: null
+  expect:
+    connect: connected
+  requests:
+  - id: connect
+    sport: 43096
+  depth: 0
+  depth_layers: []
+- id: nodes/gw-users
+  row: nodes
+  column: gw-users
+  kind: connect
+  client: k8s-cp2
+  client_kind: vm-node
+  client_addr: "10.20.1.12"
+  port: 443
+  sport: 43100
+  address: "10.20.11.210"
+  hops:
+  - row: null
+    device: k8s-cp2
+    what: "10.20.11.210 is a LoadBalancer address of k8s-cp2's own cluster: Cilium translates it to a Gateway pod at connect(), so nothing to it leaves the node and no firewall sees it"
+  mode: allowed
+  layer: null
+  expect:
+    connect: connected
+  requests:
+  - id: connect
+    sport: 43100
+  depth: 0
+  depth_layers: []
+- id: nodes/gw-inet
+  row: nodes
+  column: gw-inet
+  kind: connect
+  client: k8s-cp2
+  client_kind: vm-node
+  client_addr: "10.20.1.12"
+  port: 443
+  sport: 43104
+  address: "10.20.11.220"
+  hops:
+  - row: null
+    device: k8s-cp2
+    what: "10.20.11.220 is a LoadBalancer address of k8s-cp2's own cluster: Cilium translates it to a Gateway pod at connect(), so nothing to it leaves the node and no firewall sees it"
+  mode: allowed
+  layer: null
+  expect:
+    connect: connected
+  requests:
+  - id: connect
+    sport: 43104
+  depth: 0
+  depth_layers: []
+- id: nodes/chat
+  row: nodes
+  column: chat
+  kind: model
+  client: k8s-cp2
+  client_kind: vm-node
+  client_addr: "10.20.1.12"
+  port: 443
+  sport: 43108
+  hostname: llm.ai.tarnwick.example
+  address: "10.20.11.200"
+  lookup:
+    name: llm.ai.tarnwick.example
+    resolver: dns-res1
+    server: "10.20.13.21"
+    view: internal
+    answer: "10.20.11.200"
+  hops:
+  - row: view
+    device: dns-res1
+    what: "view internal: llm.ai.tarnwick.example A 10.20.11.200"
+  - row: null
+    device: k8s-cp2
+    what: "10.20.11.200 is a LoadBalancer address of k8s-cp2's own cluster: Cilium translates it to a Gateway pod at connect(), so nothing to it leaves the node and no firewall sees it"
+  - row: routeset
+    device: gw-internal
+    what: "HTTPRoute models-gw-internal, /models: the API gateway (api-gateway)"
+    route: models-gw-internal
+  - row: key
+    device: api-gateway
+    what: "chat's consumer group: its own key 200, staff's key 401"
+  gateway: gw-internal
+  route: models-gw-internal
+  mode: allowed
+  layer: null
+  expect:
+    status: 200
+  requests:
+  - id: own
+    sport: 43108
+    method: POST
+    url: https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions
+    key: chat
+    body:
+      model: chat
+      max_tokens: 1
+      messages:
+      - role: user
+        content: "Say yes."
+    expect:
+      status: 200
+  - id: other
+    sport: 43110
+    method: POST
+    url: https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions
+    key: staff
+    body:
+      model: chat
+      max_tokens: 1
+      messages:
+      - role: user
+        content: "Say yes."
+    expect:
+      status: 401
+      message: "Authorization Failed"
+      layer: key
+  depth: 0
+  depth_layers: []
+- id: nodes/staff
+  row: nodes
+  column: staff
+  kind: model
+  client: k8s-cp2
+  client_kind: vm-node
+  client_addr: "10.20.1.12"
+  port: 443
+  sport: 43112
+  hostname: llm.ai.tarnwick.example
+  address: "10.20.11.200"
+  lookup:
+    name: llm.ai.tarnwick.example
+    resolver: dns-res1
+    server: "10.20.13.21"
+    view: internal
+    answer: "10.20.11.200"
+  hops:
+  - row: view
+    device: dns-res1
+    what: "view internal: llm.ai.tarnwick.example A 10.20.11.200"
+  - row: null
+    device: k8s-cp2
+    what: "10.20.11.200 is a LoadBalancer address of k8s-cp2's own cluster: Cilium translates it to a Gateway pod at connect(), so nothing to it leaves the node and no firewall sees it"
+  - row: routeset
+    device: gw-internal
+    what: "HTTPRoute models-gw-internal, /models: the API gateway (api-gateway)"
+    route: models-gw-internal
+  - row: key
+    device: api-gateway
+    what: "staff's consumer group: its own key 200, chat's key 401"
+  gateway: gw-internal
+  route: models-gw-internal
+  mode: allowed
+  layer: null
+  expect:
+    status: 200
+  requests:
+  - id: own
+    sport: 43112
+    method: POST
+    url: https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions
+    key: staff
+    body:
+      model: staff
+      max_tokens: 1
+      messages:
+      - role: user
+        content: "Say yes."
+    expect:
+      status: 200
+  - id: other
+    sport: 43114
+    method: POST
+    url: https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions
+    key: chat
+    body:
+      model: staff
+      max_tokens: 1
+      messages:
+      - role: user
+        content: "Say yes."
+    expect:
+      status: 401
+      message: "Authorization Failed"
+      layer: key
+  depth: 0
+  depth_layers: []
+- id: nodes/admin
+  row: nodes
+  column: admin
+  kind: name
+  client: k8s-cp2
+  client_kind: vm-node
+  client_addr: "10.20.1.12"
+  port: 443
+  sport: 43116
+  hostname: admin.ai.tarnwick.example
+  address: "10.20.11.200"
+  lookup:
+    name: admin.ai.tarnwick.example
+    resolver: dns-res1
+    server: "10.20.13.21"
+    view: internal
+    answer: "10.20.11.200"
+  hops:
+  - row: view
+    device: dns-res1
+    what: "view internal: admin.ai.tarnwick.example A 10.20.11.200"
+  - row: null
+    device: k8s-cp2
+    what: "10.20.11.200 is a LoadBalancer address of k8s-cp2's own cluster: Cilium translates it to a Gateway pod at connect(), so nothing to it leaves the node and no firewall sees it"
+  - row: routeset
+    device: gw-internal
+    what: "HTTPRoute echo-gw-internal, /echo: the test backend (echo)"
+    route: echo-gw-internal
+  gateway: gw-internal
+  route: echo-gw-internal
+  mode: allowed
+  layer: null
+  expect:
+    status: 200
+  requests:
+  - id: request
+    sport: 43116
+    method: GET
+    url: "https://admin.ai.tarnwick.example/echo?msg=sfab-matrix-nodes-admin"
+    marker: sfab-matrix-nodes-admin
+    expect:
+      status: 200
+  depth: 0
+  depth_layers: []
+- id: nodes/api-server
+  row: nodes
+  column: api-server
+  kind: connect
+  client: k8s-cp2
+  client_kind: vm-node
+  client_addr: "10.20.1.12"
+  port: 6443
+  sport: 43120
+  address: "10.20.1.10"
+  hops:
+  - row: null
+    device: null
+    what: "same segment (nodes): no routed hop, no firewall"
+  mode: allowed
+  layer: null
+  expect:
+    connect: connected
+  requests:
+  - id: connect
+    sport: 43120
+  depth: 0
+  depth_layers: []
+- id: nodes/node
+  row: nodes
+  column: node
+  kind: connect
+  client: k8s-cp2
+  client_kind: vm-node
+  client_addr: "10.20.1.12"
+  port: 22
+  sport: 43124
+  address: "10.20.1.21"
+  hops:
+  - row: null
+    device: null
+    what: "same segment (nodes): no routed hop, no firewall"
+  mode: allowed
+  layer: null
+  expect:
+    connect: connected
+  requests:
+  - id: connect
+    sport: 43124
+  depth: 0
+  depth_layers: []
+- id: nodes/bmc
+  row: nodes
+  column: bmc
+  kind: connect
+  client: k8s-cp2
+  client_kind: vm-node
+  client_addr: "10.20.1.12"
+  port: 443
+  sport: 43128
+  address: "10.20.9.21"
+  hops:
+  - row: routing
+    device: fw
+    what: "in on ae1.100 (zone k8s-nodes): 10.20.9.0/24 connected on ethernet1/3, zone oob"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone k8s-nodes: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone k8s-nodes to oob"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: k8s-nodes
+    to_zone: oob
+    device: fw
+  fw:
+    rule: deny-all-log
+    from_zone: k8s-nodes
+    to_zone: oob
+  requests:
+  - id: connect
+    sport: 43128
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (k8s-nodes to oob)"
+    rule: deny-all-log
+- id: nodes/stor-data
+  row: nodes
+  column: stor-data
+  kind: connect
+  client: k8s-cp2
+  client_kind: vm-node
+  client_addr: "10.20.1.12"
+  port: 2049
+  sport: 43132
+  address: "10.20.12.31"
+  hops:
+  - row: routing
+    device: fw
+    what: "in on ae1.100 (zone k8s-nodes): 10.0.0.0/8 discard (discard-10): dropped before policy"
+  mode: silence
+  layer: routing
+  expect:
+    connect: refused
+    device: fw
+  requests:
+  - id: connect
+    sport: 43132
+  depth: 1
+  depth_layers:
+  - row: routing
+    device: fw
+    why: "no route to 10.20.12.31"
+- id: nodes/stor-mgmt
+  row: nodes
+  column: stor-mgmt
+  kind: connect
+  client: k8s-cp2
+  client_kind: vm-node
+  client_addr: "10.20.1.12"
+  port: 443
+  sport: 43136
+  address: "10.20.2.31"
+  hops:
+  - row: routing
+    device: fw
+    what: "in on ae1.100 (zone k8s-nodes): 10.20.2.0/24 connected on ae1.200, zone stor-mgmt"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone k8s-nodes: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "csi-to-storage-api: allow, zone k8s-nodes to stor-mgmt"
+    rule: csi-to-storage-api
+  mode: allowed
+  layer: null
+  expect:
+    connect: connected
+  fw:
+    rule: csi-to-storage-api
+    from_zone: k8s-nodes
+    to_zone: stor-mgmt
+  requests:
+  - id: connect
+    sport: 43136
+  depth: 0
+  depth_layers: []
+- id: nodes/egress
+  row: nodes
+  column: egress
+  kind: connect
+  client: k8s-cp2
+  client_kind: vm-node
+  client_addr: "10.20.1.12"
+  port: 443
+  sport: 43140
+  address: "192.0.2.18"
+  hops:
+  - row: routing
+    device: fw
+    what: "in on ae1.100 (zone k8s-nodes): 0.0.0.0/0 via 198.51.100.1 on ethernet1/5 (default-uplink), zone uplink"
+  - row: nat
+    device: fw
+    what: "internet-snat: no translation"
+    rule: internet-snat
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone k8s-nodes to uplink"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: k8s-nodes
+    to_zone: uplink
+    device: fw
+  fw:
+    rule: deny-all-log
+    from_zone: k8s-nodes
+    to_zone: uplink
+  requests:
+  - id: connect
+    sport: 43140
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (k8s-nodes to uplink)"
+    rule: deny-all-log
+- id: web/gw-internal
+  row: web
+  column: gw-internal
+  kind: connect
+  client: web-client
+  client_kind: client
+  client_addr: "192.0.2.18"
+  port: 443
+  sport: 43144
+  address: "10.20.11.200"
+  hops:
+  - row: routing
+    device: uplink-rtr
+    what: "10.20.11.0/24 via 198.51.100.2 (inside-ingress)"
+    dest: "10.20.11.0/24"
+    via: "198.51.100.2"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/5 (zone uplink): 10.20.11.0/24 connected on ae1.110, zone ingress"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone uplink: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone uplink to ingress"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: uplink
+    to_zone: ingress
+    device: fw
+  fw:
+    rule: deny-all-log
+    from_zone: uplink
+    to_zone: ingress
+  requests:
+  - id: connect
+    sport: 43144
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (uplink to ingress)"
+    rule: deny-all-log
+- id: web/gw-users
+  row: web
+  column: gw-users
+  kind: connect
+  client: web-client
+  client_kind: client
+  client_addr: "192.0.2.18"
+  port: 443
+  sport: 43148
+  address: "10.20.11.210"
+  hops:
+  - row: routing
+    device: uplink-rtr
+    what: "10.20.11.0/24 via 198.51.100.2 (inside-ingress)"
+    dest: "10.20.11.0/24"
+    via: "198.51.100.2"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/5 (zone uplink): 10.20.11.0/24 connected on ae1.110, zone ingress"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone uplink: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone uplink to ingress"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: uplink
+    to_zone: ingress
+    device: fw
+  fw:
+    rule: deny-all-log
+    from_zone: uplink
+    to_zone: ingress
+  requests:
+  - id: connect
+    sport: 43148
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (uplink to ingress)"
+    rule: deny-all-log
+- id: web/gw-inet
+  row: web
+  column: gw-inet
+  kind: connect
+  client: web-client
+  client_kind: client
+  client_addr: "192.0.2.18"
+  port: 443
+  sport: 43152
+  address: "10.20.11.220"
+  hops:
+  - row: routing
+    device: uplink-rtr
+    what: "10.20.11.0/24 via 198.51.100.2 (inside-ingress)"
+    dest: "10.20.11.0/24"
+    via: "198.51.100.2"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/5 (zone uplink): 10.20.11.0/24 connected on ae1.110, zone ingress"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone uplink: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone uplink to ingress"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: uplink
+    to_zone: ingress
+    device: fw
+  fw:
+    rule: deny-all-log
+    from_zone: uplink
+    to_zone: ingress
+  requests:
+  - id: connect
+    sport: 43152
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (uplink to ingress)"
+    rule: deny-all-log
+- id: web/chat
+  row: web
+  column: chat
+  kind: model
+  client: web-client
+  client_kind: client
+  client_addr: "192.0.2.18"
+  port: 443
+  sport: 43156
+  hostname: llm.ai.tarnwick.example
+  address: "198.51.100.2"
+  pin: true
+  lookup:
+    name: llm.ai.tarnwick.example
+    resolver: ops-dns
+    server: "192.0.2.10"
+    view: public-operator
+    answer: null
+    expect: nxdomain
+  note: "view public-operator holds no record for llm.ai.tarnwick.example: the request is pinned to 198.51.100.2, the population's answer for the users' hostname"
+  hops:
+  - row: view
+    device: ops-dns
+    what: "view public-operator: no record for llm.ai.tarnwick.example (NXDOMAIN); the request pinned to 198.51.100.2"
+  - row: routing
+    device: uplink-rtr
+    what: "198.51.100.0/29 connected on eth1"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/5 (zone uplink): 198.51.100.2 is the firewall's own address on ethernet1/5, zone uplink"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone uplink: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone uplink to uplink"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: uplink
+    to_zone: uplink
+    device: fw
+  requests:
+  - id: connect
+    sport: 43156
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (uplink to uplink)"
+    rule: deny-all-log
+- id: web/staff
+  row: web
+  column: staff
+  kind: model
+  client: web-client
+  client_kind: client
+  client_addr: "192.0.2.18"
+  port: 443
+  sport: 43160
+  hostname: llm.ai.tarnwick.example
+  address: "198.51.100.2"
+  pin: true
+  lookup:
+    name: llm.ai.tarnwick.example
+    resolver: ops-dns
+    server: "192.0.2.10"
+    view: public-operator
+    answer: null
+    expect: nxdomain
+  note: "view public-operator holds no record for llm.ai.tarnwick.example: the request is pinned to 198.51.100.2, the population's answer for the users' hostname"
+  hops:
+  - row: view
+    device: ops-dns
+    what: "view public-operator: no record for llm.ai.tarnwick.example (NXDOMAIN); the request pinned to 198.51.100.2"
+  - row: routing
+    device: uplink-rtr
+    what: "198.51.100.0/29 connected on eth1"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/5 (zone uplink): 198.51.100.2 is the firewall's own address on ethernet1/5, zone uplink"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone uplink: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone uplink to uplink"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: uplink
+    to_zone: uplink
+    device: fw
+  requests:
+  - id: connect
+    sport: 43160
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (uplink to uplink)"
+    rule: deny-all-log
+- id: web/admin
+  row: web
+  column: admin
+  kind: name
+  client: web-client
+  client_kind: client
+  client_addr: "192.0.2.18"
+  port: 443
+  sport: 43164
+  hostname: admin.ai.tarnwick.example
+  address: "198.51.100.2"
+  pin: true
+  lookup:
+    name: admin.ai.tarnwick.example
+    resolver: ops-dns
+    server: "192.0.2.10"
+    view: public-operator
+    answer: null
+    expect: nxdomain
+  note: "view public-operator holds no record for admin.ai.tarnwick.example: the request is pinned to 198.51.100.2, the population's answer for the users' hostname"
+  hops:
+  - row: view
+    device: ops-dns
+    what: "view public-operator: no record for admin.ai.tarnwick.example (NXDOMAIN); the request pinned to 198.51.100.2"
+  - row: routing
+    device: uplink-rtr
+    what: "198.51.100.0/29 connected on eth1"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/5 (zone uplink): 198.51.100.2 is the firewall's own address on ethernet1/5, zone uplink"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone uplink: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone uplink to uplink"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: uplink
+    to_zone: uplink
+    device: fw
+  requests:
+  - id: connect
+    sport: 43164
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (uplink to uplink)"
+    rule: deny-all-log
+- id: web/api-server
+  row: web
+  column: api-server
+  kind: connect
+  client: web-client
+  client_kind: client
+  client_addr: "192.0.2.18"
+  port: 6443
+  sport: 43168
+  address: "10.20.1.10"
+  hops:
+  - row: routing
+    device: uplink-rtr
+    what: "10.20.1.0/24 via 198.51.100.2 (inside-nodes)"
+    dest: "10.20.1.0/24"
+    via: "198.51.100.2"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/5 (zone uplink): 10.20.1.0/24 connected on ae1.100, zone k8s-nodes"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone uplink: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone uplink to k8s-nodes"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: uplink
+    to_zone: k8s-nodes
+    device: fw
+  fw:
+    rule: deny-all-log
+    from_zone: uplink
+    to_zone: k8s-nodes
+  requests:
+  - id: connect
+    sport: 43168
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (uplink to k8s-nodes)"
+    rule: deny-all-log
+- id: web/node
+  row: web
+  column: node
+  kind: connect
+  client: web-client
+  client_kind: client
+  client_addr: "192.0.2.18"
+  port: 22
+  sport: 43172
+  address: "10.20.1.21"
+  hops:
+  - row: routing
+    device: uplink-rtr
+    what: "10.20.1.0/24 via 198.51.100.2 (inside-nodes)"
+    dest: "10.20.1.0/24"
+    via: "198.51.100.2"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/5 (zone uplink): 10.20.1.0/24 connected on ae1.100, zone k8s-nodes"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone uplink: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone uplink to k8s-nodes"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: uplink
+    to_zone: k8s-nodes
+    device: fw
+  fw:
+    rule: deny-all-log
+    from_zone: uplink
+    to_zone: k8s-nodes
+  requests:
+  - id: connect
+    sport: 43172
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (uplink to k8s-nodes)"
+    rule: deny-all-log
+- id: web/bmc
+  row: web
+  column: bmc
+  kind: connect
+  client: web-client
+  client_kind: client
+  client_addr: "192.0.2.18"
+  port: 443
+  sport: 43176
+  address: "10.20.9.21"
+  hops:
+  - row: routing
+    device: uplink-rtr
+    what: "10.20.9.0/24 via 198.51.100.2 (inside-oob)"
+    dest: "10.20.9.0/24"
+    via: "198.51.100.2"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/5 (zone uplink): 10.20.9.0/24 connected on ethernet1/3, zone oob"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone uplink: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone uplink to oob"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: uplink
+    to_zone: oob
+    device: fw
+  fw:
+    rule: deny-all-log
+    from_zone: uplink
+    to_zone: oob
+  requests:
+  - id: connect
+    sport: 43176
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (uplink to oob)"
+    rule: deny-all-log
+- id: web/stor-data
+  row: web
+  column: stor-data
+  kind: connect
+  client: web-client
+  client_kind: client
+  client_addr: "192.0.2.18"
+  port: 2049
+  sport: 43180
+  address: "10.20.12.31"
+  hops:
+  - row: routing
+    device: uplink-rtr
+    what: "no route to 10.20.12.31"
+  mode: silence
+  layer: routing
+  expect:
+    connect: refused
+    device: uplink-rtr
+  requests:
+  - id: connect
+    sport: 43180
+  depth: 2
+  depth_layers:
+  - row: routing
+    device: uplink-rtr
+    why: "no route to 10.20.12.31"
+  - row: routing
+    device: fw
+    why: "no route to 10.20.12.31"
+- id: web/stor-mgmt
+  row: web
+  column: stor-mgmt
+  kind: connect
+  client: web-client
+  client_kind: client
+  client_addr: "192.0.2.18"
+  port: 443
+  sport: 43184
+  address: "10.20.2.31"
+  hops:
+  - row: routing
+    device: uplink-rtr
+    what: "10.20.2.0/24 via 198.51.100.2 (inside-stor-mgmt)"
+    dest: "10.20.2.0/24"
+    via: "198.51.100.2"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/5 (zone uplink): 10.20.2.0/24 connected on ae1.200, zone stor-mgmt"
+  - row: nat
+    device: fw
+    what: "no NAT rule from zone uplink: no translation"
+    rule: null
+  - row: policy
+    device: fw
+    what: "deny-all-log: deny, zone uplink to stor-mgmt"
+    rule: deny-all-log
+  mode: log-line
+  layer: policy
+  expect:
+    connect: refused
+    rule: deny-all-log
+    action: deny
+    from_zone: uplink
+    to_zone: stor-mgmt
+    device: fw
+  fw:
+    rule: deny-all-log
+    from_zone: uplink
+    to_zone: stor-mgmt
+  requests:
+  - id: connect
+    sport: 43184
+  depth: 1
+  depth_layers:
+  - row: policy
+    device: fw
+    why: "deny-all-log (uplink to stor-mgmt)"
+    rule: deny-all-log
+- id: web/egress
+  row: web
+  column: egress
+  kind: connect
+  client: web-client
+  client_kind: client
+  client_addr: "192.0.2.18"
+  port: 443
+  sport: 43188
+  address: "192.0.2.18"
+  hops:
+  - row: null
+    device: null
+    what: "same segment (web): no routed hop, no firewall"
+  mode: allowed
+  layer: null
+  expect:
+    connect: connected
+  requests:
+  - id: connect
+    sport: 43188
+  depth: 0
+  depth_layers: []
+- id: internet/gw-internal
+  row: internet
+  column: gw-internal
+  kind: connect
+  client: inet-client
+  client_kind: client
+  client_addr: "203.0.113.2"
+  port: 443
+  sport: 43192
+  address: "10.20.11.200"
+  hops:
+  - row: routing
+    device: isp-rtr
+    what: "no route to 10.20.11.200"
+  mode: silence
+  layer: routing
+  expect:
+    connect: refused
+    device: isp-rtr
+  requests:
+  - id: connect
+    sport: 43192
+  depth: 2
+  depth_layers:
+  - row: routing
+    device: isp-rtr
+    why: "no route to 10.20.11.200"
+  - row: policy
+    device: fw
+    why: "deny-all-log (isp to ingress)"
+    rule: deny-all-log
+- id: internet/gw-users
+  row: internet
+  column: gw-users
+  kind: connect
+  client: inet-client
+  client_kind: client
+  client_addr: "203.0.113.2"
+  port: 443
+  sport: 43196
+  address: "10.20.11.210"
+  hops:
+  - row: routing
+    device: isp-rtr
+    what: "no route to 10.20.11.210"
+  mode: silence
+  layer: routing
+  expect:
+    connect: refused
+    device: isp-rtr
+  requests:
+  - id: connect
+    sport: 43196
+  depth: 2
+  depth_layers:
+  - row: routing
+    device: isp-rtr
+    why: "no route to 10.20.11.210"
+  - row: policy
+    device: fw
+    why: "deny-all-log (isp to ingress)"
+    rule: deny-all-log
+- id: internet/gw-inet
+  row: internet
+  column: gw-inet
+  kind: connect
+  client: inet-client
+  client_kind: client
+  client_addr: "203.0.113.2"
+  port: 443
+  sport: 43200
+  note: "tried at the population's answer, 198.51.100.10, which the firewall translates to 10.20.11.220"
+  address: "198.51.100.10"
+  hops:
+  - row: routing
+    device: isp-rtr
+    what: "198.51.100.8/30 connected on eth1"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/6 (zone isp): 198.51.100.10 is the firewall's own address on ethernet1/6, zone isp"
+  - row: nat
+    device: fw
+    what: "dnat-internet-gateway: destination 198.51.100.10 translated to 10.20.11.220, zone ingress"
+    rule: dnat-internet-gateway
+  - row: policy
+    device: fw
+    what: "isp-to-internet-gateway: allow, zone isp to ingress"
+    rule: isp-to-internet-gateway
+  mode: allowed
+  layer: null
+  expect:
+    connect: connected
+  fw:
+    rule: isp-to-internet-gateway
+    from_zone: isp
+    to_zone: ingress
+  requests:
+  - id: connect
+    sport: 43200
+  depth: 0
+  depth_layers: []
+- id: internet/chat
+  row: internet
+  column: chat
+  kind: model
+  client: inet-client
+  client_kind: client
+  client_addr: "203.0.113.2"
+  port: 443
+  sport: 43204
+  hostname: llm.ai.tarnwick.example
+  address: "198.51.100.10"
+  lookup:
+    name: llm.ai.tarnwick.example
+    resolver: inet-dns-res
+    server: "203.0.113.10"
+    view: public-internet
+    answer: "198.51.100.10"
+  hops:
+  - row: view
+    device: inet-dns-res
+    what: "view public-internet: llm.ai.tarnwick.example A 198.51.100.10"
+  - row: routing
+    device: isp-rtr
+    what: "198.51.100.8/30 connected on eth1"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/6 (zone isp): 198.51.100.10 is the firewall's own address on ethernet1/6, zone isp"
+  - row: nat
+    device: fw
+    what: "dnat-internet-gateway: destination 198.51.100.10 translated to 10.20.11.220, zone ingress"
+    rule: dnat-internet-gateway
+  - row: policy
+    device: fw
+    what: "isp-to-internet-gateway: allow, zone isp to ingress"
+    rule: isp-to-internet-gateway
+  - row: routeset
+    device: gw-inet
+    what: "HTTPRoute models-gw-inet, /models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7: the API gateway (api-gateway)"
+    route: models-gw-inet
+  - row: key
+    device: api-gateway
+    what: "chat's consumer group: its own key (inetapp's) 200, staff's key 401"
+  fw:
+    rule: isp-to-internet-gateway
+    from_zone: isp
+    to_zone: ingress
+  gateway: gw-inet
+  route: models-gw-inet
+  mode: allowed
+  layer: null
+  expect:
+    status: 200
+  requests:
+  - id: own
+    sport: 43204
+    method: POST
+    url: https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions
+    key: chat
+    body:
+      model: chat
+      max_tokens: 1
+      messages:
+      - role: user
+        content: "Say yes."
+    expect:
+      status: 200
+    key_caller: inetapp
+  - id: other
+    sport: 43206
+    method: POST
+    url: https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions
+    key: staff
+    body:
+      model: chat
+      max_tokens: 1
+      messages:
+      - role: user
+        content: "Say yes."
+    expect:
+      status: 401
+      message: "Authorization Failed"
+      layer: key
+  depth: 0
+  depth_layers: []
+- id: internet/staff
+  row: internet
+  column: staff
+  kind: model
+  client: inet-client
+  client_kind: client
+  client_addr: "203.0.113.2"
+  port: 443
+  sport: 43208
+  hostname: llm.ai.tarnwick.example
+  address: "198.51.100.10"
+  lookup:
+    name: llm.ai.tarnwick.example
+    resolver: inet-dns-res
+    server: "203.0.113.10"
+    view: public-internet
+    answer: "198.51.100.10"
+  hops:
+  - row: view
+    device: inet-dns-res
+    what: "view public-internet: llm.ai.tarnwick.example A 198.51.100.10"
+  - row: routing
+    device: isp-rtr
+    what: "198.51.100.8/30 connected on eth1"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/6 (zone isp): 198.51.100.10 is the firewall's own address on ethernet1/6, zone isp"
+  - row: nat
+    device: fw
+    what: "dnat-internet-gateway: destination 198.51.100.10 translated to 10.20.11.220, zone ingress"
+    rule: dnat-internet-gateway
+  - row: policy
+    device: fw
+    what: "isp-to-internet-gateway: allow, zone isp to ingress"
+    rule: isp-to-internet-gateway
+  - row: routeset
+    device: gw-inet
+    what: "no HTTPRoute for llm.ai.tarnwick.example and /models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions: 404"
+  fw:
+    rule: isp-to-internet-gateway
+    from_zone: isp
+    to_zone: ingress
+  mode: "404"
+  layer: routeset
+  gateway: gw-inet
+  expect:
+    status: 404
+    gateway: gw-inet
+    api_gateway_line: false
+  requests:
+  - id: request
+    sport: 43208
+    method: GET
+    url: "https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions?msg=sfab-matrix-internet-staff"
+    marker: sfab-matrix-internet-staff
+    expect:
+      status: 404
+  depth: 2
+  depth_layers:
+  - row: routeset
+    device: gw-inet
+    why: "no HTTPRoute for llm.ai.tarnwick.example and /models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions"
+  - row: key
+    device: api-gateway
+    why: "inetapp's key: staff's route admits helpdesk, staff"
+- id: internet/admin
+  row: internet
+  column: admin
+  kind: name
+  client: inet-client
+  client_kind: client
+  client_addr: "203.0.113.2"
+  port: 443
+  sport: 43212
+  hostname: admin.ai.tarnwick.example
+  address: "198.51.100.10"
+  pin: true
+  lookup:
+    name: admin.ai.tarnwick.example
+    resolver: inet-dns-res
+    server: "203.0.113.10"
+    view: public-internet
+    answer: null
+    expect: nxdomain
+  note: "view public-internet holds no record for admin.ai.tarnwick.example: the request is pinned to 198.51.100.10, the population's answer for the users' hostname"
+  hops:
+  - row: view
+    device: inet-dns-res
+    what: "view public-internet: no record for admin.ai.tarnwick.example (NXDOMAIN); the request pinned to 198.51.100.10"
+  - row: routing
+    device: isp-rtr
+    what: "198.51.100.8/30 connected on eth1"
+  - row: routing
+    device: fw
+    what: "in on ethernet1/6 (zone isp): 198.51.100.10 is the firewall's own address on ethernet1/6, zone isp"
+  - row: nat
+    device: fw
+    what: "dnat-internet-gateway: destination 198.51.100.10 translated to 10.20.11.220, zone ingress"
+    rule: dnat-internet-gateway
+  - row: policy
+    device: fw
+    what: "isp-to-internet-gateway: allow, zone isp to ingress"
+    rule: isp-to-internet-gateway
+  - row: routeset
+    device: gw-inet
+    what: "no HTTPRoute for admin.ai.tarnwick.example and /echo: 404"
+  fw:
+    rule: isp-to-internet-gateway
+    from_zone: isp
+    to_zone: ingress
+  mode: "404"
+  layer: routeset
+  gateway: gw-inet
+  expect:
+    status: 404
+    gateway: gw-inet
+    api_gateway_line: false
+  requests:
+  - id: request
+    sport: 43212
+    method: GET
+    url: "https://admin.ai.tarnwick.example/echo?msg=sfab-matrix-internet-admin"
+    marker: sfab-matrix-internet-admin
+    expect:
+      status: 404
+  depth: 1
+  depth_layers:
+  - row: routeset
+    device: gw-inet
+    why: "no HTTPRoute for admin.ai.tarnwick.example and /echo"
+- id: internet/api-server
+  row: internet
+  column: api-server
+  kind: connect
+  client: inet-client
+  client_kind: client
+  client_addr: "203.0.113.2"
+  port: 6443
+  sport: 43216
+  address: "10.20.1.10"
+  hops:
+  - row: routing
+    device: isp-rtr
+    what: "no route to 10.20.1.10"
+  mode: silence
+  layer: routing
+  expect:
+    connect: refused
+    device: isp-rtr
+  requests:
+  - id: connect
+    sport: 43216
+  depth: 2
+  depth_layers:
+  - row: routing
+    device: isp-rtr
+    why: "no route to 10.20.1.10"
+  - row: policy
+    device: fw
+    why: "deny-all-log (isp to k8s-nodes)"
+    rule: deny-all-log
+- id: internet/node
+  row: internet
+  column: node
+  kind: connect
+  client: inet-client
+  client_kind: client
+  client_addr: "203.0.113.2"
+  port: 22
+  sport: 43220
+  address: "10.20.1.21"
+  hops:
+  - row: routing
+    device: isp-rtr
+    what: "no route to 10.20.1.21"
+  mode: silence
+  layer: routing
+  expect:
+    connect: refused
+    device: isp-rtr
+  requests:
+  - id: connect
+    sport: 43220
+  depth: 2
+  depth_layers:
+  - row: routing
+    device: isp-rtr
+    why: "no route to 10.20.1.21"
+  - row: policy
+    device: fw
+    why: "deny-all-log (isp to k8s-nodes)"
+    rule: deny-all-log
+- id: internet/bmc
+  row: internet
+  column: bmc
+  kind: connect
+  client: inet-client
+  client_kind: client
+  client_addr: "203.0.113.2"
+  port: 443
+  sport: 43224
+  address: "10.20.9.21"
+  hops:
+  - row: routing
+    device: isp-rtr
+    what: "no route to 10.20.9.21"
+  mode: silence
+  layer: routing
+  expect:
+    connect: refused
+    device: isp-rtr
+  requests:
+  - id: connect
+    sport: 43224
+  depth: 2
+  depth_layers:
+  - row: routing
+    device: isp-rtr
+    why: "no route to 10.20.9.21"
+  - row: policy
+    device: fw
+    why: "deny-all-log (isp to oob)"
+    rule: deny-all-log
+- id: internet/stor-data
+  row: internet
+  column: stor-data
+  kind: connect
+  client: inet-client
+  client_kind: client
+  client_addr: "203.0.113.2"
+  port: 2049
+  sport: 43228
+  address: "10.20.12.31"
+  hops:
+  - row: routing
+    device: isp-rtr
+    what: "no route to 10.20.12.31"
+  mode: silence
+  layer: routing
+  expect:
+    connect: refused
+    device: isp-rtr
+  requests:
+  - id: connect
+    sport: 43228
+  depth: 2
+  depth_layers:
+  - row: routing
+    device: isp-rtr
+    why: "no route to 10.20.12.31"
+  - row: routing
+    device: fw
+    why: "no route to 10.20.12.31"
+- id: internet/stor-mgmt
+  row: internet
+  column: stor-mgmt
+  kind: connect
+  client: inet-client
+  client_kind: client
+  client_addr: "203.0.113.2"
+  port: 443
+  sport: 43232
+  address: "10.20.2.31"
+  hops:
+  - row: routing
+    device: isp-rtr
+    what: "no route to 10.20.2.31"
+  mode: silence
+  layer: routing
+  expect:
+    connect: refused
+    device: isp-rtr
+  requests:
+  - id: connect
+    sport: 43232
+  depth: 2
+  depth_layers:
+  - row: routing
+    device: isp-rtr
+    why: "no route to 10.20.2.31"
+  - row: policy
+    device: fw
+    why: "deny-all-log (isp to stor-mgmt)"
+    rule: deny-all-log
+- id: internet/egress
+  row: internet
+  column: egress
+  kind: connect
+  client: inet-client
+  client_kind: client
+  client_addr: "203.0.113.2"
+  port: 443
+  sport: 43236
+  address: "192.0.2.18"
+  hops:
+  - row: routing
+    device: isp-rtr
+    what: "no route to 192.0.2.18"
+  mode: silence
+  layer: routing
+  expect:
+    connect: refused
+    device: isp-rtr
+  requests:
+  - id: connect
+    sport: 43236
+  depth: 2
+  depth_layers:
+  - row: routing
+    device: isp-rtr
+    why: "no route to 192.0.2.18"
+  - row: policy
+    device: fw
+    why: "deny-all-log (isp to uplink)"
+    rule: deny-all-log
+counts:
+  cells: 60
+  allowed: 20
+  forbidden: 40
+  log-line: 21
+  "404": 3
+  "401": 7
+  silence: 16
+  depth:
+    "1": 25
+    "2": 14
+    "3": 1
+silence:
+  cells:
+  - enterprise/stor-data
+  - operator/api-server
+  - operator/node
+  - operator/bmc
+  - operator/stor-data
+  - operator/stor-mgmt
+  - nodes/stor-data
+  - web/stor-data
+  - internet/gw-internal
+  - internet/gw-users
+  - internet/api-server
+  - internet/node
+  - internet/bmc
+  - internet/stor-data
+  - internet/stor-mgmt
+  - internet/egress
+  evidence: "a capture at the hop, beside the route table or drop counter of the device without the route"
+  strict_ip:
+  - operator/api-server
+  - operator/node
+  - operator/bmc
+  - operator/stor-mgmt
+timeout_s: 4
+retries: 1
+firewall: fw
+routers:
+- isp-rtr
+- uplink-rtr
+api_gateway:
+  namespace: inference
+  selector: app.kubernetes.io/name=api-gateway
+  deployment: api-gateway
+  secret: api-keys
+  rejected:
+    code: 401
+    message: "Authorization Failed"
+ca_root: /shared/ca/root.crt
+labels:
+  decision: decision.tarnwick.example/id
+  audience: tarnwick.example/audience
+gateway_namespace: gateways
