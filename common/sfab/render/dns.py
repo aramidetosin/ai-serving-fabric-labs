@@ -588,9 +588,12 @@ def bind_recursive(model: Model, h: Host, r: DnsResolver, ctx) -> str:
     if not to:
         raise DnsRenderError(f"resolver {r.name}: no authoritative server in this lab to send the platform's zone to")
     acl = f"{r.name}-clients"
+    inside = all(model.segments[c].scope == "internal" for c in r.clients if c in model.segments)
+    # the internet users' provider's resolver (part III) serves its customers, not the inside
+    who = "the inside segments" if inside else "its customers' segments outside the platform"
     out = [
         f"// {header(model, h.name, '', ctx)}",
-        "// named.conf: named's whole configuration, a recursive resolver for the inside segments. sfab-dns",
+        f"// named.conf: named's whole configuration, a recursive resolver for {who}. sfab-dns",
         f"// checks it and its zones, installs them as {LIVE_DIR}/named.conf and {ZONE_DIR}/, and reloads.",
         "// The platform's zone and its reverse zones go to the authoritative servers (static-stub); every",
         "// other name ends at this resolver's own empty root (NXDOMAIN), so no query leaves the lab.",

@@ -5,10 +5,14 @@
         Create Secret NAME holding FIELD = <PFX>-<32 hex> when it does not exist (the serving
         recipe's key, the model router's master key). An existing Secret is never replaced.
     sfab-keys mint    --namespace NS --secret NAME --prefix PFX --model SLUG [--id ID] [--if-none]
+                      [--for MODEL,... --audience NAME --audience-models MODEL,...]
         Add one key for a model to Secret NAME (created when missing) as field <SLUG>.<ID>
         = <PFX>-<SLUG>-<32 hex>. ID is 8 hex digits, random unless given. With --if-none the key
         is added only when the Secret holds no key for that model yet (the lab's first key per
-        model); a model that has one keeps it.
+        model); a model that has one keeps it. With --audience (sfab/keys:4), SLUG is a caller in
+        that audience, whose models are --audience-models, and --for names the models the key is
+        for: a model outside the audience is refused (exit 3) before the Secret is read, so the
+        Secret is left as it was. Without --audience the call runs as on sfab/keys:3.
     sfab-keys copy    --from-namespace NS --from-secret NAME --field FIELD --namespace NS2 --secret NAME2
         Copy one field from one Secret to another, inside the cluster (the model router's backend
         key, from the serving recipe's Secret): create NAME2 when it is missing, keep it when it
@@ -186,6 +190,32 @@ def ensure(api: Api, ns: str, name: str, field: str, prefix: str) -> int:
         return 0 if val else 1
     log(f"Secret {ns}/{name}: created, {field} {fingerprint(key)}")
     return 0
+
+
+# The exit status of a mint the audience refuses (an error is 1).
+REFUSED = 3
+
+
+class Refused(Exception):
+    pass
+
+
+def audience_check(slug: str, for_models: list, audience: str | None, audience_models: list) -> None:
+    """Refuse a key whose models lie outside the caller's audience (the issuing step's refusal):
+    raises Refused naming the caller, its audience, what the audience may call and what was asked."""
+    if audience is None:
+        if for_models or audience_models:
+            raise KeysError("--for and --audience-models need --audience")
+        return
+    if not for_models:
+        raise KeysError("--audience needs --for: the models the key is for")
+    if not audience_models:
+        raise KeysError("--audience needs --audience-models: the models the audience may call")
+    out = [m for m in for_models if m not in audience_models]
+    if out:
+        raise Refused(f"refused: caller {slug} is in audience {audience}, which may call {', '.join(audience_models)}; "
+                      f"{', '.join(out)} is outside it, so no key is minted and the Secret is left as it was")
+    log(f"caller {slug}, audience {audience} (may call {', '.join(audience_models)}): a key for {', '.join(for_models)}")
 
 
 def mint(api: Api, ns: str, name: str, prefix: str, slug: str, kid: str | None, if_none: bool = False) -> int:
@@ -455,6 +485,9 @@ def main(argv: list) -> int:
             p.add_argument("--model", required=True)
             p.add_argument("--id", default=None)
             p.add_argument("--if-none", action="store_true")
+            p.add_argument("--for", dest="for_models", default="")
+            p.add_argument("--audience", default=None)
+            p.add_argument("--audience-models", default="")
         if c == "revoke":
             p.add_argument("--model", required=True)
             p.add_argument("--id", required=True)
@@ -493,6 +526,11 @@ def main(argv: list) -> int:
                 raise KeysError("--format must hold {key}")
             return compose(Path(a.base), Path(a.keys), Path(a.out), a.format, Path(a.hold) if a.hold else None,
                            a.interval, a.once)
+        if a.cmd == "mint":
+            # the audience refusal comes first: a refused key reaches no API and reads no Secret
+            audience_check(_check("model", SLUG_RE, a.model), [_check("model", SLUG_RE, x) for x in a.for_models.split(",") if x],
+                           _check("audience", SLUG_RE, a.audience) if a.audience is not None else None,
+                           [_check("model", SLUG_RE, x) for x in a.audience_models.split(",") if x])
         api = Api()
         ns = _check("namespace", NAME_RE, a.namespace)
         if a.cmd == "probe":
@@ -522,6 +560,9 @@ def main(argv: list) -> int:
         if a.cmd == "revoke":
             return revoke(api, ns, name, _check("model", SLUG_RE, a.model), _check("id", ID_RE, a.id))
         return list_keys(api, ns, name)
+    except Refused as e:
+        print(f"sfab-keys: {e}", file=sys.stderr)
+        return REFUSED
     except (KeysError, OSError) as e:
         print(f"sfab-keys: {e}", file=sys.stderr)
         return 1

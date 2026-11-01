@@ -91,6 +91,13 @@ BFILE="$RENDERDIR/gen/breaks.json"
 . "$SFAB_COMMON/break/lib-servebreak.sh"
 # shellcheck source=common/break/lib-keybreak.sh
 . "$SFAB_COMMON/break/lib-keybreak.sh"
+# Part III (common/break/lib-k8sbreak.sh): k8s_patch changes one cluster object in place (an
+# audience's announcement policy, a model route), its heal the rendered fields; k8s_read reads the
+# objects behind a Gateway whole; dnsmasq_pin replaces the corporate resolver's forwarding with
+# address= pins, which restore of that node puts back; probe_lookup and the check lookup_answer
+# record what each stub of a client makes of one name.
+# shellcheck source=common/break/lib-k8sbreak.sh
+. "$SFAB_COMMON/break/lib-k8sbreak.sh"
 # shellcheck source=common/matrix/matrix.sh
 . "$SFAB_COMMON/matrix/matrix.sh"
 MARKS="$STATEDIR/breaks"
@@ -591,6 +598,7 @@ check_action() {
     endpoints|placement|mac_gone|reply_path) serve_check "$js" ;;
     key_pods) key_check "$js" ;;
     cell_mode) cell_check "$js" ;;
+    lookup_answer) lookup_check "$js" ;;
     rule_order)
       if fwapi order >"$RS/record/check-order-$MODE.txt" 2>&1; then
         ok "fw: the running rulebase in the render's order ($(paste -sd ';' "$RS/record/check-order-$MODE.txt"))"
@@ -652,6 +660,8 @@ do_break() {
       key_hold) key_hold_action "$js" break || { summary || true; exit 1; } ;;
       key_mint) key_mint_action "$js" break || { summary || true; exit 1; } ;;
       dns_answer) dns_answer_action "$js" break || { summary || true; exit 1; } ;;
+      dnsmasq_pin) dnsmasq_pin_action "$js" break || { summary || true; exit 1; } ;;
+      k8s_patch) k8s_patch_action "$js" break || { summary || true; exit 1; } ;;
     esac
   done < <(steps "$id" break)
   if [ "$fwc" = 1 ]; then panos_commit break || { heal_fw_now "$id"; summary || true; exit 1; }; fi
@@ -675,6 +685,8 @@ do_break() {
       key_probe) key_probe_action "$js" ;;
       key_show) key_show_action "$js" broken ;;
       matrix_cells) matrix_cells_action "$js" ;;
+      k8s_read) k8s_read_action "$js" broken ;;
+      probe_lookup) lookup_probe_action "$js" ;;
     esac
   done < <(steps "$id" record)
   sec "break-$id: broken as designed"
@@ -695,13 +707,14 @@ do_heal() {
       relay_route) relay_action "$js" heal || true ;;
       serve) serve_action "$js" heal || true ;;
       gateway_restart) gateway_restart_action "$js" heal || true ;;
+      k8s_patch) k8s_patch_action "$js" heal || true ;;
     esac
   done < <(steps "$id" heal)
   [ "$fwc" = 0 ] || panos_commit heal || true
   rm -f "$MARKS/$id"
   sleep "${SFAB_BREAK_SETTLE_S:-5}"
   sec "heal-$id: recorded"
-  probes="$(steps "$id" expect_healed | awk -F'\t' '$1 == "probe_share" || $1 == "counter" || $1 == "far_capture" || $1 == "key_pods" || $1 == "syn_at" || $1 == "tlog_rule" || $1 == "cell_mode"' | while IFS=$'\t' read -r _ _ j; do jf "$j" probe; done | tr '\n' ' ')"
+  probes="$(steps "$id" expect_healed | awk -F'\t' '$1 == "probe_share" || $1 == "counter" || $1 == "far_capture" || $1 == "key_pods" || $1 == "syn_at" || $1 == "tlog_rule" || $1 == "cell_mode" || $1 == "lookup_answer"' | while IFS=$'\t' read -r _ _ j; do jf "$j" probe; done | tr '\n' ' ')"
   while IFS=$'\t' read -r kind node js; do
     case "$kind" in
       show) show_action "$js" healed ;;
@@ -718,6 +731,8 @@ do_heal() {
       key_probe) case " $probes " in *" $(jf "$js" id) "*) key_probe_action "$js" ;; esac ;;
       key_show) key_show_action "$js" healed ;;
       matrix_cells) case " $probes " in *" $(jf "$js" id) "*) matrix_cells_action "$js" ;; esac ;;
+      k8s_read) k8s_read_action "$js" healed ;;
+      probe_lookup) case " $probes " in *" $(jf "$js" id) "*) lookup_probe_action "$js" ;; esac ;;
     esac
   done < <(steps "$id" record)
   sec "heal-$id: healed"

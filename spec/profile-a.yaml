@@ -590,7 +590,14 @@ hosts:
     requires: [fw]
     since: 1
 
-  # The internet side (state many, from chapter 9).
+  # The internet side (state many, from chapter 9): the internet users' provider and its customers.
+  # Nothing joins it to the uplink side (a lab simplification, labeled): the lab's two
+  # providers are two internets that cannot reach each other.
+  #
+  # The ISP router routes its customers' /30s and the firewall's link, all connected, and nothing
+  # inside: it holds no route to any of build A's prefixes, so an internet user's packet to an inside
+  # address dies here (chapter 11's first layer). The published address is the firewall's own
+  # address on that link, connected too, so the router needs no static route at all.
   isp-rtr:
     kind: frr
     group: internet
@@ -599,9 +606,7 @@ hosts:
       eth1: {address: 198.51.100.9/30}
       eth2: {address: 203.0.113.1/30}
       eth3: {address: 203.0.113.5/30}
-    # The ISP routes only the public address inward (chapter 11's first layer).
-    routes:
-      - {id: public-address, dest: 198.51.100.2/32, via: 198.51.100.10}
+      eth4: {address: 203.0.113.9/30}
     requires: [fw]
     when: "many>=9"
     since: 9
@@ -613,11 +618,15 @@ hosts:
       eth1: {address: 203.0.113.2/30, gw: 203.0.113.1}
     attach:
       - {id: isp, to: isp-rtr, nic: eth1, peer_nic: eth2}
-    resolver: inet-dns
-    requires: [isp-rtr]
+    resolver: inet-dns-res
+    requires: [isp-rtr, inet-dns-res]
     when: "many>=9"
     since: 9
-  inet-dns:
+  # The platform's public authoritative server on the internet side: the public names only
+  # (dns.views public-internet), recursion off. One server, on a customer port of the ISP router,
+  # outside the firewall: a lab simplification (production runs at least two, on different
+  # networks, usually a hosted service or servers in the enterprise's DMZ).
+  inet-dns-auth:
     kind: resolver
     group: internet
     mgmt: 54
@@ -627,6 +636,21 @@ hosts:
       - {id: isp, to: isp-rtr, nic: eth1, peer_nic: eth3}
     dns_role: bind-auth
     requires: [isp-rtr]
+    when: "many>=9"
+    since: 9
+  # The internet user's recursive resolver, the provider's stand-in: recursion for the
+  # provider's customers only, the platform's zone sent to the public server (static-stub, standing
+  # in for the parent zone's delegation), every other name NXDOMAIN at once (the lab has no root).
+  inet-dns-res:
+    kind: resolver
+    group: internet
+    mgmt: 65
+    ifaces:
+      eth1: {address: 203.0.113.10/30, gw: 203.0.113.9}
+    attach:
+      - {id: isp, to: isp-rtr, nic: eth1, peer_nic: eth4}
+    dns_role: bind-recursive
+    requires: [isp-rtr, inet-dns-auth]
     when: "many>=9"
     since: 9
 
@@ -713,7 +737,9 @@ firewall:
   routes:
     - {name: default-uplink, dest: 0.0.0.0/0, nexthop: 198.51.100.1, interface: ethernet1/5}
     - {name: operator-site, dest: "seg:operator-site", interface: tunnel.1, since: 4}
-    - {name: isp-customers, dest: 203.0.113.0/26, nexthop: 198.51.100.9, interface: ethernet1/6, when: "many>=10", since: 10}
+    # The internet users' prefix through the ISP, from the step that adds the ISP link: zone isp's
+    # strict IP check drops a packet whose source is not routable over the interface it arrived on.
+    - {name: isp-customers, dest: 203.0.113.0/26, nexthop: 198.51.100.9, interface: ethernet1/6, when: "many>=9", since: 9}
     # RFC 1918 space the firewall holds no connected route for is discarded, never sent to the uplink
     - {name: discard-10, dest: 10.0.0.0/8, discard: true, since: 4}
     - {name: discard-172-16, dest: 172.16.0.0/12, discard: true, since: 4}
@@ -820,13 +846,17 @@ firewall:
     - {name: csi-to-storage-api, from: [k8s-nodes], to: [stor-mgmt], src: [seg:nodes], dst: [mgmt:truenas1], application: [ssl], since: 4}
     - {name: operator-ike, from: [uplink], to: [uplink], src: [node:ops-gw], dst: [public], application: [ike, ipsec-esp, ipsec-esp-udp], since: 4}
     - {name: operator-to-internal-gateway, from: [operator-vpn], to: [ingress], src: [seg:operator-site], dst: [vip:gw-internal], application: [ssl], decision: dec-policy-operator-vpn, since: 4}
-    - {name: isp-to-internet-gateway, from: [isp], to: [ingress], src: [any], dst: [public], application: [ssl], when: "many>=10", decision: dec-nat-internet, since: 10}
+    # The internet users' one published service (chapter 10): the firewall's own isp address on
+    # tcp/443, the pre-NAT address and the post-NAT zone, as PAN-OS matches a rule after a DNAT.
+    - {name: isp-to-internet-gateway, from: [isp], to: [ingress], src: [any], dst: ["fw:ethernet1/6"], application: [ssl], when: "many>=10", decision: dec-nat-internet, since: 10}
     - {name: deny-all-log, from: [any], to: [any], src: [any], dst: [any], service: [any], action: deny, decision: dec-policy-deny-all-log, since: 2}
-  # NAT rules, in order: zones are the pre-NAT zones; a DNAT on the public address is written
-  # with the public address's own zone as its destination zone. Nothing is published on the uplink:
-  # the operator arrives through the tunnel, untranslated.
+  # NAT rules, in order: zones are the pre-NAT zones; a DNAT on one of the firewall's own addresses
+  # is written with that address's own zone as its destination zone. Nothing is published on the
+  # uplink: the operator arrives through the tunnel, untranslated. From chapter 10 the internet users
+  # are translated: the firewall's own isp address, from isp to isp, on tcp/443 only, to
+  # the internet Gateway's VIP; the second route lookup then finds ae1.110, zone ingress.
   nat:
-    - {name: dnat-internet-gateway, from: [isp], to: [uplink], src: [any], dst: [public], service: tcp-443, dnat: vip:gw-inet, when: "many>=10", decision: dec-nat-internet, since: 10}
+    - {name: dnat-internet-gateway, from: [isp], to: [isp], src: [any], dst: ["fw:ethernet1/6"], service: tcp-443, dnat: vip:gw-inet, when: "many>=10", decision: dec-nat-internet, since: 10}
     - {name: no-nat-public, from: [k8s-nodes, services], to: [uplink], src: [any], dst: [public], service: any, decision: dec-nat-no-land, since: 4}
     - {name: internet-snat, from: [k8s-nodes, services], to: [uplink], src: [any], dst: [any], service: any, snat: {type: dynamic-ip-and-port, interface: ethernet1/5}, since: 4}
 
@@ -852,7 +882,20 @@ k8s:
   # The Gateway VIPs are announced from the ingress nodes only, on their VLAN 110 unit (build A
   # revision 2). Cilium 1.19's L2 announcements are beta: one node answers ARP for a VIP, so nothing balances
   # before the cluster, and failover takes the lease timers (Cilium's default 10 to 20 s).
-  l2_announce: {interfaces: ["^bond0\\.110$"], nodes: ingress}
+  #   policies  one CiliumL2AnnouncementPolicy for every Gateway (gateways, chapters 1 to 7), or from
+  #             chapter 8 one per audience (per-audience: gateways-<audience>, each selecting its own
+  #             Gateway's Services by the audience label), so a fault in one touches one audience
+  #   lease     Cilium's lease timers. tuned: true renders Cilium's documented example (3 s duration,
+  #             1 s renew deadline, 200 ms retry, failover between 2 s and 4 s by Cilium's page) into
+  #             the release's values, from chapter 8, where the VIPs multiply; tuned: false (the one
+  #             switch), or no lease block, keeps Cilium's defaults (15 s, 5 s, 2 s), as chapters 1 to 7
+  #             were recorded with. A recorded API server VIP move on the tuned timers decides
+  #             whether they stay
+  l2_announce:
+    interfaces: ["^bond0\\.110$"]
+    nodes: ingress
+    policies: {mode: per-audience, when: "many>=8", since: 8}
+    lease: {tuned: true, duration: 3s, renew_deadline: 1s, retry_period: 200ms, when: "many>=8", since: 8}
   # The ingress nodes carry a NoSchedule taint keyed on their role label, so only what tolerates it
   # runs there (Cilium's agent and Envoy tolerate every taint).
   taints:
@@ -918,7 +961,8 @@ test_backend:
   port: 8080
   replicas: 2
   path: /echo
-  gateways: [gw-internal, gw-users]
+  # gw-inet exists from chapter 8 (gateways: below); a Gateway the state does not hold is left out
+  gateways: [gw-internal, gw-users, gw-inet]
   since: 7
 
 # VIP and pool octets in the ingress VLAN (110).
@@ -979,8 +1023,8 @@ populations:
     zones: [isp]
     audience: internet
     clients: [inet-client]
-    resolver: inet-dns
-    answer: public
+    resolver: inet-dns-res
+    answer: "fw:ethernet1/6"
     translated: true
     when: "many>=9"
     since: 9
@@ -1047,7 +1091,11 @@ models:
 serving:
   namespace: serving
   image: serving
-  keys_image: keys
+  # the key tool: sfab/keys:3 through chapter 7, as recorded; from chapter 8 sfab/keys:4, whose mint
+  # refuses a key for a model outside the caller's audience (inference.keys.audience)
+  keys_image:
+    - {id: keys, when: one}
+    - {id: keys_audience, when: many, since: 8}
   key: {secret: llm-api-key, field: key, prefix: serving}
   ports: {http: 8080, rpc: 50052, rail_probe: 50053}
   weights: {dir: images/models, tag: models, guest: /srv/models}
@@ -1113,12 +1161,20 @@ inference:
     models: {secret: api-keys}
     master: {secret: router-master-key, field: key, prefix: router}
     backend: {secret: backend-key}
+    # From chapter 8 the key tool refuses to mint a key for a model outside the caller's audience
+    # (the issuing step's refusal; sfab/keys:4): the key Job names each caller's audience and the
+    # models that audience may call, and a mint outside them changes nothing in the Secret. A key
+    # is still not bound to a Gateway: the Gateway says from where, the caller says who.
+    audience: {refuse: true, when: "many>=8", since: 8}
   route: {request_s: 620, backend_request_s: 620}
   probe: {name: key-probe}
   callers:
-    - {id: batch, kind: application, models: [chat], owner: data-platform, expires: "2027-04-30", limit: {count: 3000, window_s: 60}}
-    - {id: helpdesk, kind: application, models: [staff], owner: service-desk, expires: "2027-04-30", limit: {count: 3000, window_s: 60}}
+    - {id: batch, kind: application, audience: enterprise, models: [chat], owner: data-platform, expires: "2027-04-30", limit: {count: 3000, window_s: 60}}
+    - {id: helpdesk, kind: application, audience: enterprise, models: [staff], owner: service-desk, expires: "2027-04-30", limit: {count: 3000, window_s: 60}}
     - {id: staff, kind: people, audience: enterprise, people: [ent-client], limit: {count: 600, window_s: 60}}
+    # The internet audience's one caller (chapter 8): an application with its own keys and
+    # its own limit; no people caller and no identity provider route on the internet Gateway.
+    - {id: inetapp, kind: application, audience: internet, models: [chat], owner: partner-apps, expires: "2027-04-30", limit: {count: 600, window_s: 60}, when: "many>=8", since: 8}
   since: 6
 
 # The identity provider (chapter 7), in a lab whose features turn serving on. Dex
@@ -1186,14 +1242,21 @@ dns:
   views:
     - {id: internal, server: [dns-auth1, dns-auth2], kind: bind-auth, match: ["node:dns-res1", "node:dns-res2"], answer: vip:gw-internal, names: [users, admin, internal, identity], infra: true, decision: dec-view-internal, since: 7}
     - {id: enterprise, server: [dns-auth1, dns-auth2], kind: bind-auth, match: ["node:ent-dns"], answer: vip:gw-users, names: [users, identity], decision: dec-view-enterprise, since: 7}
-    # The uplink side's public server publishes no platform name in state one: the operator comes in
-    # through the tunnel, and no admin name, no wildcard and no internal Gateway is ever public.
-    - {id: public-operator, server: [ops-dns], kind: bind-auth, match: [operator], answer: public, names: [], when: "one | many<=8", decision: dec-view-public, since: 7}
-    - {id: public-operator, server: [ops-dns], kind: bind-auth, match: [operator], answer: public, names: [users], when: "many>=9", decision: dec-view-public, since: 9}
-    - {id: public-internet, server: [inet-dns], kind: bind-auth, match: [internet], answer: public, names: [users], when: "many>=9", decision: dec-view-public, since: 9}
+    # The uplink side's public server publishes no platform name, in state one and in state many
+    # (a lab simplification, labeled): the operator comes in through the tunnel, the lab's
+    # two provider sides are separate internets, and no admin name, no wildcard and no internal
+    # Gateway is ever public. Production publishes one public zone with the same answers for every
+    # internet client.
+    - {id: public-operator, server: [ops-dns], kind: bind-auth, match: [operator], answer: public, names: [], decision: dec-view-public, since: 7}
+    # The internet side's public server (chapter 9): the users' name alone, answered with the
+    # firewall's own isp address, the published address; recursion off.
+    - {id: public-internet, server: [inet-dns-auth], kind: bind-auth, match: [internet], answer: "fw:ethernet1/6", names: [users], when: "many>=9", decision: dec-view-public, since: 9}
   resolvers:
     - {id: inside, servers: [dns-res1, dns-res2], kind: bind-recursive, clients: [nodes, ingress, stor-mgmt, bastion, oob, services-a, services-b], to: [dns-auth1, dns-auth2], since: 1}
     - {id: corporate, servers: [ent-dns], kind: dnsmasq, clients: [enterprise], to: [dns-auth1, dns-auth2], local: [ent-client, ent-dns], since: 1}
+    # The internet users' provider's resolver (chapter 9): recursion for its customers
+    # only, the platform's zone sent to the public server
+    - {id: isp, servers: [inet-dns-res], kind: bind-recursive, clients: [internet], to: [inet-dns-auth], when: "many>=9", since: 9}
 
 # The lab CA (chapter 7): the root is made on the lab host by make ca (sfab-ca,
 # common/ca/), its key kept under the lab's state/ca at mode 0600 and bound into no node; it signs
@@ -1256,6 +1319,20 @@ decisions:
       evidence: "The answer dig returns on the population's own client"
       refusal: none
       note: "a wrong answer moves the request to another layer's refusal"
+      when: one
+    # State many (Part III): the internet side's public server joins, and the uplink side's still
+    # publishes nothing
+    - id: view
+      prefix: view
+      layer: Resolver view
+      owner: resolver
+      object: "The platform's authoritative pair, with an internal view for the platform's resolvers and an enterprise view for the corporate resolver; a public server on the internet side that publishes the users' name from Chapter 9; the uplink side's server publishes none"
+      decision: Which address a population gets for a name
+      evidence: "The answer dig returns on the population's own client"
+      refusal: none
+      note: "a wrong answer moves the request to another layer's refusal"
+      when: many
+      since: 9
     - id: routing
       prefix: route
       layer: Routing
@@ -1264,6 +1341,17 @@ decisions:
       decision: Whether a route to the destination exists, looked up on ingress
       evidence: "The route table of each device on the path; for silence, the table of the device without the route, beside a capture at that hop"
       refusal: silence
+      when: one
+    - id: routing
+      prefix: route
+      layer: Routing
+      owner: firewall, and the routers in front of it
+      object: "The firewall's one routing instance, which holds its gateway subnets as connected routes, the operator's site through the tunnel, the internet users' prefix through the ISP link, a default route toward the uplink and discard routes for the rest of RFC 1918; the uplink router, which holds a static route to each of the firewall's gateway subnets via the public address; the ISP router, which holds its customers and the firewall's link and no inside route"
+      decision: Whether a route to the destination exists, looked up on ingress
+      evidence: "The route table of each device on the path; for silence, the table of the device without the route, beside a capture at that hop"
+      refusal: silence
+      when: many
+      since: 9
     - id: nat
       prefix: nat
       layer: NAT
@@ -1273,6 +1361,18 @@ decisions:
       evidence: "The session's NAT rule and translated address"
       refusal: none
       note: an untranslated request goes on to policy
+      when: "one | many<=9"
+    - id: nat
+      prefix: nat
+      layer: NAT
+      owner: firewall
+      object: "The NAT rulebase: the internet users' destination NAT from the isp zone on the firewall's own isp address to the internet Gateway's VIP, the no-translation rule for the public address and source NAT for the allowlisted egress; nothing is published on the uplink"
+      decision: Which address a request leaves or lands with, keyed on the pre-NAT zone
+      evidence: "The session's NAT rule and translated address"
+      refusal: none
+      note: an untranslated request goes on to policy
+      when: "many>=10"
+      since: 10
     - id: policy
       prefix: policy
       layer: Security policy
@@ -1289,6 +1389,17 @@ decisions:
       decision: Whether a hostname and path exist for the audience behind that Gateway
       evidence: "The HTTP status the Gateway returns, and for a refusal, no line in the API gateway's log"
       refusal: "404"
+      when: one
+    - id: routeset
+      prefix: routeset
+      layer: Route set
+      owner: Gateway
+      object: "Each Gateway's HTTPRoutes: the internal Gateway's /models/ prefix and admin hostnames, the users' Gateway's one path per model, the internet Gateway's one path, chat's"
+      decision: Whether a hostname and path exist for the audience behind that Gateway
+      evidence: "The HTTP status the Gateway returns, and for a refusal, no line in the API gateway's log"
+      refusal: "404"
+      when: many
+      since: 8
     - id: key
       prefix: key
       layer: Caller
@@ -1336,9 +1447,14 @@ matrix:
     - {population: operator, label: Operator, client: ops-client}
     - {population: nodes, label: Nodes, client: k8s-cp2}
     - {population: web, label: Internet host, client: web-client}
+    # Part III (chapters 9 to 11): the internet users' row, 5 x 12 = 60 cells with the column below
+    - {population: internet, label: Internet users, client: inet-client, when: "many>=9", since: 9}
   columns:
     - {id: gw-internal, label: Internal Gateway, connect: "vip:gw-internal", port: 443}
     - {id: gw-users, label: "Users' Gateway", connect: "vip:gw-users", port: 443}
+    # the internet Gateway (chapter 8 on); the internet users try it at their answer, the published
+    # address, which the firewall translates to its VIP (chapter 10)
+    - {id: gw-inet, label: Internet Gateway, connect: "vip:gw-inet", port: 443, when: "many>=8", since: 8}
     - {id: chat, label: Route to chat, model: chat}
     - {id: staff, label: Route to staff, model: staff}
     - {id: admin, label: Admin hostnames, name: admin, path: /echo}
@@ -1351,3 +1467,8 @@ matrix:
   # each request of the run takes its own source port from here, in cell order
   sport: 43000
   timeout_s: 4
+  # Part III (chapter 11): every cell's isolation depth, the layers that would refuse it if every
+  # earlier layer let it through, computed per layer by the render (render/decisions.py depth()),
+  # and each model cell's own key chosen per population: the first application caller of the
+  # population's audience that may call the model, else the model's first application caller
+  depth: {when: many, since: 11}

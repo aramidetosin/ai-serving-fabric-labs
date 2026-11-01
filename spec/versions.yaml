@@ -180,12 +180,24 @@ images:
     base: debian_base
     mirror: local
     pulled: false
+  # sfab/keys:3 is the key tool chapters 1 to 7 were recorded with. sfab/keys:4, from chapter 8
+  # (spec/profile-a.yaml serving.keys_image), adds the audience refusal to mint (--audience and
+  # --audience-models); every call that names no audience runs as on sfab/keys:3. images/keys
+  # builds sfab/keys:4 on the lab host (make -C images keys), and a lab's preflight prints its ID.
   keys:
     ref: sfab/keys:3
     source: images/keys
     base: client
     mirror: local
     pulled: false
+  keys_audience:
+    ref: sfab/keys:4
+    source: images/keys
+    base: client
+    mirror: local
+    pulled: false
+    # PENDING (lab host): not built from this source yet; the build and its image ID wait for the
+    # lab host, and no image ID is written here until that build has run
 
 tools:
   # The release preflight (pf_tools) wants exactly, always the latest release (the author's rule,

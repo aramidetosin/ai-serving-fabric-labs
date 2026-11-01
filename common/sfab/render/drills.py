@@ -1458,9 +1458,13 @@ def _break_action(inv: dict, a, where: str, model=None) -> dict:
         return _syn_break_action(inv, model, kind, body, where)
     if kind in DNS_ACTIONS:
         return _dns_break_action(inv, model, kind, body, where)
+    if kind in K8S_ACTIONS:
+        return _k8s_break_action(inv, model, kind, body, where)
+    if kind in LOOKUP_ACTIONS:
+        return _lookup_break_action(inv, model, kind, body, where)
     _err(where, f"unknown action {kind!r} (have klish, show, probe_tcp, restore, vlan_member, parity, probe_share, mclag_iface, "
                 f"{', '.join(FW_ACTIONS)}, {', '.join(RAIL_ACTIONS)}, {', '.join(SERVE_ACTIONS)}, {', '.join(GW_ACTIONS)}, "
-                f"{', '.join(SYN_ACTIONS)}, {', '.join(DNS_ACTIONS)})")
+                f"{', '.join(SYN_ACTIONS)}, {', '.join(DNS_ACTIONS)}, {', '.join(K8S_ACTIONS)}, {', '.join(LOOKUP_ACTIONS)})")
     return {}
 
 
@@ -1471,6 +1475,18 @@ SERVE_ACTIONS = ("pod_rail", "pod_route", "serve", "k8s_show", "pod_net", "probe
 GW_ACTIONS = ("key_hold", "key_mint", "key_revoke", "key_probe", "key_show", "gateway_restart", "key_pods")
 SYN_ACTIONS = ("probe_syn", "syn_at", "tlog_rule")
 DNS_ACTIONS = ("dns_answer", "matrix_cells", "cell_mode")
+# Part III: a cluster object changed in place (l2_policy: an audience's announcement policy's
+# interfaces; route_rules: a Gateway's model route with another model's rule added), both rendered
+# as the merge patch kubectl applies (kind k8s_patch), the heal's the rendered fields; k8s_read: the
+# objects behind a Gateway read whole (the policy, the lease, the Gateway, a route)
+K8S_ACTIONS = ("l2_policy", "route_rules", "k8s_read")
+# Part III: the corporate resolver's forwarding replaced by address= pins (dnsmasq_pin), a client's
+# lookups of one name by every stub it has (probe_lookup: dig for A and AAAA, python3's getaddrinfo
+# through musl, curl through its own resolver library), and the check lookup_answer
+LOOKUP_ACTIONS = ("dnsmasq_pin", "probe_lookup", "lookup_answer")
+# what probe_lookup runs on the client, each timed, with its output and exit status kept
+LOOKUP_TOOLS = ("dig-a", "dig-aaaa", "getaddrinfo", "curl")
+LOOKUP_RCODES = ("NOERROR", "NXDOMAIN", "REFUSED", "SERVFAIL", "timeout")
 # where a dns_answer break installs its copy of the server's render, inside the server's container
 DNS_BREAK_DIR = "/tmp/sfab-break-dns"
 # probe_syn's captures: the TCP headers, an 802.1Q tag and the link header fit
@@ -1607,6 +1623,169 @@ def _dns_break_action(inv: dict, model, kind: str, body, where: str) -> dict:
             _err(f"{where}.cell_mode.rule", f"{b['rule']!r} is not a security rule this lab's firewall carries")
         out["rule"] = str(b["rule"])
     return out
+
+
+def _k8s_gateway(model, gname, where: str):
+    g = model.gateways.get(str(gname or "")) if model is not None else None
+    if g is None:
+        _err(where, f"{gname!r} is not a Gateway of this lab")
+    return g
+
+
+def _k8s_break_action(inv: dict, model, kind: str, body, where: str) -> dict:
+    """Part III's cluster break actions: l2_policy and route_rules render to k8s_patch (the object,
+    the merge patch kubectl patch --type merge applies, and what it changes), k8s_read to the
+    objects read whole."""
+    from . import inference  # noqa: PLC0415
+    from . import k8s as K  # noqa: PLC0415
+
+    b = body or {}
+    if model is None or model.k8s is None:
+        _err(where, f"{kind} needs the lab's cluster")
+    if kind == "l2_policy":
+        if set(b) - {"gateway", "interfaces"} or not b.get("gateway") or b.get("interfaces") in (None, [], ""):
+            _err(f"{where}.l2_policy", "gateway: a Gateway, interfaces: the patterns the policy names, or rendered")
+        g = _k8s_gateway(model, b["gateway"], f"{where}.l2_policy.gateway")
+        if K.l2_policy_mode(model) != "per-audience":
+            _err(f"{where}.l2_policy", "the lab's announcement policy is one for every Gateway: a break would touch them all")
+        name = K.l2_policies(model)[g.name]
+        rendered = list(model.k8s.l2_announce.get("interfaces") or [])
+        want = rendered if b["interfaces"] == "rendered" else [str(x) for x in b["interfaces"]]
+        if b["interfaces"] != "rendered" and want == rendered:
+            _err(f"{where}.l2_policy.interfaces", "the rendered interfaces already: the break would change nothing")
+        for x in want:
+            try:
+                re.compile(x)
+            except re.error as e:
+                _err(f"{where}.l2_policy.interfaces", f"{x!r} is not a regular expression ({e})")
+        return {"kind": "k8s_patch", "what": "l2_policy", "resource": "ciliuml2announcementpolicies.cilium.io", "namespace": None,
+                "name": name, "gateway": g.name, "patch": {"spec": {"interfaces": want}}, "rendered": rendered == want,
+                "summary": f"policy {name} (the {g.audience} audience's, {g.name}) names interfaces {', '.join(want)}"
+                           + (" (rendered)" if rendered == want else f" (rendered {', '.join(rendered)})")}
+    if kind == "route_rules":
+        if set(b) - {"route", "add"} or not b.get("route") or b.get("add") in (None, [], ""):
+            _err(f"{where}.route_rules", "route: a Gateway's model route (models-<gateway>), add: the models whose rules it gains, or rendered")
+        if not inference.enabled(model):
+            _err(where, "route_rules needs the API gateway's model routes (serving on)")
+        st = inference.settings(model)
+        rt = next((x for x in st["routes"] if x["name"] == str(b["route"])), None)
+        if rt is None:
+            _err(f"{where}.route_rules.route", f"{b['route']!r} is not one of {', '.join(x['name'] for x in st['routes'])}")
+        if any(x["model"] is None for x in rt["rules"]):
+            _err(f"{where}.route_rules.route", f"{rt['name']} carries the bare prefix: every model is on it already")
+        add = [] if b["add"] == "rendered" else [str(x) for x in b["add"]]
+        have = [x["model"] for x in rt["rules"]]
+        models = {m["name"]: m for m in st["models"]}
+        for x in add:
+            if x not in models or x in have:
+                _err(f"{where}.route_rules.add", f"{x!r}: a model the lab serves whose rule {rt['name']} does not carry")
+        st2 = json.loads(json.dumps(st))
+        rt2 = next(x for x in st2["routes"] if x["name"] == rt["name"])
+        rt2["rules"] += [{"path": models[x]["path"], "model": x} for x in add]
+        doc = next(d for d in inference.route_docs(model, st2) if d["metadata"]["name"] == rt["name"])
+        return {"kind": "k8s_patch", "what": "route_rules", "resource": "httproutes.gateway.networking.k8s.io",
+                "namespace": st["namespace"], "name": rt["name"], "gateway": rt["gateway"],
+                "patch": {"spec": {"rules": doc["spec"]["rules"]}}, "rendered": not add, "models": have + add,
+                "summary": f"HTTPRoute {st['namespace']}/{rt['name']} ({rt['gateway']}) carries the rules of {', '.join(have + add)}"
+                           + (" (rendered)" if not add else f" (rendered {', '.join(have)})")}
+    # k8s_read
+    objs = [str(x) for x in b.get("objects") or []]
+    if set(b) - {"objects"} or not objs:
+        _err(f"{where}.k8s_read", "objects: what to read whole, each l2_policy:<gateway>, lease:<gateway>, gateway:<gateway> or route:<name>")
+    out = []
+    names = K.gateway_names(model)
+    for o in objs:
+        t, _, v = o.partition(":")
+        w = f"{where}.k8s_read.objects"
+        if t == "l2_policy":
+            g = _k8s_gateway(model, v, w)
+            out.append({"id": o, "resource": "ciliuml2announcementpolicies.cilium.io", "namespace": None, "name": K.l2_policies(model)[g.name]})
+        elif t == "lease":
+            g = _k8s_gateway(model, v, w)
+            ns, _, nm = names[g.name]["lease"].partition("/")
+            out.append({"id": o, "resource": "leases.coordination.k8s.io", "namespace": ns, "name": nm})
+        elif t == "gateway":
+            g = _k8s_gateway(model, v, w)
+            out.append({"id": o, "resource": "gateways.gateway.networking.k8s.io", "namespace": K.gateway_namespace(model), "name": g.name})
+            ns, _, nm = names[g.name]["service"].partition("/")
+            out.append({"id": f"service:{g.name}", "resource": "services", "namespace": ns, "name": nm})
+        elif t == "route":
+            st = inference.settings(model) if inference.enabled(model) else None
+            rt = next((x for x in (st or {}).get("routes") or [] if x["name"] == v), None)
+            if rt is None:
+                _err(w, f"{o!r}: no model route {v!r}")
+            out.append({"id": o, "resource": "httproutes.gateway.networking.k8s.io", "namespace": st["namespace"], "name": v})
+        else:
+            _err(w, f"{o!r}: l2_policy:, lease:, gateway: or route:")
+    return {"kind": "k8s_read", "objects": out}
+
+
+def _lookup_break_action(inv: dict, model, kind: str, body, where: str) -> dict:
+    """Part III's resolver break (chapter 9): dnsmasq_pin, probe_lookup and the check lookup_answer."""
+    from . import dns as D  # noqa: PLC0415
+
+    b = body or {}
+    if kind == "dnsmasq_pin":
+        if set(b) - {"node", "names"} or not b.get("node") or not b.get("names"):
+            _err(f"{where}.dnsmasq_pin", "node: the corporate resolver (dnsmasq), names: hostnames of the platform zone to pin")
+        node = str(b["node"])
+        n = _node(inv, node, f"{where}.dnsmasq_pin.node")
+        if n.get("dns_role") != "dnsmasq" or model is None or model.dns is None:
+            _err(f"{where}.dnsmasq_pin.node", f"{node} is no dnsmasq resolver")
+        h = model.nodes[node]
+        r = model.dns.resolver_of(node)
+        ref = D.view_for(model, h.primary)
+        if ref is None or not ref.answer_address:
+            _err(f"{where}.dnsmasq_pin.node", f"no view answers {node}")
+        names = [model.org.fqdn(str(x)) for x in b["names"]]
+        held = model.dns.names_of(ref)
+        for x in names:
+            if x not in held:
+                _err(f"{where}.dnsmasq_pin.names", f"{x} is no name view {ref.name} answers for {node}")
+        ctx = type("Ctx", (), {"profile_file": staticmethod(lambda m: f"spec/profile-{m.profile}.yaml"),
+                               "warn": staticmethod(lambda *_a: None)})()
+        text = D.dnsmasq_conf(model, h, r, ctx)
+        kept = [x for x in text.splitlines() if not x.startswith(f"server=/{model.dns.zone}/")]
+        if len(kept) == len(text.splitlines()):
+            _err(f"{where}.dnsmasq_pin", f"{node}'s render forwards no zone to remove")
+        kept.append(f"# break: the platform's zone no longer forwarded; {', '.join(names)} pinned with address=, and no local= for the platform's zone")
+        kept += [f"address=/{x}/{ref.answer_address}" for x in names]
+        return {"kind": "dnsmasq_pin", "node": node, "names": names, "address": ref.answer_address, "view": ref.name,
+                "file": "dnsmasq.conf", "content": "\n".join(kept) + "\n", "dir": DNS_BREAK_DIR}
+    if kind == "probe_lookup":
+        if set(b) - {"id", "from", "name", "path", "tools", "timeout_s"} or not b.get("from") or not b.get("name"):
+            _err(f"{where}.probe_lookup", "id, from: a client, name: a hostname of the platform zone, path, tools, timeout_s")
+        src = str(b["from"])
+        sn = _node(inv, src, f"{where}.probe_lookup.from")
+        if sn.get("kind") != "client":
+            _err(f"{where}.probe_lookup.from", f"{src} must be a client container (dig, python3 and curl)")
+        tools = [str(x) for x in b.get("tools") or LOOKUP_TOOLS]
+        bad = [x for x in tools if x not in LOOKUP_TOOLS]
+        if bad or len(set(tools)) != len(tools):
+            _err(f"{where}.probe_lookup.tools", f"each of {', '.join(LOOKUP_TOOLS)}, once")
+        host = str(b["name"])
+        if not re.match(r"^[a-z0-9]([a-z0-9-]*[a-z0-9])?$", host):
+            _err(f"{where}.probe_lookup.name", "a single DNS label under the platform zone")
+        path = str(b.get("path") or "/echo")
+        if not path.startswith("/") or " " in path or "'" in path:
+            _err(f"{where}.probe_lookup.path", "must start with / and hold no space or quote")
+        fqdn = model.org.fqdn(host) if model is not None else host
+        return {"kind": "probe_lookup", "id": str(b.get("id") or "lookup"), "node": src, "name": fqdn, "tools": tools,
+                "url": f"https://{fqdn}{path}", "timeout_s": _num(b.get("timeout_s", 60), f"{where}.probe_lookup.timeout_s")}
+    # lookup_answer
+    keys = {"probe", "type", "rcode", "answers", "tool", "ok"}
+    if set(b) - keys or not b.get("probe"):
+        _err(f"{where}.lookup_answer", "probe: a probe_lookup, and type (A or AAAA) with rcode and answers, or tool with ok")
+    if b.get("tool"):
+        if b["tool"] not in ("getaddrinfo", "curl") or not isinstance(b.get("ok"), bool) or b.get("type") or b.get("rcode"):
+            _err(f"{where}.lookup_answer", "tool: getaddrinfo or curl, ok: true or false (whether it resolved and, for curl, connected)")
+        return {"kind": "lookup_answer", "probe": str(b["probe"]), "tool": str(b["tool"]), "ok": bool(b["ok"])}
+    if str(b.get("type")) not in ("A", "AAAA") or str(b.get("rcode")) not in LOOKUP_RCODES:
+        _err(f"{where}.lookup_answer", f"type: A or AAAA, rcode: one of {', '.join(LOOKUP_RCODES)}")
+    ans = b.get("answers")
+    if ans is not None and (not isinstance(ans, int) or ans < 0):
+        _err(f"{where}.lookup_answer.answers", "how many records the answer section holds")
+    return {"kind": "lookup_answer", "probe": str(b["probe"]), "type": str(b["type"]), "rcode": str(b["rcode"]), "answers": ans}
 
 
 def _gw_break_action(inv: dict, model, kind: str, body, where: str) -> dict:
@@ -1969,18 +2148,19 @@ def _break(inv: dict, bid: str, raw: dict, model=None) -> dict:
     if not out["heal"]:
         _err(where, "heal: names no action")
     checks = {"vlan_member", "parity", "probe_share", "counter", "rule_order", "route_src", "far_capture", "endpoints", "placement",
-              "mac_gone", "key_pods", "syn_at", "tlog_rule", "cell_mode", "reply_path", "mclag_iface"}
-    allowed = {"break": {"klish", "panos_api", "relay_route", "pod_rail", "pod_route", "key_hold", "key_mint", "dns_answer"},
+              "mac_gone", "key_pods", "syn_at", "tlog_rule", "cell_mode", "reply_path", "mclag_iface", "lookup_answer"}
+    allowed = {"break": {"klish", "panos_api", "relay_route", "pod_rail", "pod_route", "key_hold", "key_mint", "dns_answer", "k8s_patch",
+                         "dnsmasq_pin"},
                "record": {"show", "probe_tcp", "fw_show", "probe_ping", "probe_http", "ns_show", "probe_rail", "k8s_show", "pod_net",
-                          "probe_gateway", "key_probe", "key_show", "probe_syn", "matrix_cells"},
-               "heal": {"klish", "restore", "panos_api", "relay_route", "serve", "gateway_restart"}, "expect_broken": checks,
+                          "probe_gateway", "key_probe", "key_show", "probe_syn", "matrix_cells", "k8s_read", "probe_lookup"},
+               "heal": {"klish", "restore", "panos_api", "relay_route", "serve", "gateway_restart", "k8s_patch"}, "expect_broken": checks,
                "expect_healed": checks, "cleanup": {"key_revoke"}}
     for part, kinds in allowed.items():
         for a in out.get(part) or []:
             if a["kind"] not in kinds:
                 _err(where, f"{part}: a {a['kind']} action does not belong there (have {', '.join(sorted(kinds))})")
     probes = {a["id"]: a for a in out["record"] if a["kind"] in ("probe_tcp", "probe_ping", "probe_http", "probe_rail", "probe_gateway",
-                                                                 "key_probe", "probe_syn", "matrix_cells")}
+                                                                 "key_probe", "probe_syn", "matrix_cells", "probe_lookup")}
     for part in ("expect_broken", "expect_healed"):
         for a in out[part]:
             if a["kind"] in ("syn_at", "tlog_rule"):
@@ -1998,6 +2178,15 @@ def _break(inv: dict, bid: str, raw: dict, model=None) -> dict:
                 p = probes.get(a["probe"])
                 if p is None or p["kind"] != "matrix_cells" or a["cell"] not in p["cells"]:
                     _err(where, f"{part}: cell_mode names {a['cell']!r} of {a['probe']!r}, which no matrix_cells of record: tries")
+            if a["kind"] == "lookup_answer":
+                p = probes.get(a["probe"])
+                if p is None or p["kind"] != "probe_lookup":
+                    _err(where, f"{part}: lookup_answer names {a['probe']!r}, which is no probe_lookup of record:")
+                need = a.get("tool") or {"A": "dig-a", "AAAA": "dig-aaaa"}[a["type"]]
+                if need not in p["tools"]:
+                    _err(where, f"{part}: lookup_answer wants {need}, which {a['probe']} does not run")
+            if a["kind"] == "probe_share" and probes.get(a["probe"], {}).get("kind") in ("matrix_cells", "probe_lookup"):
+                _err(where, f"{part}: probe_share names {a['probe']!r}, whose check is cell_mode or lookup_answer")
             if a["kind"] == "probe_share" and probes.get(a["probe"], {}).get("kind") == "matrix_cells":
                 _err(where, f"{part}: probe_share names {a['probe']!r}, a matrix_cells: its check is cell_mode")
             if a["kind"] == "probe_share" and a["probe"] not in probes:
@@ -2035,7 +2224,14 @@ def _break(inv: dict, bid: str, raw: dict, model=None) -> dict:
     if not out["cleanup"]:
         # a break with no cleanup renders as it did before chapter 7 added the part
         del out["cleanup"]
-    moved = {a["node"] for a in out["break"] if a["kind"] == "dns_answer"}
+    patched = {(a["resource"], a["name"]) for a in out["break"] if a["kind"] == "k8s_patch"}
+    healed = {(a["resource"], a["name"]) for a in out["heal"] if a["kind"] == "k8s_patch" and a["rendered"]}
+    if patched - healed:
+        _err(where, "heal: puts no patched object back to its render (" + ", ".join(n for _r, n in sorted(patched - healed)) + ")")
+    for a in out["break"]:
+        if a["kind"] == "k8s_patch" and a["rendered"]:
+            _err(where, f"break: {a['name']} as rendered changes nothing")
+    moved = {a["node"] for a in out["break"] if a["kind"] in ("dns_answer", "dnsmasq_pin")}
     restored = {a["node"] for a in out["heal"] if a["kind"] == "restore" and a.get("what") == "dns"}
     if moved - restored:
         _err(where, f"heal: restore names no DNS server the break moved ({', '.join(sorted(moved - restored))})")

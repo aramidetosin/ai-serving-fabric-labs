@@ -481,13 +481,35 @@ class TestPublicServers(unittest.TestCase):
                          ["bootstrap/ops-dns/named.conf", f"bootstrap/ops-dns/zones/db.public-operator.{ZONE}"],
                          "no reverse zone: every address in it is outside")
 
-    def test_the_two_public_servers_answer_the_same(self):
+    def test_the_two_public_servers_answer_differently(self):
+        # part III: the uplink side's server publishes no platform name in state many
+        # either, and the internet side's server publishes the users' name alone, at the firewall's
+        # own isp address; no admin, internal, identity or infrastructure name, no
+        # wildcard and no AAAA record
         out, _ = render_dns(model("many"))
         a = parse_zone(out[f"bootstrap/ops-dns/zones/db.public-operator.{ZONE}"])
-        b = parse_zone(out[f"bootstrap/inet-dns/zones/db.public-internet.{ZONE}"])
-        self.assertEqual(a, b, "the same records, SOA and serial on both")
-        ns = [v for o, t, v in a["records"] if t == "NS"]
-        self.assertEqual(ns, [f"ops-dns.{ZONE}", f"inet-dns.{ZONE}"])
+        b = parse_zone(out[f"bootstrap/inet-dns-auth/zones/db.public-internet.{ZONE}"])
+        self.assertEqual([(o, t, v) for o, t, v in a["records"] if t != "SOA"],
+                         [(ZONE, "NS", f"ops-dns.{ZONE}"), (f"ops-dns.{ZONE}", "A", "192.0.2.10")])
+        self.assertEqual([(o, t, v) for o, t, v in b["records"] if t != "SOA"],
+                         [(ZONE, "NS", f"inet-dns-auth.{ZONE}"), (f"inet-dns-auth.{ZONE}", "A", "203.0.113.6"),
+                          (f"llm.{ZONE}", "A", "198.51.100.10")])
+        self.assertFalse([o for o, t, v in b["records"] if t == "AAAA" or "*" in o])
+        self.assertNotIn(f"bootstrap/inet-dns/zones/db.public-internet.{ZONE}", out)
+
+    def test_the_isp_resolver_recurses_for_its_customers_only(self):
+        # inet-dns-res recurses for 203.0.113.0/26 alone, sends the platform's zone to the
+        # public server and ends every other name at its own empty root; inet-dns-auth recurses for none
+        out, _ = render_dns(model("many"))
+        res = out["bootstrap/inet-dns-res/named.conf"]
+        self.assertIn("recursion yes;", res)
+        self.assertIn("acl isp-clients { 203.0.113.0/26; };", res)
+        self.assertIn("allow-recursion { 127.0.0.1; isp-clients; };", res)
+        self.assertIn(f'zone "{ZONE}" {{ type static-stub; server-addresses {{ 203.0.113.6; }}; }};', res)
+        self.assertIn('zone "." { type primary; file "/etc/sfab/dns/zones/db.inet-dns-res.root"; };', res)
+        auth = out["bootstrap/inet-dns-auth/named.conf"]
+        self.assertIn("recursion no;", auth)
+        self.assertIn("allow-recursion { none; };", auth)
 
 
 @unittest.skipUnless(HAVE_YAML, "PyYAML is needed to read the spec")

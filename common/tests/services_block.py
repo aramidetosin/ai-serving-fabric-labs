@@ -62,6 +62,9 @@ def services(m) -> dict:
     else:
         ks = spec.get("k8s") or {}
         tb = dict(spec.get("test_backend") or {})
+        if tb.get("gateways"):
+            # the Gateways of this state only (gw-inet joins the list from chapter 8)
+            tb["gateways"] = [g for g in tb["gateways"] if g in m.gateways]
         out["k8s"] = {
             "version": k.version, "api_vip": k.api_vip, "api_fqdn": k.api_fqdn, "pod_cidr": k.pod_cidr,
             "service_cidr": k.service_cidr, "init": k.init, "control": list(k.control), "workers": list(k.workers),

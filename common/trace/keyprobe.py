@@ -11,9 +11,13 @@ lines read back.
         is), and prints one JSON line per pod and answer; EXPECT is the status the check wants.
         With --repeat each check runs in rounds, every --interval seconds, until every pod has
         answered EXPECT or --max-s passes (a minted key loading, a revoked key leaving)
-    keyprobe.py job  --k8s gen/k8s.json --name NAME (--mint|--revoke) --model M --id ID
+    keyprobe.py job  --k8s gen/k8s.json --name NAME (--mint|--revoke) --model M --id ID [--caller C]
         a Job of the key tool on the key Job's account that mints or revokes one key of the model
-        keys' Secret, field <M>.<ID>; its log names the key by its fingerprint only
+        keys' Secret, field <caller>.<ID> (the caller C, else the first application caller that
+        may call M); its log names the key by its fingerprint only. In a lab whose callers carry
+        an audience (chapter 8 on, sfab/keys:4) a mint names the caller's audience and that the key
+        is for M, so a model outside the audience is refused: the Job then fails, and its log
+        holds the refusal (the audit's refused mint)
     keyprobe.py rows --log FILE [--label LABEL]
         the probe's lines, as JSON, one a line, from a saved log (the pod's own log)
     keyprobe.py summary --log FILE --label LABEL --expect STATUS
@@ -103,13 +107,22 @@ def job(a) -> int:
         raise SystemExit(f"keyprobe: {a.name!r} is not a Job name")
     if not any(m["name"] == a.model for m in inf["models"]) or not re.match(r"^[0-9a-f]{8}$", a.id):
         raise SystemExit(f"keyprobe: {a.model}.{a.id} is not a key of a model the lab serves")
-    # the key goes to the application caller that stands for the model (servekeys.caller_of)
-    slug = next((c["id"] for c in inf.get("callers") or [] if c.get("kind") == "application" and a.model in (c.get("models") or [])),
-                a.model)
+    callers = inf.get("callers") or []
+    if a.caller:
+        c = next((x for x in callers if x.get("id") == a.caller and x.get("kind") == "application"), None)
+        if c is None:
+            raise SystemExit(f"keyprobe: {a.caller!r} is not an application caller of the lab")
+        slug = c["id"]
+    else:
+        # the key goes to the application caller that stands for the model (servekeys.caller_of)
+        c = next((x for x in callers if x.get("kind") == "application" and a.model in (x.get("models") or [])), None)
+        slug = c["id"] if c else a.model
     k = inf["keys"]["models"]
     if a.mint:
         cmd = ["sfab-keys", "mint", "--namespace", inf["namespace"], "--secret", k["secret"], "--prefix", k["prefix"],
                "--model", slug, "--id", a.id]
+        if c and c.get("audience"):
+            cmd += ["--for", a.model, "--audience", c["audience"], "--audience-models", ",".join(c.get("audience_models") or [])]
     else:
         cmd = ["sfab-keys", "revoke", "--namespace", inf["namespace"], "--secret", k["secret"], "--model", slug, "--id", a.id]
     lab = {"app.kubernetes.io/part-of": "inference", "app.kubernetes.io/component": "keys"}
@@ -187,6 +200,7 @@ def main(argv=None) -> int:
     g.add_argument("--revoke", action="store_true")
     s.add_argument("--model", required=True)
     s.add_argument("--id", required=True)
+    s.add_argument("--caller", default=None)
     s = sub.add_parser("rows")
     s.add_argument("--log", required=True)
     s.add_argument("--label")

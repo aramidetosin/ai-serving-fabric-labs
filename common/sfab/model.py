@@ -2263,7 +2263,14 @@ class _Builder:
             if g is None:
                 raise SpecError(f"answer {ref!r}: no Gateway {val!r} in this state")
             return g.vip
-        raise SpecError(f"answer {ref!r}: use public or vip:<gateway>")
+        if kind == "fw" and val:
+            # one of the firewall's own addresses: the internet side's published address is the
+            # firewall's own isp address (part III)
+            fi = next((i for i in (getattr(self, "fw_raw", None) or {}).get("interfaces") or [] if str(i.get("name")) == val), None)
+            if not fi or not fi.get("address"):
+                raise SpecError(f"answer {ref!r}: the firewall has no interface {val!r} with an address")
+            return addr.ip(str(fi["address"])).compressed
+        raise SpecError(f"answer {ref!r}: use public, vip:<gateway> or fw:<interface>")
 
     def _public(self) -> str | None:
         pub_if = self.fw_raw.get("public")

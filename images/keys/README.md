@@ -4,17 +4,17 @@ The API key tool, `sfab-keys`, in an image the cluster pulls from the in-lab reg
 
 ```
 make -C images keys-fetch     # the pinned PyYAML wheel into VENDOR_DIR/keys/, checked against its sha256
-make -C images keys           # sfab/keys:1
+make -C images keys           # sfab/keys:4
 ```
 
-The image is `sfab/client` (pinned Alpine with Python 3.12) plus `sfab-keys` and PyYAML 6.0.3, unpacked from its pinned wheel (`keys.pyyaml` in `spec/versions.yaml`: CPython 3.12 on musl, with its sha256 from PyPI) with Python's own `zipfile`, so the build downloads nothing and runs no `pip`. Its user is 65532. `make -C images registry-seed` pushes it into the in-lab registry, where a pod names it `<mirror>/sfab/keys:1` (`192.0.2.6:5000/sfab/keys:1` in build A).
+The image is `sfab/client` (pinned Alpine with Python 3.12) plus `sfab-keys` and PyYAML 6.0.3, unpacked from its pinned wheel (`keys.pyyaml` in `spec/versions.yaml`: CPython 3.12 on musl, with its sha256 from PyPI) with Python's own `zipfile`, so the build downloads nothing and runs no `pip`. Its user is 65532. `make -C images registry-seed` pushes it into the in-lab registry, where a pod names it `<mirror>/sfab/keys:4` (`192.0.2.6:5000/sfab/keys:4` in build A). This source builds `sfab/keys:4` (`images.keys_audience` in `spec/versions.yaml`), the tool of chapter 8 on; chapters 1 to 7 were recorded with `sfab/keys:3` (`images.keys`), which every call that names no audience runs the same as. On a host with no `sfab/keys:3` (a fresh clone), `make -C images keys` tags its `sfab/keys:4` build `sfab/keys:3` too, so chapters 1 to 7 run there; a host that has one keeps it untouched.
 
 ## What it does
 
 | Command | What it does | Who runs it |
 |---|---|---|
 | `sfab-keys ensure --namespace NS --secret NAME --field FIELD --prefix PFX` | creates the Secret with `FIELD` set to `<PFX>-<32 hex>` (128 random bits) when it does not exist; an existing Secret is kept as it is, and one without the field is refused | the serving recipe's key Job (`serving-layer/`), for the servers' bearer key |
-| `sfab-keys mint --namespace NS --secret NAME --prefix PFX --model SLUG [--id ID] [--if-none]` | adds one key for a model to the Secret as field `<SLUG>.<ID>`, `<PFX>-<SLUG>-<32 hex>`; the id is 8 hex digits. With `--if-none` it adds one only when the Secret holds no key for that model yet, so a lab's first key per model is made once | the per-model keys behind the API gateway (the lab's keys Job mints the first with `--if-none`) |
+| `sfab-keys mint --namespace NS --secret NAME --prefix PFX --model SLUG [--id ID] [--if-none] [--for MODELS --audience NAME --audience-models MODELS]` | adds one key for a caller to the Secret as field `<SLUG>.<ID>`, `<PFX>-<SLUG>-<32 hex>`; the id is 8 hex digits. With `--if-none` it adds one only when the Secret holds no key for that caller yet, so a lab's first key per caller is made once. With `--audience` (`sfab/keys:4`) the caller is in that audience, which may call `--audience-models`, and `--for` names the models the key is for: a model outside the audience is refused with exit status 3 before the tool reaches the API, so the Secret is left as it was | the per-model keys behind the API gateway (the lab's keys Job mints the first with `--if-none`) |
 | `sfab-keys copy --from-namespace NS --from-secret NAME --field FIELD --namespace NS2 --secret NAME2` | copies one field from one Secret to another: creates the second when it is missing, keeps it when it holds the same value and updates it when the value differs, printing which, with the fingerprint | the model router's backend key, copied from the serving recipe's Secret |
 | `sfab-keys revoke --namespace NS --secret NAME --model SLUG --id ID` | removes that key from the Secret | the same |
 | `sfab-keys list --namespace NS --secret NAME` | each key's field and fingerprint | anyone with read access |

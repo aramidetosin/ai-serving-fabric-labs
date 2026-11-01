@@ -668,7 +668,7 @@ def cilium_values_doc(model: Model, idle_s: int | None = None) -> dict:
         "bpf": {"masquerade": False, "hostLegacyRouting": True},
         # Multus (the rail networks, from chapter 5) chains its own configurations beside Cilium's.
         "cni": {"exclusive": False},
-        "l2announcements": {"enabled": True},
+        "l2announcements": dict({"enabled": True}, **lease_values(model)),
         # Lease renewals for every announced Service ride on the agents' API client.
         "k8sClientRateLimit": dict(CILIUM_CLIENT_RATE),
         # The class always: the CRDs are in before the chart, and a missing one should fail the install.
@@ -1000,27 +1000,141 @@ def l2_nodes_selector(model: Model) -> dict:
     return {"matchExpressions": [{"key": model.k8s.labels[who], "operator": "Exists"}]}
 
 
-def l2_policy(model: Model, ctx) -> str:
-    ifaces = list(model.k8s.l2_announce.get("interfaces") or [])
-    if not ifaces:
-        raise RenderError("spec k8s.l2_announce.interfaces is empty")
-    names = [g.name for g in model.gateways.values()]
-    doc = {
+# The one policy for every Gateway (chapters 1 to 7), and the name of each audience's policy when the
+# spec's k8s.l2_announce.policies says per-audience (chapter 8 on).
+L2_POLICY = "gateways"
+L2_POLICY_MODES = ("single", "per-audience")
+# Cilium's lease timers (the release's l2announcements values) as the spec's k8s.l2_announce.lease
+# names them, and Cilium 1.19's defaults, which a lab without tuned timers keeps.
+L2_LEASE_KEYS = {"duration": "leaseDuration", "renew_deadline": "leaseRenewDeadline", "retry_period": "leaseRetryPeriod"}
+L2_LEASE_DEFAULTS = {"duration": "15s", "renew_deadline": "5s", "retry_period": "2s"}
+_DURATION = re.compile(r"^([0-9]+)(ms|s)$")
+
+
+def _duration_ms(v: str, where: str) -> int:
+    m = _DURATION.match(str(v))
+    if not m:
+        raise RenderError(f"{where}: {v!r} is not a duration in ms or s (for example 3s, 200ms)")
+    return int(m.group(1)) * (1 if m.group(2) == "ms" else 1000)
+
+
+def lease_timers(model: Model) -> dict | None:
+    """The tuned lease timers, {duration, renew_deadline, retry_period} as written, when the spec's
+    k8s.l2_announce.lease says tuned: true; None keeps Cilium's defaults. The renew deadline must
+    be shorter than the duration, and the retry period shorter than the renew deadline."""
+    le = model.k8s.l2_announce.get("lease")
+    if not le:
+        return None
+    if not isinstance(le, dict) or set(le) - {"tuned", *L2_LEASE_KEYS, "since"}:
+        raise RenderError(f"spec k8s.l2_announce.lease: tuned and {', '.join(L2_LEASE_KEYS)} only")
+    if not le.get("tuned"):
+        return None
+    out = {}
+    for k in L2_LEASE_KEYS:
+        if not le.get(k):
+            raise RenderError(f"spec k8s.l2_announce.lease: tuned timers need {k}")
+        out[k] = str(le[k])
+    d, r, t = (_duration_ms(out[k], f"spec k8s.l2_announce.lease.{k}") for k in L2_LEASE_KEYS)
+    if not (t < r < d):
+        raise RenderError("spec k8s.l2_announce.lease: want retry_period < renew_deadline < duration")
+    return out
+
+
+def lease_values(model: Model) -> dict:
+    """The tuned timers as the Cilium release's l2announcements values, or nothing."""
+    le = lease_timers(model)
+    return {L2_LEASE_KEYS[k]: v for k, v in le.items()} if le else {}
+
+
+def lease_summary(model: Model) -> dict:
+    """The timers the agents run with, the renew rate the Gateway Services ask of the agents' client
+    (Cilium's sizing: QPS = Services x 1 / renew deadline) and the failover window Cilium's page
+    gives (duration - renew deadline to duration + renew deadline), for the audit and the chapter."""
+    le = lease_timers(model)
+    t = dict(le) if le else dict(L2_LEASE_DEFAULTS)
+    d, r = _duration_ms(t["duration"], "lease"), _duration_ms(t["renew_deadline"], "lease")
+    n = len(model.gateways)
+    return {"tuned": bool(le), **t, "services": n, "renew_qps": round(n * 1000 / r, 3),
+            "client_qps": CILIUM_CLIENT_RATE["qps"], "failover_ms": [d - r, d + r]}
+
+
+def l2_policy_mode(model: Model) -> str:
+    po = model.k8s.l2_announce.get("policies")
+    if not po:
+        return "single"
+    mode = str(po.get("mode") if isinstance(po, dict) else po)
+    if mode not in L2_POLICY_MODES:
+        raise RenderError(f"spec k8s.l2_announce.policies.mode {mode!r} is not one of {', '.join(L2_POLICY_MODES)}")
+    return mode
+
+
+def l2_policies(model: Model) -> dict:
+    """{gateway: the name of the CiliumL2AnnouncementPolicy that announces its VIP}: gateways for
+    every one, or gateways-<audience> per audience."""
+    if l2_policy_mode(model) == "single":
+        return {g.name: L2_POLICY for g in model.gateways.values()}
+    out = {}
+    for g in model.gateways.values():
+        if not g.audience:
+            raise RenderError(f"gateway {g.name}: a policy per audience needs the Gateway's audience")
+        out[g.name] = f"{L2_POLICY}-{g.audience}"
+    if len(set(out.values())) != len(out):
+        raise RenderError("spec k8s.l2_announce.policies per-audience: two Gateways share an audience")
+    return out
+
+
+def l2_policy_doc(model: Model, name: str, selector: dict, interfaces: list | None = None) -> dict:
+    ifaces = list(interfaces if interfaces is not None else model.k8s.l2_announce.get("interfaces") or [])
+    return {
         "apiVersion": "cilium.io/v2alpha1", "kind": "CiliumL2AnnouncementPolicy",
-        "metadata": {"name": "gateways"},
+        "metadata": {"name": name},
         "spec": {
-            "serviceSelector": {"matchExpressions": [{"key": model.k8s.labels["pool"], "operator": "In", "values": names}]},
+            "serviceSelector": selector,
             "nodeSelector": l2_nodes_selector(model),
             "interfaces": ifaces,
             "loadBalancerIPs": True,
             "externalIPs": False,
         },
     }
-    head = header(model, "L2 announcement policy", ctx) + [
-        f"The Gateway Services' VIPs answered by ARP on {', '.join(ifaces)}, from the nodes labelled",
-        f"{model.k8s.labels[str(model.k8s.l2_announce.get('nodes') or 'control')]}; one lease per Service decides which node answers.",
-    ]
-    return yaml_file(head, [doc])
+
+
+def l2_policy_docs(model: Model) -> list:
+    """The policies in Gateway order: one selecting every Gateway's Service by its pool label, or
+    one per audience selecting its own Gateway's Service by the audience label (Cilium copies each
+    Gateway's infrastructure labels onto the Service it makes, as it does the pool label)."""
+    if l2_policy_mode(model) == "single":
+        names = [g.name for g in model.gateways.values()]
+        return [l2_policy_doc(model, L2_POLICY, {"matchExpressions": [{"key": model.k8s.labels["pool"], "operator": "In", "values": names}]})]
+    if "audience" not in model.k8s.labels:
+        raise RenderError("spec k8s.labels needs audience for a policy per audience")
+    pol = l2_policies(model)
+    return [l2_policy_doc(model, pol[g.name], {"matchLabels": {model.k8s.labels["audience"]: g.audience}})
+            for g in model.gateways.values()]
+
+
+def l2_policy(model: Model, ctx) -> str:
+    ifaces = list(model.k8s.l2_announce.get("interfaces") or [])
+    if not ifaces:
+        raise RenderError("spec k8s.l2_announce.interfaces is empty")
+    docs = l2_policy_docs(model)
+    who = model.k8s.labels[str(model.k8s.l2_announce.get('nodes') or 'control')]
+    if l2_policy_mode(model) == "single":
+        head = header(model, "L2 announcement policy", ctx) + [
+            f"The Gateway Services' VIPs answered by ARP on {', '.join(ifaces)}, from the nodes labelled",
+            f"{who}; one lease per Service decides which node answers.",
+        ]
+    else:
+        pol = l2_policies(model)
+        head = header(model, "L2 announcement policies", ctx) + [
+            f"One policy per audience ({', '.join(f'{pol[g.name]} for {g.name}' for g in model.gateways.values())}), each",
+            f"selecting its own Gateway's Service by the label {model.k8s.labels['audience']}: the VIP answered by ARP on",
+            f"{', '.join(ifaces)}, from the nodes labelled {who}; one lease per Service decides which node answers.",
+        ]
+    le = lease_timers(model)
+    if le:
+        head.append(f"The leases run on tuned timers (cilium-config, 20-cilium-values.yaml): duration {le['duration']}, renew "
+                    f"deadline {le['renew_deadline']}, retry period {le['retry_period']}.")
+    return yaml_file(head, docs)
 
 
 # --------------------------------------------------------------------------------------------
@@ -1210,11 +1324,25 @@ def multus(model: Model, ctx) -> str:
     return "".join(f"# {h}\n" for h in head) + text
 
 
+def keys_image_key(spec_value) -> str:
+    """The images.<key> of the key tool this state runs: serving.keys_image is that key, or a list
+    of {id: <key>, when: ...} of which exactly one holds in the state (sfab/keys:3 through chapter 7,
+    sfab/keys:4 from chapter 8, whose mint refuses a model outside the caller's audience)."""
+    v = spec_value
+    if isinstance(v, list):
+        ids = [str(x.get("id") or "") for x in v if isinstance(x, dict)]
+        if len(ids) != 1 or not ids[0]:
+            raise RenderError(f"spec serving.keys_image: exactly one entry must hold in this state (have {ids})")
+        return ids[0]
+    return str(v or "")
+
+
 def serving_settings(model: Model) -> dict:
     s = dict((model.spec or {}).get("serving") or {})
     for f in ("namespace", "image", "keys_image", "key", "ports", "server_args", "worker_args", "readiness", "route", "load"):
         if s.get(f) in (None, "", {}, []):
             raise RenderError(f"spec serving needs {f}")
+    s["keys_image"] = keys_image_key(s["keys_image"])
     for f in ("secret", "field", "prefix"):
         if not (s["key"] or {}).get(f):
             raise RenderError(f"spec serving.key needs {f}")
@@ -1673,12 +1801,20 @@ def summary(model: Model, ctx) -> dict:
                               "pool_range": [g.pool_start, g.pool_end], "l2_lease": f"{SYSTEM_NS}/{l2_lease(model, g)}",
                               "hostnames": list(g.hostnames), "audience": g.audience,
                               "listener": listener(model, g.name)} for g in model.gateways.values()},
-        "l2_policy": "gateways" if model.gateways else None,
+        "l2_policy": L2_POLICY if model.gateways and l2_policy_mode(model) == "single" else None,
         "issuer": dict(issuer(model), kind="ClusterIssuer"),
         "certificates": certificates(model),
         "charts": [dict(zip(("release", "namespace", "chart", "version", "values", "phase"), r)) for r in charts(model)],
         "apply": [FILES[x] for x in APPLY_ORDER if _wanted(model, x)],
     }
+    if model.gateways and l2_policy_mode(model) != "single":
+        # chapter 8: a policy per audience, and the lease timers the agents run with
+        pol = l2_policies(model)
+        out["l2_policies"] = {"mode": l2_policy_mode(model), "by_gateway": pol}
+        for g in model.gateways.values():
+            out["gateways"][g.name]["l2_policy"] = pol[g.name]
+    if lease_timers(model):
+        out["l2_lease"] = lease_summary(model)
     enc = secrets_encryption(model)
     if enc:
         out["secrets_encryption"] = enc

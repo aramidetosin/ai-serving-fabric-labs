@@ -223,6 +223,45 @@ class Keys(unittest.TestCase):
         rc, out = self.run_keys("revoke", "--namespace", "gw", "--secret", "keys-minted", "--model", "chat", "--id", "0a1b2c3d")
         self.assertEqual(rc, 1)
 
+    def test_mint_refused_outside_the_audience(self):
+        # sfab/keys:4: a key for a model outside the caller's audience is refused before the Secret is
+        # read, with its own exit status, and the Secret is left as it was
+        FakeApi.secrets[("inference", "api-keys")] = {"data": {"inetapp.0a1b2c3d": base64.b64encode(b"sk-tw-inetapp-x").decode()}}
+        before = repr(sorted(FakeApi.secrets.items()))
+        rc, out = self.run_keys("mint", "--namespace", "inference", "--secret", "api-keys", "--prefix", "sk-tw", "--model", "inetapp",
+                                "--for", "staff", "--audience", "internet", "--audience-models", "chat")
+        self.assertEqual(rc, keys.REFUSED, out)
+        self.assertIn("refused: caller inetapp is in audience internet, which may call chat; staff is outside it", out)
+        self.assertEqual(FakeApi.calls, [])
+        self.assertEqual(repr(sorted(FakeApi.secrets.items())), before)
+        # inside the audience the key is minted, and the line names the audience
+        rc, out = self.run_keys("mint", "--namespace", "inference", "--secret", "api-keys", "--prefix", "sk-tw", "--model", "inetapp",
+                                "--id", "0b1c2d3e", "--for", "chat", "--audience", "internet", "--audience-models", "chat")
+        self.assertEqual(rc, 0, out)
+        self.assertIn("caller inetapp, audience internet (may call chat): a key for chat", out)
+        self.assertRegex(self.value("inference", "api-keys", "inetapp.0b1c2d3e"), r"^sk-tw-inetapp-[0-9a-f]{32}$")
+        # one model outside the audience refuses the whole key
+        rc, out = self.run_keys("mint", "--namespace", "inference", "--secret", "api-keys", "--prefix", "sk-tw", "--model", "batch",
+                                "--for", "chat,staff", "--audience", "internet", "--audience-models", "chat")
+        self.assertEqual(rc, keys.REFUSED, out)
+        # the audience's flags come together, or not at all
+        for extra in (["--for", "chat"], ["--audience", "internet"], ["--audience", "internet", "--for", "chat"],
+                      ["--audience-models", "chat"]):
+            rc, out = self.run_keys("mint", "--namespace", "inference", "--secret", "api-keys", "--prefix", "sk-tw", "--model", "batch", *extra)
+            self.assertEqual(rc, 1, (extra, out))
+        rc, out = self.run_keys("mint", "--namespace", "inference", "--secret", "api-keys", "--prefix", "sk-tw", "--model", "batch",
+                                "--for", "chat", "--audience", "Internet!", "--audience-models", "chat")
+        self.assertEqual(rc, 1, out)
+        # the refusal needs no Kubernetes API: it is decided before the tool reaches one
+        os.environ.pop("SFAB_KEYS_API")
+        rc, out = self.run_keys("mint", "--namespace", "inference", "--secret", "api-keys", "--prefix", "sk-tw", "--model", "inetapp",
+                                "--for", "staff", "--audience", "internet", "--audience-models", "chat")
+        self.assertEqual(rc, keys.REFUSED, out)
+        rc, out = self.run_keys("mint", "--namespace", "inference", "--secret", "api-keys", "--prefix", "sk-tw", "--model", "inetapp",
+                                "--for", "chat", "--audience", "internet", "--audience-models", "chat")
+        self.assertEqual(rc, 1, out)
+        self.assertIn("no Kubernetes API", out)
+
     def test_mint_if_none_once_per_model(self):
         rc, out = self.run_keys("mint", "--namespace", "inference", "--secret", "model-keys", "--prefix", "sk-tw", "--model", "chat", "--if-none")
         self.assertEqual(rc, 0, out)

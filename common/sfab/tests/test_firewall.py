@@ -485,12 +485,39 @@ class TestPanosStates(unittest.TestCase):
         self.assertEqual(vsys.find("rulebase/nat/rules/entry[@name='dnat-internet-gateway']").findtext(
             "destination-translation/translated-address"), "10.20.11.220")
 
-    def test_many_step_9_has_no_static_to_isp_customers(self):
+    def test_many_step_9_routes_the_isp_customers(self):
+        # the route comes with the isp link in step 9 (zone isp's strict IP
+        # check drops a source not routable over its arrival interface), and step 9 has no NAT or
+        # rule for isp yet; step 8 has neither the interface nor the route
         out = render_fw({"lab": "sfab-ch09", "profile": "a", "state": "many"})
         root = ET.fromstring(out["bootstrap/fw/startup-config.xml"])
         names = [e.get("name") for e in root.findall("devices/entry/network/virtual-router/entry/routing-table/ip/static-route/entry")]
-        self.assertEqual(names, ["default-uplink", "operator-site", "discard-10", "discard-172-16", "discard-192-168"])
-        self.assertNotIn("isp-customers", names)
+        self.assertEqual(names, ["default-uplink", "operator-site", "isp-customers", "discard-10", "discard-172-16", "discard-192-168"])
+        text = out["bootstrap/fw/enforced.txt"]
+        self.assertNotIn("dnat-internet-gateway", text)
+        self.assertNotIn("isp-to-internet-gateway", text)
+        out8 = render_fw({"lab": "sfab-ch08", "profile": "a", "state": "many"})
+        self.assertNotIn("isp-customers", out8["bootstrap/fw/enforced.txt"])
+        self.assertNotIn("ethernet1/6", out8["bootstrap/fw/enforced.txt"])
+
+    def test_many_step_10_publishes_the_firewalls_own_isp_address(self):
+        # the DNAT from isp to isp on 198.51.100.10 tcp/443 to gw-inet's VIP, first in the NAT
+        # rulebase; the security rule on the pre-NAT address and the post-NAT zone as rule 24, then
+        # deny-all-log as rule 25
+        text = render_fw({"lab": "sfab-ch10", "profile": "a", "state": "many"})["bootstrap/fw/enforced.txt"]
+        sec = list(dict.fromkeys(re.findall(r"^set rulebase security rules (\S+) ", text, re.M)))
+        nat = list(dict.fromkeys(re.findall(r"^set rulebase nat rules (\S+) ", text, re.M)))
+        self.assertEqual(sec[-2:], ["isp-to-internet-gateway", "deny-all-log"])
+        self.assertEqual(len(sec), 25)
+        self.assertEqual(nat, ["dnat-internet-gateway", "no-nat-public", "internet-snat"])
+        for ln in ("set rulebase nat rules dnat-internet-gateway from isp", "set rulebase nat rules dnat-internet-gateway to isp",
+                   "set rulebase nat rules dnat-internet-gateway destination 198.51.100.10",
+                   "set rulebase nat rules dnat-internet-gateway service tcp-443",
+                   "set rulebase nat rules dnat-internet-gateway destination-translation translated-address 10.20.11.220",
+                   "set rulebase security rules isp-to-internet-gateway to ingress",
+                   "set rulebase security rules isp-to-internet-gateway destination 198.51.100.10",
+                   "set rulebase security rules isp-to-internet-gateway application ssl"):
+            self.assertIn(ln + "\n", text)
 
     def test_no_firewall_in_slice(self):
         out = render_fw({"lab": "sfab-ch05", "profile": "a", "state": "one", "slice": {"nodes": ["rail", "k8s-gpu1", "k8s-gpu2"]},

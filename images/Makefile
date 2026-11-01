@@ -10,7 +10,7 @@
 #   make -C images frr            sfab/frr (frr/image.mk)
 #   make -C images registry       sfab/registry; registry-seed, registry-check, registry-link (registry/image.mk)
 #   make -C images serving        sfab/serving, the model server; serving-fetch (serving-layer/image/image.mk)
-#   make -C images keys           sfab/keys, the API key tool; keys-fetch (keys/image.mk)
+#   make -C images keys           sfab/keys:4, the API key tool; keys-fetch (keys/image.mk)
 #   make -C images check          namecheck and shellcheck over the build contexts
 #   make -C images pins           print the pins this Makefile reads
 #

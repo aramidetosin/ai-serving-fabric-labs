@@ -658,6 +658,135 @@ def _target(model: Model, ref: str, where: str) -> tuple:
     return None, None
 
 
+def _gw_iface_toward(v, rtr: Host):
+    """The firewall's interface on a subnet it shares with a router: where the router would hand the
+    firewall a request it held a route for."""
+    for i in rtr.ifaces:
+        if not i.address:
+            continue
+        for fi in v.interfaces:
+            if fi.address and fi.zone and addr.contains(addr.prefix_of(fi.address), _bare(i.address)):
+                return fi
+    return None
+
+
+def own_caller(model: Model, inf: dict, population, model_name: str) -> tuple:
+    """(the caller whose key a population's model cell is asked with, the default one): the first
+    application caller of the population's audience that may call the model, else the model's first
+    application caller (Part II's rule: batch for chat). The default is the model's first."""
+    apps = [c for c in inf["callers"] if c["kind"] == "application" and model_name in c["models"]]
+    if not apps:
+        return None, None
+    default = apps[0]["id"]
+    aud = {str(c.get("id")): c.get("audience") for c in ((model.spec or {}).get("inference") or {}).get("callers") or []}
+    mine = next((c["id"] for c in apps if aud.get(c["id"]) == population.audience), None)
+    return mine or default, default
+
+
+def held_caller(model: Model, inf: dict, population) -> str | None:
+    """The caller whose key a population holds, for the depth of a forbidden model cell: the first
+    application caller of its audience; None when its audience has none (no key the API gateway
+    admits anywhere)."""
+    aud = {str(c.get("id")): c.get("audience") for c in ((model.spec or {}).get("inference") or {}).get("callers") or []}
+    return next((c["id"] for c in inf["callers"] if c["kind"] == "application" and aud.get(c["id"]) == population.audience), None)
+
+
+def depth_on(model: Model) -> bool:
+    raw = (model.spec or {}).get("matrix") or {}
+    return bool(raw.get("depth"))
+
+
+def depth(model: Model, v, src: Host, dst: str, port: int, http: dict | None, where: str) -> list:
+    """The layers that would refuse a request from src to dst:port if every earlier layer let it
+    through (chapter 11's isolation depth), in the order the request meets them: each
+    {row, device, why}. A router without a route refuses (and, let through, hands the request to the
+    firewall on their shared subnet); the firewall's strict IP check, its own route, its first
+    security rule after NAT; then, for an HTTP request (http: {host, path, caller, model}) that
+    reaches a Gateway, its route set and the API gateway's consumer restriction for the caller's key.
+    A layer that has no route onward ends the count: nothing behind it can be reached to refuse."""
+    from .trace import first_nat, first_rule  # noqa: PLC0415
+
+    out: list = []
+    s_addr = src.primary
+    ss, ds = model.segment_of(s_addr), model.segment_of(dst)
+    reached = None
+    if ss is not None and ds is not None and ss.id == ds.id:
+        reached = dst
+    elif model.k8s is not None and getattr(src, "k8s", None) and any(g.vip == dst for g in model.gateways.values()):
+        reached = dst
+    if reached is None:
+        gw, ing = src.gateway, None
+        vr = _vpn_router_holding(model, gw)
+        if vr is not None:
+            t = _tunnel_for(v, vr, s_addr, dst)
+            if t is not None:
+                ing = t[2]
+            else:
+                gw = vr.gateway
+        if ing is None and v is not None and _fw_own(v, gw) is not None:
+            ing = _fw_own(v, gw)
+        elif ing is None:
+            rtr = _router_holding(model, gw)
+            if rtr is None:
+                _err(where, f"{src.name}'s gateway {gw} is neither the firewall's nor a router's")
+            r, _text = _router_route(model, rtr, dst)
+            if r is False:
+                out.append({"row": "routing", "device": rtr.name, "why": f"no route to {dst}"})
+                ing = _gw_iface_toward(v, rtr) if v is not None else None
+                if ing is None:
+                    return out
+            elif r is None:
+                ing = _fw_own(v, dst) if v is not None else None
+                if ing is None:
+                    reached = dst
+            else:
+                ing = _fw_own(v, r.via) if v is not None else None
+                if ing is None:
+                    _err(where, f"{rtr.name} routes {dst} via {r.via}, which is not the firewall")
+    if reached is None:
+        sip = _strict_ip_drop(v, ing, s_addr)
+        if sip is not None:
+            out.append({"row": "routing", "device": model.firewall.name,
+                        "why": f"strict IP check ({sip['profile']}): {s_addr} is routed {sip['route']}, not over {ing.name}"})
+        own = _fw_own(v, dst)
+        if own is not None:
+            pre_zone = own.zone
+        else:
+            rt = _fw_route(v, dst)
+            if rt is None or (rt[0] is None and rt[1] is None):
+                out.append({"row": "routing", "device": model.firewall.name, "why": f"no route to {dst}"})
+                return out
+            pre_zone = rt[1]
+        n = first_nat(v, ing.zone, pre_zone, s_addr, dst, port)
+        post, post_zone = dst, pre_zone
+        if n is not None and n.dnat:
+            post = n.dnat
+            post_zone = _fw_iface_of(v, post).zone
+        r = first_rule(v, ing.zone, post_zone, s_addr, dst, port)
+        if r is not None and r.action != "allow":
+            out.append({"row": "policy", "device": model.firewall.name, "why": f"{r.name} ({ing.zone} to {post_zone})", "rule": r.name})
+        if own is not None and post == dst:
+            return out
+        reached = post
+    if http:
+        gw = next((g for g in model.gateways.values() if g.vip == reached), None)
+        if gw is None:
+            return out
+        rs, _rp = _route_match(route_sets(model), gw.name, http["host"], http["path"])
+        if rs is None:
+            out.append({"row": "routeset", "device": gw.name, "why": f"no HTTPRoute for {http['host']} and {http['path']}"})
+        if http.get("model"):
+            from . import inference  # noqa: PLC0415
+
+            inf = inference.settings(model)
+            m = next((x for x in inf["models"] if x["name"] == http["model"]), None)
+            if m is not None and http.get("caller") not in m["callers"]:
+                whose = f"{http['caller']}'s key" if http.get("caller") else "no key of the population's audience"
+                out.append({"row": "key", "device": inf["gateway"]["name"],
+                            "why": f"{whose}: {http['model']}'s route admits {', '.join(m['callers'])}"})
+    return out
+
+
 def matrix(model: Model) -> dict:
     """The matrix with every cell's mode, requests and evidence (gen/matrix.yaml)."""
     from . import inference  # noqa: PLC0415
@@ -798,13 +927,19 @@ def matrix(model: Model) -> dict:
                                              "route": rs["name"]})
                         cell.update(gateway=gw.name, route=rs["name"])
                         if col["kind"] == "model":
+                            mine, default = own_caller(model, inf, model.populations[r["id"]], col["model"])
+                            whose = f"its own key ({mine}'s)" if mine != default else "its own key"
                             cell["hops"].append({"row": "key", "device": inf["gateway"]["name"],
-                                                 "what": f"{col['model']}'s consumer group: its own key 200, {col['other']}'s key {inf['rejected']['code']}"})
+                                                 "what": f"{col['model']}'s consumer group: {whose} 200, {col['other']}'s key {inf['rejected']['code']}"})
                             cell.update(mode="allowed", layer=None, expect={"status": 200})
                             body = {"model": col["model"], "max_tokens": 1, "messages": [{"role": "user", "content": "Say yes."}]}
+                            own = {"id": "own", "sport": cell["sport"], "method": "POST", "url": f"https://{host}{upath}", "key": col["model"],
+                                   "body": body, "expect": {"status": 200}}
+                            if mine != default:
+                                # the population's own caller (the internet users' inetapp), not the model's first
+                                own["key_caller"] = mine
                             cell["requests"] = [
-                                {"id": "own", "sport": cell["sport"], "method": "POST", "url": f"https://{host}{upath}", "key": col["model"],
-                                 "body": body, "expect": {"status": 200}},
+                                own,
                                 {"id": "other", "sport": cell["sport"] + 2, "method": "POST", "url": f"https://{host}{upath}", "key": col["other"],
                                  "body": body, "expect": {"status": int(inf["rejected"]["code"]), "message": inf["rejected"]["message"],
                                                           "layer": "key"}},
@@ -813,12 +948,25 @@ def matrix(model: Model) -> dict:
                             cell.update(mode="allowed", layer=None, expect={"status": 200})
                             cell["requests"] = [{"id": "request", "sport": cell["sport"], "method": "GET",
                                                  "url": f"https://{host}{upath}?msg={marker}", "marker": marker, "expect": {"status": 200}}]
+            if depth_on(model) and cell["mode"] != "allowed":
+                http = None
+                if col["kind"] != "connect":
+                    caller = held_caller(model, inf, model.populations[r["id"]]) if col["kind"] == "model" else None
+                    http = {"host": col["hostname"], "path": col["path"], "model": col.get("model"), "caller": caller}
+                layers = depth(model, v, c, cell["address"], col["port"], http, where)
+                cell["depth"] = len(layers)
+                cell["depth_layers"] = layers
+            elif depth_on(model):
+                cell["depth"], cell["depth_layers"] = 0, []
             cells.append(cell)
     counts = {"cells": len(cells), "allowed": sum(1 for x in cells if x["mode"] == "allowed")}
     counts["forbidden"] = counts["cells"] - counts["allowed"]
     for md in MODES[1:]:
         counts[md] = sum(1 for x in cells if x["mode"] == md)
     counts["401"] = sum(1 for x in cells for q in x.get("requests") or [] if (q.get("expect") or {}).get("layer") == "key")
+    if depth_on(model):
+        counts["depth"] = {str(d): sum(1 for x in cells if x["mode"] != "allowed" and x["depth"] == d)
+                           for d in sorted({x["depth"] for x in cells if x["mode"] != "allowed"})}
     if sport + 4 * n >= 65536:
         _err("spec matrix.sport", "the cells' source ports run past 65535")
     from . import k8s as K  # noqa: PLC0415

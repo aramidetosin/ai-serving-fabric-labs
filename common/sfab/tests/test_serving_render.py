@@ -337,7 +337,7 @@ class SeedLocal(unittest.TestCase):
             with self.subTest(bad=bad), self.assertRaises(seed.SeedError):
                 seed.collect_local({"images": {"b": bad}})
         real = seed.collect_local(seed.load_tree(None)[0])
-        self.assertEqual([x.mirror_path for x in real], ["sfab/keys:3", "sfab/serving:b11382-2"])
+        self.assertEqual([x.mirror_path for x in real], ["sfab/keys:3", "sfab/keys:4", "sfab/serving:b11382-2"])
 
     def test_push_is_byte_stable_and_once(self):
         res = seed.seed_local([self.im], self.http, lambda ref: sha(self.config), self.save)

@@ -210,17 +210,14 @@ class FrrRender(unittest.TestCase):
                     if block:
                         self.assertRegex(ln, r"^ (description \S+|ip address \S+|ipv6 address \S+)$", f"{path}: {ln!r}")
 
-    def test_isp_router_routes_the_public_address_inward(self):
+    def test_isp_router_holds_no_static_route(self):
+        # the published address is the firewall's own isp address, connected on eth1, so the
+        # ISP router holds no static at all and no route to any inside prefix (chapter 11's first layer)
         files = Labs.get()["many"]["files"]
-        conf = files["bootstrap/isp-rtr/frr.conf"]
-        lines = conf.splitlines()
-        i = lines.index("ip route 198.51.100.2/32 198.51.100.10")
-        self.assertEqual(lines[i - 1], "! public-address")
-        self.assertIn(" ip address 198.51.100.9/30", lines)
-        self.assertIn(" ip address 203.0.113.1/30", lines)
-        self.assertIn(" ip address 203.0.113.5/30", lines)
-        # the routes come before the interfaces, as show running-config prints them
-        self.assertLess(i, lines.index("interface eth1"))
+        lines = files["bootstrap/isp-rtr/frr.conf"].splitlines()
+        self.assertFalse([ln for ln in lines if ln.startswith("ip route")])
+        for a in ("198.51.100.9/30", "203.0.113.1/30", "203.0.113.5/30", "203.0.113.9/30"):
+            self.assertIn(f" ip address {a}", lines)
         self.assertNotIn("frr: isp-rtr", " ".join(Labs.get()["many"]["ctx"].warnings))
 
     def test_daemons_file(self):

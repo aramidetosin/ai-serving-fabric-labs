@@ -178,6 +178,23 @@ def settings(model: Model) -> dict:
             # a decisions lab (chapter 2 on) labels each model's consumer group with the key row's id
             models[-1]["decision"] = decisions.label_of(model, "key", m.name)
     callers = _callers(model, raw, models)
+    refuse = audience_refusal(raw)
+    if refuse:
+        # chapter 8 on: every caller names its audience, its models lie inside it, and the key tool
+        # refuses a key for a model outside it (sfab/keys:4)
+        auds = {a.get("id"): a for a in (model.spec or {}).get("audiences") or []}
+        names = [m["name"] for m in models]
+        for c in callers:
+            spec_c = next((x for x in raw.get("callers") or [] if str(x.get("id")) == c["id"]), {})
+            a = auds.get(spec_c.get("audience"))
+            if a is None:
+                raise RenderError(f"spec inference.callers {c['id']}: the audience refusal needs every caller's audience")
+            am = list(names) if a.get("models") == "all" else [str(x) for x in a.get("models") or [] if str(x) in names]
+            out = [x for x in c["models"] if x not in am]
+            if out:
+                raise RenderError(f"spec inference.callers {c['id']}: {', '.join(out)} lies outside audience {a['id']} ({', '.join(am)})")
+            c["audience"] = str(a["id"])
+            c["audience_models"] = am
     for m in models:
         m["callers"] = [c["id"] for c in callers if m["name"] in c["models"]]
         if not m["callers"]:
@@ -224,7 +241,7 @@ def settings(model: Model) -> dict:
     return {
         "callers": callers, "callers_on": bool(raw.get("callers")), "oidc": oidc, "www_authenticate": WWW_AUTHENTICATE.format(realm=realm),
         "placement": edge_placement(model),
-        "namespace": ns, "path": path, "gateway": gw, "router": ro, "keys": keys, "keys_image": local_image(model, "keys"),
+        "namespace": ns, "path": path, "gateway": gw, "router": ro, "keys": keys, "keys_image": sv["keys_image"],
         "serving_namespace": sv["namespace"], "models": models, "routes": routes, "key_format": KEY_FORMAT,
         "timeouts": {"router_attempt_s": ro["attempt_timeout_s"], "router_stream_s": ro["stream_timeout_s"], "router_retries": ro["retries"],
                      "gateway_read_s": gw["upstream_timeout_s"], "backend_request_s": backend_s, "request_s": request_s},
@@ -235,6 +252,24 @@ def settings(model: Model) -> dict:
         "configmaps": {"routes": f"{gw['name']}-routes", "config": f"{gw['name']}-config", "router": f"{ro['name']}-config",
                        "plugins": f"{gw['name']}-plugins"},
     }
+
+
+def audience_refusal(raw: dict) -> bool:
+    """The spec's inference.keys.audience: refuse: true turns on the key tool's audience refusal."""
+    a = (raw.get("keys") or {}).get("audience")
+    if not a:
+        return False
+    if not isinstance(a, dict) or set(a) - {"refuse", "since"}:
+        raise RenderError("spec inference.keys.audience: refuse only")
+    return bool(a.get("refuse"))
+
+
+def mint_audience_args(c: dict, for_models: list | None = None) -> list:
+    """The key tool's audience arguments for a key of caller c (sfab/keys:4), or none."""
+    if not c.get("audience"):
+        return []
+    return ["--for", ",".join(for_models if for_models is not None else c["models"]), "--audience", c["audience"],
+            "--audience-models", ",".join(c["audience_models"])]
 
 
 def _callers(model: Model, raw: dict, models: list) -> list:
@@ -352,7 +387,9 @@ def keys_command(s: dict) -> str:
     lines = [f"sfab-keys ensure --namespace {ns} --secret {k['master']['secret']} --field {k['master']['field']} --prefix {k['master']['prefix']}"]
     for c in s["callers"]:
         if c["kind"] == "application":
-            lines.append(f"sfab-keys mint --namespace {ns} --secret {k['models']['secret']} --prefix {k['models']['prefix']} --model {c['id']} --if-none")
+            aud = " ".join(mint_audience_args(c))
+            lines.append(f"sfab-keys mint --namespace {ns} --secret {k['models']['secret']} --prefix {k['models']['prefix']} --model {c['id']} --if-none"
+                         + (f" {aud}" if aud else ""))
     lines.append(f"sfab-keys copy --from-namespace {src['namespace']} --from-secret {src['secret']} --field {k['backend']['field']} "
                  f"--namespace {ns} --secret {k['backend']['secret']}")
     return "set -e\n" + "\n".join(lines) + "\n"

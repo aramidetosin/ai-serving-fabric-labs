@@ -287,9 +287,9 @@ The full pair plan (state one, unsliced): eth1 and eth2 peer link (PortChannel1)
 | `rails` | tuple[`RailIf`] by rail (GPU nodes) |
 | `relay` | `Relay` or None (GPU nodes) |
 | `ifaces` | tuple[`Iface`]: addressed ports outside a bond (clients, resolvers, routers, the registry) |
-| `routes` | tuple[`Route`]: static routes (isp-rtr's `198.51.100.2/32 via 198.51.100.10`; uplink-rtr's five inside prefixes via `198.51.100.2`) |
+| `routes` | tuple[`Route`]: static routes (uplink-rtr's inside prefixes via `198.51.100.2`; isp-rtr holds none) |
 | `resolver`, `resolver_address` | the node it resolves through and that node's primary address (bare; None while that node is pending) |
-| `dns_role` | `bind-views` (bastion), `bind-auth` (ops-dns, inet-dns), `dnsmasq` (lan-dns) |
+| `dns_role` | `bind-views` (bastion), `bind-auth` (ops-dns, inet-dns-auth), `bind-recursive` (dns-res1, dns-res2, inet-dns-res), `dnsmasq` (lan-dns) |
 | `resolv_options` | a resolv.conf options line when the spec asks for one |
 | `mgmt_mac` | VM guests: eth0's guest MAC |
 | `disk_gib` | VM guests: the root disk's virtual size in GiB (`VM_DISK_GIB`), not a budget; `None` otherwise |
@@ -309,7 +309,7 @@ The NIC convention for vm-node and the bastion (common.yaml `guest.nics`): eth1 
 
 **`Iface`**: `eth`, `address` (CIDR), `gateway` (bare), `segment` (id), `peer` (`End` or None when unwired in this lab), `mtu`.
 
-Build A hosts: k8s-cp1 to k8s-cp3 (data .11 to .13), k8s-gpu1 and k8s-gpu2 (data .21, .22), bastion (VLAN 300 .10), uplink-rtr (198.51.100.1/29 to the firewall, 192.0.2.1/30, .5/30 and .9/30 to its three customers), ops-client (192.0.2.2/30), inet-registry (192.0.2.6/30), ops-dns (192.0.2.10/30), ent-client (10.24.10.10/24); from step 9 isp-rtr (198.51.100.9/30, 203.0.113.1/30 and .5/30), inet-client (203.0.113.2/30), inet-dns (203.0.113.6/30), and lan-dns (pending: chapter 9 settles the enterprise LAN layout, so it has no wire and no address yet).
+Build A hosts: k8s-cp1 to k8s-cp3 (data .11 to .13), k8s-gpu1 and k8s-gpu2 (data .21, .22), bastion (VLAN 300 .10), uplink-rtr (198.51.100.1/29 to the firewall, 192.0.2.1/30, .5/30 and .9/30 to its three customers), ops-client (192.0.2.2/30), inet-registry (192.0.2.6/30), ops-dns (192.0.2.10/30), ent-client (10.24.10.10/24); from step 9 isp-rtr (198.51.100.9/30, 203.0.113.1/30, .5/30 and .9/30), inet-client (203.0.113.2/30), inet-dns-auth (203.0.113.6/30), inet-dns-res (203.0.113.10/30), and lan-dns (pending: chapter 9 settles the enterprise LAN layout, so it has no wire and no address yet).
 
 ### 6.3 `Firewall` (kind `paloalto_panos`)
 
@@ -396,7 +396,7 @@ The CSI driver calls the management address over HTTPS (`csi.api: mgmt`), throug
 
 **`Audience`**: `name`, `gateway`, `models` (the model ids its route set lists: internal has all, enterprise `("chat", "staff")`, internet `("chat",)`), `admin` (its Gateway carries the bare /models/ prefix and the admin hostnames), `populations` (names whose audience this is), `decision`, `since`.
 
-**`Population`**: `name`, `segments`, `prefixes`, `zones` (the firewall zones it arrives in), `audience`, `clients` (client node names), `resolver`, `resolver_address`, `answer` (`"public"` or `"vip:<gateway>"`) and `answer_address` (bare), `translated` (arrives through a DNAT), `decision`, `since`. Build A: `operator` (192.0.2.0/30, the site behind ops-gw, zone operator-vpn through the tunnel, resolver ops-dns, answer the internal VIP, untranslated), `web` (192.0.2.16/30, an internet host that is not the operator, zone uplink, audience none, answer the public address, where nothing is published), `nodes` (nodes and bastion, resolvers dns-res1 and dns-res2, answer the internal VIP), `enterprise` (10.24.10.0/24, resolver ent-dns, answer the users' VIP), `internet` (step 9 on: 203.0.113.0/26, zone isp, resolver inet-dns, answer the public address).
+**`Population`**: `name`, `segments`, `prefixes`, `zones` (the firewall zones it arrives in), `audience`, `clients` (client node names), `resolver`, `resolver_address`, `answer` (`"public"`, `"vip:<gateway>"` or `"fw:<interface>"`) and `answer_address` (bare), `translated` (arrives through a DNAT), `decision`, `since`. Build A: `operator` (192.0.2.0/30, the site behind ops-gw, zone operator-vpn through the tunnel, resolver ops-dns, answer the internal VIP, untranslated), `web` (192.0.2.16/30, an internet host that is not the operator, zone uplink, audience none, answer the public address, where nothing is published), `nodes` (nodes and bastion, resolvers dns-res1 and dns-res2, answer the internal VIP), `enterprise` (10.24.10.0/24, resolver ent-dns, answer the users' VIP), `internet` (step 9 on: 203.0.113.0/26, zone isp, resolver inet-dns-res, answer `fw:ethernet1/6`, the firewall's own isp address).
 
 **`ServedModel`**: `name` (`"chat"`), `weights`, `route_id` (`Org.route_id`), `audiences`, `copies` (tuple[`Copy`]), `since`.
 
@@ -406,7 +406,7 @@ The CSI driver calls the management address over HTTPS (`csi.api: mgmt`), throug
 
 **`Dns`**: `zone` (`"tarnwick.example"`), `users` (`("llm.tarnwick.example",)`), `admin` (`("admin.tarnwick.example", "grafana.tarnwick.example")`), `wildcard` (`"*.tarnwick.example"`), `views` (tuple[`DnsView`]), `records` (tuple[`DnsRecord`], sorted by name: every node in the slice whose primary address is internal, `truenas1` and `truenas1-mgmt`, and `k8s` for the API VIP).
 
-**`DnsView`**: `name`, `server` (the node serving it), `kind` (`bind-views`, `bind-auth`, `dnsmasq`), `match` (segment ids) and `match_cidrs`, `answer` and `answer_address` (what the users' and admin hostnames and the wildcard resolve to in this view), `recursion`, `infra` (the view holds the infrastructure records), `decision`, `since`. Build A: `internal` (bastion; data, bastion, stor-mgmt, oob; the internal VIP; recursion on), `enterprise` (bastion, through step 8; the users' VIP), `lan` (lan-dns, from step 9; the users' VIP), `public-operator` (ops-dns; the public address), `public-internet` (inet-dns, from step 9; the public address). The two public views serve identical zones.
+**`DnsView`**: `name`, `server` (the node serving it), `kind` (`bind-views`, `bind-auth`, `dnsmasq`), `match` (segment ids) and `match_cidrs`, `answer` and `answer_address` (what the users' and admin hostnames and the wildcard resolve to in this view), `recursion`, `infra` (the view holds the infrastructure records), `decision`, `since`. Build A: `internal` (bastion; data, bastion, stor-mgmt, oob; the internal VIP; recursion on), `enterprise` (bastion, through step 8; the users' VIP), `lan` (lan-dns, from step 9; the users' VIP), `public-operator` (ops-dns; the public address), `public-internet` (inet-dns-auth, from step 9; the firewall's own isp address). The uplink side's view publishes no platform name in either state.
 
 **`DnsRecord`**: `name` (FQDN), `address` (bare), `kind` (`infra` or `api`).
 

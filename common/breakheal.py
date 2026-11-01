@@ -19,6 +19,8 @@
     breakheal.py tlogrule --breaks gen/breaks.json --id ID --dir DIR --mode MODE --file LOG --check JSON
                                                                         the rule and action the log names for each connect
     breakheal.py cellmode --dir DIR --plan gen/matrix.json --check JSON a matrix cell's mode as its evidence shows (chapter 2)
+    breakheal.py lookup --dir DIR (--check JSON | --summary)         a probe_lookup's answers: each dig's status and records,
+                                                                        each stub's result and time (Part III, chapter 9)
 
 Run from a lab directory (make break-3a does). The breaks are the lab's breaks/<id>.yaml, rendered
 to gen/breaks.json (sfab.render.drills), so nothing here needs PyYAML. break and heal hand over to
@@ -409,6 +411,69 @@ def cmd_gwshare(a) -> int:
     return 0
 
 
+DIG_STATUS = re.compile(r"status: ([A-Z]+)")
+DIG_ANSWER = re.compile(r"ANSWER: (\d+)")
+TOOL_EXIT = re.compile(r"^exit (\d+) start ([0-9.]+) end ([0-9.]+)$", re.M)
+
+
+def read_lookup(d: Path) -> dict:
+    """What a probe_lookup's tools answered (Part III, chapter 9): per dig, the status and the
+    answer section's count (timeout when dig got no answer); per stub, whether it resolved (and
+    for curl connected), its exit status and its time in seconds."""
+    out: dict = {}
+    for t in ("dig-a", "dig-aaaa", "getaddrinfo", "curl"):
+        f = d / f"{t}.txt"
+        if not f.is_file():
+            continue
+        text = f.read_text(encoding="utf-8", errors="replace")
+        m = TOOL_EXIT.search(text)
+        rc = int(m.group(1)) if m else None
+        secs = round(float(m.group(3)) - float(m.group(2)), 2) if m else None
+        row = {"exit": rc, "seconds": secs}
+        if t.startswith("dig-"):
+            st = DIG_STATUS.search(text)
+            an = DIG_ANSWER.search(text)
+            row.update(rcode=st.group(1) if st else "timeout", answers=int(an.group(1)) if an else 0)
+        elif t == "getaddrinfo":
+            row.update(ok=rc == 0, line=next((x for x in text.splitlines() if x.startswith(("[", "gaierror"))), ""))
+        else:
+            h = re.search(r"http (\d{3})", text)
+            row.update(ok=rc == 0 and bool(h) and h.group(1) != "000", http=h.group(1) if h else None,
+                       line=next((x for x in text.splitlines() if x.startswith("curl:")), ""))
+        out[t] = row
+    return out
+
+
+def cmd_lookup(a) -> int:
+    got = read_lookup(Path(a.dir))
+    if a.summary:
+        parts = []
+        for t, r in got.items():
+            if t.startswith("dig-"):
+                parts.append(f"{t} {r['rcode']} with {r['answers']} answer(s)")
+            else:
+                parts.append(f"{t} {'resolved' if r['ok'] else 'failed'} in {r['seconds']} s")
+        print("; ".join(parts) or "nothing recorded")
+        return 0
+    c = json.loads(a.check)
+    if c.get("tool"):
+        r = got.get(c["tool"])
+        if r is None:
+            print(f"{c['tool']}: not recorded")
+            return 1
+        what = f"{c['tool']} {'resolved' if r['ok'] else 'failed'} in {r['seconds']} s, exit {r['exit']}" + (f" ({r['line']})" if r.get("line") else "")
+        print(what)
+        return 0 if r["ok"] == c["ok"] else 1
+    t = {"A": "dig-a", "AAAA": "dig-aaaa"}[c["type"]]
+    r = got.get(t)
+    if r is None:
+        print(f"{t}: not recorded")
+        return 1
+    print(f"{c['type']}: {r['rcode']} with {r['answers']} answer(s)")
+    want = r["rcode"] == c["rcode"] and (c.get("answers") is None or r["answers"] == c["answers"])
+    return 0 if want else 1
+
+
 def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if argv[:1] in (["break"], ["heal"]):
@@ -482,6 +547,11 @@ def main(argv=None) -> int:
     s.add_argument("--file", required=True)
     s = sub.add_parser("gwshare")
     s.add_argument("--file", required=True)
+    s = sub.add_parser("lookup")
+    s.add_argument("--dir", required=True)
+    g = s.add_mutually_exclusive_group(required=True)
+    g.add_argument("--check")
+    g.add_argument("--summary", action="store_true")
     s = sub.add_parser("cellmode")
     s.add_argument("--dir", required=True)
     s.add_argument("--plan", required=True)
@@ -489,7 +559,7 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
     return {"steps": cmd_steps, "vlan": cmd_vlan, "mclag": cmd_mclag, "share": cmd_share, "pingshare": cmd_pingshare, "counter": cmd_counter,
             "farcap": cmd_farcap, "netstatus": cmd_netstatus, "epready": cmd_epready, "gwshare": cmd_gwshare, "synat": cmd_synat,
-            "tlogcmd": cmd_tlogcmd, "tlogrule": cmd_tlogrule, "cellmode": cmd_cellmode}[a.cmd](a)
+            "tlogcmd": cmd_tlogcmd, "tlogrule": cmd_tlogrule, "cellmode": cmd_cellmode, "lookup": cmd_lookup}[a.cmd](a)
 
 
 if __name__ == "__main__":

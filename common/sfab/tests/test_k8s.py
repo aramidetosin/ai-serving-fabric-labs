@@ -200,14 +200,14 @@ class TestOutputs(unittest.TestCase):
             self.assertNotRegex(text, r"(?i)password\s*[:=]\s*\S", p)
 
     def test_many(self):
-        """The A/many lab: three Gateways, the test backend behind the two it lists."""
+        """The A/many lab: three Gateways, the test backend behind each (gw-inet's from step 8)."""
         out = Labs.get()["many"]["out"]
         if not HAVE_YAML:
             self.skipTest("PyYAML is needed")
         pools = docs(out["bootstrap/k8s/30-lb-pools.yaml"])
         self.assertEqual([p["metadata"]["name"] for p in pools], ["gw-internal", "gw-users", "gw-inet"])
         routes = [d["metadata"]["name"] for d in docs(out["bootstrap/k8s/55-test-backend.yaml"]) if d["kind"] == "HTTPRoute"]
-        self.assertEqual(routes, ["echo-gw-internal", "echo-gw-users"])
+        self.assertEqual(routes, ["echo-gw-internal", "echo-gw-users", "echo-gw-inet"])
 
 
 @unittest.skipUnless(HAVE_YAML, "PyYAML is needed to read the rendered files")
