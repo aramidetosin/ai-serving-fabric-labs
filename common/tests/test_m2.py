@@ -718,7 +718,9 @@ class BootPiecesTest(M2LabTest):
     def test_dns_zones_loaded_or_retransferred(self):
         """dns_zones: a loaded secondary zone passes as it is; one BIND left unloaded behind its backed-off
         retries (ch04's second revision 2 attempt: dns-auth2's internal forward zone, many minutes after
-        the firewall was up) is told to transfer at once, then passes; one that never loads fails."""
+        the firewall was up) is told to transfer at once, then passes; one that never loads fails.
+        Every zone is read in each round, so a primary BIND caches as unreachable holds no zone up
+        behind another (ch06's first clean-clone attempt)."""
         run = self.t / "dnsz"
         (run / "bootstrap" / "dns-auth2").mkdir(parents=True)
         (run / "bootstrap" / "dns-auth2" / "named.conf").write_text(
@@ -752,7 +754,7 @@ class BootPiecesTest(M2LabTest):
         self.assertEqual(log.count("retransfer"), 1, log)
         r = self.run_bash(body + "", {"RUNDIR": str(run), "RENDERDIR": str(run), "NEVER": "1"})
         self.assertNotEqual(r.returncode, 0)
-        self.assertIn("FAIL dns-auth2: view internal's secondary zone 1.20.10.in-addr.arpa loaded -> not loaded after 300 s, rndc retransfer sent", r.stdout)
+        self.assertIn("FAIL dns-auth2: view internal's secondary zone 1.20.10.in-addr.arpa loaded -> not loaded after 900 s, rndc retransfer sent", r.stdout)
 
     def test_iccp_listener_put_in_its_vrf(self):
         """iccp_listen: a listener in the session VRF passes; one left in the default VRF is put right

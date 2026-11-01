@@ -37,7 +37,11 @@
 #                 bootstrap/<node>/named.conf), by rndc zonestatus, loaded: a zone not loaded is told
 #                 to transfer at once (rndc retransfer), since BIND backs a never-loaded zone's retries
 #                 off while its primary is out of reach at boot (behind the firewall, which boots last)
-#                 and can leave it unloaded many minutes after the path is up. Every 5 s, 300 s at most.
+#                 and can leave it unloaded many minutes after the path is up. BIND also caches the
+#                 primary as unreachable and skips every transfer from it, rndc retransfer's included,
+#                 until that entry expires, which took about 10 minutes after the last failed refresh
+#                 (BIND 9.18; ch06's first clean-clone attempt). So every zone still unloaded is read
+#                 every 5 s and told again every 15 s, all zones in each round, 900 s at most.
 #
 # Each step writes state/stage/boot.<step>.ok and is skipped while its marker matches.
 # shellcheck disable=SC2317 # every step function runs through stage_step
@@ -536,28 +540,40 @@ secondary_zones() {
 }
 
 dns_zones() {
-  local plan n v z i got how fails=0 left
+  local plan n v z i k got fails=0 left
+  local -a keys=()
+  local -A serial=() how=()
   sec "secondary DNS zones"
   plan="$(secondary_zones)"
   if [ -z "$plan" ]; then ok "no secondary DNS zone in this lab"; return 0; fi
   while read -r n v z; do
     [ -n "$n" ] || continue
-    got="" how="by transfer"
-    for i in $(seq 1 60); do
-      got="$(EVID_OFF=1 X "$n" rndc -k /run/named/rndc.key zonestatus "$z" IN "$v" 2>/dev/null | sed -n 's/^serial: //p')"
-      [ -z "$got" ] || break
-      if [ $((i % 12)) = 1 ]; then
-        EVID_OFF=1 X "$n" rndc -k /run/named/rndc.key retransfer "$z" IN "$v" >/dev/null 2>&1 || true
-        how="by rndc retransfer"
-      fi
-      sleep 5
-    done
-    if [ -n "$got" ]; then
-      ok "$n: view $v's secondary zone $z loaded at serial $got ($how)"
-    else
-      bad "$n: view $v's secondary zone $z loaded" "not loaded after 300 s, rndc retransfer sent"; fails=1
-    fi
+    keys+=("$n $v $z"); how["$n $v $z"]="by transfer"
   done <<<"$plan"
+  for i in $(seq 1 180); do
+    left=0
+    for k in "${keys[@]}"; do
+      [ -z "${serial[$k]:-}" ] || continue
+      read -r n v z <<<"$k"
+      got="$(EVID_OFF=1 X "$n" rndc -k /run/named/rndc.key zonestatus "$z" IN "$v" 2>/dev/null | sed -n 's/^serial: //p')"
+      if [ -n "$got" ]; then serial["$k"]="$got"; continue; fi
+      left=1
+      if [ $((i % 3)) = 1 ]; then
+        EVID_OFF=1 X "$n" rndc -k /run/named/rndc.key retransfer "$z" IN "$v" >/dev/null 2>&1 || true
+        how["$k"]="by rndc retransfer"
+      fi
+    done
+    [ "$left" = 1 ] || break
+    sleep 5
+  done
+  for k in "${keys[@]}"; do
+    read -r n v z <<<"$k"
+    if [ -n "${serial[$k]:-}" ]; then
+      ok "$n: view $v's secondary zone $z loaded at serial ${serial[$k]} (${how[$k]})"
+    else
+      bad "$n: view $v's secondary zone $z loaded" "not loaded after 900 s, rndc retransfer sent"; fails=1
+    fi
+  done
   return "$fails"
 }
 
