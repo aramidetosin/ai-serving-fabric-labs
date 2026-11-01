@@ -393,6 +393,12 @@ hold_counts() {
   rows="$(tn_get hold.rows | grep -c .)"
   for ((i = 0; i < rows; i++)); do
     pop="$(hold_field "$i" population)" flt="$(hold_field "$i" filter)"
+    # after the stop, first the entries still listed with their states (closing sessions age out by
+    # their own timeouts, so what is listed depends on when it is read), then the count
+    if [ "$tag" = after ]; then
+      cmd="show session all filter $flt"
+      FW "$cmd" | fwt_body "$cmd" >"$d/sessions-$tag-$pop.txt" 2>/dev/null || true
+    fi
     cmd="show session all filter $flt count yes"
     FW "$cmd" | fwt_body "$cmd" >"$d/counts-$tag-$pop.txt" 2>/dev/null || true
   done

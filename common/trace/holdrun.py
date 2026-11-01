@@ -12,7 +12,7 @@ $SFAB_VERDICT:
   chat          one chat completion per population with its own caller's key: HTTP 200
   timeouts      show session info's TCP timeouts equal the plan's, the pinned PA-VM 12.1.2's
                 defaults: TCP 3,600 s, handshake 10 s, init 5 s, half closed 30 s (PAN-OS 12.1 help
-                documents 120 s), time wait 15 s, and the discard timeout of a denied TCP session,
+                documents 120 s), time wait 15 s, and the session timeout in the discard state,
                 90 s
 
 HOLD.md holds, per zone, the counts before, while held, after the chat and after the stop, and
@@ -78,7 +78,7 @@ def judge(a) -> int:
     got = T.session_timeouts(read(d / "session-info-held.txt"))
     for k, want in hp["timeouts"].items():
         if k not in got and k == "discard_tcp":
-            v.skip(f"show session info: the discard timeout of a denied TCP session, {want} s", "the command does not print it")
+            v.skip(f"show session info: the session timeout in the discard state, {want} s", "the command does not print it")
             continue
         v.check(f"show session info: {k.replace('_', ' ')} {got.get(k, 'not printed')} s, the plan's {want} s", got.get(k) == want,
                 f"{got.get(k, 'not printed')}")
@@ -125,17 +125,19 @@ def write_md(d: Path, plan: dict, rows: list, factor: int, stamp, timeouts: dict
     for r, c, lt, _x in rows:
         if lt:
             L.append(f"| {r['zone']} | {lt['arrivals']} | {lt['window_s']} | {lt['mean_hold_s']} | {lt['predicted']} | {c['held']} |")
-    L += ["", "A denied TCP attempt holds its entry for the discard timeout"
+    L += ["", "The discard timeout"
           + (f" ({timeouts['discard_tcp']} s as show session info prints it)" if "discard_tcp" in timeouts else
              f" ({hp['timeouts']['discard_tcp']} s in the plan; show session info did not print it)")
-          + ", so a zone's denied arrivals add their own term to its total. The counts above do not hold that term: each "
-          "population's filter names its zone and its own Gateway's address and port, so a denied attempt to any other address, "
-          "held for the discard timeout, is outside every count here.", ""]
+          + " applies to a session the firewall holds in the discard state. This run makes no denied attempt, and each "
+          "population's filter names its zone and its own Gateway's address and port, so the counts above hold the "
+          "population's own connections and its chat request alone.", ""]
     verdict = read(d / "verdict.txt")
     L += ["## Verdict", "", "```"] + [x for x in verdict.splitlines() if x.strip()] + ["```", ""]
     L += ["## Files", "", "- `hold-<population>.jsonl`: each client's events (open, reply, held, closed, done), on the client's clock",
           "- `counts-<when>-<population>.txt`: show session all with the population's filter and count yes, before, held, after the chat "
-          "and after the stop", "- `session-info-<when>.txt`: show session info at the same reads",
+          "and after the stop", "- `sessions-after-<population>.txt`: the same filter's entries still listed after the stop, with their states "
+          "(closing sessions age out by their own timeouts, so the after-the-stop count depends on when it is read)",
+          "- `session-info-<when>.txt`: show session info at the same reads",
           "- `chat-<population>-result.txt`, `chat-<population>-key.txt`: the chat completion's status and the key's field and "
           "fingerprint (never the key)", "- `tenancy.json`: the plan", ""]
     (d / "HOLD.md").write_text("\n".join(L), encoding="utf-8")

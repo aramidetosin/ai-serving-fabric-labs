@@ -428,6 +428,13 @@ class Ch10Test(P3LabTest):
         md = (rs / "HOLD.md").read_text()
         self.assertIn("## Little's law per zone", md)
         self.assertNotRegex(md, r"(?i)per second|/s\b")
+        # the probe found a refused SYN holds no session on the pinned release: HOLD.md claims no denied-attempt term
+        self.assertNotIn("denied arrivals add", md)
+        # the connections are held for the plan's hold_s, not stopped once the chat is done
+        ev = [json.loads(x) for x in (rs / "hold-enterprise.jsonl").read_text().splitlines() if x.startswith("{")]
+        opens = [e["t"] for e in ev if e["event"] == "open"]
+        done = [e["t"] for e in ev if e["event"] == "done"]
+        self.assertTrue(done and done[0] - min(opens) >= 29, ev[-3:])
         self.no_key_in(rs)
 
 
