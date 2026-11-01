@@ -91,6 +91,20 @@ class ReadersTest(unittest.TestCase):
         self.assertTrue(T.overlaps(rr[1]["dest"], "10.0.0.0/8"))
         self.assertFalse(T.overlaps(rr[0]["dest"], "10.0.0.0/8"))
 
+    def test_matrix_reads_a_table_of_connected_routes_alone(self):
+        # the ISP router holds only its connected links: the matrix's silence cells at it read that
+        # table as a table, with no route covering an inside address (chapter 11's first recording
+        # judged it "no routing table read")
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "matrix"))
+        import matrix as MX  # noqa: PLC0415
+
+        rr = MX.router_routes("IPv4 unicast VRF default:\nC>* 198.51.100.8/30 is directly connected, eth1, weight 1, 00:55:28\n"
+                              "L>* 198.51.100.9/32 is directly connected, eth1, weight 1, 00:55:28\n"
+                              "S>* 10.20.11.0/24 [1/0] via 198.51.100.2, eth1, weight 1, 00:09:00\n")
+        self.assertEqual([(x["dest"], x["via"], x["line"]) for x in rr],
+                         [("198.51.100.8/30", None, 2), ("198.51.100.9/32", None, 3), ("10.20.11.0/24", "198.51.100.2", 4)])
+        self.assertFalse(any(MX._covers(x["dest"], "10.20.11.200") for x in rr[:2]))
+
 
 def syn_line(t, src, sp, dst, dp, seq, vlan=None):
     eth = (f"ethertype 802.1Q (0x8100), length 78: vlan {vlan}, p 0, ethertype IPv4 (0x0800), " if vlan else

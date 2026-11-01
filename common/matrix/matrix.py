@@ -76,7 +76,9 @@ import vocab  # noqa: E402
 
 DIG_A = re.compile(r"^(\S+)\s+(\d+)\s+IN\s+A\s+(\d+\.\d+\.\d+\.\d+)\s*$")
 GETENT = re.compile(r"^(\d+\.\d+\.\d+\.\d+)\s+(STREAM|DGRAM|RAW)?")
-FRR_ROUTE = re.compile(r"^([A-Z])[>*]*\s*\*?\s*(\d+\.\d+\.\d+\.\d+/\d+)\s+\[\d+/\d+\]\s+via\s+(\d+\.\d+\.\d+\.\d+)")
+# a route of FRR's show ip route: a route via a next hop, or a connected or local one (via None), so a
+# router whose table holds only its connected links (the ISP router) is still read as a table
+FRR_ROUTE = re.compile(r"^([A-Z])[>*]*\s*\*?\s*(\d+\.\d+\.\d+\.\d+/\d+)\s+(?:\[\d+/\d+\]\s+via\s+(\d+\.\d+\.\d+\.\d+)|is directly connected)")
 MODE_TEXT = {"allowed": "allowed", "log-line": "log line", "404": "404", "401": "401", "silence": "silence"}
 
 
