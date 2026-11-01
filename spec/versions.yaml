@@ -197,8 +197,10 @@ images:
     base: client
     mirror: local
     pulled: false
-    # PENDING (lab host): not built from this source yet. No mirror: local entry stores an image ID;
-    # once built, its ID is what the lab's preflight prints and RUN.json records for each run
+    # Built on the lab host from this source (make -C images keys), 2026-10-31: image ID
+    # sha256:5244e9c7788c5fa8eb189d04e5089f8d3768341446ed5877f0d6aaa9b05477b1, the config the
+    # in-lab registry's sfab/keys:4 manifest names. A lab's preflight prints the ID it runs with and
+    # RUN.json records it for each run.
 
 tools:
   # The release preflight (pf_tools) wants exactly, always the latest release (the author's rule,
