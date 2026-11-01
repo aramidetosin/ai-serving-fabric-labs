@@ -2,7 +2,7 @@
 
 Lab `sfab-ch11`, the companion lab of the book's Chapter 11, "Validating Tenant Isolation". It runs build A's state many at step 11 with the decision table and the matrix (`decisions: true`, as chapter 2's lab): chapter 10's deployment, the internet users' row and the internet Gateway's column, 60 cells, each with its isolation depth.
 
-Status: rendered, unit-tested (`common/sfab/tests/test_part3_render.py`, `test_part3_tools_render.py`) and run against the stand-ins (`common/tests/test_part3_labs.py`); not deployed or recorded yet.
+Status: recorded under build A revision 2 on 2026-11-01 on the first lab host, one deployment from wiped disks that ran `make up`, `make audit`, `make label`, `make matrix`, `make trace`, `make drills PASSES=3`, break-11a and its heal, and `make record`, every set green (`RESULTS.md`; `audits/INDEX.md` maps the chapter's exhibits to their files and lines); tested against the stand-ins too (`common/sfab/tests/test_part3_render.py`, `test_part3_tools_render.py`, `common/tests/test_part3_labs.py`).
 
 | Selection | Value |
 |---|---|

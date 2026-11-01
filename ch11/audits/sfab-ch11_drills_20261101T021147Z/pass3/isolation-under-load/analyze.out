@@ -1,0 +1,20 @@
+== pass 3 isolation-under-load: 8 held connection(s) a population
+  PASS  pass 3 isolation-under-load x1 enterprise: 8 connection(s) from ent-client held to gw-users at 10.20.11.210:443 (llm.ai.tarnwick.example), 48 replies, every one 200
+  PASS  pass 3 isolation-under-load x1 enterprise: the firewall counts 8 session(s) from enterprise destination 10.20.11.210 destination-port 443 while they are held, within the plan's bound 8 to 11
+  PASS  pass 3 isolation-under-load x1 internet: 8 connection(s) from inet-client held to gw-inet at 198.51.100.10:443 (llm.ai.tarnwick.example), 48 replies, every one 200
+  PASS  pass 3 isolation-under-load x1 internet: the firewall counts 8 session(s) from isp destination 198.51.100.10 destination-port 443 while they are held, within the plan's bound 8 to 11
+  PASS  pass 3 isolation-under-load x1 operator: 8 connection(s) from ops-client held to gw-internal at 10.20.11.200:443 (llm.ai.tarnwick.example), 48 replies, every one 200
+  PASS  pass 3 isolation-under-load x1 operator: the firewall counts 8 session(s) from operator-vpn destination 10.20.11.200 destination-port 443 while they are held, within the plan's bound 8 to 11
+  PASS  pass 3 isolation-under-load x1 enterprise (ent-client): its own Gateway 10 of 10 answered 200; gw-internal 0/10 through; gw-users 10/10 allowed; gw-inet 0/10 through; admin 0/10 through
+  PASS  pass 3 isolation-under-load x1 internet (inet-client): its own Gateway 10 of 10 answered 200; gw-internal 0/10 through; gw-users 0/10 through; gw-inet 10/10 allowed; staff 0/10 through; admin 0/10 through
+  PASS  pass 3 isolation-under-load x1 operator (ops-client): its own Gateway 10 of 10 answered 200; gw-internal 10/10 allowed; gw-users 0/10 through; gw-inet 0/10 through; admin 10/10 allowed
+== pass 3 isolation-under-load: 16 held connection(s) a population
+  PASS  pass 3 isolation-under-load x2 enterprise: 16 connection(s) from ent-client held to gw-users at 10.20.11.210:443 (llm.ai.tarnwick.example), 96 replies, every one 200
+  PASS  pass 3 isolation-under-load x2 enterprise: the firewall counts 16 session(s) from enterprise destination 10.20.11.210 destination-port 443 while they are held, within the plan's bound 16 to 19
+  PASS  pass 3 isolation-under-load x2 internet: 16 connection(s) from inet-client held to gw-inet at 198.51.100.10:443 (llm.ai.tarnwick.example), 96 replies, every one 200
+  PASS  pass 3 isolation-under-load x2 internet: the firewall counts 16 session(s) from isp destination 198.51.100.10 destination-port 443 while they are held, within the plan's bound 16 to 19
+  PASS  pass 3 isolation-under-load x2 operator: 16 connection(s) from ops-client held to gw-internal at 10.20.11.200:443 (llm.ai.tarnwick.example), 96 replies, every one 200
+  PASS  pass 3 isolation-under-load x2 operator: the firewall counts 16 session(s) from operator-vpn destination 10.20.11.200 destination-port 443 while they are held, within the plan's bound 16 to 19
+  PASS  pass 3 isolation-under-load x2 enterprise (ent-client): its own Gateway 10 of 10 answered 200; gw-internal 0/10 through; gw-users 10/10 allowed; gw-inet 0/10 through; admin 0/10 through
+  PASS  pass 3 isolation-under-load x2 internet (inet-client): its own Gateway 10 of 10 answered 200; gw-internal 0/10 through; gw-users 0/10 through; gw-inet 10/10 allowed; staff 0/10 through; admin 0/10 through
+  PASS  pass 3 isolation-under-load x2 operator (ops-client): its own Gateway 10 of 10 answered 200; gw-internal 10/10 allowed; gw-users 0/10 through; gw-inet 0/10 through; admin 10/10 allowed

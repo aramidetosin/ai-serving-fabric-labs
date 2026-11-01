@@ -1,0 +1,171 @@
+routes:
+- id: chat
+  name: chat
+  uris:
+  - /models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions
+  - /models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/completions
+  methods:
+  - POST
+  upstream_id: router
+  plugins:
+    multi-auth:
+      auth_plugins:
+      - key-auth:
+          header: Authorization
+          hide_credentials: true
+      - oidc-consumer:
+          issuer: https://id.ai.tarnwick.example
+          jwks_uri: http://idp.identity.svc.cluster.local:5556/keys
+          audience: ai-gateway
+          claim: email
+    consumer-restriction:
+      type: consumer_group_id
+      whitelist:
+      - batch
+      - staff
+      - inetapp
+      rejected_code: 401
+      rejected_msg: "Authorization Failed"
+    proxy-rewrite:
+      regex_uri:
+      - "^/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/(chat/completions|completions)$"
+      - "/engines/chat/$1"
+      headers:
+        set:
+          Authorization: <redacted hmac:90c33e25fba6> ${{ROUTER_MASTER_KEY}}"
+    response-rewrite:
+      headers:
+        set:
+          WWW-Authenticate: "Bearer realm=\"llm.ai.tarnwick.example\""
+      vars:
+      - - status
+        - "=="
+        - 401
+    file-logger:
+      path: /dev/stdout
+      log_format:
+        time: "$time_iso8601"
+        client: "$remote_addr"
+        host: "$host"
+        route: "$route_id"
+        request: "$request_method $uri"
+        status: "$status"
+        consumer: "$consumer_name"
+        caller: "$consumer_group_id"
+        upstream_status: "$upstream_status"
+        request_time: "$request_time"
+- id: staff
+  name: staff
+  uris:
+  - /models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions
+  - /models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/completions
+  methods:
+  - POST
+  upstream_id: router
+  plugins:
+    multi-auth:
+      auth_plugins:
+      - key-auth:
+          header: Authorization
+          hide_credentials: true
+      - oidc-consumer:
+          issuer: https://id.ai.tarnwick.example
+          jwks_uri: http://idp.identity.svc.cluster.local:5556/keys
+          audience: ai-gateway
+          claim: email
+    consumer-restriction:
+      type: consumer_group_id
+      whitelist:
+      - helpdesk
+      - staff
+      rejected_code: 401
+      rejected_msg: "Authorization Failed"
+    proxy-rewrite:
+      regex_uri:
+      - "^/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/(chat/completions|completions)$"
+      - "/engines/staff/$1"
+      headers:
+        set:
+          Authorization: <redacted hmac:90c33e25fba6> ${{ROUTER_MASTER_KEY}}"
+    response-rewrite:
+      headers:
+        set:
+          WWW-Authenticate: "Bearer realm=\"llm.ai.tarnwick.example\""
+      vars:
+      - - status
+        - "=="
+        - 401
+    file-logger:
+      path: /dev/stdout
+      log_format:
+        time: "$time_iso8601"
+        client: "$remote_addr"
+        host: "$host"
+        route: "$route_id"
+        request: "$request_method $uri"
+        status: "$status"
+        consumer: "$consumer_name"
+        caller: "$consumer_group_id"
+        upstream_status: "$upstream_status"
+        request_time: "$request_time"
+upstreams:
+- id: router
+  type: roundrobin
+  scheme: http
+  pass_host: pass
+  nodes:
+  - host: router.inference.svc.cluster.local
+    port: 4000
+    weight: 1
+  timeout:
+    connect: 5
+    send: 600
+    read: 600
+consumer_groups:
+- id: batch
+  desc: "dec-key-batch: application batch (owner data-platform, keys expire 2027-04-30); may call chat"
+  plugins:
+    limit-count:
+      count: 3000
+      time_window: 60
+      key_type: var
+      key: consumer_group_id
+      rejected_code: 429
+      policy: local
+- id: helpdesk
+  desc: "dec-key-helpdesk: application helpdesk (owner service-desk, keys expire 2027-04-30); may call staff"
+  plugins:
+    limit-count:
+      count: 3000
+      time_window: 60
+      key_type: var
+      key: consumer_group_id
+      rejected_code: 429
+      policy: local
+- id: staff
+  desc: "dec-key-staff: people: ent-client; may call chat, staff"
+  plugins:
+    limit-count:
+      count: 600
+      time_window: 60
+      key_type: var
+      key: consumer_group_id
+      rejected_code: 429
+      policy: local
+- id: inetapp
+  desc: "dec-key-inetapp: application inetapp (owner partner-apps, keys expire 2027-04-30); may call chat"
+  plugins:
+    limit-count:
+      count: 600
+      time_window: 60
+      key_type: var
+      key: consumer_group_id
+      rejected_code: 429
+      policy: local
+consumers:
+- username: staff_ent_client
+  group_id: staff
+  plugins:
+    oidc-consumer:
+      subject: ent-client@tarnwick.example
+#END

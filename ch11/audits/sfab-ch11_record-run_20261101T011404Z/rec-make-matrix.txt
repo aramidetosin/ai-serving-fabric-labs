@@ -1,0 +1,144 @@
+Script started on 2026-11-01 02:06:44+00:00 [COMMAND="make matrix" TERM="tmux-256color" TTY="/dev/pts/6" COLUMNS="-1" LINES="-1"]
+/root/sfab/labs/ai-serving-fabric-labs/common/stages/run.sh matrix
+== stage matrix 2026-11-01T02:06:44Z (log state/logs/matrix-20261101T020644Z.log)
+== the matrix: 60 cells, 20 allowed and 40 forbidden
+matrix: chat's key handed to ent-client (batch.4bba878c sha256:1df7a5c7ea0d)
+matrix: staff's key handed to ent-client (helpdesk.77a33a1c sha256:ba11730bec62)
+matrix: inetapp's key handed to inet-client (inetapp.366eb68e sha256:77069427f66d)
+matrix: staff's key handed to inet-client (helpdesk.77a33a1c sha256:ba11730bec62)
+matrix: chat's key handed to k8s-cp2 (batch.4bba878c sha256:1df7a5c7ea0d)
+matrix: staff's key handed to k8s-cp2 (helpdesk.77a33a1c sha256:ba11730bec62)
+matrix: chat's key handed to ops-client (batch.4bba878c sha256:1df7a5c7ea0d)
+matrix: staff's key handed to ops-client (helpdesk.77a33a1c sha256:ba11730bec62)
+== Staff: ent-client (10.24.10.10), resolver ent-dns, view enterprise
+  PASS  [policy] Staff / Internal Gateway: log line, deny-all-log (deny), zone enterprise to ingress, for port 43000; the client: timed out, at its connect timeout
+  PASS  [allowed] Staff / Users' Gateway: connected to 10.20.11.210:443, attempt 1 from port 43004
+  PASS  [policy] Staff / Internet Gateway: log line, deny-all-log (deny), zone enterprise to ingress, for port 43008; the client: timed out, at its connect timeout
+  PASS  [view] Staff / Route to chat: llm.ai.tarnwick.example answers 10.20.11.210 through ent-dns (view enterprise)
+  PASS  [allowed] Staff / Route to chat: HTTP 200 from gw-users (models-gw-users), from port 43012
+  PASS  [key] Staff / Route to chat: 401 with staff's key, `Authorization Failed`, from port 43014
+  PASS  [view] Staff / Route to staff: llm.ai.tarnwick.example answers 10.20.11.210 through ent-dns (view enterprise)
+  PASS  [allowed] Staff / Route to staff: HTTP 200 from gw-users (models-gw-users), from port 43016
+  PASS  [key] Staff / Route to staff: 401 with chat's key, `Authorization Failed`, from port 43018
+  PASS  [view] Staff / Admin hostnames: admin.ai.tarnwick.example has no answer through ent-dns (view enterprise holds no record for it); the request pinned to 10.20.11.210
+  PASS  [routeset] Staff / Admin hostnames: 404 from gw-users, server envoy, from port 43020
+  PASS  [routeset] Staff / Admin hostnames: no line for sfab-matrix-enterprise-admin in the API gateway's log, which holds the run's model requests
+  PASS  [policy] Staff / API server: log line, deny-all-log (deny), zone enterprise to k8s-nodes, for port 43024; the client: timed out, at its connect timeout
+  PASS  [policy] Staff / A node, k8s-gpu1: log line, deny-all-log (deny), zone enterprise to k8s-nodes, for port 43028; the client: timed out, at its connect timeout
+  PASS  [policy] Staff / A BMC, k8s-gpu1's: log line, deny-all-log (deny), zone enterprise to oob, for port 43032; the client: timed out, at its connect timeout
+  PASS  [routing] Staff / Storage data: fw discards 10.20.12.31 by its route 10.0.0.0/8, before any rule
+  PASS  [routing] Staff / Storage data: silence at fw; no traffic log line names it; the client: timed out, at its connect timeout
+  PASS  [policy] Staff / Storage management: log line, deny-all-log (deny), zone enterprise to stor-mgmt, for port 43040; the client: timed out, at its connect timeout
+  PASS  [policy] Staff / An internet host, web-client: log line, deny-all-log (deny), zone enterprise to uplink, for port 43044; the client: timed out, at its connect timeout
+== Operator: ops-client (192.0.2.2), resolver ops-dns, view public-operator
+  PASS  [allowed] Operator / Internal Gateway: connected to 10.20.11.200:443, attempt 1 from port 43048
+  PASS  [policy] Operator / Users' Gateway: log line, deny-all-log (deny), zone operator-vpn to ingress, for port 43052; the client: timed out, at its connect timeout
+  PASS  [policy] Operator / Internet Gateway: log line, deny-all-log (deny), zone operator-vpn to ingress, for port 43056; the client: timed out, at its connect timeout
+  PASS  [view] Operator / Route to chat: llm.ai.tarnwick.example has no answer through ops-dns (view public-operator holds no record for it); the request pinned to 10.20.11.200
+  PASS  [allowed] Operator / Route to chat: HTTP 200 from gw-internal (models-gw-internal), from port 43060
+  PASS  [key] Operator / Route to chat: 401 with staff's key, `Authorization Failed`, from port 43062
+  PASS  [view] Operator / Route to staff: llm.ai.tarnwick.example has no answer through ops-dns (view public-operator holds no record for it); the request pinned to 10.20.11.200
+  PASS  [allowed] Operator / Route to staff: HTTP 200 from gw-internal (models-gw-internal), from port 43064
+  PASS  [key] Operator / Route to staff: 401 with chat's key, `Authorization Failed`, from port 43066
+  PASS  [view] Operator / Admin hostnames: admin.ai.tarnwick.example has no answer through ops-dns (view public-operator holds no record for it); the request pinned to 10.20.11.200
+  PASS  [allowed] Operator / Admin hostnames: HTTP 200 from gw-internal (echo-gw-internal), from port 43068
+  PASS  [routing] Operator / API server: fw routes the source 192.0.2.2 by 192.0.2.0/30 out tunnel.1 (operator-site), not over the interface the request arrived on
+  PASS  [routing] Operator / API server: zone protection's strict IP check dropped it before any rule (flow_dos_pf_strictip 16 over the run, fw/drops.txt)
+  PASS  [routing] Operator / API server: silence at fw; no traffic log line names it; the client: timed out, at its connect timeout
+  PASS  [routing] Operator / A node, k8s-gpu1: fw routes the source 192.0.2.2 by 192.0.2.0/30 out tunnel.1 (operator-site), not over the interface the request arrived on
+  PASS  [routing] Operator / A node, k8s-gpu1: zone protection's strict IP check dropped it before any rule (flow_dos_pf_strictip 16 over the run, fw/drops.txt)
+  PASS  [routing] Operator / A node, k8s-gpu1: silence at fw; no traffic log line names it; the client: timed out, at its connect timeout
+  PASS  [routing] Operator / A BMC, k8s-gpu1's: fw routes the source 192.0.2.2 by 192.0.2.0/30 out tunnel.1 (operator-site), not over the interface the request arrived on
+  PASS  [routing] Operator / A BMC, k8s-gpu1's: zone protection's strict IP check dropped it before any rule (flow_dos_pf_strictip 16 over the run, fw/drops.txt)
+  PASS  [routing] Operator / A BMC, k8s-gpu1's: silence at fw; no traffic log line names it; the client: timed out, at its connect timeout
+  PASS  [routing] Operator / Storage data: uplink-rtr holds no route to 10.20.12.31 (21 routes read)
+  PASS  [routing] Operator / Storage data: silence at uplink-rtr; no traffic log line names it; the client: an error, Network unreachable
+  PASS  [routing] Operator / Storage management: fw routes the source 192.0.2.2 by 192.0.2.0/30 out tunnel.1 (operator-site), not over the interface the request arrived on
+  PASS  [routing] Operator / Storage management: zone protection's strict IP check dropped it before any rule (flow_dos_pf_strictip 16 over the run, fw/drops.txt)
+  PASS  [routing] Operator / Storage management: silence at fw; no traffic log line names it; the client: timed out, at its connect timeout
+  PASS  [allowed] Operator / An internet host, web-client: connected to 192.0.2.18:443, attempt 1 from port 43092
+== Nodes: k8s-cp2 (10.20.1.12), resolver dns-res1, view internal
+  PASS  [allowed] Nodes / Internal Gateway: connected to 10.20.11.200:443, attempt 1 from port 43096
+  PASS  [allowed] Nodes / Internal Gateway: answered on k8s-cp2 itself, no line in the firewall's traffic log for port 43096
+  PASS  [allowed] Nodes / Users' Gateway: connected to 10.20.11.210:443, attempt 1 from port 43100
+  PASS  [allowed] Nodes / Users' Gateway: answered on k8s-cp2 itself, no line in the firewall's traffic log for port 43100
+  PASS  [allowed] Nodes / Internet Gateway: connected to 10.20.11.220:443, attempt 1 from port 43104
+  PASS  [allowed] Nodes / Internet Gateway: answered on k8s-cp2 itself, no line in the firewall's traffic log for port 43104
+  PASS  [view] Nodes / Route to chat: llm.ai.tarnwick.example answers 10.20.11.200 through dns-res1 (view internal)
+  PASS  [allowed] Nodes / Route to chat: HTTP 200 from gw-internal (models-gw-internal), from port 43108
+  PASS  [allowed] Nodes / Route to chat: answered on k8s-cp2 itself, no line in the firewall's traffic log for port 43108
+  PASS  [key] Nodes / Route to chat: 401 with staff's key, `Authorization Failed`, from port 43110
+  PASS  [view] Nodes / Route to staff: llm.ai.tarnwick.example answers 10.20.11.200 through dns-res1 (view internal)
+  PASS  [allowed] Nodes / Route to staff: HTTP 200 from gw-internal (models-gw-internal), from port 43112
+  PASS  [allowed] Nodes / Route to staff: answered on k8s-cp2 itself, no line in the firewall's traffic log for port 43112
+  PASS  [key] Nodes / Route to staff: 401 with chat's key, `Authorization Failed`, from port 43114
+  PASS  [view] Nodes / Admin hostnames: admin.ai.tarnwick.example answers 10.20.11.200 through dns-res1 (view internal)
+  PASS  [allowed] Nodes / Admin hostnames: HTTP 200 from gw-internal (echo-gw-internal), from port 43116
+  PASS  [allowed] Nodes / Admin hostnames: answered on k8s-cp2 itself, no line in the firewall's traffic log for port 43116
+  PASS  [allowed] Nodes / API server: connected to 10.20.1.10:6443, attempt 1 from port 43120
+  PASS  [allowed] Nodes / A node, k8s-gpu1: connected to 10.20.1.21:22, attempt 1 from port 43124
+  PASS  [policy] Nodes / A BMC, k8s-gpu1's: log line, deny-all-log (deny), zone k8s-nodes to oob, for port 43128; the client: timed out, at its connect timeout
+  PASS  [routing] Nodes / Storage data: fw discards 10.20.12.31 by its route 10.0.0.0/8, before any rule
+  PASS  [routing] Nodes / Storage data: silence at fw; no traffic log line names it; the client: timed out, at its connect timeout
+  PASS  [allowed] Nodes / Storage management: connected to 10.20.2.31:443, attempt 1 from port 43136
+  PASS  [policy] Nodes / An internet host, web-client: log line, deny-all-log (deny), zone k8s-nodes to uplink, for port 43140; the client: timed out, at its connect timeout
+== Internet host: web-client (192.0.2.18), resolver ops-dns, view public-operator
+  PASS  [policy] Internet host / Internal Gateway: log line, deny-all-log (deny), zone uplink to ingress, for port 43144; the client: timed out, at its connect timeout
+  PASS  [routing] Internet host / Internal Gateway: uplink-rtr routes 10.20.11.0/24 via 198.51.100.2, so the request meets the firewall
+  PASS  [policy] Internet host / Users' Gateway: log line, deny-all-log (deny), zone uplink to ingress, for port 43148; the client: timed out, at its connect timeout
+  PASS  [routing] Internet host / Users' Gateway: uplink-rtr routes 10.20.11.0/24 via 198.51.100.2, so the request meets the firewall
+  PASS  [policy] Internet host / Internet Gateway: log line, deny-all-log (deny), zone uplink to ingress, for port 43152; the client: timed out, at its connect timeout
+  PASS  [routing] Internet host / Internet Gateway: uplink-rtr routes 10.20.11.0/24 via 198.51.100.2, so the request meets the firewall
+  PASS  [view] Internet host / Route to chat: llm.ai.tarnwick.example has no answer through ops-dns (view public-operator holds no record for it); the request pinned to 198.51.100.2
+  PASS  [policy] Internet host / Route to chat: log line, deny-all-log (deny), zone uplink to uplink, for port 43156; the client: timed out, at its connect timeout
+  PASS  [view] Internet host / Route to staff: llm.ai.tarnwick.example has no answer through ops-dns (view public-operator holds no record for it); the request pinned to 198.51.100.2
+  PASS  [policy] Internet host / Route to staff: log line, deny-all-log (deny), zone uplink to uplink, for port 43160; the client: timed out, at its connect timeout
+  PASS  [view] Internet host / Admin hostnames: admin.ai.tarnwick.example has no answer through ops-dns (view public-operator holds no record for it); the request pinned to 198.51.100.2
+  PASS  [policy] Internet host / Admin hostnames: log line, deny-all-log (deny), zone uplink to uplink, for port 43164; the client: timed out, at its connect timeout
+  PASS  [policy] Internet host / API server: log line, deny-all-log (deny), zone uplink to k8s-nodes, for port 43168; the client: timed out, at its connect timeout
+  PASS  [routing] Internet host / API server: uplink-rtr routes 10.20.1.0/24 via 198.51.100.2, so the request meets the firewall
+  PASS  [policy] Internet host / A node, k8s-gpu1: log line, deny-all-log (deny), zone uplink to k8s-nodes, for port 43172; the client: timed out, at its connect timeout
+  PASS  [routing] Internet host / A node, k8s-gpu1: uplink-rtr routes 10.20.1.0/24 via 198.51.100.2, so the request meets the firewall
+  PASS  [policy] Internet host / A BMC, k8s-gpu1's: log line, deny-all-log (deny), zone uplink to oob, for port 43176; the client: timed out, at its connect timeout
+  PASS  [routing] Internet host / A BMC, k8s-gpu1's: uplink-rtr routes 10.20.9.0/24 via 198.51.100.2, so the request meets the firewall
+  PASS  [routing] Internet host / Storage data: uplink-rtr holds no route to 10.20.12.31 (21 routes read)
+  PASS  [routing] Internet host / Storage data: silence at uplink-rtr; no traffic log line names it; the client: an error, Network unreachable
+  PASS  [policy] Internet host / Storage management: log line, deny-all-log (deny), zone uplink to stor-mgmt, for port 43184; the client: timed out, at its connect timeout
+  PASS  [routing] Internet host / Storage management: uplink-rtr routes 10.20.2.0/24 via 198.51.100.2, so the request meets the firewall
+  PASS  [allowed] Internet host / An internet host, web-client: connected to 192.0.2.18:443, attempt 1 from port 43188
+== Internet users: inet-client (203.0.113.2), resolver inet-dns-res, view public-internet
+  PASS  [routing] Internet users / Internal Gateway: isp-rtr holds no route to 10.20.11.200 (8 routes read)
+  PASS  [routing] Internet users / Internal Gateway: silence at isp-rtr; no traffic log line names it; the client: an error, Network unreachable
+  PASS  [routing] Internet users / Users' Gateway: isp-rtr holds no route to 10.20.11.210 (8 routes read)
+  PASS  [routing] Internet users / Users' Gateway: silence at isp-rtr; no traffic log line names it; the client: an error, Network unreachable
+  PASS  [allowed] Internet users / Internet Gateway: connected to 198.51.100.10:443 (tried at the population's answer, 198.51.100.10, which the firewall translates to 10.20.11.220), attempt 1 from port 43200
+  PASS  [view] Internet users / Route to chat: llm.ai.tarnwick.example answers 198.51.100.10 through inet-dns-res (view public-internet)
+  PASS  [allowed] Internet users / Route to chat: HTTP 200 from gw-inet (models-gw-inet), from port 43204
+  PASS  [key] Internet users / Route to chat: with inetapp's key, the population's own caller: the API gateway's access log names caller inetapp (1 answered line(s))
+  PASS  [key] Internet users / Route to chat: 401 with staff's key, `Authorization Failed`, from port 43206
+  PASS  [view] Internet users / Route to staff: llm.ai.tarnwick.example answers 198.51.100.10 through inet-dns-res (view public-internet)
+  PASS  [routeset] Internet users / Route to staff: 404 from gw-inet, server envoy, from port 43208
+  PASS  [routeset] Internet users / Route to staff: no line for sfab-matrix-internet-staff in the API gateway's log, which holds the run's model requests
+  PASS  [view] Internet users / Admin hostnames: admin.ai.tarnwick.example has no answer through inet-dns-res (view public-internet holds no record for it); the request pinned to 198.51.100.10
+  PASS  [routeset] Internet users / Admin hostnames: 404 from gw-inet, server envoy, from port 43212
+  PASS  [routeset] Internet users / Admin hostnames: no line for sfab-matrix-internet-admin in the API gateway's log, which holds the run's model requests
+  PASS  [routing] Internet users / API server: isp-rtr holds no route to 10.20.1.10 (8 routes read)
+  PASS  [routing] Internet users / API server: silence at isp-rtr; no traffic log line names it; the client: an error, Network unreachable
+  PASS  [routing] Internet users / A node, k8s-gpu1: isp-rtr holds no route to 10.20.1.21 (8 routes read)
+  PASS  [routing] Internet users / A node, k8s-gpu1: silence at isp-rtr; no traffic log line names it; the client: timed out, at its connect timeout
+  PASS  [routing] Internet users / A BMC, k8s-gpu1's: isp-rtr holds no route to 10.20.9.21 (8 routes read)
+  PASS  [routing] Internet users / A BMC, k8s-gpu1's: silence at isp-rtr; no traffic log line names it; the client: timed out, at its connect timeout
+  PASS  [routing] Internet users / Storage data: isp-rtr holds no route to 10.20.12.31 (8 routes read)
+  PASS  [routing] Internet users / Storage data: silence at isp-rtr; no traffic log line names it; the client: timed out, at its connect timeout
+  PASS  [routing] Internet users / Storage management: isp-rtr holds no route to 10.20.2.31 (8 routes read)
+  PASS  [routing] Internet users / Storage management: silence at isp-rtr; no traffic log line names it; the client: timed out, at its connect timeout
+  PASS  [routing] Internet users / An internet host, web-client: isp-rtr holds no route to 192.0.2.18 (8 routes read)
+  PASS  [routing] Internet users / An internet host, web-client: silence at isp-rtr; no traffic log line names it; the client: timed out, at its connect timeout
+== the matrix
+  PASS  60 of 60 cells in their mode (20 allowed, 21 log lines, 3 404, 16 silent)
+  PASS  the cells' isolation depth as the render computes it: depth 1 25, depth 2 14, depth 3 1 (and 20 allowed at depth 0)
+== RESULT: 121 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+== result set: ch11/audits/sfab-ch11_matrix_20261101T020644Z
+== stage matrix done in 187s
+
+Script done on 2026-11-01 02:09:51+00:00 [COMMAND_EXIT_CODE="0"]

@@ -1,0 +1,1081 @@
+### 2026-11-01T03:02:38Z ent-client container
++ dig llm.ai.tarnwick.example
+
+; <<>> DiG 9.18.49 <<>> llm.ai.tarnwick.example
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 27278
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+;; QUESTION SECTION:
+;llm.ai.tarnwick.example.	IN	A
+
+;; ANSWER SECTION:
+llm.ai.tarnwick.example. 127	IN	A	10.20.11.210
+
+;; Query time: 0 msec
+;; SERVER: 10.24.10.53#53(10.24.10.53) (UDP)
+;; WHEN: Sun Nov 01 03:02:38 UTC 2026
+;; MSG SIZE  rcvd: 68
+
+### 2026-11-01T03:02:38Z ops-client container
++ dig llm.ai.tarnwick.example
+
+; <<>> DiG 9.18.49 <<>> llm.ai.tarnwick.example
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NXDOMAIN, id: 4345
+;; flags: qr aa rd; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 1
+;; WARNING: recursion requested but not available
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: bbb07b6aef0d30ca010000006ae6abce582ef081b6f9c86c (good)
+;; QUESTION SECTION:
+;llm.ai.tarnwick.example.	IN	A
+
+;; AUTHORITY SECTION:
+ai.tarnwick.example.	60	IN	SOA	ops-dns.ai.tarnwick.example. hostmaster.ai.tarnwick.example. 781267259 3600 600 86400 60
+
+;; Query time: 0 msec
+;; SERVER: 192.0.2.10#53(192.0.2.10) (UDP)
+;; WHEN: Sun Nov 01 03:02:38 UTC 2026
+;; MSG SIZE  rcvd: 135
+
+### 2026-11-01T03:02:39Z k8s-cp2 guest
++ getent ahostsv4 llm.ai.tarnwick.example
+10.20.11.200    STREAM llm.ai.tarnwick.example
+10.20.11.200    DGRAM  
+10.20.11.200    RAW    
+
+### 2026-11-01T03:02:39Z web-client container
++ dig llm.ai.tarnwick.example
+
+; <<>> DiG 9.18.49 <<>> llm.ai.tarnwick.example
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NXDOMAIN, id: 11549
+;; flags: qr aa rd; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 1
+;; WARNING: recursion requested but not available
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: 643ebf7b24b5779a010000006ae6abcf129d4ef432976dbf (good)
+;; QUESTION SECTION:
+;llm.ai.tarnwick.example.	IN	A
+
+;; AUTHORITY SECTION:
+ai.tarnwick.example.	60	IN	SOA	ops-dns.ai.tarnwick.example. hostmaster.ai.tarnwick.example. 781267259 3600 600 86400 60
+
+;; Query time: 0 msec
+;; SERVER: 192.0.2.10#53(192.0.2.10) (UDP)
+;; WHEN: Sun Nov 01 03:02:39 UTC 2026
+;; MSG SIZE  rcvd: 135
+
+### 2026-11-01T03:02:39Z inet-client container
++ dig llm.ai.tarnwick.example
+
+; <<>> DiG 9.18.49 <<>> llm.ai.tarnwick.example
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 41573
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: ca59c207cc29f96d010000006ae6abcfd4fc87a3f767574a (good)
+;; QUESTION SECTION:
+;llm.ai.tarnwick.example.	IN	A
+
+;; ANSWER SECTION:
+llm.ai.tarnwick.example. 126	IN	A	198.51.100.10
+
+;; Query time: 0 msec
+;; SERVER: 203.0.113.10#53(203.0.113.10) (UDP)
+;; WHEN: Sun Nov 01 03:02:39 UTC 2026
+;; MSG SIZE  rcvd: 96
+
+### 2026-11-01T03:02:39Z dns-auth1 container
++ cat /etc/sfab/dns/zones/db.internal.ai.tarnwick.example
+; sfab-ch11 dns-auth1, view internal, zone ai.tarnwick.example: rendered from spec/profile-a.yaml by render/dns.py; edit the spec and run make render
+; decision dec-view-internal
+$ORIGIN ai.tarnwick.example.
+$TTL 300
+@ IN SOA dns-auth1.ai.tarnwick.example. hostmaster.ai.tarnwick.example. (
+    846505745 ; serial, from the zone's data
+    3600 ; refresh
+    600 ; retry
+    86400 ; expire
+    60 ) ; negative answers
+@             IN NS  dns-auth1.ai.tarnwick.example.
+@             IN NS  dns-auth2.ai.tarnwick.example.
+dns-auth1     IN A   10.20.13.11 ; name server
+dns-auth2     IN A   10.20.14.11 ; name server
+bastion       IN A   10.20.3.10
+dns-res1      IN A   10.20.13.21
+dns-res2      IN A   10.20.14.21
+k8s           IN A   10.20.1.10 ; the Kubernetes API VIP
+k8s-cp1       IN A   10.20.1.11
+k8s-cp2       IN A   10.20.1.12
+k8s-cp3       IN A   10.20.1.13
+k8s-gpu1      IN A   10.20.1.21
+k8s-gpu2      IN A   10.20.1.22
+k8s-ingress1  IN A   10.20.1.31
+k8s-ingress2  IN A   10.20.1.32
+truenas1      IN A   10.20.12.31
+truenas1-mgmt IN A   10.20.2.31
+llm           IN A   10.20.11.200 ; decision dec-view-internal: a name users type
+admin         IN A   10.20.11.200 ; decision dec-view-internal: an admin name
+grafana       IN A   10.20.11.200 ; decision dec-view-internal: an admin name
+serve         IN A   10.20.11.200 ; decision dec-view-internal: an internal name
+id            IN A   10.20.11.200 ; decision dec-view-internal: the identity provider
+
+### 2026-11-01T03:02:39Z dns-auth1 container
++ cat /etc/sfab/dns/zones/db.enterprise.ai.tarnwick.example
+; sfab-ch11 dns-auth1, view enterprise, zone ai.tarnwick.example: rendered from spec/profile-a.yaml by render/dns.py; edit the spec and run make render
+; decision dec-view-enterprise
+$ORIGIN ai.tarnwick.example.
+$TTL 300
+@ IN SOA dns-auth1.ai.tarnwick.example. hostmaster.ai.tarnwick.example. (
+    261946292 ; serial, from the zone's data
+    3600 ; refresh
+    600 ; retry
+    86400 ; expire
+    60 ) ; negative answers
+@         IN NS  dns-auth1.ai.tarnwick.example.
+@         IN NS  dns-auth2.ai.tarnwick.example.
+dns-auth1 IN A   10.20.13.11 ; name server
+dns-auth2 IN A   10.20.14.11 ; name server
+llm       IN A   10.20.11.210 ; decision dec-view-enterprise: a name users type
+id        IN A   10.20.11.210 ; decision dec-view-enterprise: the identity provider
+
+### 2026-11-01T03:02:39Z ops-dns container
++ cat /etc/sfab/dns/zones/db.public-operator.ai.tarnwick.example
+; sfab-ch11 ops-dns, view public-operator, zone ai.tarnwick.example: rendered from spec/profile-a.yaml by render/dns.py; edit the spec and run make render
+; decision dec-view-public
+$ORIGIN ai.tarnwick.example.
+$TTL 300
+@ IN SOA ops-dns.ai.tarnwick.example. hostmaster.ai.tarnwick.example. (
+    781267259 ; serial, from the zone's data
+    3600 ; refresh
+    600 ; retry
+    86400 ; expire
+    60 ) ; negative answers
+@       IN NS  ops-dns.ai.tarnwick.example.
+ops-dns IN A   192.0.2.10 ; name server
+
+### 2026-11-01T03:02:39Z inet-dns-auth container
++ cat /etc/sfab/dns/zones/db.public-internet.ai.tarnwick.example
+; sfab-ch11 inet-dns-auth, view public-internet, zone ai.tarnwick.example: rendered from spec/profile-a.yaml by render/dns.py; edit the spec and run make render
+; decision dec-view-public
+$ORIGIN ai.tarnwick.example.
+$TTL 300
+@ IN SOA inet-dns-auth.ai.tarnwick.example. hostmaster.ai.tarnwick.example. (
+    469659643 ; serial, from the zone's data
+    3600 ; refresh
+    600 ; retry
+    86400 ; expire
+    60 ) ; negative answers
+@             IN NS  inet-dns-auth.ai.tarnwick.example.
+inet-dns-auth IN A   203.0.113.6 ; name server
+llm           IN A   198.51.100.10 ; decision dec-view-public: a name users type
+
+### 2026-11-01T03:02:44Z fw panos-cli
+Last login: Sun Nov  1 03:00:36 2026 from 172.21.40.1
+set cli pager off
+show routing route
+show running nat-policy
+show running security-policy
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show routing 
+admin@fw> show routing route
+
+flags: A:active, ?:loose, C:connect, H:host, S:static, ~:internal, R:rip, O:ospf, B:bgp, 
+       Oi:ospf intra-area, Oo:ospf inter-area, O1:ospf ext-type-1, O2:ospf ext-type-2, E:ecmp, M:multicast
+
+  
+VIRTUAL ROUTER: core (id 2)
+  ==========
+destination                                 nexthop                                 metric flags      age   interface          next-AS    
+0.0.0.0/0                                   198.51.100.1                            10     A S              ethernet1/5                   
+10.0.0.0/8                                  discard                                 10     A S                                            
+10.20.1.0/24                                10.20.1.1                               0      A C              ae1.100                       
+10.20.1.1/32                                0.0.0.0                                 0      A H                                            
+10.20.2.0/24                                10.20.2.1                               0      A C              ae1.200                       
+10.20.2.1/32                                0.0.0.0                                 0      A H                                            
+10.20.3.0/24                                10.20.3.1                               0      A C              ae1.300                       
+10.20.3.1/32                                0.0.0.0                                 0      A H                                            
+10.20.9.0/24                                10.20.9.254                             0      A C              ethernet1/3                   
+10.20.9.254/32                              0.0.0.0                                 0      A H                                            
+10.20.11.0/24                               10.20.11.1                              0      A C              ae1.110                       
+10.20.11.1/32                               0.0.0.0                                 0      A H                                            
+10.20.13.0/24                               10.20.13.1                              0      A C              ae1.130                       
+10.20.13.1/32                               0.0.0.0                                 0      A H                                            
+10.20.14.0/24                               10.20.14.1                              0      A C              ae1.131                       
+10.20.14.1/32                               0.0.0.0                                 0      A H                                            
+10.24.10.8/30                               10.24.10.9                              0      A C              ethernet1/4                   
+10.24.10.9/32                               0.0.0.0                                 0      A H                                            
+10.24.10.52/30                              10.24.10.54                             0      A C              ethernet1/7                   
+10.24.10.54/32                              0.0.0.0                                 0      A H                                            
+172.16.0.0/12                               discard                                 10     A S                                            
+192.0.2.0/30                                0.0.0.0                                 10     A S              tunnel.1                      
+192.168.0.0/16                              discard                                 10     A S                                            
+198.51.100.0/29                             198.51.100.2                            0      A C              ethernet1/5                   
+198.51.100.2/32                             0.0.0.0                                 0      A H                                            
+198.51.100.8/30                             198.51.100.10                           0      A C              ethernet1/6                   
+198.51.100.10/32                            0.0.0.0                                 0      A H                                            
+203.0.113.0/26                              198.51.100.9                            10     A S              ethernet1/6                   
+total routes shown: 28
+
+admin@fw> show 
+admin@fw> show running 
+admin@fw> show running nat-policy
+
+Nat policy configured on vsys1:
+"dnat-internet-gateway; index: 1" {
+        nat-type ipv4;
+        from isp;
+        source any;
+        source-region none;
+        to isp;
+        to-interface  ;
+        destination 198.51.100.10;
+        destination-region none;
+        service 0:tcp/any/443;
+        translate-to "dst: 10.20.11.220";
+        terminal no;
+}
+
+"no-nat-public; index: 2" {
+        nat-type ipv4;
+        from [ k8s-nodes services ];
+        source any;
+        source-region none;
+        to uplink;
+        to-interface  ;
+        destination 198.51.100.2;
+        destination-region none;
+        service 0:any/any/any;
+        terminal no;
+}
+
+"internet-snat; index: 3" {
+        nat-type ipv4;
+        from [ k8s-nodes services ];
+        source any;
+        source-region none;
+        to uplink;
+        to-interface  ;
+        destination any;
+        destination-region none;
+        service 0:any/any/any;
+        translate-to "src: ethernet1/5 198.51.100.2 (dynamic-ip-and-port) (pool idx: 1)";
+        terminal no;
+}
+
+
+
+admin@fw> show 
+admin@fw> show running 
+admin@fw> show running security-policy
+
+"staff-to-users-gateway; index: 1" {
+        from enterprise;
+        source 10.24.10.0/24;
+        source-region none;
+        to ingress;
+        destination 10.20.11.210;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"ent-dns-to-platform-dns; index: 2" {
+        from enterprise;
+        source 10.24.10.53;
+        source-region none;
+        to services;
+        destination [ 10.20.14.11 10.20.13.11 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"staff-to-enterprise-dns; index: 3" {
+        from enterprise;
+        source 10.24.10.0/24;
+        source-region none;
+        to enterprise;
+        destination 10.24.10.53;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"admins-to-bastion; index: 4" {
+        from [ enterprise operator-vpn ];
+        source [ 10.24.10.10 192.0.2.0/30 ];
+        source-region none;
+        to bastion;
+        destination 10.20.3.10;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssh/tcp/any/22;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-firewall-admin; index: 5" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to bastion;
+        destination 10.20.3.1;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ssl/tcp/any/443 1:ssh/tcp/any/22 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-nodes; index: 6" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to k8s-nodes;
+        destination 10.20.1.0/24;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssh/tcp/any/22;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-api; index: 7" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to k8s-nodes;
+        destination 10.20.1.0/24;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/6443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-internal-gateway; index: 8" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to ingress;
+        destination 10.20.11.200;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-stor-mgmt; index: 9" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to stor-mgmt;
+        destination 10.20.2.31;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-bmc; index: 10" {
+        from bastion;
+        source [ 10.20.3.10 10.20.3.20 ];
+        source-region none;
+        to oob;
+        destination 10.20.9.0/24;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ssl/tcp/any/443 1:ssh/tcp/any/22 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-services-admin; index: 11" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to services;
+        destination [ 10.20.14.11 10.20.13.21 10.20.13.11 10.20.14.21 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssh/tcp/any/22;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"inside-to-gateway-ping; index: 12" {
+        from [ k8s-nodes ingress stor-mgmt bastion services oob enterprise ];
+        source [ 10.20.2.0/24 10.20.9.0/24 10.20.3.0/24 10.20.13.0/24 10.20.14.0/24 10.20.11.0/24 10.24.10.0/24 10.20.1.0/24 ];
+        source-region none;
+        to [ k8s-nodes ingress stor-mgmt bastion services oob enterprise ];
+        destination [ 10.24.10.54 10.20.14.1 10.20.2.1 10.20.9.254 10.20.1.1 10.20.11.1 10.20.3.1 10.24.10.9 10.20.13.1 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ping/icmp/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"inside-to-resolvers; index: 13" {
+        from [ k8s-nodes ingress stor-mgmt bastion services oob ];
+        source [ 10.20.2.0/24 10.20.9.0/24 10.20.3.0/24 10.20.13.0/24 10.20.14.0/24 10.20.11.0/24 10.20.1.0/24 ];
+        source-region none;
+        to services;
+        destination [ 10.20.13.21 10.20.14.21 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"inside-to-ntp; index: 14" {
+        from [ k8s-nodes ingress stor-mgmt bastion services oob ];
+        source [ 10.20.2.0/24 10.20.9.0/24 10.20.3.0/24 10.20.13.0/24 10.20.14.0/24 10.20.11.0/24 10.20.1.0/24 ];
+        source-region none;
+        to services;
+        destination [ 10.20.13.21 10.20.14.21 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ntp-base/tcp/any/123 1:ntp-base/udp/any/123 2:ntp-non-rfc/tcp/any/123 3:ntp-non-rfc/udp/any/123 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"resolvers-to-auth; index: 15" {
+        from services;
+        source [ 10.20.13.21 10.20.14.21 ];
+        source-region none;
+        to services;
+        destination [ 10.20.14.11 10.20.13.11 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"auth-zone-transfer; index: 16" {
+        from services;
+        source [ 10.20.14.11 10.20.13.11 ];
+        source-region none;
+        to services;
+        destination [ 10.20.14.11 10.20.13.11 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"ntp-upstream; index: 17" {
+        from services;
+        source [ 10.20.13.21 10.20.14.21 ];
+        source-region none;
+        to uplink;
+        destination 192.0.2.14;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ntp-base/tcp/any/123 1:ntp-base/udp/any/123 2:ntp-non-rfc/tcp/any/123 3:ntp-non-rfc/udp/any/123 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"nts-ke-upstream; index: 18" {
+        from services;
+        source [ 10.20.13.21 10.20.14.21 ];
+        source-region none;
+        to uplink;
+        destination 192.0.2.14;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/4460;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"nodes-to-registry; index: 19" {
+        from k8s-nodes;
+        source 10.20.1.0/24;
+        source-region none;
+        to uplink;
+        destination 192.0.2.6;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/5000;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"nodes-to-internal-gateway; index: 20" {
+        from k8s-nodes;
+        source 10.20.1.0/24;
+        source-region none;
+        to ingress;
+        destination 10.20.11.200;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"csi-to-storage-api; index: 21" {
+        from k8s-nodes;
+        source 10.20.1.0/24;
+        source-region none;
+        to stor-mgmt;
+        destination 10.20.2.31;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"operator-ike; index: 22" {
+        from uplink;
+        source 192.0.2.22;
+        source-region none;
+        to uplink;
+        destination 198.51.100.2;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ike/tcp/any/500 1:ike/udp/any/500 2:ipsec-esp/50/any/any 3:ipsec-esp-udp/udp/any/4500 4:ipsec-esp-udp/udp/any/4501 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"operator-to-internal-gateway; index: 23" {
+        from operator-vpn;
+        source 192.0.2.0/30;
+        source-region none;
+        to ingress;
+        destination 10.20.11.200;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"isp-to-internet-gateway; index: 24" {
+        from isp;
+        source any;
+        source-region none;
+        to ingress;
+        destination 198.51.100.10;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"deny-all-log; index: 25" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal no;
+}
+
+"vsys1+intrazone-default; index: 26" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal yes;
+        type intrazone;
+}
+
+"vsys1+interzone-default; index: 27" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal yes;
+        type interzone;
+}
+
+dynamic url: no
+
+
+admin@fw> exit
+
+### 2026-11-01T03:02:44Z fw xml-api
++ common/fw/fw-api.sh show /config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase
+
+### 2026-11-01T03:02:45Z uplink-rtr frr
++ vtysh -c 'show ip route'
+Codes: K - kernel route, C - connected, L - local, S - static,
+       R - RIP, O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric, t - Table-Direct,
+       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+IPv4 unicast VRF default:
+S>* 10.20.1.0/24 [1/0] via 198.51.100.2, eth1, weight 1, 01:48:27
+S>* 10.20.2.0/24 [1/0] via 198.51.100.2, eth1, weight 1, 01:48:27
+S>* 10.20.3.0/24 [1/0] via 198.51.100.2, eth1, weight 1, 01:48:27
+S>* 10.20.9.0/24 [1/0] via 198.51.100.2, eth1, weight 1, 01:48:27
+S>* 10.20.11.0/24 [1/0] via 198.51.100.2, eth1, weight 1, 01:48:27
+S>* 10.20.13.0/24 [1/0] via 198.51.100.2, eth1, weight 1, 01:48:27
+S>* 10.20.14.0/24 [1/0] via 198.51.100.2, eth1, weight 1, 01:48:27
+S>* 10.24.10.0/24 [1/0] via 198.51.100.2, eth1, weight 1, 01:48:27
+S>* 192.0.2.0/30 [1/0] via 192.0.2.22, eth7, weight 1, 01:48:27
+C>* 192.0.2.4/30 is directly connected, eth3, weight 1, 01:48:27
+L>* 192.0.2.5/32 is directly connected, eth3, weight 1, 01:48:27
+C>* 192.0.2.8/30 is directly connected, eth4, weight 1, 01:48:27
+L>* 192.0.2.9/32 is directly connected, eth4, weight 1, 01:48:27
+C>* 192.0.2.12/30 is directly connected, eth5, weight 1, 01:48:27
+L>* 192.0.2.13/32 is directly connected, eth5, weight 1, 01:48:27
+C>* 192.0.2.16/30 is directly connected, eth6, weight 1, 01:48:27
+L>* 192.0.2.17/32 is directly connected, eth6, weight 1, 01:48:27
+C>* 192.0.2.20/30 is directly connected, eth7, weight 1, 01:48:27
+L>* 192.0.2.21/32 is directly connected, eth7, weight 1, 01:48:27
+C>* 198.51.100.0/29 is directly connected, eth1, weight 1, 00:00:10
+L>* 198.51.100.1/32 is directly connected, eth1, weight 1, 00:00:10
+
+### 2026-11-01T03:02:45Z uplink-rtr container
++ cat /sfab/bootstrap/frr.conf
+! sfab-ch11 uplink-rtr: rendered from spec/profile-a.yaml by render/frr.py; edit the spec and run make render
+! eth0 is in VRF mgmt (frr-init.sh), so the default table holds only the lab's routes.
+! This file is bound read-only: change the spec and run make render, never write memory.
+frr defaults traditional
+hostname uplink-rtr
+log stdout informational
+service integrated-vtysh-config
+!
+! operator-site: dec-route-operator-site
+ip route 192.0.2.0/30 192.0.2.22
+! inside-nodes: dec-route-inside-via-fw
+ip route 10.20.1.0/24 198.51.100.2
+! inside-ingress: dec-route-inside-via-fw
+ip route 10.20.11.0/24 198.51.100.2
+! inside-stor-mgmt: dec-route-inside-via-fw
+ip route 10.20.2.0/24 198.51.100.2
+! inside-bastion: dec-route-inside-via-fw
+ip route 10.20.3.0/24 198.51.100.2
+! inside-services-a: dec-route-inside-via-fw
+ip route 10.20.13.0/24 198.51.100.2
+! inside-services-b: dec-route-inside-via-fw
+ip route 10.20.14.0/24 198.51.100.2
+! inside-oob: dec-route-inside-via-fw
+ip route 10.20.9.0/24 198.51.100.2
+! inside-enterprise: dec-route-inside-via-fw
+ip route 10.24.10.0/24 198.51.100.2
+!
+interface eth1
+ description fw-eth5
+ ip address 198.51.100.1/29
+exit
+!
+interface eth3
+ description inet-registry-eth1
+ ip address 192.0.2.5/30
+exit
+!
+interface eth4
+ description ops-dns-eth1
+ ip address 192.0.2.9/30
+exit
+!
+interface eth5
+ description inet-ntp-eth1
+ ip address 192.0.2.13/30
+exit
+!
+interface eth6
+ description web-client-eth1
+ ip address 192.0.2.17/30
+exit
+!
+interface eth7
+ description ops-gw-eth1
+ ip address 192.0.2.21/30
+exit
+!
+end
+
+### 2026-11-01T03:02:45Z isp-rtr frr
++ vtysh -c 'show ip route'
+Codes: K - kernel route, C - connected, L - local, S - static,
+       R - RIP, O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric, t - Table-Direct,
+       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+IPv4 unicast VRF default:
+C>* 198.51.100.8/30 is directly connected, eth1, weight 1, 00:00:10
+L>* 198.51.100.9/32 is directly connected, eth1, weight 1, 00:00:10
+C>* 203.0.113.0/30 is directly connected, eth2, weight 1, 01:48:27
+L>* 203.0.113.1/32 is directly connected, eth2, weight 1, 01:48:27
+C>* 203.0.113.4/30 is directly connected, eth3, weight 1, 01:48:27
+L>* 203.0.113.5/32 is directly connected, eth3, weight 1, 01:48:27
+C>* 203.0.113.8/30 is directly connected, eth4, weight 1, 01:48:27
+L>* 203.0.113.9/32 is directly connected, eth4, weight 1, 01:48:27
+
+### 2026-11-01T03:02:45Z isp-rtr container
++ cat /sfab/bootstrap/frr.conf
+! sfab-ch11 isp-rtr: rendered from spec/profile-a.yaml by render/frr.py; edit the spec and run make render
+! eth0 is in VRF mgmt (frr-init.sh), so the default table holds only the lab's routes.
+! This file is bound read-only: change the spec and run make render, never write memory.
+frr defaults traditional
+hostname isp-rtr
+log stdout informational
+service integrated-vtysh-config
+!
+interface eth1
+ description fw-eth6
+ ip address 198.51.100.9/30
+exit
+!
+interface eth2
+ description inet-client-eth1
+ ip address 203.0.113.1/30
+exit
+!
+interface eth3
+ description inet-dns-auth-eth1
+ ip address 203.0.113.5/30
+exit
+!
+interface eth4
+ description inet-dns-res-eth1
+ ip address 203.0.113.9/30
+exit
+!
+end
+
+### 2026-11-01T03:02:46Z k8s-cp1 kubectl
++ kubectl get httproutes -A -L tarnwick.example/audience -L decision.tarnwick.example/id
+NAMESPACE   NAME                 HOSTNAMES                                                                               AGE   AUDIENCE     ID
+echo        echo-gw-inet         ["llm.ai.tarnwick.example"]                                                             95m   internet     dec-routeset-internet
+echo        echo-gw-internal     ["llm.ai.tarnwick.example","admin.ai.tarnwick.example","grafana.ai.tarnwick.example"]   95m   internal     dec-routeset-internal
+echo        echo-gw-users        ["llm.ai.tarnwick.example"]                                                             95m   enterprise   dec-routeset-enterprise
+identity    idp-gw-internal      ["id.ai.tarnwick.example"]                                                              95m   internal     dec-routeset-internal
+identity    idp-gw-users         ["id.ai.tarnwick.example"]                                                              95m   enterprise   dec-routeset-enterprise
+inference   models-gw-inet       ["llm.ai.tarnwick.example"]                                                             91m   internet     dec-routeset-internet
+inference   models-gw-internal   ["llm.ai.tarnwick.example"]                                                             91m   internal     dec-routeset-internal
+inference   models-gw-users      ["llm.ai.tarnwick.example"]                                                             91m   enterprise   dec-routeset-enterprise
+serving     serving              ["serve.ai.tarnwick.example"]                                                           91m                dec-routeset-internal
+
+### 2026-11-01T03:02:47Z k8s-cp1 kubectl
++ kubectl -n inference logs api-gateway-7dc68d586f-g7kz8 -c compose --tail=5
+composed /standalone/apisix.yaml: 3 key(s) from /keys: batch.4bba878c sha256:1df7a5c7ea0d helpdesk.77a33a1c sha256:ba11730bec62 inetapp.366eb68e sha256:77069427f66d
+
+### 2026-11-01T03:02:47Z k8s-cp1 kubectl
++ kubectl -n inference logs api-gateway-7dc68d586f-g7kz8 -c keys --tail=5
+
+
+### 2026-11-01T03:02:47Z k8s-cp1 kubectl
++ kubectl -n serving get pods -o wide -L decision.tarnwick.example/id
+NAME                READY   STATUS    RESTARTS   AGE   IP            NODE       NOMINATED NODE   READINESS GATES   ID
+chat-a-server-0     1/1     Running   0          92m   10.22.3.201   k8s-gpu1   <none>           <none>            dec-place-chat
+chat-a-worker0-0    1/1     Running   0          93m   10.22.3.105   k8s-gpu1   <none>           <none>            dec-place-chat
+chat-b-server-0     1/1     Running   0          92m   10.22.4.80    k8s-gpu2   <none>           <none>            dec-place-chat
+chat-b-worker0-0    1/1     Running   0          93m   10.22.4.201   k8s-gpu2   <none>           <none>            dec-place-chat
+chat-c-server-0     1/1     Running   0          92m   10.22.3.155   k8s-gpu1   <none>           <none>            dec-place-chat
+chat-c-worker0-0    1/1     Running   0          93m   10.22.4.188   k8s-gpu2   <none>           <none>            dec-place-chat
+chat-c-worker1-0    1/1     Running   0          93m   10.22.3.28    k8s-gpu1   <none>           <none>            dec-place-chat
+staff-a-server-0    1/1     Running   0          92m   10.22.3.135   k8s-gpu1   <none>           <none>            dec-place-staff
+staff-a-worker0-0   1/1     Running   0          93m   10.22.3.110   k8s-gpu1   <none>           <none>            dec-place-staff
+staff-b-server-0    1/1     Running   0          92m   10.22.4.227   k8s-gpu2   <none>           <none>            dec-place-staff
+staff-b-worker0-0   1/1     Running   0          93m   10.22.4.3     k8s-gpu2   <none>           <none>            dec-place-staff
+
+### 2026-11-01T03:02:48Z fe-sw1 container
++ head -n 3 /config/startup-config.cfg
+! sfab-ch11 fe-sw1: rendered from spec/profile-a.yaml; edit the spec and run make render
+! decision dec-forwarding-only: forwards frames and decides nothing, with no routing protocol and no address on any served VLAN, PortChannel or host port; an MCLAG member's only addresses are its two keepalive /31s, in a VRF nothing routes
+configure terminal
+
+### 2026-11-01T03:02:49Z fe-sw1 klish
+terminal length 0
+show ip route
+exit
+terminal length 0
+show ip route
+exit
+fe-sw1# terminal length 0
+fe-sw1# show ip route
+fe-sw1# exit
+
+### 2026-11-01T03:02:49Z fe-sw2 container
++ head -n 3 /config/startup-config.cfg
+! sfab-ch11 fe-sw2: rendered from spec/profile-a.yaml; edit the spec and run make render
+! decision dec-forwarding-only: forwards frames and decides nothing, with no routing protocol and no address on any served VLAN, PortChannel or host port; an MCLAG member's only addresses are its two keepalive /31s, in a VRF nothing routes
+configure terminal
+
+### 2026-11-01T03:02:50Z fe-sw2 klish
+terminal length 0
+show ip route
+exit
+terminal length 0
+show ip route
+exit
+fe-sw2# terminal length 0
+fe-sw2# show ip route
+fe-sw2# exit
+
+### 2026-11-01T03:02:50Z rail-sw1 container
++ head -n 3 /config/startup-config.cfg
+! sfab-ch11 rail-sw1: rendered from spec/profile-a.yaml; edit the spec and run make render
+! decision dec-forwarding-only: forwards frames and decides nothing, with no routing protocol and no address on any served VLAN, PortChannel or host port; an MCLAG member's only addresses are its two keepalive /31s, in a VRF nothing routes
+configure terminal
+
+### 2026-11-01T03:02:51Z rail-sw1 klish
+terminal length 0
+show ip route
+exit
+terminal length 0
+show ip route
+exit
+rail-sw1# terminal length 0
+rail-sw1# show ip route
+rail-sw1# exit
+
+### 2026-11-01T03:02:51Z rail-sw2 container
++ head -n 3 /config/startup-config.cfg
+! sfab-ch11 rail-sw2: rendered from spec/profile-a.yaml; edit the spec and run make render
+! decision dec-forwarding-only: forwards frames and decides nothing, with no routing protocol and no address on any served VLAN, PortChannel or host port; an MCLAG member's only addresses are its two keepalive /31s, in a VRF nothing routes
+configure terminal
+
+### 2026-11-01T03:02:52Z rail-sw2 klish
+terminal length 0
+show ip route
+exit
+terminal length 0
+show ip route
+exit
+rail-sw2# terminal length 0
+rail-sw2# show ip route
+rail-sw2# exit
+
+### 2026-11-01T03:02:52Z oob-sw container
++ head -n 3 /config/startup-config.cfg
+! sfab-ch11 oob-sw: rendered from spec/profile-a.yaml; edit the spec and run make render
+! decision dec-forwarding-only: forwards frames and decides nothing, with no routing protocol and no address on any served VLAN, PortChannel or host port; an MCLAG member's only addresses are its two keepalive /31s, in a VRF nothing routes
+configure terminal
+
+### 2026-11-01T03:02:53Z oob-sw klish
+terminal length 0
+show ip route
+exit
+terminal length 0
+show ip route
+exit
+oob-sw# terminal length 0
+oob-sw# show ip route
+oob-sw# exit
+

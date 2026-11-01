@@ -1,0 +1,31 @@
+Script started on 2026-11-01 02:09:51+00:00 [COMMAND="make trace" TERM="tmux-256color" TTY="/dev/pts/6" COLUMNS="-1" LINES="-1"]
+/root/sfab/labs/ai-serving-fabric-labs/common/stages/run.sh trace
+== stage trace 2026-11-01T02:09:51Z (log state/logs/trace-20261101T020951Z.log)
+== the ladder trace
+trace: 11 capture points started
+== the ladder's rungs and the lease holders
+  PASS  gw-inet's lease held by k8s-ingress1; the pair's ports facing it by its MAC: 4-fe-sw1-Ethernet13, 4-fe-sw2-Ethernet13
+  PASS  gw-internal's lease held by k8s-ingress1; the pair's ports facing it by its MAC: 4-fe-sw1-Ethernet13, 4-fe-sw2-Ethernet13
+  PASS  gw-users's lease held by k8s-ingress1; the pair's ports facing it by its MAC: 4-fe-sw1-Ethernet13, 4-fe-sw2-Ethernet13
+  PASS  enterprise/gw-internal: log-line at fw (TIMEOUT): 3 SYNs by distinct sequence number reached 2-fw-ethernet1-4 3, and none past it
+  PASS  enterprise/gw-users: allowed (CONNECTED), its SYN at 2-fw-ethernet1-4, on one leg (3-fw-ae1-leg1), on the pair's port facing k8s-ingress1 (4-fe-sw1-Ethernet13) and on 5-k8s-ingress1-bond0.110
+  PASS  enterprise/gw-inet: log-line at fw (TIMEOUT): 3 SYNs by distinct sequence number reached 2-fw-ethernet1-4 3, and none past it
+  PASS  operator/gw-internal: allowed (CONNECTED), its SYN on one leg (3-fw-ae1-leg2), on the pair's port facing k8s-ingress1 (4-fe-sw2-Ethernet13) and on 5-k8s-ingress1-bond0.110
+  PASS  operator/gw-users: log-line at fw (TIMEOUT): 3 SYNs by distinct sequence number reached no rung, and none past it
+  PASS  operator/gw-inet: log-line at fw (TIMEOUT): 3 SYNs by distinct sequence number reached no rung, and none past it
+  PASS  nodes/gw-internal: answered on k8s-cp2 itself (CONNECTED): no SYN at any rung
+  PASS  nodes/gw-users: answered on k8s-cp2 itself (CONNECTED): no SYN at any rung
+  PASS  nodes/gw-inet: answered on k8s-cp2 itself (CONNECTED): no SYN at any rung
+  PASS  web/gw-internal: log-line at fw (TIMEOUT): 3 SYNs by distinct sequence number reached 1-uplink-rtr-eth1 3, and none past it
+  PASS  web/gw-users: log-line at fw (TIMEOUT): 3 SYNs by distinct sequence number reached 1-uplink-rtr-eth1 3, and none past it
+  PASS  web/gw-inet: log-line at fw (TIMEOUT): 3 SYNs by distinct sequence number reached 1-uplink-rtr-eth1 3, and none past it
+  PASS  internet/gw-internal: silence at isp-rtr (ERROR:Network_unreachable, TIMEOUT): 3 SYNs by distinct sequence number reached no rung, and none past it
+  PASS  internet/gw-users: silence at isp-rtr (TIMEOUT): 3 SYNs by distinct sequence number reached no rung, and none past it
+  PASS  internet/gw-inet: allowed (CONNECTED), its SYN at 1-isp-rtr-eth1, on one leg (3-fw-ae1-leg1), on the pair's port facing k8s-ingress1 (4-fe-sw1-Ethernet13) and on 5-k8s-ingress1-bond0.110
+== the forbidden tallies
+  PASS  every rung's forbidden tally is zero (11 rungs, 9 forbidden flows)
+== RESULT: 19 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+== result set: ch11/audits/sfab-ch11_trace_20261101T020951Z
+== stage trace done in 115s
+
+Script done on 2026-11-01 02:11:46+00:00 [COMMAND_EXIT_CODE="0"]

@@ -1,0 +1,111 @@
+== the decision table: 7 rows, the live object behind each
+== Resolver view (resolver): which address a population gets for a name
+  PASS  [view] enterprise (ent-client): llm.ai.tarnwick.example answers 10.20.11.210 through 10.24.10.53, view enterprise
+  PASS  [view] operator (ops-client): llm.ai.tarnwick.example answers NXDOMAIN through 192.0.2.10, view public-operator
+  PASS  [view] nodes (k8s-cp2): llm.ai.tarnwick.example answers 10.20.11.200 through 10.20.13.21, view internal
+  PASS  [view] web (web-client): llm.ai.tarnwick.example answers NXDOMAIN through 192.0.2.10, view public-operator
+  PASS  [view] internet (inet-client): llm.ai.tarnwick.example answers 198.51.100.10 through 203.0.113.10, view public-internet
+  PASS  [view] dns-auth1, view internal: the zone file's entry for llm.ai.tarnwick.example carries decision dec-view-internal
+  PASS  [view] dns-auth1, view enterprise: the zone file's entry for llm.ai.tarnwick.example carries decision dec-view-enterprise
+  PASS  [view] ops-dns, view public-operator: the zone file is labelled dec-view-public and holds no entry for llm.ai.tarnwick.example
+  PASS  [view] inet-dns-auth, view public-internet: the zone file's entry for llm.ai.tarnwick.example carries decision dec-view-public
+== Routing (firewall, and the routers in front of it): whether a route to the destination exists, looked up on ingress
+  PASS  [routing] fw: 10.20.1.0/24 connected on ae1.100 (dec-route-connected-ae1-100, in the decision table only)
+  PASS  [routing] fw: 10.20.11.0/24 connected on ae1.110 (dec-route-connected-ae1-110, in the decision table only)
+  PASS  [routing] fw: 10.20.2.0/24 connected on ae1.200 (dec-route-connected-ae1-200, in the decision table only)
+  PASS  [routing] fw: 10.20.3.0/24 connected on ae1.300 (dec-route-connected-ae1-300, in the decision table only)
+  PASS  [routing] fw: 10.20.13.0/24 connected on ae1.130 (dec-route-connected-ae1-130, in the decision table only)
+  PASS  [routing] fw: 10.20.14.0/24 connected on ae1.131 (dec-route-connected-ae1-131, in the decision table only)
+  PASS  [routing] fw: 10.20.9.0/24 connected on ethernet1/3 (dec-route-connected-ethernet1-3, in the decision table only)
+  PASS  [routing] fw: 10.24.10.8/30 connected on ethernet1/4 (dec-route-connected-ethernet1-4, in the decision table only)
+  PASS  [routing] fw: 10.24.10.52/30 connected on ethernet1/7 (dec-route-connected-ethernet1-7, in the decision table only)
+  PASS  [routing] fw: 198.51.100.0/29 connected on ethernet1/5 (dec-route-connected-ethernet1-5, in the decision table only)
+  PASS  [routing] fw: 198.51.100.8/30 connected on ethernet1/6 (dec-route-connected-ethernet1-6, in the decision table only)
+  PASS  [routing] fw: 0.0.0.0/0 via 198.51.100.1 on ethernet1/5 (dec-route-default-uplink, in the decision table only)
+  PASS  [routing] fw: 192.0.2.0/30 via None on tunnel.1 (dec-route-operator-site, in the decision table only)
+  PASS  [routing] fw: 203.0.113.0/26 via 198.51.100.9 on ethernet1/6 (dec-route-isp-customers, in the decision table only)
+  PASS  [routing] fw: 10.0.0.0/8 via None on None (dec-route-discard-10, in the decision table only)
+  PASS  [routing] fw: 172.16.0.0/12 via None on None (dec-route-discard-172-16, in the decision table only)
+  PASS  [routing] fw: 192.168.0.0/16 via None on None (dec-route-discard-192-168, in the decision table only)
+  PASS  [routing] uplink-rtr: 192.0.2.0/30 via 192.0.2.22 (operator-site), labelled dec-route-operator-site
+  PASS  [routing] uplink-rtr: 10.20.1.0/24 via 198.51.100.2 (inside-nodes), labelled dec-route-inside-via-fw
+  PASS  [routing] uplink-rtr: 10.20.11.0/24 via 198.51.100.2 (inside-ingress), labelled dec-route-inside-via-fw
+  PASS  [routing] uplink-rtr: 10.20.2.0/24 via 198.51.100.2 (inside-stor-mgmt), labelled dec-route-inside-via-fw
+  PASS  [routing] uplink-rtr: 10.20.3.0/24 via 198.51.100.2 (inside-bastion), labelled dec-route-inside-via-fw
+  PASS  [routing] uplink-rtr: 10.20.13.0/24 via 198.51.100.2 (inside-services-a), labelled dec-route-inside-via-fw
+  PASS  [routing] uplink-rtr: 10.20.14.0/24 via 198.51.100.2 (inside-services-b), labelled dec-route-inside-via-fw
+  PASS  [routing] uplink-rtr: 10.20.9.0/24 via 198.51.100.2 (inside-oob), labelled dec-route-inside-via-fw
+  PASS  [routing] uplink-rtr: 10.24.10.0/24 via 198.51.100.2 (inside-enterprise), labelled dec-route-inside-via-fw
+== NAT (firewall): which address a request leaves or lands with, keyed on the pre-nat zone
+  PASS  [nat] the running nat rulebase in the rendered order (3 rules)
+  PASS  [nat] dnat-internet-gateway: description dec-nat-internet
+  PASS  [nat] no-nat-public: description dec-nat-no-land
+  PASS  [nat] internet-snat: description dec-nat-internet-snat
+== Security policy (firewall): allow or deny, and log, on the original addresses and the post-nat zone
+  PASS  [policy] the running security rulebase in the rendered order (25 rules)
+  PASS  [policy] staff-to-users-gateway: description dec-policy-enterprise-users
+  PASS  [policy] ent-dns-to-platform-dns: description dec-policy-ent-dns-to-platform-dns
+  PASS  [policy] staff-to-enterprise-dns: description dec-policy-staff-to-enterprise-dns
+  PASS  [policy] admins-to-bastion: description dec-policy-admins-to-bastion
+  PASS  [policy] bastion-to-firewall-admin: description dec-policy-bastion-to-firewall-admin
+  PASS  [policy] bastion-to-nodes: description dec-policy-bastion-to-nodes
+  PASS  [policy] bastion-to-api: description dec-policy-bastion-to-api
+  PASS  [policy] bastion-to-internal-gateway: description dec-policy-bastion-to-internal-gateway
+  PASS  [policy] bastion-to-stor-mgmt: description dec-policy-bastion-to-stor-mgmt
+  PASS  [policy] bastion-to-bmc: description dec-policy-bastion-to-bmc
+  PASS  [policy] bastion-to-services-admin: description dec-policy-bastion-to-services-admin
+  PASS  [policy] inside-to-gateway-ping: description dec-policy-inside-to-gateway-ping
+  PASS  [policy] inside-to-resolvers: description dec-policy-inside-to-resolvers
+  PASS  [policy] inside-to-ntp: description dec-policy-inside-to-ntp
+  PASS  [policy] resolvers-to-auth: description dec-policy-resolvers-to-auth
+  PASS  [policy] auth-zone-transfer: description dec-policy-auth-zone-transfer
+  PASS  [policy] ntp-upstream: description dec-policy-ntp-upstream
+  PASS  [policy] nts-ke-upstream: description dec-policy-nts-ke-upstream
+  PASS  [policy] nodes-to-registry: description dec-policy-nodes-to-registry
+  PASS  [policy] nodes-to-internal-gateway: description dec-policy-nodes-to-internal-gateway
+  PASS  [policy] csi-to-storage-api: description dec-policy-csi-to-storage-api
+  PASS  [policy] operator-ike: description dec-policy-operator-ike
+  PASS  [policy] operator-to-internal-gateway: description dec-policy-operator-vpn
+  PASS  [policy] isp-to-internet-gateway: description dec-nat-internet
+  PASS  [policy] deny-all-log: description dec-policy-deny-all-log
+  PASS  [policy] the rulebase closes with deny-all-log
+== Route set (Gateway): whether a hostname and path exist for the audience behind that gateway
+  PASS  [routeset] HTTPRoute inference/models-gw-internal on gw-internal: label decision.tarnwick.example/id=dec-routeset-internal
+  PASS  [routeset] HTTPRoute inference/models-gw-users on gw-users: label decision.tarnwick.example/id=dec-routeset-enterprise
+  PASS  [routeset] HTTPRoute inference/models-gw-inet on gw-inet: label decision.tarnwick.example/id=dec-routeset-internet
+  PASS  [routeset] HTTPRoute serving/serving on gw-internal: label decision.tarnwick.example/id=dec-routeset-internal
+  PASS  [routeset] HTTPRoute echo/echo-gw-internal on gw-internal: label decision.tarnwick.example/id=dec-routeset-internal
+  PASS  [routeset] HTTPRoute echo/echo-gw-users on gw-users: label decision.tarnwick.example/id=dec-routeset-enterprise
+  PASS  [routeset] HTTPRoute echo/echo-gw-inet on gw-inet: label decision.tarnwick.example/id=dec-routeset-internet
+== Caller (API gateway): whether the caller may use the model
+  PASS  [key] consumer group batch: desc labelled dec-key-batch
+  PASS  [key] consumer group batch: its consumer composed in api-gateway-7dc68d586f-g7kz8 (batch.4bba878c sha256:1df7a5c7ea0d)
+  PASS  [key] consumer group helpdesk: desc labelled dec-key-helpdesk
+  PASS  [key] consumer group helpdesk: its consumer composed in api-gateway-7dc68d586f-g7kz8 (helpdesk.77a33a1c sha256:ba11730bec62)
+  PASS  [key] consumer group inetapp: desc labelled dec-key-inetapp
+  PASS  [key] consumer group inetapp: its consumer composed in api-gateway-7dc68d586f-g7kz8 (inetapp.366eb68e sha256:77069427f66d)
+  PASS  [key] consumer group staff: desc labelled dec-key-staff
+  PASS  [key] consumer group staff: its consumer staff_ent_client in the routes (key/api-gateway-routes.yaml:166)
+== Placement (cluster): which rail a replica's workers answer from
+  PASS  [placement] copy chat-a: 2 pods labelled dec-place-chat
+  PASS  [placement] copy chat-b: 2 pods labelled dec-place-chat
+  PASS  [placement] copy chat-c: 3 pods labelled dec-place-chat
+  PASS  [placement] copy staff-a: 2 pods labelled dec-place-staff
+  PASS  [placement] copy staff-b: 2 pods labelled dec-place-staff
+  PASS  [placement] rail attachment rail3: annotation decision.tarnwick.example/id=dec-place-chat
+  PASS  [placement] rail attachment rail4: annotation decision.tarnwick.example/id=dec-place-staff
+  PASS  [placement] rail attachment rail5: annotation decision.tarnwick.example/id=dec-place-staff
+  PASS  [placement] rail attachment rail6: annotation decision.tarnwick.example/id=dec-place-chat
+  PASS  [placement] rail attachment rail7: annotation decision.tarnwick.example/id=dec-place-chat
+== the switches: forwarding only, no row
+  PASS  [forwarding] fe-sw1: its startup file labelled dec-forwarding-only
+  PASS  [forwarding] fe-sw1: show ip route prints nothing
+  PASS  [forwarding] fe-sw2: its startup file labelled dec-forwarding-only
+  PASS  [forwarding] fe-sw2: show ip route prints nothing
+  PASS  [forwarding] rail-sw1: its startup file labelled dec-forwarding-only
+  PASS  [forwarding] rail-sw1: show ip route prints nothing
+  PASS  [forwarding] rail-sw2: its startup file labelled dec-forwarding-only
+  PASS  [forwarding] rail-sw2: show ip route prints nothing
+  PASS  [forwarding] oob-sw: its startup file labelled dec-forwarding-only
+  PASS  [forwarding] oob-sw: show ip route prints nothing
+== RESULT: 101 passed, 0 failed, 0 known platform limitation(s), 0 skipped

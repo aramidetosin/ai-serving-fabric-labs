@@ -1,0 +1,306 @@
+{
+  "kind": "part3",
+  "lab": "sfab-ch11",
+  "list": [
+    {
+      "factors": [
+        1,
+        2
+      ],
+      "hold": {
+        "ca_root": "/shared/ca/root.crt",
+        "dir": "/tmp/sfab-hold",
+        "every_s": 20,
+        "hold_s": 120,
+        "n": 8,
+        "rows": [
+          {
+            "address": "10.20.11.210",
+            "bound": {
+              "max": 11,
+              "min": 8
+            },
+            "chat": {
+              "caller": "batch",
+              "model": "chat",
+              "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+            },
+            "client": "ent-client",
+            "filter": "from enterprise destination 10.20.11.210 destination-port 443",
+            "gateway": "gw-users",
+            "hostname": "llm.ai.tarnwick.example",
+            "nat_rule": null,
+            "path": "/echo",
+            "population": "enterprise",
+            "resolve": null,
+            "rule": "staff-to-users-gateway",
+            "sport": 44500,
+            "translated_to": null,
+            "zone": "enterprise"
+          },
+          {
+            "address": "198.51.100.10",
+            "bound": {
+              "max": 11,
+              "min": 8
+            },
+            "chat": {
+              "caller": "inetapp",
+              "model": "chat",
+              "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+            },
+            "client": "inet-client",
+            "filter": "from isp destination 198.51.100.10 destination-port 443",
+            "gateway": "gw-inet",
+            "hostname": "llm.ai.tarnwick.example",
+            "nat_rule": "dnat-internet-gateway",
+            "path": "/echo",
+            "population": "internet",
+            "resolve": null,
+            "rule": "isp-to-internet-gateway",
+            "sport": 44600,
+            "translated_to": "10.20.11.220",
+            "zone": "isp"
+          },
+          {
+            "address": "10.20.11.200",
+            "bound": {
+              "max": 11,
+              "min": 8
+            },
+            "chat": {
+              "caller": "batch",
+              "model": "chat",
+              "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+            },
+            "client": "ops-client",
+            "filter": "from operator-vpn destination 10.20.11.200 destination-port 443",
+            "gateway": "gw-internal",
+            "hostname": "llm.ai.tarnwick.example",
+            "nat_rule": null,
+            "path": "/echo",
+            "population": "operator",
+            "resolve": "llm.ai.tarnwick.example:443:10.20.11.200",
+            "rule": "operator-to-internal-gateway",
+            "sport": 44700,
+            "translated_to": null,
+            "zone": "operator-vpn"
+          }
+        ],
+        "slack": 2,
+        "timeouts": {
+          "discard_tcp": 90,
+          "tcp": 3600,
+          "tcp_half_closed": 30,
+          "tcp_handshake": 10,
+          "tcp_init": 5,
+          "tcp_time_wait": 15
+        }
+      },
+      "id": "isolation-under-load",
+      "interval_s": 3,
+      "kind": "isolation",
+      "rounds": 10,
+      "rows": [
+        {
+          "client": "ent-client",
+          "gateway": "gw-users",
+          "own": {
+            "address": "10.20.11.210",
+            "resolve": null,
+            "url": "https://llm.ai.tarnwick.example/echo"
+          },
+          "population": "enterprise",
+          "tries": [
+            {
+              "address": "10.20.11.200",
+              "cell": "enterprise/gw-internal",
+              "column": "gw-internal",
+              "kind": "connect",
+              "mode": "log-line",
+              "port": 443
+            },
+            {
+              "address": "10.20.11.210",
+              "cell": "enterprise/gw-users",
+              "column": "gw-users",
+              "kind": "connect",
+              "mode": "allowed",
+              "port": 443
+            },
+            {
+              "address": "10.20.11.220",
+              "cell": "enterprise/gw-inet",
+              "column": "gw-inet",
+              "kind": "connect",
+              "mode": "log-line",
+              "port": 443
+            },
+            {
+              "address": "10.20.11.210",
+              "cell": "enterprise/admin",
+              "column": "admin",
+              "hostname": "admin.ai.tarnwick.example",
+              "kind": "http",
+              "method": "GET",
+              "mode": "404",
+              "port": 443,
+              "resolve": "admin.ai.tarnwick.example:443:10.20.11.210",
+              "url": "https://admin.ai.tarnwick.example/echo?msg=sfab-matrix-enterprise-admin"
+            }
+          ]
+        },
+        {
+          "client": "inet-client",
+          "gateway": "gw-inet",
+          "own": {
+            "address": "198.51.100.10",
+            "resolve": null,
+            "url": "https://llm.ai.tarnwick.example/echo"
+          },
+          "population": "internet",
+          "tries": [
+            {
+              "address": "10.20.11.200",
+              "cell": "internet/gw-internal",
+              "column": "gw-internal",
+              "kind": "connect",
+              "mode": "silence",
+              "port": 443
+            },
+            {
+              "address": "10.20.11.210",
+              "cell": "internet/gw-users",
+              "column": "gw-users",
+              "kind": "connect",
+              "mode": "silence",
+              "port": 443
+            },
+            {
+              "address": "198.51.100.10",
+              "cell": "internet/gw-inet",
+              "column": "gw-inet",
+              "kind": "connect",
+              "mode": "allowed",
+              "port": 443
+            },
+            {
+              "address": "198.51.100.10",
+              "cell": "internet/staff",
+              "column": "staff",
+              "hostname": "llm.ai.tarnwick.example",
+              "kind": "http",
+              "method": "GET",
+              "mode": "404",
+              "port": 443,
+              "resolve": null,
+              "url": "https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions?msg=sfab-matrix-internet-staff"
+            },
+            {
+              "address": "198.51.100.10",
+              "cell": "internet/admin",
+              "column": "admin",
+              "hostname": "admin.ai.tarnwick.example",
+              "kind": "http",
+              "method": "GET",
+              "mode": "404",
+              "port": 443,
+              "resolve": "admin.ai.tarnwick.example:443:198.51.100.10",
+              "url": "https://admin.ai.tarnwick.example/echo?msg=sfab-matrix-internet-admin"
+            }
+          ]
+        },
+        {
+          "client": "ops-client",
+          "gateway": "gw-internal",
+          "own": {
+            "address": "10.20.11.200",
+            "resolve": "llm.ai.tarnwick.example:443:10.20.11.200",
+            "url": "https://llm.ai.tarnwick.example/echo"
+          },
+          "population": "operator",
+          "tries": [
+            {
+              "address": "10.20.11.200",
+              "cell": "operator/gw-internal",
+              "column": "gw-internal",
+              "kind": "connect",
+              "mode": "allowed",
+              "port": 443
+            },
+            {
+              "address": "10.20.11.210",
+              "cell": "operator/gw-users",
+              "column": "gw-users",
+              "kind": "connect",
+              "mode": "log-line",
+              "port": 443
+            },
+            {
+              "address": "10.20.11.220",
+              "cell": "operator/gw-inet",
+              "column": "gw-inet",
+              "kind": "connect",
+              "mode": "log-line",
+              "port": 443
+            },
+            {
+              "address": "10.20.11.200",
+              "cell": "operator/admin",
+              "column": "admin",
+              "hostname": "admin.ai.tarnwick.example",
+              "kind": "http",
+              "method": "GET",
+              "mode": "allowed",
+              "port": 443,
+              "resolve": "admin.ai.tarnwick.example:443:10.20.11.200",
+              "url": "https://admin.ai.tarnwick.example/echo?msg=sfab-matrix-operator-admin"
+            }
+          ]
+        }
+      ],
+      "timeout_s": 4,
+      "title": "every population's own Gateway under held load, and every forbidden try refused"
+    },
+    {
+      "accept_max_s": 300,
+      "address": "198.51.100.10",
+      "api_gateway": {
+        "namespace": "inference",
+        "selector": "app.kubernetes.io/name=api-gateway"
+      },
+      "ca_root": "/shared/ca/root.crt",
+      "caller": "batch",
+      "caller_audience": "enterprise",
+      "client": "inet-client",
+      "client_audience": "internet",
+      "gateway": "gw-inet",
+      "hostname": "llm.ai.tarnwick.example",
+      "id": "leaked-key",
+      "id_base": "fb000000",
+      "interval_s": 2,
+      "keys": {
+        "namespace": "inference",
+        "secret": "api-keys"
+      },
+      "kind": "leaked-key",
+      "model": "chat",
+      "probe": "key-probe",
+      "rejected": {
+        "code": 401,
+        "message": "Authorization Failed"
+      },
+      "resolve": null,
+      "title": "an enterprise caller's key used from the internet, answered, then refused after its revoke",
+      "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+    }
+  ],
+  "schema": 1,
+  "timing": {
+    "hold_s": 30,
+    "lead_s": 10,
+    "settle_max_s": 300,
+    "tail_s": 10,
+    "whole_polls": 3
+  }
+}
