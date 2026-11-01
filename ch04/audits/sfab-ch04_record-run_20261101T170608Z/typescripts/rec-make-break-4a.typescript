@@ -1,0 +1,20 @@
+Script started on 2026-11-01 18:42:32+00:00 [COMMAND="make break-4a" TERM="tmux-256color" TTY="/dev/pts/0" COLUMNS="-1" LINES="-1"]
+PYTHONDONTWRITEBYTECODE=1 python3 /root/sfab/clean/ai-serving-fabric-labs/common/breakheal.py break 4a
+== break-4a: the no-translation rule for the public address removed
+  PASS  fw: nat rule no-nat-public deleted through the XML API (success: command succeeded)
+  PASS  fw: committed (commit job 22: OK (Configuration committed successfully; Local configuration size: 56 KB; Predefined configuration size: 13 MB; Merged configuration size(local, panorama pushed, predefined): 16 MB; Maximum recommended merged configuration size: 47 MB (34% configured); Warning: Default master-key configured please change to custom master-key))
+== break-4a: recorded
+  PASS  node-delta, break, pass 1: 10 of 10 pings from k8s-cp2 to 198.51.100.2 unanswered (recorded)
+  PASS  node-public, break, pass 1: 10 of 10 pings from k8s-cp2 to 198.51.100.2 unanswered (recorded)
+  PASS  node-public, break, pass 2: 10 of 10 pings from k8s-cp2 to 198.51.100.2 unanswered (recorded)
+  PASS  node-public, break, pass 3: 10 of 10 pings from k8s-cp2 to 198.51.100.2 unanswered (recorded)
+  PASS  users, break, pass 1: 0 of 10 requests from ent-client to https://llm.ai.tarnwick.example/echo?msg=sfab-break-4a answered other than 200 (recorded)
+== break-4a: broken as designed
+  PASS  node-delta: every ping fails (10 of 10 across the passes)
+  PASS  node-public: every ping fails (30 of 30 across the passes)
+  PASS  fw: flow_policy_nat_land rose by 30 across node-public's passes
+  PASS  users: every request succeeds (10 of 10)
+== RESULT: 11 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+== result set: ch04/audits/sfab-ch04_break-4a_20261101T184232Z
+
+Script done on 2026-11-01 18:45:48+00:00 [COMMAND_EXIT_CODE="0"]

@@ -1,0 +1,1777 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "annotations": {
+                    "deployment.kubernetes.io/revision": "1",
+                    "meta.helm.sh/release-name": "cert-manager",
+                    "meta.helm.sh/release-namespace": "cert-manager"
+                },
+                "creationTimestamp": "2026-11-01T17:31:29Z",
+                "generation": 1,
+                "labels": {
+                    "app": "cert-manager",
+                    "app.kubernetes.io/component": "controller",
+                    "app.kubernetes.io/instance": "cert-manager",
+                    "app.kubernetes.io/managed-by": "Helm",
+                    "app.kubernetes.io/name": "cert-manager",
+                    "app.kubernetes.io/version": "v1.21.2",
+                    "helm.sh/chart": "cert-manager-v1.21.2"
+                },
+                "name": "cert-manager",
+                "namespace": "cert-manager",
+                "resourceVersion": "2979",
+                "uid": "72de02e4-6e77-4b49-b09e-38ba3bc812e7"
+            },
+            "spec": {
+                "progressDeadlineSeconds": 600,
+                "replicas": 1,
+                "revisionHistoryLimit": 10,
+                "selector": {
+                    "matchLabels": {
+                        "app.kubernetes.io/component": "controller",
+                        "app.kubernetes.io/instance": "cert-manager",
+                        "app.kubernetes.io/name": "cert-manager"
+                    }
+                },
+                "strategy": {
+                    "rollingUpdate": {
+                        "maxSurge": "25%",
+                        "maxUnavailable": "25%"
+                    },
+                    "type": "RollingUpdate"
+                },
+                "template": {
+                    "metadata": {
+                        "annotations": {
+                            "prometheus.io/path": "/metrics",
+                            "prometheus.io/port": "9402",
+                            "prometheus.io/scrape": "true"
+                        },
+                        "labels": {
+                            "app": "cert-manager",
+                            "app.kubernetes.io/component": "controller",
+                            "app.kubernetes.io/instance": "cert-manager",
+                            "app.kubernetes.io/managed-by": "Helm",
+                            "app.kubernetes.io/name": "cert-manager",
+                            "app.kubernetes.io/version": "v1.21.2",
+                            "helm.sh/chart": "cert-manager-v1.21.2"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "args": [
+                                    "--v=2",
+                                    "--cluster-resource-namespace=$(POD_NAMESPACE)",
+                                    "--leader-election-namespace=kube-system",
+                                    "--acme-http01-solver-image=quay.io/jetstack/cert-manager-acmesolver:v1.21.2@sha256:699b40d622211ab7accad8a21b04c5fbaa1841ef7a12621e8de492dbe27b2503",
+                                    "--max-concurrent-challenges=60"
+                                ],
+                                "env": [
+                                    {
+                                        "name": "POD_NAMESPACE",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "metadata.namespace"
+                                            }
+                                        }
+                                    }
+                                ],
+                                "image": "quay.io/jetstack/cert-manager-controller:v1.21.2@sha256:70f532fd9cfde0b09d55687200942399d89838bc2d5d5b45152eb799a15912b8",
+                                "imagePullPolicy": "IfNotPresent",
+                                "livenessProbe": {
+                                    "failureThreshold": 8,
+                                    "httpGet": {
+                                        "path": "/livez",
+                                        "port": "http-healthz",
+                                        "scheme": "HTTP"
+                                    },
+                                    "initialDelaySeconds": 10,
+                                    "periodSeconds": 10,
+                                    "successThreshold": 1,
+                                    "timeoutSeconds": 15
+                                },
+                                "name": "cert-manager-controller",
+                                "ports": [
+                                    {
+                                        "containerPort": 9402,
+                                        "name": "http-metrics",
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 9403,
+                                        "name": "http-healthz",
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "resources": {},
+                                "securityContext": {
+                                    "allowPrivilegeEscalation": false,
+                                    "capabilities": {
+                                        "drop": [
+                                            "ALL"
+                                        ]
+                                    },
+                                    "readOnlyRootFilesystem": true
+                                },
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File"
+                            }
+                        ],
+                        "dnsPolicy": "ClusterFirst",
+                        "enableServiceLinks": false,
+                        "nodeSelector": {
+                            "kubernetes.io/os": "linux"
+                        },
+                        "restartPolicy": "Always",
+                        "schedulerName": "default-scheduler",
+                        "securityContext": {
+                            "runAsNonRoot": true,
+                            "seccompProfile": {
+                                "type": "RuntimeDefault"
+                            }
+                        },
+                        "serviceAccount": "cert-manager",
+                        "serviceAccountName": "cert-manager",
+                        "terminationGracePeriodSeconds": 30
+                    }
+                }
+            },
+            "status": {
+                "availableReplicas": 1,
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T17:31:33Z",
+                        "lastUpdateTime": "2026-11-01T17:31:33Z",
+                        "message": "Deployment has minimum availability.",
+                        "reason": "MinimumReplicasAvailable",
+                        "status": "True",
+                        "type": "Available"
+                    },
+                    {
+                        "lastTransitionTime": "2026-11-01T17:31:29Z",
+                        "lastUpdateTime": "2026-11-01T17:31:33Z",
+                        "message": "ReplicaSet \"cert-manager-5748c9d4f5\" has successfully progressed.",
+                        "reason": "NewReplicaSetAvailable",
+                        "status": "True",
+                        "type": "Progressing"
+                    }
+                ],
+                "observedGeneration": 1,
+                "readyReplicas": 1,
+                "replicas": 1,
+                "terminatingReplicas": 0,
+                "updatedReplicas": 1
+            }
+        },
+        {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "annotations": {
+                    "deployment.kubernetes.io/revision": "1",
+                    "meta.helm.sh/release-name": "cert-manager",
+                    "meta.helm.sh/release-namespace": "cert-manager"
+                },
+                "creationTimestamp": "2026-11-01T17:31:29Z",
+                "generation": 1,
+                "labels": {
+                    "app": "cainjector",
+                    "app.kubernetes.io/component": "cainjector",
+                    "app.kubernetes.io/instance": "cert-manager",
+                    "app.kubernetes.io/managed-by": "Helm",
+                    "app.kubernetes.io/name": "cainjector",
+                    "app.kubernetes.io/version": "v1.21.2",
+                    "helm.sh/chart": "cert-manager-v1.21.2"
+                },
+                "name": "cert-manager-cainjector",
+                "namespace": "cert-manager",
+                "resourceVersion": "2965",
+                "uid": "ec02fa0f-4f96-4775-843a-ffedbf87d5f8"
+            },
+            "spec": {
+                "progressDeadlineSeconds": 600,
+                "replicas": 1,
+                "revisionHistoryLimit": 10,
+                "selector": {
+                    "matchLabels": {
+                        "app.kubernetes.io/component": "cainjector",
+                        "app.kubernetes.io/instance": "cert-manager",
+                        "app.kubernetes.io/name": "cainjector"
+                    }
+                },
+                "strategy": {
+                    "rollingUpdate": {
+                        "maxSurge": "25%",
+                        "maxUnavailable": "25%"
+                    },
+                    "type": "RollingUpdate"
+                },
+                "template": {
+                    "metadata": {
+                        "annotations": {
+                            "prometheus.io/path": "/metrics",
+                            "prometheus.io/port": "9402",
+                            "prometheus.io/scrape": "true"
+                        },
+                        "labels": {
+                            "app": "cainjector",
+                            "app.kubernetes.io/component": "cainjector",
+                            "app.kubernetes.io/instance": "cert-manager",
+                            "app.kubernetes.io/managed-by": "Helm",
+                            "app.kubernetes.io/name": "cainjector",
+                            "app.kubernetes.io/version": "v1.21.2",
+                            "helm.sh/chart": "cert-manager-v1.21.2"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "args": [
+                                    "--v=2",
+                                    "--leader-election-namespace=kube-system"
+                                ],
+                                "env": [
+                                    {
+                                        "name": "POD_NAMESPACE",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "metadata.namespace"
+                                            }
+                                        }
+                                    }
+                                ],
+                                "image": "quay.io/jetstack/cert-manager-cainjector:v1.21.2@sha256:c85268c64f2e0e76684bf5fe8906caff34b82523561c6affe0fae3546bd87562",
+                                "imagePullPolicy": "IfNotPresent",
+                                "name": "cert-manager-cainjector",
+                                "ports": [
+                                    {
+                                        "containerPort": 9402,
+                                        "name": "http-metrics",
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "resources": {},
+                                "securityContext": {
+                                    "allowPrivilegeEscalation": false,
+                                    "capabilities": {
+                                        "drop": [
+                                            "ALL"
+                                        ]
+                                    },
+                                    "readOnlyRootFilesystem": true
+                                },
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File"
+                            }
+                        ],
+                        "dnsPolicy": "ClusterFirst",
+                        "enableServiceLinks": false,
+                        "nodeSelector": {
+                            "kubernetes.io/os": "linux"
+                        },
+                        "restartPolicy": "Always",
+                        "schedulerName": "default-scheduler",
+                        "securityContext": {
+                            "runAsNonRoot": true,
+                            "seccompProfile": {
+                                "type": "RuntimeDefault"
+                            }
+                        },
+                        "serviceAccount": "cert-manager-cainjector",
+                        "serviceAccountName": "cert-manager-cainjector",
+                        "terminationGracePeriodSeconds": 30
+                    }
+                }
+            },
+            "status": {
+                "availableReplicas": 1,
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T17:31:32Z",
+                        "lastUpdateTime": "2026-11-01T17:31:32Z",
+                        "message": "Deployment has minimum availability.",
+                        "reason": "MinimumReplicasAvailable",
+                        "status": "True",
+                        "type": "Available"
+                    },
+                    {
+                        "lastTransitionTime": "2026-11-01T17:31:29Z",
+                        "lastUpdateTime": "2026-11-01T17:31:32Z",
+                        "message": "ReplicaSet \"cert-manager-cainjector-54b9c9cd8d\" has successfully progressed.",
+                        "reason": "NewReplicaSetAvailable",
+                        "status": "True",
+                        "type": "Progressing"
+                    }
+                ],
+                "observedGeneration": 1,
+                "readyReplicas": 1,
+                "replicas": 1,
+                "terminatingReplicas": 0,
+                "updatedReplicas": 1
+            }
+        },
+        {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "annotations": {
+                    "deployment.kubernetes.io/revision": "1",
+                    "meta.helm.sh/release-name": "cert-manager",
+                    "meta.helm.sh/release-namespace": "cert-manager"
+                },
+                "creationTimestamp": "2026-11-01T17:31:29Z",
+                "generation": 1,
+                "labels": {
+                    "app": "webhook",
+                    "app.kubernetes.io/component": "webhook",
+                    "app.kubernetes.io/instance": "cert-manager",
+                    "app.kubernetes.io/managed-by": "Helm",
+                    "app.kubernetes.io/name": "webhook",
+                    "app.kubernetes.io/version": "v1.21.2",
+                    "helm.sh/chart": "cert-manager-v1.21.2"
+                },
+                "name": "cert-manager-webhook",
+                "namespace": "cert-manager",
+                "resourceVersion": "3021",
+                "uid": "5fa7b5e5-7077-4b48-b594-7cbe6ce5b375"
+            },
+            "spec": {
+                "progressDeadlineSeconds": 600,
+                "replicas": 1,
+                "revisionHistoryLimit": 10,
+                "selector": {
+                    "matchLabels": {
+                        "app.kubernetes.io/component": "webhook",
+                        "app.kubernetes.io/instance": "cert-manager",
+                        "app.kubernetes.io/name": "webhook"
+                    }
+                },
+                "strategy": {
+                    "rollingUpdate": {
+                        "maxSurge": "25%",
+                        "maxUnavailable": "25%"
+                    },
+                    "type": "RollingUpdate"
+                },
+                "template": {
+                    "metadata": {
+                        "annotations": {
+                            "prometheus.io/path": "/metrics",
+                            "prometheus.io/port": "9402",
+                            "prometheus.io/scrape": "true"
+                        },
+                        "labels": {
+                            "app": "webhook",
+                            "app.kubernetes.io/component": "webhook",
+                            "app.kubernetes.io/instance": "cert-manager",
+                            "app.kubernetes.io/managed-by": "Helm",
+                            "app.kubernetes.io/name": "webhook",
+                            "app.kubernetes.io/version": "v1.21.2",
+                            "helm.sh/chart": "cert-manager-v1.21.2"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "args": [
+                                    "--v=2",
+                                    "--secure-port=10250",
+                                    "--dynamic-serving-ca-secret-namespace=$(POD_NAMESPACE)",
+                                    "--dynamic-serving-ca-secret-name=cert-manager-webhook-ca",
+                                    "--dynamic-serving-dns-names=cert-manager-webhook",
+                                    "--dynamic-serving-dns-names=cert-manager-webhook.$(POD_NAMESPACE)",
+                                    "--dynamic-serving-dns-names=cert-manager-webhook.$(POD_NAMESPACE).svc"
+                                ],
+                                "env": [
+                                    {
+                                        "name": "POD_NAMESPACE",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "metadata.namespace"
+                                            }
+                                        }
+                                    }
+                                ],
+                                "image": "quay.io/jetstack/cert-manager-webhook:v1.21.2@sha256:a60e2dac46dbb8a7f3df95c54ce941012f54c2fe022f0ee55aaa1ab40ed957ae",
+                                "imagePullPolicy": "IfNotPresent",
+                                "livenessProbe": {
+                                    "failureThreshold": 3,
+                                    "httpGet": {
+                                        "path": "/livez",
+                                        "port": "healthcheck",
+                                        "scheme": "HTTP"
+                                    },
+                                    "initialDelaySeconds": 60,
+                                    "periodSeconds": 10,
+                                    "successThreshold": 1,
+                                    "timeoutSeconds": 1
+                                },
+                                "name": "cert-manager-webhook",
+                                "ports": [
+                                    {
+                                        "containerPort": 10250,
+                                        "name": "https",
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 6080,
+                                        "name": "healthcheck",
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 9402,
+                                        "name": "http-metrics",
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "readinessProbe": {
+                                    "failureThreshold": 3,
+                                    "httpGet": {
+                                        "path": "/healthz",
+                                        "port": "healthcheck",
+                                        "scheme": "HTTP"
+                                    },
+                                    "initialDelaySeconds": 5,
+                                    "periodSeconds": 5,
+                                    "successThreshold": 1,
+                                    "timeoutSeconds": 1
+                                },
+                                "resources": {},
+                                "securityContext": {
+                                    "allowPrivilegeEscalation": false,
+                                    "capabilities": {
+                                        "drop": [
+                                            "ALL"
+                                        ]
+                                    },
+                                    "readOnlyRootFilesystem": true
+                                },
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File"
+                            }
+                        ],
+                        "dnsPolicy": "ClusterFirst",
+                        "enableServiceLinks": false,
+                        "nodeSelector": {
+                            "kubernetes.io/os": "linux"
+                        },
+                        "restartPolicy": "Always",
+                        "schedulerName": "default-scheduler",
+                        "securityContext": {
+                            "runAsNonRoot": true,
+                            "seccompProfile": {
+                                "type": "RuntimeDefault"
+                            }
+                        },
+                        "serviceAccount": "cert-manager-webhook",
+                        "serviceAccountName": "cert-manager-webhook",
+                        "terminationGracePeriodSeconds": 30
+                    }
+                }
+            },
+            "status": {
+                "availableReplicas": 1,
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T17:31:41Z",
+                        "lastUpdateTime": "2026-11-01T17:31:41Z",
+                        "message": "Deployment has minimum availability.",
+                        "reason": "MinimumReplicasAvailable",
+                        "status": "True",
+                        "type": "Available"
+                    },
+                    {
+                        "lastTransitionTime": "2026-11-01T17:31:29Z",
+                        "lastUpdateTime": "2026-11-01T17:31:41Z",
+                        "message": "ReplicaSet \"cert-manager-webhook-7d65b95c98\" has successfully progressed.",
+                        "reason": "NewReplicaSetAvailable",
+                        "status": "True",
+                        "type": "Progressing"
+                    }
+                ],
+                "observedGeneration": 1,
+                "readyReplicas": 1,
+                "replicas": 1,
+                "terminatingReplicas": 0,
+                "updatedReplicas": 1
+            }
+        },
+        {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "annotations": {
+                    "deployment.kubernetes.io/revision": "1",
+                    "meta.helm.sh/release-name": "truenas-nfs",
+                    "meta.helm.sh/release-namespace": "democratic-csi"
+                },
+                "creationTimestamp": "2026-11-01T17:34:05Z",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/component": "controller-linux",
+                    "app.kubernetes.io/csi-role": "controller",
+                    "app.kubernetes.io/instance": "truenas-nfs",
+                    "app.kubernetes.io/managed-by": "Helm",
+                    "app.kubernetes.io/name": "democratic-csi",
+                    "helm.sh/chart": "democratic-csi-0.15.1"
+                },
+                "name": "truenas-nfs-democratic-csi-controller",
+                "namespace": "democratic-csi",
+                "resourceVersion": "4296",
+                "uid": "368d45d3-9029-444b-a712-ea269f3a2a3a"
+            },
+            "spec": {
+                "progressDeadlineSeconds": 600,
+                "replicas": 1,
+                "revisionHistoryLimit": 10,
+                "selector": {
+                    "matchLabels": {
+                        "app.kubernetes.io/component": "controller-linux",
+                        "app.kubernetes.io/csi-role": "controller",
+                        "app.kubernetes.io/instance": "truenas-nfs",
+                        "app.kubernetes.io/managed-by": "Helm",
+                        "app.kubernetes.io/name": "democratic-csi"
+                    }
+                },
+                "strategy": {
+                    "rollingUpdate": {
+                        "maxSurge": "25%",
+                        "maxUnavailable": "25%"
+                    },
+                    "type": "RollingUpdate"
+                },
+                "template": {
+                    "metadata": {
+                        "annotations": {
+                            "checksum/configmap": "0df5d4dc3ae5c64e1e15485a05ba08a1bbaf3476f4741ef2145d0fc61363d6bd"
+                        },
+                        "labels": {
+                            "app.kubernetes.io/component": "controller-linux",
+                            "app.kubernetes.io/csi-role": "controller",
+                            "app.kubernetes.io/instance": "truenas-nfs",
+                            "app.kubernetes.io/managed-by": "Helm",
+                            "app.kubernetes.io/name": "democratic-csi"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "args": [
+                                    "--v=5",
+                                    "--leader-election",
+                                    "--leader-election-namespace=democratic-csi",
+                                    "--timeout=90s",
+                                    "--worker-threads=10",
+                                    "--csi-address=/csi-data/csi.sock"
+                                ],
+                                "image": "registry.k8s.io/sig-storage/csi-attacher:v4.4.0@sha256:dbded4ebe299973e31d0ef55815eb07a990fc67872b14900a8e69232acae4f2d",
+                                "imagePullPolicy": "IfNotPresent",
+                                "name": "external-attacher",
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File",
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/csi-data",
+                                        "name": "socket-dir"
+                                    }
+                                ]
+                            },
+                            {
+                                "args": [
+                                    "--v=5",
+                                    "--leader-election",
+                                    "--leader-election-namespace=democratic-csi",
+                                    "--timeout=90s",
+                                    "--worker-threads=10",
+                                    "--extra-create-metadata",
+                                    "--csi-address=/csi-data/csi.sock"
+                                ],
+                                "env": [
+                                    {
+                                        "name": "NODE_NAME",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "spec.nodeName"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "NAMESPACE",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "metadata.namespace"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "POD_NAME",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "metadata.name"
+                                            }
+                                        }
+                                    }
+                                ],
+                                "image": "registry.k8s.io/sig-storage/csi-provisioner:v3.6.0@sha256:6de50bacfd72627ffe4209e3db8ad7391d04ea6fb741bf51feab6c5dcfd80002",
+                                "imagePullPolicy": "IfNotPresent",
+                                "name": "external-provisioner",
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File",
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/csi-data",
+                                        "name": "socket-dir"
+                                    }
+                                ]
+                            },
+                            {
+                                "args": [
+                                    "--v=5",
+                                    "--leader-election",
+                                    "--leader-election-namespace=democratic-csi",
+                                    "--timeout=90s",
+                                    "--workers=10",
+                                    "--csi-address=/csi-data/csi.sock"
+                                ],
+                                "env": [
+                                    {
+                                        "name": "NODE_NAME",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "spec.nodeName"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "NAMESPACE",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "metadata.namespace"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "POD_NAME",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "metadata.name"
+                                            }
+                                        }
+                                    }
+                                ],
+                                "image": "registry.k8s.io/sig-storage/csi-resizer:v1.9.0@sha256:f1f352df97874442624fcef23eab04aa038f66cb0e361212f6ec09e92998184d",
+                                "imagePullPolicy": "IfNotPresent",
+                                "name": "external-resizer",
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File",
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/csi-data",
+                                        "name": "socket-dir"
+                                    }
+                                ]
+                            },
+                            {
+                                "args": [
+                                    "--csi-version=1.5.0",
+                                    "--csi-name=org.democratic-csi.nfs",
+                                    "--driver-config-file=/config/driver-config-file.yaml",
+                                    "--log-level=info",
+                                    "--csi-mode=controller",
+                                    "--server-socket=/csi-data/csi.sock.internal"
+                                ],
+                                "env": [
+                                    {
+                                        "name": "NODE_EXTRA_CA_CERTS",
+                                        "value": "/tmp/certs/extra-ca-certs.crt"
+                                    }
+                                ],
+                                "image": "ghcr.io/democratic-csi/democratic-csi:next@sha256:c6d74146e10b8ea2e0efd1f688779b6db529a71b83887ca3de953e5226d374b7",
+                                "imagePullPolicy": "IfNotPresent",
+                                "livenessProbe": {
+                                    "exec": {
+                                        "command": [
+                                            "bin/liveness-probe",
+                                            "--csi-version=1.5.0",
+                                            "--csi-address=/csi-data/csi.sock.internal"
+                                        ]
+                                    },
+                                    "failureThreshold": 3,
+                                    "initialDelaySeconds": 10,
+                                    "periodSeconds": 60,
+                                    "successThreshold": 1,
+                                    "timeoutSeconds": 15
+                                },
+                                "name": "csi-driver",
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File",
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/csi-data",
+                                        "name": "socket-dir"
+                                    },
+                                    {
+                                        "mountPath": "/config",
+                                        "name": "config"
+                                    },
+                                    {
+                                        "mountPath": "/tmp/certs",
+                                        "name": "extra-ca-certs"
+                                    }
+                                ]
+                            },
+                            {
+                                "env": [
+                                    {
+                                        "name": "BIND_TO",
+                                        "value": "unix:///csi-data/csi.sock"
+                                    },
+                                    {
+                                        "name": "PROXY_TO",
+                                        "value": "unix:///csi-data/csi.sock.internal"
+                                    }
+                                ],
+                                "image": "ghcr.io/democratic-csi/csi-grpc-proxy:v0.5.7@sha256:0240d0fba3cedd598036766b1865e88aa2eac9c16822df03d5d912a81128ebb6",
+                                "imagePullPolicy": "IfNotPresent",
+                                "name": "csi-proxy",
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File",
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/csi-data",
+                                        "name": "socket-dir"
+                                    }
+                                ]
+                            }
+                        ],
+                        "dnsPolicy": "ClusterFirst",
+                        "nodeSelector": {
+                            "kubernetes.io/os": "linux"
+                        },
+                        "priorityClassName": "system-cluster-critical",
+                        "restartPolicy": "Always",
+                        "schedulerName": "default-scheduler",
+                        "securityContext": {},
+                        "serviceAccount": "truenas-nfs-democratic-csi-controller-sa",
+                        "serviceAccountName": "truenas-nfs-democratic-csi-controller-sa",
+                        "terminationGracePeriodSeconds": 30,
+                        "volumes": [
+                            {
+                                "emptyDir": {},
+                                "name": "socket-dir"
+                            },
+                            {
+                                "name": "config",
+                                "secret": {
+                                    "defaultMode": 420,
+                                    "secretName": "truenas-nfs-driver-config"
+                                }
+                            },
+                            {
+                                "configMap": {
+                                    "defaultMode": 420,
+                                    "items": [
+                                        {
+                                            "key": "extra-ca-certs",
+                                            "path": "extra-ca-certs.crt"
+                                        }
+                                    ],
+                                    "name": "truenas-nfs-democratic-csi"
+                                },
+                                "name": "extra-ca-certs"
+                            }
+                        ]
+                    }
+                }
+            },
+            "status": {
+                "availableReplicas": 1,
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T17:34:11Z",
+                        "lastUpdateTime": "2026-11-01T17:34:11Z",
+                        "message": "Deployment has minimum availability.",
+                        "reason": "MinimumReplicasAvailable",
+                        "status": "True",
+                        "type": "Available"
+                    },
+                    {
+                        "lastTransitionTime": "2026-11-01T17:34:05Z",
+                        "lastUpdateTime": "2026-11-01T17:34:11Z",
+                        "message": "ReplicaSet \"truenas-nfs-democratic-csi-controller-5fd44d79cc\" has successfully progressed.",
+                        "reason": "NewReplicaSetAvailable",
+                        "status": "True",
+                        "type": "Progressing"
+                    }
+                ],
+                "observedGeneration": 1,
+                "readyReplicas": 1,
+                "replicas": 1,
+                "terminatingReplicas": 0,
+                "updatedReplicas": 1
+            }
+        },
+        {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "annotations": {
+                    "deployment.kubernetes.io/revision": "1",
+                    "meta.helm.sh/release-name": "truenas-nvmeof",
+                    "meta.helm.sh/release-namespace": "democratic-csi"
+                },
+                "creationTimestamp": "2026-11-01T17:33:11Z",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/component": "controller-linux",
+                    "app.kubernetes.io/csi-role": "controller",
+                    "app.kubernetes.io/instance": "truenas-nvmeof",
+                    "app.kubernetes.io/managed-by": "Helm",
+                    "app.kubernetes.io/name": "democratic-csi",
+                    "helm.sh/chart": "democratic-csi-0.15.1"
+                },
+                "name": "truenas-nvmeof-democratic-csi-controller",
+                "namespace": "democratic-csi",
+                "resourceVersion": "4038",
+                "uid": "d9e4b1dc-a035-4499-929b-051a9edc2bc9"
+            },
+            "spec": {
+                "progressDeadlineSeconds": 600,
+                "replicas": 1,
+                "revisionHistoryLimit": 10,
+                "selector": {
+                    "matchLabels": {
+                        "app.kubernetes.io/component": "controller-linux",
+                        "app.kubernetes.io/csi-role": "controller",
+                        "app.kubernetes.io/instance": "truenas-nvmeof",
+                        "app.kubernetes.io/managed-by": "Helm",
+                        "app.kubernetes.io/name": "democratic-csi"
+                    }
+                },
+                "strategy": {
+                    "rollingUpdate": {
+                        "maxSurge": "25%",
+                        "maxUnavailable": "25%"
+                    },
+                    "type": "RollingUpdate"
+                },
+                "template": {
+                    "metadata": {
+                        "annotations": {
+                            "checksum/configmap": "fa68e4325028b0884a8c52b2ca584ebcefa1ef62573691eae1b018b4f27d2a6e"
+                        },
+                        "labels": {
+                            "app.kubernetes.io/component": "controller-linux",
+                            "app.kubernetes.io/csi-role": "controller",
+                            "app.kubernetes.io/instance": "truenas-nvmeof",
+                            "app.kubernetes.io/managed-by": "Helm",
+                            "app.kubernetes.io/name": "democratic-csi"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "args": [
+                                    "--v=5",
+                                    "--leader-election",
+                                    "--leader-election-namespace=democratic-csi",
+                                    "--timeout=90s",
+                                    "--worker-threads=10",
+                                    "--csi-address=/csi-data/csi.sock"
+                                ],
+                                "image": "registry.k8s.io/sig-storage/csi-attacher:v4.4.0@sha256:dbded4ebe299973e31d0ef55815eb07a990fc67872b14900a8e69232acae4f2d",
+                                "imagePullPolicy": "IfNotPresent",
+                                "name": "external-attacher",
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File",
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/csi-data",
+                                        "name": "socket-dir"
+                                    }
+                                ]
+                            },
+                            {
+                                "args": [
+                                    "--v=5",
+                                    "--leader-election",
+                                    "--leader-election-namespace=democratic-csi",
+                                    "--timeout=90s",
+                                    "--worker-threads=10",
+                                    "--extra-create-metadata",
+                                    "--csi-address=/csi-data/csi.sock"
+                                ],
+                                "env": [
+                                    {
+                                        "name": "NODE_NAME",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "spec.nodeName"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "NAMESPACE",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "metadata.namespace"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "POD_NAME",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "metadata.name"
+                                            }
+                                        }
+                                    }
+                                ],
+                                "image": "registry.k8s.io/sig-storage/csi-provisioner:v3.6.0@sha256:6de50bacfd72627ffe4209e3db8ad7391d04ea6fb741bf51feab6c5dcfd80002",
+                                "imagePullPolicy": "IfNotPresent",
+                                "name": "external-provisioner",
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File",
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/csi-data",
+                                        "name": "socket-dir"
+                                    }
+                                ]
+                            },
+                            {
+                                "args": [
+                                    "--v=5",
+                                    "--leader-election",
+                                    "--leader-election-namespace=democratic-csi",
+                                    "--timeout=90s",
+                                    "--workers=10",
+                                    "--csi-address=/csi-data/csi.sock"
+                                ],
+                                "env": [
+                                    {
+                                        "name": "NODE_NAME",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "spec.nodeName"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "NAMESPACE",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "metadata.namespace"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "POD_NAME",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "metadata.name"
+                                            }
+                                        }
+                                    }
+                                ],
+                                "image": "registry.k8s.io/sig-storage/csi-resizer:v1.9.0@sha256:f1f352df97874442624fcef23eab04aa038f66cb0e361212f6ec09e92998184d",
+                                "imagePullPolicy": "IfNotPresent",
+                                "name": "external-resizer",
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File",
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/csi-data",
+                                        "name": "socket-dir"
+                                    }
+                                ]
+                            },
+                            {
+                                "args": [
+                                    "--csi-version=1.5.0",
+                                    "--csi-name=org.democratic-csi.nvmeof",
+                                    "--driver-config-file=/config/driver-config-file.yaml",
+                                    "--log-level=info",
+                                    "--csi-mode=controller",
+                                    "--server-socket=/csi-data/csi.sock.internal"
+                                ],
+                                "env": [
+                                    {
+                                        "name": "NODE_EXTRA_CA_CERTS",
+                                        "value": "/tmp/certs/extra-ca-certs.crt"
+                                    }
+                                ],
+                                "image": "ghcr.io/democratic-csi/democratic-csi:next@sha256:c6d74146e10b8ea2e0efd1f688779b6db529a71b83887ca3de953e5226d374b7",
+                                "imagePullPolicy": "IfNotPresent",
+                                "livenessProbe": {
+                                    "exec": {
+                                        "command": [
+                                            "bin/liveness-probe",
+                                            "--csi-version=1.5.0",
+                                            "--csi-address=/csi-data/csi.sock.internal"
+                                        ]
+                                    },
+                                    "failureThreshold": 3,
+                                    "initialDelaySeconds": 10,
+                                    "periodSeconds": 60,
+                                    "successThreshold": 1,
+                                    "timeoutSeconds": 15
+                                },
+                                "name": "csi-driver",
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File",
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/csi-data",
+                                        "name": "socket-dir"
+                                    },
+                                    {
+                                        "mountPath": "/config",
+                                        "name": "config"
+                                    },
+                                    {
+                                        "mountPath": "/tmp/certs",
+                                        "name": "extra-ca-certs"
+                                    }
+                                ]
+                            },
+                            {
+                                "env": [
+                                    {
+                                        "name": "BIND_TO",
+                                        "value": "unix:///csi-data/csi.sock"
+                                    },
+                                    {
+                                        "name": "PROXY_TO",
+                                        "value": "unix:///csi-data/csi.sock.internal"
+                                    }
+                                ],
+                                "image": "ghcr.io/democratic-csi/csi-grpc-proxy:v0.5.7@sha256:0240d0fba3cedd598036766b1865e88aa2eac9c16822df03d5d912a81128ebb6",
+                                "imagePullPolicy": "IfNotPresent",
+                                "name": "csi-proxy",
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File",
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/csi-data",
+                                        "name": "socket-dir"
+                                    }
+                                ]
+                            }
+                        ],
+                        "dnsPolicy": "ClusterFirst",
+                        "nodeSelector": {
+                            "kubernetes.io/os": "linux"
+                        },
+                        "priorityClassName": "system-cluster-critical",
+                        "restartPolicy": "Always",
+                        "schedulerName": "default-scheduler",
+                        "securityContext": {},
+                        "serviceAccount": "truenas-nvmeof-democratic-csi-controller-sa",
+                        "serviceAccountName": "truenas-nvmeof-democratic-csi-controller-sa",
+                        "terminationGracePeriodSeconds": 30,
+                        "volumes": [
+                            {
+                                "emptyDir": {},
+                                "name": "socket-dir"
+                            },
+                            {
+                                "name": "config",
+                                "secret": {
+                                    "defaultMode": 420,
+                                    "secretName": "truenas-nvmeof-driver-config"
+                                }
+                            },
+                            {
+                                "configMap": {
+                                    "defaultMode": 420,
+                                    "items": [
+                                        {
+                                            "key": "extra-ca-certs",
+                                            "path": "extra-ca-certs.crt"
+                                        }
+                                    ],
+                                    "name": "truenas-nvmeof-democratic-csi"
+                                },
+                                "name": "extra-ca-certs"
+                            }
+                        ]
+                    }
+                }
+            },
+            "status": {
+                "availableReplicas": 1,
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T17:34:02Z",
+                        "lastUpdateTime": "2026-11-01T17:34:02Z",
+                        "message": "Deployment has minimum availability.",
+                        "reason": "MinimumReplicasAvailable",
+                        "status": "True",
+                        "type": "Available"
+                    },
+                    {
+                        "lastTransitionTime": "2026-11-01T17:33:11Z",
+                        "lastUpdateTime": "2026-11-01T17:34:02Z",
+                        "message": "ReplicaSet \"truenas-nvmeof-democratic-csi-controller-78cd99c49d\" has successfully progressed.",
+                        "reason": "NewReplicaSetAvailable",
+                        "status": "True",
+                        "type": "Progressing"
+                    }
+                ],
+                "observedGeneration": 1,
+                "readyReplicas": 1,
+                "replicas": 1,
+                "terminatingReplicas": 0,
+                "updatedReplicas": 1
+            }
+        },
+        {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "annotations": {
+                    "deployment.kubernetes.io/revision": "1"
+                },
+                "creationTimestamp": "2026-11-01T17:31:18Z",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/name": "echo"
+                },
+                "name": "echo",
+                "namespace": "echo",
+                "resourceVersion": "2794",
+                "uid": "7bee1359-663a-4f6c-bb73-c6f609fe4997"
+            },
+            "spec": {
+                "progressDeadlineSeconds": 600,
+                "replicas": 2,
+                "revisionHistoryLimit": 10,
+                "selector": {
+                    "matchLabels": {
+                        "app.kubernetes.io/name": "echo"
+                    }
+                },
+                "strategy": {
+                    "rollingUpdate": {
+                        "maxSurge": "25%",
+                        "maxUnavailable": "25%"
+                    },
+                    "type": "RollingUpdate"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "app.kubernetes.io/name": "echo"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "args": [
+                                    "netexec",
+                                    "--http-port=8080"
+                                ],
+                                "image": "registry.k8s.io/e2e-test-images/agnhost:2.59@sha256:10ed98804c877e505e17bced991682b6fd50ab1da9cddcd19935b48d645da40a",
+                                "imagePullPolicy": "IfNotPresent",
+                                "name": "echo",
+                                "ports": [
+                                    {
+                                        "containerPort": 8080,
+                                        "name": "http",
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "readinessProbe": {
+                                    "failureThreshold": 3,
+                                    "periodSeconds": 5,
+                                    "successThreshold": 1,
+                                    "tcpSocket": {
+                                        "port": "http"
+                                    },
+                                    "timeoutSeconds": 1
+                                },
+                                "resources": {
+                                    "limits": {
+                                        "memory": "64Mi"
+                                    },
+                                    "requests": {
+                                        "cpu": "10m",
+                                        "memory": "16Mi"
+                                    }
+                                },
+                                "securityContext": {
+                                    "allowPrivilegeEscalation": false,
+                                    "capabilities": {
+                                        "drop": [
+                                            "ALL"
+                                        ]
+                                    },
+                                    "runAsNonRoot": true,
+                                    "runAsUser": 65534,
+                                    "seccompProfile": {
+                                        "type": "RuntimeDefault"
+                                    }
+                                },
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File"
+                            }
+                        ],
+                        "dnsPolicy": "ClusterFirst",
+                        "restartPolicy": "Always",
+                        "schedulerName": "default-scheduler",
+                        "securityContext": {},
+                        "terminationGracePeriodSeconds": 30,
+                        "topologySpreadConstraints": [
+                            {
+                                "labelSelector": {
+                                    "matchLabels": {
+                                        "app.kubernetes.io/name": "echo"
+                                    }
+                                },
+                                "maxSkew": 1,
+                                "topologyKey": "kubernetes.io/hostname",
+                                "whenUnsatisfiable": "ScheduleAnyway"
+                            }
+                        ]
+                    }
+                }
+            },
+            "status": {
+                "availableReplicas": 2,
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T17:31:22Z",
+                        "lastUpdateTime": "2026-11-01T17:31:22Z",
+                        "message": "Deployment has minimum availability.",
+                        "reason": "MinimumReplicasAvailable",
+                        "status": "True",
+                        "type": "Available"
+                    },
+                    {
+                        "lastTransitionTime": "2026-11-01T17:31:18Z",
+                        "lastUpdateTime": "2026-11-01T17:31:22Z",
+                        "message": "ReplicaSet \"echo-c876b5585\" has successfully progressed.",
+                        "reason": "NewReplicaSetAvailable",
+                        "status": "True",
+                        "type": "Progressing"
+                    }
+                ],
+                "observedGeneration": 1,
+                "readyReplicas": 2,
+                "replicas": 2,
+                "terminatingReplicas": 0,
+                "updatedReplicas": 2
+            }
+        },
+        {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "annotations": {
+                    "deployment.kubernetes.io/revision": "1",
+                    "meta.helm.sh/release-name": "cilium",
+                    "meta.helm.sh/release-namespace": "kube-system"
+                },
+                "creationTimestamp": "2026-11-01T17:24:50Z",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/managed-by": "Helm",
+                    "app.kubernetes.io/name": "cilium-operator",
+                    "app.kubernetes.io/part-of": "cilium",
+                    "io.cilium/app": "operator",
+                    "name": "cilium-operator"
+                },
+                "name": "cilium-operator",
+                "namespace": "kube-system",
+                "resourceVersion": "1007",
+                "uid": "bc6f0a24-f690-40a3-8996-03df48536467"
+            },
+            "spec": {
+                "progressDeadlineSeconds": 600,
+                "replicas": 2,
+                "revisionHistoryLimit": 10,
+                "selector": {
+                    "matchLabels": {
+                        "io.cilium/app": "operator",
+                        "name": "cilium-operator"
+                    }
+                },
+                "strategy": {
+                    "rollingUpdate": {
+                        "maxSurge": "25%",
+                        "maxUnavailable": "50%"
+                    },
+                    "type": "RollingUpdate"
+                },
+                "template": {
+                    "metadata": {
+                        "annotations": {
+                            "prometheus.io/port": "9963",
+                            "prometheus.io/scrape": "true"
+                        },
+                        "labels": {
+                            "app.kubernetes.io/name": "cilium-operator",
+                            "app.kubernetes.io/part-of": "cilium",
+                            "io.cilium/app": "operator",
+                            "name": "cilium-operator"
+                        }
+                    },
+                    "spec": {
+                        "affinity": {
+                            "podAntiAffinity": {
+                                "requiredDuringSchedulingIgnoredDuringExecution": [
+                                    {
+                                        "labelSelector": {
+                                            "matchLabels": {
+                                                "io.cilium/app": "operator"
+                                            }
+                                        },
+                                        "topologyKey": "kubernetes.io/hostname"
+                                    }
+                                ]
+                            }
+                        },
+                        "automountServiceAccountToken": true,
+                        "containers": [
+                            {
+                                "args": [
+                                    "--config-dir=/tmp/cilium/config-map",
+                                    "--debug=$(CILIUM_DEBUG)"
+                                ],
+                                "command": [
+                                    "cilium-operator-generic"
+                                ],
+                                "env": [
+                                    {
+                                        "name": "K8S_NODE_NAME",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "spec.nodeName"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "CILIUM_K8S_NAMESPACE",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "metadata.namespace"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "CILIUM_DEBUG",
+                                        "valueFrom": {
+                                            "configMapKeyRef": {
+                                                "key": "debug",
+                                                "name": "cilium-config",
+                                                "optional": true
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "KUBERNETES_SERVICE_HOST",
+                                        "value": "10.20.1.10"
+                                    },
+                                    {
+                                        "name": "KUBERNETES_SERVICE_PORT",
+                                        "value": "6443"
+                                    }
+                                ],
+                                "image": "quay.io/cilium/operator-generic:v1.19.7@sha256:61e773bfc25a448f1ad3ead605af94b3ef176ba2925cf4bd1b11e09794b72bed",
+                                "imagePullPolicy": "IfNotPresent",
+                                "livenessProbe": {
+                                    "failureThreshold": 3,
+                                    "httpGet": {
+                                        "host": "127.0.0.1",
+                                        "path": "/healthz",
+                                        "port": "health",
+                                        "scheme": "HTTP"
+                                    },
+                                    "initialDelaySeconds": 60,
+                                    "periodSeconds": 10,
+                                    "successThreshold": 1,
+                                    "timeoutSeconds": 3
+                                },
+                                "name": "cilium-operator",
+                                "ports": [
+                                    {
+                                        "containerPort": 9234,
+                                        "hostPort": 9234,
+                                        "name": "health",
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 9963,
+                                        "hostPort": 9963,
+                                        "name": "prometheus",
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "readinessProbe": {
+                                    "failureThreshold": 5,
+                                    "httpGet": {
+                                        "host": "127.0.0.1",
+                                        "path": "/healthz",
+                                        "port": "health",
+                                        "scheme": "HTTP"
+                                    },
+                                    "periodSeconds": 5,
+                                    "successThreshold": 1,
+                                    "timeoutSeconds": 3
+                                },
+                                "resources": {},
+                                "securityContext": {
+                                    "allowPrivilegeEscalation": false,
+                                    "capabilities": {
+                                        "drop": [
+                                            "ALL"
+                                        ]
+                                    }
+                                },
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "FallbackToLogsOnError",
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/tmp/cilium/config-map",
+                                        "name": "cilium-config-path",
+                                        "readOnly": true
+                                    }
+                                ]
+                            }
+                        ],
+                        "dnsPolicy": "ClusterFirst",
+                        "hostNetwork": true,
+                        "nodeSelector": {
+                            "kubernetes.io/os": "linux"
+                        },
+                        "priorityClassName": "system-cluster-critical",
+                        "restartPolicy": "Always",
+                        "schedulerName": "default-scheduler",
+                        "securityContext": {
+                            "seccompProfile": {
+                                "type": "RuntimeDefault"
+                            }
+                        },
+                        "serviceAccount": "cilium-operator",
+                        "serviceAccountName": "cilium-operator",
+                        "terminationGracePeriodSeconds": 30,
+                        "tolerations": [
+                            {
+                                "key": "node-role.kubernetes.io/control-plane",
+                                "operator": "Exists"
+                            },
+                            {
+                                "key": "node-role.kubernetes.io/master",
+                                "operator": "Exists"
+                            },
+                            {
+                                "key": "node.kubernetes.io/not-ready",
+                                "operator": "Exists"
+                            },
+                            {
+                                "key": "node.cloudprovider.kubernetes.io/uninitialized",
+                                "operator": "Exists"
+                            },
+                            {
+                                "key": "node.cilium.io/agent-not-ready",
+                                "operator": "Exists"
+                            }
+                        ],
+                        "volumes": [
+                            {
+                                "configMap": {
+                                    "defaultMode": 420,
+                                    "name": "cilium-config"
+                                },
+                                "name": "cilium-config-path"
+                            }
+                        ]
+                    }
+                }
+            },
+            "status": {
+                "availableReplicas": 2,
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T17:25:31Z",
+                        "lastUpdateTime": "2026-11-01T17:25:31Z",
+                        "message": "Deployment has minimum availability.",
+                        "reason": "MinimumReplicasAvailable",
+                        "status": "True",
+                        "type": "Available"
+                    },
+                    {
+                        "lastTransitionTime": "2026-11-01T17:24:51Z",
+                        "lastUpdateTime": "2026-11-01T17:25:33Z",
+                        "message": "ReplicaSet \"cilium-operator-7d585b7b46\" has successfully progressed.",
+                        "reason": "NewReplicaSetAvailable",
+                        "status": "True",
+                        "type": "Progressing"
+                    }
+                ],
+                "observedGeneration": 1,
+                "readyReplicas": 2,
+                "replicas": 2,
+                "terminatingReplicas": 0,
+                "updatedReplicas": 2
+            }
+        },
+        {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "annotations": {
+                    "deployment.kubernetes.io/revision": "1"
+                },
+                "creationTimestamp": "2026-11-01T17:24:43Z",
+                "generation": 1,
+                "labels": {
+                    "k8s-app": "kube-dns"
+                },
+                "name": "coredns",
+                "namespace": "kube-system",
+                "resourceVersion": "1364",
+                "uid": "5f05eea6-6a95-40d4-a6d1-eff86a63e29f"
+            },
+            "spec": {
+                "progressDeadlineSeconds": 600,
+                "replicas": 2,
+                "revisionHistoryLimit": 10,
+                "selector": {
+                    "matchLabels": {
+                        "k8s-app": "kube-dns"
+                    }
+                },
+                "strategy": {
+                    "rollingUpdate": {
+                        "maxSurge": "25%",
+                        "maxUnavailable": 1
+                    },
+                    "type": "RollingUpdate"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "k8s-app": "kube-dns"
+                        }
+                    },
+                    "spec": {
+                        "affinity": {
+                            "podAntiAffinity": {
+                                "preferredDuringSchedulingIgnoredDuringExecution": [
+                                    {
+                                        "podAffinityTerm": {
+                                            "labelSelector": {
+                                                "matchExpressions": [
+                                                    {
+                                                        "key": "k8s-app",
+                                                        "operator": "In",
+                                                        "values": [
+                                                            "kube-dns"
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            "topologyKey": "kubernetes.io/hostname"
+                                        },
+                                        "weight": 100
+                                    }
+                                ]
+                            }
+                        },
+                        "containers": [
+                            {
+                                "args": [
+                                    "-conf",
+                                    "/etc/coredns/Corefile"
+                                ],
+                                "image": "registry.k8s.io/coredns/coredns:v1.13.1",
+                                "imagePullPolicy": "IfNotPresent",
+                                "livenessProbe": {
+                                    "failureThreshold": 5,
+                                    "httpGet": {
+                                        "path": "/health",
+                                        "port": "liveness-probe",
+                                        "scheme": "HTTP"
+                                    },
+                                    "initialDelaySeconds": 60,
+                                    "periodSeconds": 10,
+                                    "successThreshold": 1,
+                                    "timeoutSeconds": 5
+                                },
+                                "name": "coredns",
+                                "ports": [
+                                    {
+                                        "containerPort": 53,
+                                        "name": "dns",
+                                        "protocol": "UDP"
+                                    },
+                                    {
+                                        "containerPort": 53,
+                                        "name": "dns-tcp",
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 9153,
+                                        "name": "metrics",
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 8080,
+                                        "name": "liveness-probe",
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 8181,
+                                        "name": "readiness-probe",
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "readinessProbe": {
+                                    "failureThreshold": 3,
+                                    "httpGet": {
+                                        "path": "/ready",
+                                        "port": "readiness-probe",
+                                        "scheme": "HTTP"
+                                    },
+                                    "periodSeconds": 10,
+                                    "successThreshold": 1,
+                                    "timeoutSeconds": 1
+                                },
+                                "resources": {
+                                    "limits": {
+                                        "memory": "170Mi"
+                                    },
+                                    "requests": {
+                                        "cpu": "100m",
+                                        "memory": "70Mi"
+                                    }
+                                },
+                                "securityContext": {
+                                    "allowPrivilegeEscalation": false,
+                                    "capabilities": {
+                                        "add": [
+                                            "NET_BIND_SERVICE"
+                                        ],
+                                        "drop": [
+                                            "ALL"
+                                        ]
+                                    },
+                                    "readOnlyRootFilesystem": true
+                                },
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File",
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/etc/coredns",
+                                        "name": "config-volume",
+                                        "readOnly": true
+                                    }
+                                ]
+                            }
+                        ],
+                        "dnsPolicy": "Default",
+                        "nodeSelector": {
+                            "kubernetes.io/os": "linux"
+                        },
+                        "priorityClassName": "system-cluster-critical",
+                        "restartPolicy": "Always",
+                        "schedulerName": "default-scheduler",
+                        "securityContext": {},
+                        "serviceAccount": "coredns",
+                        "serviceAccountName": "coredns",
+                        "terminationGracePeriodSeconds": 30,
+                        "tolerations": [
+                            {
+                                "key": "CriticalAddonsOnly",
+                                "operator": "Exists"
+                            },
+                            {
+                                "effect": "NoSchedule",
+                                "key": "node-role.kubernetes.io/control-plane"
+                            }
+                        ],
+                        "volumes": [
+                            {
+                                "configMap": {
+                                    "defaultMode": 420,
+                                    "items": [
+                                        {
+                                            "key": "Corefile",
+                                            "path": "Corefile"
+                                        }
+                                    ],
+                                    "name": "coredns"
+                                },
+                                "name": "config-volume"
+                            }
+                        ]
+                    }
+                }
+            },
+            "status": {
+                "availableReplicas": 2,
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T17:25:54Z",
+                        "lastUpdateTime": "2026-11-01T17:25:54Z",
+                        "message": "Deployment has minimum availability.",
+                        "reason": "MinimumReplicasAvailable",
+                        "status": "True",
+                        "type": "Available"
+                    },
+                    {
+                        "lastTransitionTime": "2026-11-01T17:24:51Z",
+                        "lastUpdateTime": "2026-11-01T17:25:54Z",
+                        "message": "ReplicaSet \"coredns-7d764666f9\" has successfully progressed.",
+                        "reason": "NewReplicaSetAvailable",
+                        "status": "True",
+                        "type": "Progressing"
+                    }
+                ],
+                "observedGeneration": 1,
+                "readyReplicas": 2,
+                "replicas": 2,
+                "terminatingReplicas": 0,
+                "updatedReplicas": 2
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

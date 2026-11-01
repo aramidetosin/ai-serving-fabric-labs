@@ -1,0 +1,37 @@
+Last login: Sun Nov  1 18:11:17 2026 from 172.21.40.1
+set cli pager off
+show running nat-policy
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show running 
+admin@fw> show running nat-policy
+
+Nat policy configured on vsys1:
+"internet-snat; index: 1" {
+        nat-type ipv4;
+        from [ k8s-nodes services ];
+        source any;
+        source-region none;
+        to uplink;
+        to-interface  ;
+        destination any;
+        destination-region none;
+        service 0:any/any/any;
+        translate-to "src: ethernet1/5 198.51.100.2 (dynamic-ip-and-port) (pool idx: 1)";
+        terminal no;
+}
+
+
+
+admin@fw> exit

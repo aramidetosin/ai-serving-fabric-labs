@@ -1,0 +1,1158 @@
+### 2026-11-01T18:07:44Z ent-client container
++ python3 - 10.20.11.210 llm.ai.tarnwick.example /echo?msg=sfab-ch04-enterprise 42443 30 /shared/ca/root.crt < common/trace/hold_request.py (started)
+
+### 2026-11-01T18:07:55Z fw panos-cli
+Last login: Sun Nov  1 18:07:27 2026 from 172.21.40.1
+set cli pager off
+show session all filter source 10.24.10.10 source-port 42443
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show session 
+admin@fw> show session all 
+admin@fw> show session all filter 
+admin@fw> show session all filter source 
+admin@fw> show session all filter source 10.24.10.10 
+admin@fw> show session all filter source 10.24.10.10 source-port 
+admin@fw> show session all filter source 10.24.10.10 source-port 42443
+
+--------------------------------------------------------------------------------
+ID          Application    State   Type Flag  Src[Sport]/Zone/Proto (translated IP[Port])
+Vsys                                          Dst[Dport]/Zone (translated IP[Port])
+--------------------------------------------------------------------------------
+1230         ssl            ACTIVE  FLOW       10.24.10.10[42443]/enterprise/6  (10.24.10.10[42443])
+vsys1                                          10.20.11.210[443]/ingress  (10.20.11.210[443])
+admin@fw> exit
+
+### 2026-11-01T18:07:55Z fw xml-api
++ GET /api/?type=op&cmd=<show><session><all><filter><source>10.24.10.10</source><source-port>42443</source-port></filter></all></session></show>
+<response status="success"><result>
+  <entry>
+    <dst>10.20.11.210</dst>
+    <xsource>10.24.10.10</xsource>
+    <source>10.24.10.10</source>
+    <xdst>10.20.11.210</xdst>
+    <xsport>42443</xsport>
+    <xdport>443</xdport>
+    <sport>42443</sport>
+    <dport>443</dport>
+    <proto>6</proto>
+    <from>enterprise</from>
+    <to>ingress</to>
+    <start-time>Sun Nov  1 18:07:44 2026</start-time>
+    <nat>False</nat>
+    <srcnat>False</srcnat>
+    <dstnat>False</dstnat>
+    <proxy>False</proxy>
+    <decrypt-mirror>False</decrypt-mirror>
+    <state>ACTIVE</state>
+    <type>FLOW</type>
+    <total-byte-count>3761</total-byte-count>
+    <idx>1230</idx>
+    <vsys-idx>1</vsys-idx>
+    <vsys>vsys1</vsys>
+    <application>ssl</application>
+    <security-rule>staff-to-users-gateway</security-rule>
+    <ingress>ethernet1/4</ingress>
+    <egress>ae1.110</egress>
+    <flags>   </flags>
+  </entry>
+</result></response>
+
+### 2026-11-01T18:08:06Z fw panos-cli
+Last login: Sun Nov  1 18:07:47 2026 from 172.21.40.1
+set cli pager off
+show session id 1230
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show session 
+admin@fw> show session id 
+admin@fw> show session id 1230
+
+Session            1230
+
+        c2s flow:
+                source:      10.24.10.10 [enterprise]
+                dst:         10.20.11.210
+                proto:       6
+                sport:       42443           dport:      443
+                state:       ACTIVE          type:       FLOW
+                src user:    unknown
+                dst user:    unknown
+
+        s2c flow:
+                source:      10.20.11.210 [ingress]
+                dst:         10.24.10.10
+                proto:       6
+                sport:       443             dport:      42443
+                state:       ACTIVE          type:       FLOW
+                src user:    unknown
+                dst user:    unknown
+
+        start time                           : Sun Nov  1 18:07:44 2026
+        timeout                              : 1800 sec
+        time to live                         : 1779 sec 
+        total byte count(c2s)                : 1294
+        total byte count(s2c)                : 2467
+        layer7 packet count(c2s)             : 8
+        layer7 packet count(s2c)             : 7
+        vsys                                 : vsys1
+        application                          : ssl  
+        rule                                 : staff-to-users-gateway
+        service timeout override(index)      : False
+        session is promoted                  : False
+        session to be logged at end          : True
+        session in session ager              : True
+        session updated by HA peer           : False
+        layer7 processing                    : completed
+        URL filtering enabled                : False
+        session via syn-cookies              : False
+        session terminated on host           : False
+        session traverses tunnel             : False
+        session terminate tunnel             : False
+        captive portal session               : False
+        ingress interface                    : ethernet1/4
+        egress interface                     : ae1.110
+        session QoS rule                     : N/A (class 4)
+        tracker stage l7proc                 : ctd decoder done
+        end-reason                           : unknown
+admin@fw> exit
+
+### 2026-11-01T18:08:07Z fw xml-api
++ GET /api/?type=op&cmd=<show><session><id>1230</id></session></show>
+<response status="success"><result>
+  <slot>1</slot>
+  <cpu>0</cpu>
+  <c2s>
+    <source>10.24.10.10</source>
+    <dst>10.20.11.210</dst>
+    <proto>6</proto>
+    <sport>42443</sport>
+    <dport>443</dport>
+    <type>FLOW</type>
+    <state>ACTIVE</state>
+    <ipver>4</ipver>
+    <source-zone>enterprise</source-zone>
+    <src-user>unknown</src-user>
+    <dst-user>unknown</dst-user>
+  </c2s>
+  <s2c>
+    <source>10.20.11.210</source>
+    <dst>10.24.10.10</dst>
+    <proto>6</proto>
+    <sport>443</sport>
+    <dport>42443</dport>
+    <type>FLOW</type>
+    <state>ACTIVE</state>
+    <ipver>4</ipver>
+    <source-zone>ingress</source-zone>
+    <src-user>unknown</src-user>
+    <dst-user>unknown</dst-user>
+  </s2c>
+  <start-time>Sun Nov  1 18:07:44 2026</start-time>
+  <vsys>vsys1</vsys>
+  <application>ssl</application>
+  <l7proc>ctd decoder done</l7proc>
+  <end-reason>unknown</end-reason>
+  <pktlog-up>1793553409</pktlog-up>
+  <pansys-up>3077</pansys-up>
+  <timeout>1800</timeout>
+  <timestamp>3055</timestamp>
+  <time-start>3055</time-start>
+  <c2s-packets>8</c2s-packets>
+  <c2s-octets>1294</c2s-octets>
+  <s2c-packets>7</s2c-packets>
+  <s2c-octets>2467</s2c-octets>
+  <prxy-started>False</prxy-started>
+  <prxy-wait-ssl>False</prxy-wait-ssl>
+  <app-insufficient>False</app-insufficient>
+  <sess-promoted>False</sess-promoted>
+  <sess-log>True</sess-log>
+  <sess-ager>True</sess-ager>
+  <sess-ha-sync>False</sess-ha-sync>
+  <rule>staff-to-users-gateway</rule>
+  <override>False</override>
+  <flow-type>0</flow-type>
+  <l7-proc>completed</l7-proc>
+  <src-user-invalid>False</src-user-invalid>
+  <session-rematched>False</session-rematched>
+  <url-en>False</url-en>
+  <syncookie>False</syncookie>
+  <host-session>False</host-session>
+  <tunnel-session>False</tunnel-session>
+  <tunnel-termination>False</tunnel-termination>
+  <captive-portal>False</captive-portal>
+  <igr-if>ethernet1/4</igr-if>
+  <egr-if>ae1.110</egr-if>
+  <qos-class>4</qos-class>
+  <qos-rule>N/A</qos-rule>
+  <ttl>1778</ttl>
+  <prxy-status/>
+</result></response>
+
+### 2026-11-01T18:08:14Z ent-client container
++ hold_request.py 10.20.11.210 llm.ai.tarnwick.example (finished)
+HTTP/1.1 200 OK
+date: Sun, 01 Nov 2026 18:07:44 GMT
+content-length: 20
+content-type: text/plain; charset=utf-8
+x-envoy-upstream-service-time: 5
+server: envoy
+
+sfab-ch04-enterprise
+HELD 1793556464.614013
+CLOSED 1793556494.614368
+
+### 2026-11-01T18:08:25Z fw panos-cli
+Last login: Sun Nov  1 18:07:58 2026 from 172.21.40.1
+set cli pager off
+show log traffic direction equal backward receive_time in last-15-minutes dport equal 443
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show log 
+admin@fw> show log traffic 
+admin@fw> show log traffic direction 
+admin@fw> show log traffic direction equal 
+admin@fw> show log traffic direction equal backward 
+admin@fw> show log traffic direction equal backward receive_time 
+admin@fw> show log traffic direction equal backward receive_time in 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 443
+Time                App             From                            Src Port          Source
+Rule                Action          To                              Dst Port          Destination
+Src User        Dst User                        End Reason
+Rule_UUid
+====================================================================================================
+2026/11/01 17:59:46 not-applicable  operator-vpn                    46252             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:45 not-applicable  operator-vpn                    46252             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:44 not-applicable  operator-vpn                    46252             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:43 not-applicable  operator-vpn                    46252             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:04 ssl             bastion                         49372             10.20.3.10
+bastion-to-firewall allow           bastion                         443               10.20.3.1
+                                                tcp-fin
+47304342-c130-4f1c-be3e-75b8a4eaf685
+2026/11/01 17:59:03 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:01 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:00 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:59 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:58 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:57 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:56 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:38 not-applicable  k8s-nodes                       34704             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:37 not-applicable  k8s-nodes                       34704             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:36 not-applicable  k8s-nodes                       34704             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:35 not-applicable  k8s-nodes                       34704             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:04 incomplete      enterprise                      38103             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-fin
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:58:03 incomplete      enterprise                      39187             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-fin
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:58:02 incomplete      enterprise                      33063             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-fin
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:54:49 ssl             enterprise                      51114             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:54:49 ssl             enterprise                      51110             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:54:40 ssl             operator-vpn                    33292             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+22fb14ec-ab4c-4e0c-8753-4d667868f759
+2026/11/01 17:54:40 ssl             operator-vpn                    33284             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+22fb14ec-ab4c-4e0c-8753-4d667868f759
+2026/11/01 17:54:32 ssl             bastion                         59070             10.20.3.10
+bastion-to-stor-mgm allow           stor-mgmt                       443               10.20.2.31
+                                                tcp-fin
+bb58ebd1-ff64-40eb-ad72-41ea45ef557d
+admin@fw> exit
+
+### 2026-11-01T18:08:46Z fw panos-cli
+Last login: Sun Nov  1 18:08:16 2026 from 172.21.40.1
+set cli pager off
+show log traffic direction equal backward receive_time in last-15-minutes dport equal 443
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show log 
+admin@fw> show log traffic 
+admin@fw> show log traffic direction 
+admin@fw> show log traffic direction equal 
+admin@fw> show log traffic direction equal backward 
+admin@fw> show log traffic direction equal backward receive_time 
+admin@fw> show log traffic direction equal backward receive_time in 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 443
+Time                App             From                            Src Port          Source
+Rule                Action          To                              Dst Port          Destination
+Src User        Dst User                        End Reason
+Rule_UUid
+====================================================================================================
+2026/11/01 18:08:29 ssl             enterprise                      42443             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:59:46 not-applicable  operator-vpn                    46252             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:45 not-applicable  operator-vpn                    46252             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:44 not-applicable  operator-vpn                    46252             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:43 not-applicable  operator-vpn                    46252             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:04 ssl             bastion                         49372             10.20.3.10
+bastion-to-firewall allow           bastion                         443               10.20.3.1
+                                                tcp-fin
+47304342-c130-4f1c-be3e-75b8a4eaf685
+2026/11/01 17:59:03 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:01 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:00 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:59 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:58 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:57 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:56 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:38 not-applicable  k8s-nodes                       34704             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:37 not-applicable  k8s-nodes                       34704             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:36 not-applicable  k8s-nodes                       34704             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:35 not-applicable  k8s-nodes                       34704             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:04 incomplete      enterprise                      38103             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-fin
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:58:03 incomplete      enterprise                      39187             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-fin
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:58:02 incomplete      enterprise                      33063             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-fin
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:54:49 ssl             enterprise                      51114             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:54:49 ssl             enterprise                      51110             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:54:40 ssl             operator-vpn                    33292             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+22fb14ec-ab4c-4e0c-8753-4d667868f759
+2026/11/01 17:54:40 ssl             operator-vpn                    33284             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+22fb14ec-ab4c-4e0c-8753-4d667868f759
+2026/11/01 17:54:32 ssl             bastion                         59070             10.20.3.10
+bastion-to-stor-mgm allow           stor-mgmt                       443               10.20.2.31
+                                                tcp-fin
+bb58ebd1-ff64-40eb-ad72-41ea45ef557d
+admin@fw> exit
+
+### 2026-11-01T18:08:46Z ops-client container
++ python3 - 10.20.11.200 llm.ai.tarnwick.example /echo?msg=sfab-ch04-operator 42444 30 /shared/ca/root.crt < common/trace/hold_request.py (started)
+
+### 2026-11-01T18:08:57Z fw panos-cli
+Last login: Sun Nov  1 18:08:37 2026 from 172.21.40.1
+set cli pager off
+show session all filter source 192.0.2.2 source-port 42444
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show session 
+admin@fw> show session all 
+admin@fw> show session all filter 
+admin@fw> show session all filter source 
+admin@fw> show session all filter source 192.0.2.2 
+admin@fw> show session all filter source 192.0.2.2 source-port 
+admin@fw> show session all filter source 192.0.2.2 source-port 42444
+
+--------------------------------------------------------------------------------
+ID          Application    State   Type Flag  Src[Sport]/Zone/Proto (translated IP[Port])
+Vsys                                          Dst[Dport]/Zone (translated IP[Port])
+--------------------------------------------------------------------------------
+1328         ssl            ACTIVE  FLOW       192.0.2.2[42444]/operator-vpn/6  (192.0.2.2[42444])
+vsys1                                          10.20.11.200[443]/ingress  (10.20.11.200[443])
+admin@fw> exit
+
+### 2026-11-01T18:08:57Z fw xml-api
++ GET /api/?type=op&cmd=<show><session><all><filter><source>192.0.2.2</source><source-port>42444</source-port></filter></all></session></show>
+<response status="success"><result>
+  <entry>
+    <dst>10.20.11.200</dst>
+    <xsource>192.0.2.2</xsource>
+    <source>192.0.2.2</source>
+    <xdst>10.20.11.200</xdst>
+    <xsport>42444</xsport>
+    <xdport>443</xdport>
+    <sport>42444</sport>
+    <dport>443</dport>
+    <proto>6</proto>
+    <from>operator-vpn</from>
+    <to>ingress</to>
+    <start-time>Sun Nov  1 18:08:46 2026</start-time>
+    <nat>False</nat>
+    <srcnat>False</srcnat>
+    <dstnat>False</dstnat>
+    <proxy>False</proxy>
+    <decrypt-mirror>False</decrypt-mirror>
+    <state>ACTIVE</state>
+    <type>FLOW</type>
+    <total-byte-count>3614</total-byte-count>
+    <idx>1328</idx>
+    <vsys-idx>1</vsys-idx>
+    <vsys>vsys1</vsys>
+    <application>ssl</application>
+    <security-rule>operator-to-internal-gateway</security-rule>
+    <ingress>tunnel.1</ingress>
+    <egress>ae1.110</egress>
+    <flags>   </flags>
+  </entry>
+</result></response>
+
+### 2026-11-01T18:09:08Z fw panos-cli
+Last login: Sun Nov  1 18:08:49 2026 from 172.21.40.1
+set cli pager off
+show session id 1328
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show session 
+admin@fw> show session id 
+admin@fw> show session id 1328
+
+Session            1328
+
+        c2s flow:
+                source:      192.0.2.2 [operator-vpn]
+                dst:         10.20.11.200
+                proto:       6
+                sport:       42444           dport:      443
+                state:       ACTIVE          type:       FLOW
+                src user:    unknown
+                dst user:    unknown
+
+        s2c flow:
+                source:      10.20.11.200 [ingress]
+                dst:         192.0.2.2
+                proto:       6
+                sport:       443             dport:      42444
+                state:       ACTIVE          type:       FLOW
+                src user:    unknown
+                dst user:    unknown
+
+        start time                           : Sun Nov  1 18:08:46 2026
+        timeout                              : 1800 sec
+        time to live                         : 1779 sec 
+        total byte count(c2s)                : 1226
+        total byte count(s2c)                : 2388
+        layer7 packet count(c2s)             : 7
+        layer7 packet count(s2c)             : 6
+        vsys                                 : vsys1
+        application                          : ssl  
+        rule                                 : operator-to-internal-gateway
+        service timeout override(index)      : False
+        session is promoted                  : False
+        session to be logged at end          : True
+        session in session ager              : True
+        session updated by HA peer           : False
+        layer7 processing                    : enabled
+        ctd version                          : 1
+        URL filtering enabled                : False
+        session via syn-cookies              : False
+        session terminated on host           : False
+        session traverses tunnel             : True
+        session terminate tunnel             : False
+        captive portal session               : False
+        ingress interface                    : tunnel.1
+        egress interface                     : ae1.110
+        session QoS rule                     : N/A (class 4)
+        end-reason                           : unknown
+admin@fw> exit
+
+### 2026-11-01T18:09:08Z fw xml-api
++ GET /api/?type=op&cmd=<show><session><id>1328</id></session></show>
+<response status="success"><result>
+  <slot>1</slot>
+  <cpu>0</cpu>
+  <c2s>
+    <source>192.0.2.2</source>
+    <dst>10.20.11.200</dst>
+    <proto>6</proto>
+    <sport>42444</sport>
+    <dport>443</dport>
+    <type>FLOW</type>
+    <state>ACTIVE</state>
+    <ipver>4</ipver>
+    <source-zone>operator-vpn</source-zone>
+    <src-user>unknown</src-user>
+    <dst-user>unknown</dst-user>
+  </c2s>
+  <s2c>
+    <source>10.20.11.200</source>
+    <dst>192.0.2.2</dst>
+    <proto>6</proto>
+    <sport>443</sport>
+    <dport>42444</dport>
+    <type>FLOW</type>
+    <state>ACTIVE</state>
+    <ipver>4</ipver>
+    <source-zone>ingress</source-zone>
+    <src-user>unknown</src-user>
+    <dst-user>unknown</dst-user>
+  </s2c>
+  <start-time>Sun Nov  1 18:08:46 2026</start-time>
+  <vsys>vsys1</vsys>
+  <application>ssl</application>
+  <end-reason>unknown</end-reason>
+  <pktlog-up>1793553409</pktlog-up>
+  <pansys-up>3139</pansys-up>
+  <timeout>1800</timeout>
+  <timestamp>3117</timestamp>
+  <time-start>3117</time-start>
+  <c2s-packets>7</c2s-packets>
+  <c2s-octets>1226</c2s-octets>
+  <s2c-packets>6</s2c-packets>
+  <s2c-octets>2388</s2c-octets>
+  <prxy-started>False</prxy-started>
+  <prxy-wait-ssl>False</prxy-wait-ssl>
+  <app-insufficient>False</app-insufficient>
+  <sess-promoted>False</sess-promoted>
+  <sess-log>True</sess-log>
+  <sess-ager>True</sess-ager>
+  <sess-ha-sync>False</sess-ha-sync>
+  <rule>operator-to-internal-gateway</rule>
+  <override>False</override>
+  <flow-type>0</flow-type>
+  <l7-proc>enabled</l7-proc>
+  <src-user-invalid>False</src-user-invalid>
+  <session-rematched>False</session-rematched>
+  <url-en>False</url-en>
+  <syncookie>False</syncookie>
+  <host-session>False</host-session>
+  <tunnel-session>True</tunnel-session>
+  <tunnel-termination>False</tunnel-termination>
+  <captive-portal>False</captive-portal>
+  <igr-if>tunnel.1</igr-if>
+  <egr-if>ae1.110</egr-if>
+  <qos-class>4</qos-class>
+  <qos-rule>N/A</qos-rule>
+  <ctd-ver>1</ctd-ver>
+  <ctd-proc>True</ctd-proc>
+  <from-ha>False</from-ha>
+  <ctd-pktseq>5</ctd-pktseq>
+  <ctd-q-pkts>0</ctd-q-pkts>
+  <ctd-wqe-fpga>0</ctd-wqe-fpga>
+  <ctd-wqe-fpga-type>none</ctd-wqe-fpga-type>
+  <ctd-appid>15</ctd-appid>
+  <ctd-qual-bm>0</ctd-qual-bm>
+  <ctd-func>0</ctd-func>
+  <ctd-pc>43220</ctd-pc>
+  <ctd-sp>0</ctd-sp>
+  <ctd-fp>0</ctd-fp>
+  <ctd-state>5</ctd-state>
+  <ctd-stateinit>1</ctd-stateinit>
+  <ctd-is-skip>1</ctd-is-skip>
+  <ctd-is-valid-cb>1</ctd-is-valid-cb>
+  <ctd-rexex-appid>15</ctd-rexex-appid>
+  <ctd-skip-char>0</ctd-skip-char>
+  <ttl>1778</ttl>
+  <prxy-status/>
+</result></response>
+
+### 2026-11-01T18:09:16Z ops-client container
++ hold_request.py 10.20.11.200 llm.ai.tarnwick.example (finished)
+HTTP/1.1 200 OK
+date: Sun, 01 Nov 2026 18:08:46 GMT
+content-length: 18
+content-type: text/plain; charset=utf-8
+x-envoy-upstream-service-time: 5
+server: envoy
+
+sfab-ch04-operator
+HELD 1793556526.817369
+CLOSED 1793556556.817973
+
+### 2026-11-01T18:09:27Z fw panos-cli
+Last login: Sun Nov  1 18:08:59 2026 from 172.21.40.1
+set cli pager off
+show log traffic direction equal backward receive_time in last-15-minutes dport equal 443
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show log 
+admin@fw> show log traffic 
+admin@fw> show log traffic direction 
+admin@fw> show log traffic direction equal 
+admin@fw> show log traffic direction equal backward 
+admin@fw> show log traffic direction equal backward receive_time 
+admin@fw> show log traffic direction equal backward receive_time in 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 443
+Time                App             From                            Src Port          Source
+Rule                Action          To                              Dst Port          Destination
+Src User        Dst User                        End Reason
+Rule_UUid
+====================================================================================================
+2026/11/01 18:08:29 ssl             enterprise                      42443             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:59:46 not-applicable  operator-vpn                    46252             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:45 not-applicable  operator-vpn                    46252             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:44 not-applicable  operator-vpn                    46252             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:43 not-applicable  operator-vpn                    46252             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:04 ssl             bastion                         49372             10.20.3.10
+bastion-to-firewall allow           bastion                         443               10.20.3.1
+                                                tcp-fin
+47304342-c130-4f1c-be3e-75b8a4eaf685
+2026/11/01 17:59:03 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:01 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:00 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:59 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:58 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:57 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:56 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:38 not-applicable  k8s-nodes                       34704             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:37 not-applicable  k8s-nodes                       34704             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:36 not-applicable  k8s-nodes                       34704             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:35 not-applicable  k8s-nodes                       34704             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:04 incomplete      enterprise                      38103             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-fin
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:58:03 incomplete      enterprise                      39187             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-fin
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:58:02 incomplete      enterprise                      33063             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-fin
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:54:49 ssl             enterprise                      51114             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:54:49 ssl             enterprise                      51110             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:54:40 ssl             operator-vpn                    33292             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+22fb14ec-ab4c-4e0c-8753-4d667868f759
+2026/11/01 17:54:40 ssl             operator-vpn                    33284             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+22fb14ec-ab4c-4e0c-8753-4d667868f759
+2026/11/01 17:54:32 ssl             bastion                         59070             10.20.3.10
+bastion-to-stor-mgm allow           stor-mgmt                       443               10.20.2.31
+                                                tcp-fin
+bb58ebd1-ff64-40eb-ad72-41ea45ef557d
+admin@fw> exit
+
+### 2026-11-01T18:09:48Z fw panos-cli
+Last login: Sun Nov  1 18:09:18 2026 from 172.21.40.1
+set cli pager off
+show log traffic direction equal backward receive_time in last-15-minutes dport equal 443
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show log 
+admin@fw> show log traffic 
+admin@fw> show log traffic direction 
+admin@fw> show log traffic direction equal 
+admin@fw> show log traffic direction equal backward 
+admin@fw> show log traffic direction equal backward receive_time 
+admin@fw> show log traffic direction equal backward receive_time in 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 443
+Time                App             From                            Src Port          Source
+Rule                Action          To                              Dst Port          Destination
+Src User        Dst User                        End Reason
+Rule_UUid
+====================================================================================================
+2026/11/01 18:09:31 ssl             operator-vpn                    42444             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+22fb14ec-ab4c-4e0c-8753-4d667868f759
+2026/11/01 18:08:29 ssl             enterprise                      42443             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:59:46 not-applicable  operator-vpn                    46252             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:45 not-applicable  operator-vpn                    46252             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:44 not-applicable  operator-vpn                    46252             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:43 not-applicable  operator-vpn                    46252             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.210
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:04 ssl             bastion                         49372             10.20.3.10
+bastion-to-firewall allow           bastion                         443               10.20.3.1
+                                                tcp-fin
+47304342-c130-4f1c-be3e-75b8a4eaf685
+2026/11/01 17:59:03 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:01 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:59:00 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:59 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:58 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:57 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:56 not-applicable  k8s-nodes                       46076             10.20.1.12
+deny-all-log        deny            bastion                         443               10.20.3.1
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:38 not-applicable  k8s-nodes                       34704             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:37 not-applicable  k8s-nodes                       34704             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:36 not-applicable  k8s-nodes                       34704             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:35 not-applicable  k8s-nodes                       34704             10.20.1.12
+deny-all-log        deny            uplink                          443               192.0.2.18
+                                                policy-deny
+b883a377-2858-46c1-902a-b505d3a41819
+2026/11/01 17:58:04 incomplete      enterprise                      38103             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-fin
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:58:03 incomplete      enterprise                      39187             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-fin
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:58:02 incomplete      enterprise                      33063             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-fin
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:54:49 ssl             enterprise                      51114             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+1ec5faad-8505-480d-8842-d8df9a837b3a
+2026/11/01 17:54:49 ssl             enterprise                      51110             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+1ec5faad-8505-480d-8842-d8df9a837b3a
+admin@fw> exit
+
+### 2026-11-01T18:09:48Z fw capture
++ nsenter -t 2412300 -n timeout 300 tcpdump -i eth1 -nn -s 256 -c 5000 -U -w pull/captures/1-fw-ae1-leg1.pcap '(tcp port 5000) or (vlan and (tcp port 5000))'
+
+### 2026-11-01T18:09:48Z fw capture
++ nsenter -t 2412300 -n timeout 300 tcpdump -i eth2 -nn -s 256 -c 5000 -U -w pull/captures/1-fw-ae1-leg2.pcap '(tcp port 5000) or (vlan and (tcp port 5000))'
+
+### 2026-11-01T18:09:48Z fw capture
++ nsenter -t 2412300 -n timeout 300 tcpdump -i eth5 -nn -s 256 -c 5000 -U -w pull/captures/2-fw-ethernet1-5.pcap '(tcp port 5000) or (vlan and (tcp port 5000))'
+
+### 2026-11-01T18:09:56Z k8s-gpu2 guest
++ crictl --runtime-endpoint unix:///run/containerd/containerd.sock pull docker.io/alpine/helm@sha256:e29ba4b553fa9648d0a35a9e29c8744c597a3e400d5574daf0f20a4c3854b852
+Image is up to date for sha256:7a7096e36aa1338d025f11d130fa3c9bb0720f46cf953d5a7c26eec5a306a4a4
+time="2026-11-01T18:09:54Z" level=warning msg="Config \"/etc/crictl.yaml\" does not exist, trying next: \"/usr/bin/crictl.yaml\""
+
+### 2026-11-01T18:10:10Z fw panos-cli
+Last login: Sun Nov  1 18:09:39 2026 from 172.21.40.1
+set cli pager off
+show log traffic direction equal backward receive_time in last-15-minutes dport equal 5000
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show log 
+admin@fw> show log traffic 
+admin@fw> show log traffic direction 
+admin@fw> show log traffic direction equal 
+admin@fw> show log traffic direction equal backward 
+admin@fw> show log traffic direction equal backward receive_time 
+admin@fw> show log traffic direction equal backward receive_time in 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 5000
+Time                App             From                            Src Port          Source
+Rule                Action          To                              Dst Port          Destination
+Src User        Dst User                        End Reason
+Rule_UUid
+====================================================================================================
+2026/11/01 17:55:36 ssl             k8s-nodes                       54648             10.20.1.21
+nodes-to-registry   allow           uplink                          5000              192.0.2.6
+                                                tcp-rst-from-client
+cc902eda-bba0-4e4d-89cb-2d16a86459bb
+2026/11/01 17:55:35 ssl             k8s-nodes                       41322             10.20.1.22
+nodes-to-registry   allow           uplink                          5000              192.0.2.6
+                                                tcp-rst-from-client
+cc902eda-bba0-4e4d-89cb-2d16a86459bb
+admin@fw> exit
+
+### 2026-11-01T18:10:31Z fw panos-cli
+Last login: Sun Nov  1 18:10:01 2026 from 172.21.40.1
+set cli pager off
+show log traffic direction equal backward receive_time in last-15-minutes dport equal 5000
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show log 
+admin@fw> show log traffic 
+admin@fw> show log traffic direction 
+admin@fw> show log traffic direction equal 
+admin@fw> show log traffic direction equal backward 
+admin@fw> show log traffic direction equal backward receive_time 
+admin@fw> show log traffic direction equal backward receive_time in 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 5000
+Time                App             From                            Src Port          Source
+Rule                Action          To                              Dst Port          Destination
+Src User        Dst User                        End Reason
+Rule_UUid
+====================================================================================================
+2026/11/01 18:10:09 ssl             k8s-nodes                       33358             10.20.1.22
+nodes-to-registry   allow           uplink                          5000              192.0.2.6
+                                                tcp-rst-from-client
+cc902eda-bba0-4e4d-89cb-2d16a86459bb
+2026/11/01 17:55:36 ssl             k8s-nodes                       54648             10.20.1.21
+nodes-to-registry   allow           uplink                          5000              192.0.2.6
+                                                tcp-rst-from-client
+cc902eda-bba0-4e4d-89cb-2d16a86459bb
+2026/11/01 17:55:35 ssl             k8s-nodes                       41322             10.20.1.22
+nodes-to-registry   allow           uplink                          5000              192.0.2.6
+                                                tcp-rst-from-client
+cc902eda-bba0-4e4d-89cb-2d16a86459bb
+admin@fw> exit
+
+### 2026-11-01T18:10:52Z fw panos-cli
+Last login: Sun Nov  1 18:10:22 2026 from 172.21.40.1
+set cli pager off
+show log traffic direction equal backward receive_time in last-15-minutes dport equal 5000
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show log 
+admin@fw> show log traffic 
+admin@fw> show log traffic direction 
+admin@fw> show log traffic direction equal 
+admin@fw> show log traffic direction equal backward 
+admin@fw> show log traffic direction equal backward receive_time 
+admin@fw> show log traffic direction equal backward receive_time in 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 5000
+Time                App             From                            Src Port          Source
+Rule                Action          To                              Dst Port          Destination
+Src User        Dst User                        End Reason
+Rule_UUid
+====================================================================================================
+2026/11/01 18:10:39 ssl             k8s-nodes                       33348             10.20.1.22
+nodes-to-registry   allow           uplink                          5000              192.0.2.6
+                                                tcp-rst-from-client
+cc902eda-bba0-4e4d-89cb-2d16a86459bb
+2026/11/01 18:10:39 ssl             k8s-nodes                       33360             10.20.1.22
+nodes-to-registry   allow           uplink                          5000              192.0.2.6
+                                                tcp-rst-from-client
+cc902eda-bba0-4e4d-89cb-2d16a86459bb
+2026/11/01 18:10:38 ssl             k8s-nodes                       43660             10.20.1.22
+nodes-to-registry   allow           uplink                          5000              192.0.2.6
+                                                tcp-rst-from-client
+cc902eda-bba0-4e4d-89cb-2d16a86459bb
+2026/11/01 18:10:09 ssl             k8s-nodes                       33358             10.20.1.22
+nodes-to-registry   allow           uplink                          5000              192.0.2.6
+                                                tcp-rst-from-client
+cc902eda-bba0-4e4d-89cb-2d16a86459bb
+admin@fw> exit
+
+### 2026-11-01T18:10:53Z k8s-gpu2 guest
++ crictl --runtime-endpoint unix:///run/containerd/containerd.sock rmi docker.io/alpine/helm@sha256:e29ba4b553fa9648d0a35a9e29c8744c597a3e400d5574daf0f20a4c3854b852
+Deleted: docker.io/alpine/helm@sha256:e29ba4b553fa9648d0a35a9e29c8744c597a3e400d5574daf0f20a4c3854b852
+time="2026-11-01T18:10:53Z" level=warning msg="Config \"/etc/crictl.yaml\" does not exist, trying next: \"/usr/bin/crictl.yaml\""
+

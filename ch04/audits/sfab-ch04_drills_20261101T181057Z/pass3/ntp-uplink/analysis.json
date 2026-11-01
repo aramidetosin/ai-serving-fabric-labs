@@ -1,0 +1,73 @@
+{
+  "drill": "ntp-uplink",
+  "entry": {
+    "action": "deny",
+    "app": "not-applicable",
+    "dport": "123",
+    "dst": "10.20.13.21",
+    "end_reason": "policy-deny",
+    "from": "uplink",
+    "line": 18,
+    "rule": "deny-all-log",
+    "sport": "123",
+    "src": "198.51.100.2",
+    "time": "2026/11/01 18:38:21",
+    "to": "services"
+  },
+  "fails": 0,
+  "host": {
+    "eth1": 0,
+    "eth2": 0,
+    "eth5": 1
+  },
+  "pass": 3,
+  "problems": [],
+  "restored_entry": {
+    "action": "allow",
+    "app": "ntp-base",
+    "dport": "123",
+    "dst": "10.20.13.21",
+    "end_reason": "aged-out",
+    "from": "services",
+    "line": 14,
+    "rule": "inside-to-ntp",
+    "sport": "123",
+    "src": "10.20.13.1",
+    "time": "2026/11/01 18:40:46",
+    "to": "services"
+  },
+  "title": "the firewall's own NTP and DNS sent from the uplink by their service routes, dropped by deny-all-log",
+  "with": [
+    {
+      "entry": {
+        "action": "deny",
+        "app": "not-applicable",
+        "dport": "53",
+        "dst": "10.20.13.21",
+        "end_reason": "policy-deny",
+        "from": "uplink",
+        "line": 54,
+        "rule": "deny-all-log",
+        "sport": "47251",
+        "src": "198.51.100.2",
+        "time": "2026/11/01 18:38:27",
+        "to": "services"
+      },
+      "restored_entry": {
+        "action": "allow",
+        "app": "dns-base",
+        "dport": "53",
+        "dst": "10.20.13.21",
+        "end_reason": "aged-out",
+        "from": "services",
+        "line": 6,
+        "rule": "inside-to-resolvers",
+        "sport": "47071",
+        "src": "10.20.13.1",
+        "time": "2026/11/01 18:40:57",
+        "to": "services"
+      },
+      "service": "dns"
+    }
+  ]
+}

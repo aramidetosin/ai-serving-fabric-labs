@@ -1,0 +1,146 @@
+# /etc/hosts lines naming sfab-ch04
+###### CLAB-sfab-ch04-START ######
+172.21.40.70	sfab-ch04-inet-registry a32a02813ea7	# Kind: linux
+172.21.40.102	sfab-ch04-k8s-cp2 0bae67ec25ed	# Kind: linux
+172.21.40.111	sfab-ch04-k8s-gpu1 b110f0075e95	# Kind: linux
+172.21.40.61	sfab-ch04-uplink-rtr fc5a00584b1a	# Kind: linux
+172.21.40.50	sfab-ch04-bastion 591f92650feb	# Kind: linux
+172.21.40.58	sfab-ch04-dns-auth2 6cc7b01cbd76	# Kind: linux
+172.21.40.57	sfab-ch04-dns-res1 e69456bba839	# Kind: linux
+172.21.40.101	sfab-ch04-k8s-cp1 5e08500cc2aa	# Kind: linux
+172.21.40.112	sfab-ch04-k8s-gpu2 657abc73687b	# Kind: linux
+172.21.40.104	sfab-ch04-k8s-ingress1 857e85159ac1	# Kind: linux
+172.21.40.84	sfab-ch04-web-client 34c9f09e923c	# Kind: linux
+172.21.40.59	sfab-ch04-dns-res2 b4f1191f8d61	# Kind: linux
+172.21.40.55	sfab-ch04-ent-dns cc0961847f66	# Kind: linux
+172.21.40.103	sfab-ch04-k8s-cp3 90a3e150430c	# Kind: linux
+172.21.40.105	sfab-ch04-k8s-ingress2 7e0012f44ae9	# Kind: linux
+172.21.40.31	sfab-ch04-oob-sw 662ddb9e4c11	# Kind: dell_sonic
+172.21.40.81	sfab-ch04-ops-client edaf65e8c83f	# Kind: linux
+172.21.40.64	sfab-ch04-ops-gw db3571feb0eb	# Kind: linux
+172.21.40.21	sfab-ch04-rail-sw1 2437113194d0	# Kind: dell_sonic
+172.21.40.56	sfab-ch04-dns-auth1 1d9788b936af	# Kind: linux
+172.21.40.82	sfab-ch04-ent-client b4a33defa109	# Kind: linux
+172.21.40.12	sfab-ch04-fe-sw2 d8a94969f5d9	# Kind: dell_sonic
+172.21.40.22	sfab-ch04-rail-sw2 074dc555deb8	# Kind: dell_sonic
+172.21.40.121	sfab-ch04-truenas1 81d333144bbe	# Kind: generic_vm
+172.21.40.11	sfab-ch04-fe-sw1 fa7ee9b2b158	# Kind: dell_sonic
+172.21.40.40	sfab-ch04-fw f4f024aa9b8c	# Kind: paloalto_panos
+172.21.40.63	sfab-ch04-inet-ntp 57e7457c1c87	# Kind: linux
+###### CLAB-sfab-ch04-END ######
+# /etc/ssh/ssh_config.d/clab-sfab-ch04.conf
+# Containerlab SSH Config for the sfab-ch04 lab
+Host sfab-ch04-uplink-rtr fc5a00584b1a
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-bastion 591f92650feb
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-dns-auth2 6cc7b01cbd76
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-dns-res1 e69456bba839
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-k8s-cp1 5e08500cc2aa
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-k8s-gpu2 657abc73687b
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-k8s-ingress1 857e85159ac1
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-web-client 34c9f09e923c
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-dns-res2 b4f1191f8d61
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-ent-dns cc0961847f66
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-k8s-cp3 90a3e150430c
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-k8s-ingress2 7e0012f44ae9
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-oob-sw 662ddb9e4c11
+	User admin
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-ops-client edaf65e8c83f
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-ops-gw db3571feb0eb
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-rail-sw1 2437113194d0
+	User admin
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-dns-auth1 1d9788b936af
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-ent-client b4a33defa109
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-fe-sw2 d8a94969f5d9
+	User admin
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-rail-sw2 074dc555deb8
+	User admin
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-truenas1 81d333144bbe
+	User clab
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-fe-sw1 fa7ee9b2b158
+	User admin
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-fw f4f024aa9b8c
+	User admin
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-inet-ntp 57e7457c1c87
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-inet-registry a32a02813ea7
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-k8s-cp2 0bae67ec25ed
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null
+
+Host sfab-ch04-k8s-gpu1 b110f0075e95
+	StrictHostKeyChecking=no
+	UserKnownHostsFile=/dev/null

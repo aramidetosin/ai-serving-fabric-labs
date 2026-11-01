@@ -1,0 +1,21 @@
+Script started on 2026-11-01 18:45:48+00:00 [COMMAND="make heal-4a" TERM="tmux-256color" TTY="/dev/pts/0" COLUMNS="-1" LINES="-1"]
+PYTHONDONTWRITEBYTECODE=1 python3 /root/sfab/clean/ai-serving-fabric-labs/common/breakheal.py heal 4a
+== heal-4a: the no-translation rule for the public address removed
+  PASS  fw: nat rule no-nat-public set from the render and moved before internet-snat (success: command succeeded)
+  PASS  fw: committed (commit job 23: OK (Configuration committed successfully; Local configuration size: 56 KB; Predefined configuration size: 13 MB; Merged configuration size(local, panorama pushed, predefined): 16 MB; Maximum recommended merged configuration size: 47 MB (34% configured); Warning: Default master-key configured please change to custom master-key))
+== heal-4a: recorded
+  PASS  node-delta, heal, pass 1: 0 of 10 pings from k8s-cp2 to 198.51.100.2 unanswered (recorded)
+  PASS  node-public, heal, pass 1: 0 of 10 pings from k8s-cp2 to 198.51.100.2 unanswered (recorded)
+  PASS  users, heal, pass 1: 0 of 10 requests from ent-client to https://llm.ai.tarnwick.example/echo?msg=sfab-break-4a answered other than 200 (recorded)
+== heal-4a: healed
+  PASS  fw: the running rulebase in the render's order (order: security 25 rules as rendered;order: nat 2 rules as rendered)
+  PASS  node-delta: every ping succeeds (10 of 10)
+  PASS  node-public: every ping succeeds (10 of 10)
+  PASS  fw: flow_policy_nat_land did not rise across node-public's passes
+  PASS  users: every request succeeds (10 of 10)
+== the chapter audit after the heal
+  PASS  audit.sh after the heal: RESULT: 861 passed, 0 failed, 0 known platform limitation(s), 3 skipped (ch04/audits/sfab-ch04_audit_20261101T184755Z)
+== RESULT: 11 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+== result set: ch04/audits/sfab-ch04_heal-4a_20261101T184549Z
+
+Script done on 2026-11-01 19:01:38+00:00 [COMMAND_EXIT_CODE="0"]

@@ -1,0 +1,28 @@
+== /etc/containerd/certs.d/docker.io/hosts.toml
+server = "https://registry-1.docker.io"
+
+[host."https://192.0.2.6:5000/v2/docker.io"]
+  capabilities = ["pull", "resolve"]
+  override_path = true
+  ca = "/shared/ca/root.crt"
+== /etc/containerd/certs.d/ghcr.io/hosts.toml
+server = "https://ghcr.io"
+
+[host."https://192.0.2.6:5000/v2/ghcr.io"]
+  capabilities = ["pull", "resolve"]
+  override_path = true
+  ca = "/shared/ca/root.crt"
+== /etc/containerd/certs.d/quay.io/hosts.toml
+server = "https://quay.io"
+
+[host."https://192.0.2.6:5000/v2/quay.io"]
+  capabilities = ["pull", "resolve"]
+  override_path = true
+  ca = "/shared/ca/root.crt"
+== /etc/containerd/certs.d/registry.k8s.io/hosts.toml
+server = "https://registry.k8s.io"
+
+[host."https://192.0.2.6:5000/v2/registry.k8s.io"]
+  capabilities = ["pull", "resolve"]
+  override_path = true
+  ca = "/shared/ca/root.crt"

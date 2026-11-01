@@ -1,0 +1,14 @@
+  PASS  pass 2 land: flow_policy_nat_land is in this firewall's own show counter global table (6415 counters read)
+  PASS  pass 2 land: with no-nat-public in place, k8s-cp2 (10.20.1.12) reaches 198.51.100.2: 5 of 5 answered
+  PASS  pass 2 land: ... and flow_policy_nat_land did not rise
+  PASS  pass 2 land: without it, 0 of 5 answered: the firewall discards every request
+  PASS  pass 2 land: ... and flow_policy_nat_land rose by 5 while 5 requests were sent
+  PASS  pass 2 land: drop counters that moved during it: flow_fwd_notopology +2, flow_ingress_ifp_lookup_invalid_mode +2, flow_no_interface +2, flow_policy_nat_land +5, flow_rcv_dot1q_tag_err +2 (recorded; not judged)
+  PASS  pass 2 land: show counter global filter delta yes severity drop, read after the probe, lists flow_policy_nat_land +5 (drop-delta-after.txt)
+  PASS  pass 2 land: the receive stage captured 5 frame(s) from 10.20.1.12 to 198.51.100.2 (recorded)
+  PASS  pass 2 land: the drop stage captured 5 frame(s) from 10.20.1.12 to 198.51.100.2 (diag/drop.decode.txt)
+  PASS  pass 2 land: the host-side captures saw 5 requests arrive at the firewall (eth1 5) and 0 replies leave it
+  PASS  pass 2 land: nothing of it left on the uplink (eth5: 0 frames)
+  PASS  pass 2 land: no-nat-public back where the render puts it (before internet-snat): the running rulebase in the render's order
+  PASS  pass 2 land: with it back, 5 of 5 answered
+  PASS  pass 2 land: ... and flow_policy_nat_land did not rise
