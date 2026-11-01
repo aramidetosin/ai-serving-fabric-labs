@@ -520,7 +520,9 @@ class Breaks(unittest.TestCase):
         self.assertEqual(paths, [f"/models/{m.models['chat'].route_id}", f"/models/{m.models['staff'].route_id}"])
         self.assertEqual((p["resource"], p["namespace"], p["name"]), ("httproutes.gateway.networking.k8s.io", "inference", "models-gw-inet"))
         self.assertEqual(len(b["heal"][0]["patch"]["spec"]["rules"]), 1)
-        self.assertEqual(b["expect_broken"][0], {"kind": "cell_mode", "probe": "cells", "cell": "internet/staff", "mode": "404", "not": True})
+        self.assertEqual(b["expect_broken"][0], {"kind": "cell_mode", "probe": "cells", "cell": "internet/staff", "mode": "404", "not": True,
+                                                  "at": "gateway"})
+        self.assertEqual(b["expect_healed"][0]["at"], "gateway")
         rs = b["expect_broken"][1]
         self.assertEqual((rs["kind"], rs["route"], rs["paths"], rs["rendered"]),
                          ("route_set", "models-gw-inet", [f"/models/{m.models['chat'].route_id}"], False))
@@ -528,6 +530,9 @@ class Breaks(unittest.TestCase):
         bad = copy.deepcopy(raw)
         bad["expect_broken"] = [{"cell_mode": {"probe": "cells", "cell": "internet/staff", "mode": "log-line", "rule": "deny-all-log", "not": True}}]
         with self.assertRaisesRegex(RenderError, "no rule to name"):
+            RD._break(c["inv"], "11a", bad, c["m"])
+        bad["expect_broken"] = [{"cell_mode": {"probe": "cells", "cell": "internet/chat", "mode": "allowed", "at": "gateway"}}]
+        with self.assertRaisesRegex(RenderError, "for a 404"):
             RD._break(c["inv"], "11a", bad, c["m"])
         bad["expect_broken"] = [{"route_set": {"route": "models-gw-nowhere", "rendered": True}}]
         with self.assertRaisesRegex(RenderError, "is not one of"):

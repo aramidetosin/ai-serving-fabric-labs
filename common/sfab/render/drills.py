@@ -1648,7 +1648,7 @@ def _dns_break_action(inv: dict, model, kind: str, body, where: str) -> dict:
             _err(f"{where}.matrix_cells.cells", f"each a cell of the lab's matrix, once (not one: {', '.join(bad) or 'a repeat'})")
         return {"kind": "matrix_cells", "id": str(b.get("id") or "cells"), "cells": cells}
     # cell_mode
-    extra = set(b) - {"probe", "cell", "mode", "rule", "not"}
+    extra = set(b) - {"probe", "cell", "mode", "rule", "not", "at"}
     if extra or not b.get("probe") or not b.get("cell") or str(b.get("mode")) not in decisions.MODES or not isinstance(b.get("not", False), bool):
         _err(f"{where}.cell_mode", f"probe: a matrix_cells, cell: one of its cells, mode: one of {', '.join(decisions.MODES)}, rule: for a log line, "
                                    "not: true for any mode but that one")
@@ -1657,6 +1657,12 @@ def _dns_break_action(inv: dict, model, kind: str, body, where: str) -> dict:
         if b.get("rule"):
             _err(f"{where}.cell_mode.not", "a mode other than one: no rule to name")
         out["not"] = True
+    if "at" in b:
+        # at: gateway, a 404 the Gateway's own proxy answered (its route set), told from one an upstream
+        # behind it answered by the response's headers; with not, any answer but that one
+        if b["at"] != "gateway" or out["mode"] != "404":
+            _err(f"{where}.cell_mode.at", "gateway, for a 404: the route set's, answered by the Gateway's own proxy")
+        out["at"] = "gateway"
     if b.get("rule"):
         if out["mode"] != "log-line":
             _err(f"{where}.cell_mode.rule", "names the rule of a log line")

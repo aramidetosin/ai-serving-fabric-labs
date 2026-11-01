@@ -715,6 +715,14 @@ def curl_p3(s, ctr, argv, now):
         if hdr:
             files[hdr] = "HTTP/1.1 200 OK\r\nserver: envoy\r\n\r\n"
         return 0, fmt.replace("%{http_code}", "200").replace("%{remote_ip}", addr).replace("%{local_port}", str(sport)).replace("\\n", "\n")
+    if model is not None and "--data" not in argv and "POST" not in argv:
+        # a GET on a model path the Gateway carries reaches the API gateway, whose routes take POST
+        # alone: APISIX's own 404, behind Envoy (which adds its upstream service time)
+        if hdr:
+            files[hdr] = "HTTP/1.1 404 Not Found\r\nserver: envoy\r\nx-envoy-upstream-service-time: 0\r\n\r\n"
+        if out and out != "/dev/null":
+            files[out] = '{"error_msg":"404 Route Not Found"}'
+        return 0, fmt.replace("%{http_code}", "404").replace("%{remote_ip}", addr).replace("%{local_port}", str(sport)).replace("\\n", "\n")
     if model is not None and (lp is None or cl.get("kind") == "client"):
         # a model request with a caller's key at the API gateway (chapter 7's stand-in decides the
         # answer), logged under the key's caller

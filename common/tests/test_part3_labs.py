@@ -618,7 +618,9 @@ class Break11aTest(BreakMixin, P3LabTest):
 
     def test_break_heal(self):
         vb, vh = self.broke_and_healed("11a")
-        self.assertRegex(vb, r"  PASS  internet/staff: mode \S+.*, not 404")
+        self.assertRegex(vb, r"  PASS  internet/staff: mode 404; .*answered by an upstream behind the Gateway \(x-envoy-upstream-service-time: 0, "
+                             r"body \{\"error_msg\":\"404 Route Not Found\"\}; .*\), not the Gateway's own 404")
+        self.assertRegex(vh, r"  PASS  internet/staff: mode 404; .*answered by the Gateway itself, its route set")
         self.assertRegex(vb, r"  PASS  models-gw-inet: its rules carry .*; beyond its audience's row: /models/")
         self.assertRegex(vh, r"  PASS  models-gw-inet: its rules carry /models/[0-9a-f-]+, the audience's row \(chat\)")
         self.assertRegex(vh, r"  PASS  internet/staff: ")

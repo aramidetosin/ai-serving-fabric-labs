@@ -326,6 +326,13 @@ def cmd_tlogrule(a) -> int:
 # chapter 2: a matrix cell's mode
 
 
+def _read(path: Path) -> str:
+    try:
+        return path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return ""
+
+
 def cmd_cellmode(a) -> int:
     """The mode a cell's evidence shows (common/matrix/matrix.py observe), against the check's mode
     and, for a log line, its rule; prints what it found."""
@@ -353,6 +360,20 @@ def cmd_cellmode(a) -> int:
     elif first.get("remote"):
         what += f"; answered from {first['remote']}"
     good = got == chk["mode"] and (not chk.get("rule") or (first.get("tlog") or {}).get("rule") == chk["rule"][:19])
+    if chk.get("at") == "gateway" and got == "404":
+        # who answered the 404: the Gateway's own proxy (its route set: no upstream service time) or an
+        # upstream behind it (Envoy adds x-envoy-upstream-service-time to an upstream's answer)
+        tag = first.get("tag") or ""
+        hd = _read(Path(a.dir) / "requests" / f"{tag}-headers.txt")
+        body = " ".join(_read(Path(a.dir) / "requests" / f"{tag}-body.txt").split())[:60]
+        up = next((l.strip() for l in hd.splitlines() if l.lower().startswith("x-envoy-upstream-service-time:")), None)
+        what += (f"; answered by an upstream behind the Gateway ({up}" + (f", body {body}" if body else "") + f"; requests/{tag}-headers.txt)"
+                 if up else f"; answered by the Gateway itself, its route set (no upstream service time; requests/{tag}-headers.txt)")
+        good = good and up is None
+    if chk.get("not") and chk.get("at") == "gateway":
+        good = got is not None and not good
+        print(f"{what}, not the Gateway's own {chk['mode']}" if good else f"want any answer but the Gateway's own {chk['mode']}, got {what}")
+        return 0 if good else 1
     if chk.get("not"):
         good = got is not None and got != chk["mode"]
         print(f"{what}, not {chk['mode']}" if good else f"want any mode but {chk['mode']}, got {what}")
