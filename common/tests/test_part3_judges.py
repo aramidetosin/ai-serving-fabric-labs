@@ -91,6 +91,37 @@ class ReadersTest(unittest.TestCase):
         self.assertTrue(T.overlaps(rr[1]["dest"], "10.0.0.0/8"))
         self.assertFalse(T.overlaps(rr[0]["dest"], "10.0.0.0/8"))
 
+    def test_leaked_key_log_line_is_the_new_keys_answered_line(self):
+        # APISIX's file-logger prints the status as a number, after kubectl's pod prefix; only the new
+        # key's consumer counts, not the caller's standing key
+        log = ('[pod/api-gateway-x/apisix] {"route":"chat","consumer":"batch_key_9b271ecf","status":200,"caller":"batch"}\n'
+               '[pod/api-gateway-x/apisix] 10.22.0.108 - - [31/Oct/2026:21:42:30 +0000] "POST /v1/chat/completions" 200\n'
+               '[pod/api-gateway-x/apisix] {"route":"chat","consumer":"batch_key_fb000001","status":401,"caller":"batch"}\n'
+               '[pod/api-gateway-x/apisix] {"route":"chat","consumer":"batch_key_fb000001","status":200,"caller":"batch"}\n')
+        got = p3drill.access_lines(log)
+        self.assertEqual([n for n, _ in got], [1, 3, 4])
+        d = Path(tempfile.mkdtemp())
+        try:
+            (d / "timeline.txt").write_text("10.0 MINT batch.fb000001\n11.0 MINTED batch.fb000001\n13.0 ANSWERED 12.9 200\n"
+                                           "13.1 REVOKE batch.fb000001\n14.0 REVOKED batch.fb000001\n15.0 REFUSED 14.9 401\n")
+            (d / "field.txt").write_text("batch.fb000001\n")
+            (d / "mint.log").write_text("minted batch.fb000001 in Secret inference/api-keys: sha256:0\n")
+            (d / "requests-minted.txt").write_text("12.9 200\n")
+            (d / "requests-revoked.txt").write_text("14.9 401\n")
+            (d / "api-gateway-access.txt").write_text(log)
+            out = io.StringIO()
+            v = vocab.Vocab(verdict="", known=set(), out=out)
+            dr = {"id": "leaked-key", "caller": "batch", "caller_audience": "enterprise", "client": "inet-client",
+                  "client_audience": "internet", "gateway": "gw-inet", "model": "chat"}
+            try:
+                p3drill.analyze_leak(v, dr, d, "1")
+            except (KeyError, OSError, ValueError):
+                pass
+            self.assertIn("  PASS  pass 1 leaked-key: the API gateway's access log names caller batch for it (1 answered line(s) of consumer "
+                          "batch_key_fb000001, the first at api-gateway-access.txt:4)", out.getvalue())
+        finally:
+            shutil.rmtree(d)
+
     def test_matrix_reads_a_table_of_connected_routes_alone(self):
         # the ISP router holds only its connected links: the matrix's silence cells at it read that
         # table as a table, with no route covering an inside address (chapter 11's first recording

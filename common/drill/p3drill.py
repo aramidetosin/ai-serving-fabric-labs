@@ -393,6 +393,23 @@ def asked(text: str) -> list:
     return out
 
 
+def access_lines(text: str) -> list:
+    """[(line number, entry)] of the API gateway's JSON access lines (kubectl logs --prefix puts the
+    pod before each; the status is a number), any other line skipped."""
+    out = []
+    for n, line in enumerate((text or "").splitlines(), 1):
+        i = line.find("{")
+        if i < 0:
+            continue
+        try:
+            x = json.loads(line[i:])
+        except ValueError:
+            continue
+        if isinstance(x, dict):
+            out.append((n, x))
+    return out
+
+
 def analyze_leak(v, dr: dict, d: Path, pas: str) -> dict:
     lab = f"pass {pas} {dr['id']}"
     tl = timeline(d)
@@ -409,9 +426,12 @@ def analyze_leak(v, dr: dict, d: Path, pas: str) -> dict:
             f"HTTP 200{when}: no network layer refuses it, the caller's key is not bound to a Gateway", ok is not None,
             f"{len(got)} request(s), the last {got[-1][1] if got else 'none'}")
     log = read(d / "api-gateway-access.txt")
-    hit = [l for l in log.splitlines() if f'"caller":"{dr["caller"]}"' in l.replace(" ", "") and '"status":"200"' in l.replace(" ", "")]
-    v.check(f"{lab}: the API gateway's access log names caller {dr['caller']} for it ({len(hit)} answered line(s)): the log says who, the "
-            "Gateway says from where", bool(hit), "no answered line names the caller")
+    hit = [n for n, x in access_lines(log) if x.get("caller") == dr["caller"] and str(x.get("status")) == "200"
+           and str(x.get("consumer") or "").endswith("_" + field.split(".", 1)[-1])]
+    first = f", the first at api-gateway-access.txt:{hit[0]}" if hit else ""
+    v.check(f"{lab}: the API gateway's access log names caller {dr['caller']} for it ({len(hit)} answered line(s) of consumer "
+            f"{dr['caller']}_key_{field.split('.', 1)[-1]}{first}): the log says who, the Gateway says from where", bool(hit),
+            "no answered line names the caller with this key")
     tr = (tl.get("REVOKED") or (None,))[0]
     after = asked(read(d / "requests-revoked.txt"))
     code = str((dr.get("rejected") or {}).get("code", 401))

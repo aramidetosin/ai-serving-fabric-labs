@@ -1007,7 +1007,7 @@ def kube_p3(s, cmd, stdin, now):
             for p_ in pods[:1]:
                 lines.append(f"[pod/{p_}/apisix] " + json.dumps({"time": a["time"], "client": "10.22.9.7", "host": f"llm.{W7.DOMAIN}",
                                                                  "route": a["route"], "request": f"POST {paths.get(a['route'], '/models')}/v1/chat/completions",
-                                                                 "status": a["status"], "consumer": a["consumer"], "caller": a["caller"]}))
+                                                                 "status": int(a["status"]), "consumer": a["consumer"], "caller": a["caller"]}))
         return 0, "\n".join(lines)
     if words[:2] == ["get", "pods"] and ns == "kube-system" and W.opt(args, "-l") == "k8s-app=cilium":
         # one Cilium agent pod a node of the cluster
