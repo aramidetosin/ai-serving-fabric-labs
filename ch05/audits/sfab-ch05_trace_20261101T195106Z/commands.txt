@@ -1,0 +1,253 @@
+### 2026-11-01T19:51:08Z k8s-gpu1 guest
++ ip netns exec gpu1 ping -c 2 -i 0.5 -W 2 10.21.1.12
+PING 10.21.1.12 (10.21.1.12) 56(84) bytes of data.
+64 bytes from 10.21.1.12: icmp_seq=1 ttl=64 time=1.42 ms
+64 bytes from 10.21.1.12: icmp_seq=2 ttl=64 time=1.86 ms
+
+--- 10.21.1.12 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 501ms
+rtt min/avg/max/mdev = 1.423/1.642/1.862/0.219 ms
+
+### 2026-11-01T19:51:09Z k8s-gpu1 guest
++ ip netns exec gpu2 ping -c 2 -i 0.5 -W 2 10.21.2.12
+PING 10.21.2.12 (10.21.2.12) 56(84) bytes of data.
+64 bytes from 10.21.2.12: icmp_seq=1 ttl=64 time=1.47 ms
+64 bytes from 10.21.2.12: icmp_seq=2 ttl=64 time=1.83 ms
+
+--- 10.21.2.12 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 501ms
+rtt min/avg/max/mdev = 1.468/1.646/1.825/0.178 ms
+
+### 2026-11-01T19:51:10Z k8s-gpu1 guest
++ ip netns exec gpu3 ping -c 2 -i 0.5 -W 2 10.21.3.12
+PING 10.21.3.12 (10.21.3.12) 56(84) bytes of data.
+64 bytes from 10.21.3.12: icmp_seq=1 ttl=64 time=1.51 ms
+64 bytes from 10.21.3.12: icmp_seq=2 ttl=64 time=1.31 ms
+
+--- 10.21.3.12 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 501ms
+rtt min/avg/max/mdev = 1.310/1.411/1.513/0.101 ms
+
+### 2026-11-01T19:51:11Z k8s-gpu1 guest
++ ip netns exec gpu4 ping -c 2 -i 0.5 -W 2 10.21.4.12
+PING 10.21.4.12 (10.21.4.12) 56(84) bytes of data.
+64 bytes from 10.21.4.12: icmp_seq=1 ttl=64 time=1.43 ms
+64 bytes from 10.21.4.12: icmp_seq=2 ttl=64 time=1.95 ms
+
+--- 10.21.4.12 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 501ms
+rtt min/avg/max/mdev = 1.430/1.692/1.954/0.262 ms
+
+### 2026-11-01T19:51:12Z k8s-gpu1 guest
++ ip netns exec gpu5 ping -c 2 -i 0.5 -W 2 10.21.5.12
+PING 10.21.5.12 (10.21.5.12) 56(84) bytes of data.
+64 bytes from 10.21.5.12: icmp_seq=1 ttl=64 time=1.77 ms
+64 bytes from 10.21.5.12: icmp_seq=2 ttl=64 time=1.62 ms
+
+--- 10.21.5.12 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 502ms
+rtt min/avg/max/mdev = 1.615/1.693/1.771/0.078 ms
+
+### 2026-11-01T19:51:13Z k8s-gpu1 guest
++ ip netns exec gpu6 ping -c 2 -i 0.5 -W 2 10.21.6.12
+PING 10.21.6.12 (10.21.6.12) 56(84) bytes of data.
+64 bytes from 10.21.6.12: icmp_seq=1 ttl=64 time=1.45 ms
+64 bytes from 10.21.6.12: icmp_seq=2 ttl=64 time=1.59 ms
+
+--- 10.21.6.12 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 501ms
+rtt min/avg/max/mdev = 1.448/1.520/1.592/0.072 ms
+
+### 2026-11-01T19:51:14Z k8s-gpu1 guest
++ ip netns exec gpu7 ping -c 2 -i 0.5 -W 2 10.21.7.12
+PING 10.21.7.12 (10.21.7.12) 56(84) bytes of data.
+64 bytes from 10.21.7.12: icmp_seq=1 ttl=64 time=1.61 ms
+64 bytes from 10.21.7.12: icmp_seq=2 ttl=64 time=1.80 ms
+
+--- 10.21.7.12 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 501ms
+rtt min/avg/max/mdev = 1.610/1.705/1.801/0.095 ms
+
+### 2026-11-01T19:51:15Z k8s-gpu1 guest
++ ip netns exec gpu8 ping -c 2 -i 0.5 -W 2 10.21.8.12
+PING 10.21.8.12 (10.21.8.12) 56(84) bytes of data.
+64 bytes from 10.21.8.12: icmp_seq=1 ttl=64 time=1.38 ms
+64 bytes from 10.21.8.12: icmp_seq=2 ttl=64 time=1.30 ms
+
+--- 10.21.8.12 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 501ms
+rtt min/avg/max/mdev = 1.302/1.342/1.383/0.040 ms
+
+### 2026-11-01T19:51:16Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-captures-1-k8s-gpu1-relay0.pcap /tmp/sfab-rail-captures-1-k8s-gpu1-relay0.txt; exec timeout 300 tcpdump -i relay0 -nn -s 256 -U -w /tmp/sfab-rail-captures-1-k8s-gpu1-relay0.pcap 'icmp' &
+
+
+### 2026-11-01T19:51:16Z rail-sw1 capture
++ nsenter -t 570896 -n timeout 300 tcpdump -i eth1 -nn -s 256 -U -w captures/2-rail-sw1-Ethernet0.pcap 'icmp'
+
+### 2026-11-01T19:51:16Z rail-sw2 capture
++ nsenter -t 570917 -n timeout 300 tcpdump -i eth1 -nn -s 256 -U -w captures/2-rail-sw2-Ethernet0.pcap 'icmp'
+
+### 2026-11-01T19:51:16Z rail-sw1 capture
++ nsenter -t 570896 -n timeout 300 tcpdump -i eth5 -nn -s 256 -U -w captures/3-rail-sw1-Ethernet4.pcap 'icmp'
+
+### 2026-11-01T19:51:16Z rail-sw2 capture
++ nsenter -t 570917 -n timeout 300 tcpdump -i eth5 -nn -s 256 -U -w captures/3-rail-sw2-Ethernet4.pcap 'icmp'
+
+### 2026-11-01T19:51:17Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-captures-4-k8s-gpu2-relay0.pcap /tmp/sfab-rail-captures-4-k8s-gpu2-relay0.txt; exec timeout 300 tcpdump -i relay0 -nn -s 256 -U -w /tmp/sfab-rail-captures-4-k8s-gpu2-relay0.pcap 'icmp' &
+
+
+### 2026-11-01T19:51:22Z k8s-gpu1 guest
++ ip netns exec gpu1 ping -c 3 -i 0.5 -W 2 -e 5101 10.21.1.12
+PING 10.21.1.12 (10.21.1.12) 56(84) bytes of data.
+64 bytes from 10.21.1.12: icmp_seq=1 ttl=64 time=1.79 ms
+64 bytes from 10.21.1.12: icmp_seq=2 ttl=64 time=1.82 ms
+64 bytes from 10.21.1.12: icmp_seq=3 ttl=64 time=1.86 ms
+
+--- 10.21.1.12 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 1.790/1.822/1.862/0.029 ms
+
+### 2026-11-01T19:51:24Z k8s-gpu1 guest
++ ip netns exec gpu1 ping -c 3 -i 0.5 -W 2 -e 5102 10.21.2.12
+PING 10.21.2.12 (10.21.2.12) 56(84) bytes of data.
+64 bytes from 10.21.2.12: icmp_seq=1 ttl=63 time=2.13 ms
+64 bytes from 10.21.2.12: icmp_seq=2 ttl=63 time=2.08 ms
+64 bytes from 10.21.2.12: icmp_seq=3 ttl=63 time=2.30 ms
+
+--- 10.21.2.12 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 2.075/2.167/2.297/0.094 ms
+
+### 2026-11-01T19:51:27Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-captures-1-k8s-gpu1-relay0.pcap > /tmp/sfab-rail-captures-1-k8s-gpu1-relay0.txt 2>&1; wc -l < /tmp/sfab-rail-captures-1-k8s-gpu1-relay0.txt
+7
+
+### 2026-11-01T19:51:30Z k8s-gpu2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-captures-4-k8s-gpu2-relay0.pcap > /tmp/sfab-rail-captures-4-k8s-gpu2-relay0.txt 2>&1; wc -l < /tmp/sfab-rail-captures-4-k8s-gpu2-relay0.txt
+7
+
+### 2026-11-01T19:51:32Z k8s-gpu1 guest
++ ip netns exec gpu1 traceroute -n -w 2 -q 3 -m 4 10.21.1.12
+traceroute to 10.21.1.12 (10.21.1.12), 4 hops max, 60 byte packets
+ 1  10.21.1.12  2.880 ms  2.806 ms  2.740 ms
+
+### 2026-11-01T19:51:33Z k8s-gpu1 guest
++ ip netns exec gpu1 traceroute -n -w 2 -q 3 -m 4 10.21.2.12
+traceroute to 10.21.2.12 (10.21.2.12), 4 hops max, 60 byte packets
+ 1  10.21.2.11  0.082 ms  0.026 ms  0.045 ms
+ 2  10.21.2.12  2.738 ms  2.661 ms  2.606 ms
+
+### 2026-11-01T19:51:34Z k8s-gpu1 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-captures-df-1-k8s-gpu1-relay0.pcap /tmp/sfab-rail-captures-df-1-k8s-gpu1-relay0.txt; exec timeout 300 tcpdump -i relay0 -nn -s 256 -U -w /tmp/sfab-rail-captures-df-1-k8s-gpu1-relay0.pcap 'icmp' &
+
+
+### 2026-11-01T19:51:34Z rail-sw1 capture
++ nsenter -t 570896 -n timeout 300 tcpdump -i eth1 -nn -s 256 -U -w captures-df/2-rail-sw1-Ethernet0.pcap 'icmp'
+
+### 2026-11-01T19:51:34Z rail-sw2 capture
++ nsenter -t 570917 -n timeout 300 tcpdump -i eth1 -nn -s 256 -U -w captures-df/2-rail-sw2-Ethernet0.pcap 'icmp'
+
+### 2026-11-01T19:51:34Z rail-sw1 capture
++ nsenter -t 570896 -n timeout 300 tcpdump -i eth5 -nn -s 256 -U -w captures-df/3-rail-sw1-Ethernet4.pcap 'icmp'
+
+### 2026-11-01T19:51:34Z rail-sw2 capture
++ nsenter -t 570917 -n timeout 300 tcpdump -i eth5 -nn -s 256 -U -w captures-df/3-rail-sw2-Ethernet4.pcap 'icmp'
+
+### 2026-11-01T19:51:35Z k8s-gpu2 guest
++ setsid mkdir -p /tmp/sfab-rail; rm -f /tmp/sfab-rail-captures-df-4-k8s-gpu2-relay0.pcap /tmp/sfab-rail-captures-df-4-k8s-gpu2-relay0.txt; exec timeout 300 tcpdump -i relay0 -nn -s 256 -U -w /tmp/sfab-rail-captures-df-4-k8s-gpu2-relay0.pcap 'icmp' &
+
+
+### 2026-11-01T19:51:40Z k8s-gpu1 guest
++ ip netns exec gpu1 ping -c 3 -i 0.5 -W 2 -M do -s 8972 -e 5201 10.21.1.12
+PING 10.21.1.12 (10.21.1.12) 8972(9000) bytes of data.
+8980 bytes from 10.21.1.12: icmp_seq=1 ttl=64 time=1.64 ms
+8980 bytes from 10.21.1.12: icmp_seq=2 ttl=64 time=1.86 ms
+8980 bytes from 10.21.1.12: icmp_seq=3 ttl=64 time=1.96 ms
+
+--- 10.21.1.12 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 1.644/1.820/1.957/0.130 ms
+
+### 2026-11-01T19:51:42Z k8s-gpu1 guest
++ ip netns exec gpu1 ping -c 3 -i 0.5 -W 2 -M do -s 8973 -e 5202 10.21.1.12
+PING 10.21.1.12 (10.21.1.12) 8973(9001) bytes of data.
+
+--- 10.21.1.12 ping statistics ---
+3 packets transmitted, 0 received, +3 errors, 100% packet loss, time 1005ms
+ping: local error: message too long, mtu=9000
+ping: local error: message too long, mtu=9000
+ping: local error: message too long, mtu=9000
+
+### 2026-11-01T19:51:44Z k8s-gpu2 guest
++ ip netns exec gpu1 ping -c 3 -i 0.5 -W 2 -M do -s 8972 -e 5203 10.21.1.11
+PING 10.21.1.11 (10.21.1.11) 8972(9000) bytes of data.
+8980 bytes from 10.21.1.11: icmp_seq=1 ttl=64 time=1.86 ms
+8980 bytes from 10.21.1.11: icmp_seq=2 ttl=64 time=2.20 ms
+8980 bytes from 10.21.1.11: icmp_seq=3 ttl=64 time=2.01 ms
+
+--- 10.21.1.11 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 1003ms
+rtt min/avg/max/mdev = 1.858/2.024/2.202/0.140 ms
+
+### 2026-11-01T19:51:46Z k8s-gpu2 guest
++ ip netns exec gpu1 ping -c 3 -i 0.5 -W 2 -M do -s 8973 -e 5204 10.21.1.11
+PING 10.21.1.11 (10.21.1.11) 8973(9001) bytes of data.
+
+--- 10.21.1.11 ping statistics ---
+3 packets transmitted, 0 received, +3 errors, 100% packet loss, time 1007ms
+ping: local error: message too long, mtu=9000
+ping: local error: message too long, mtu=9000
+ping: local error: message too long, mtu=9000
+
+### 2026-11-01T19:51:47Z k8s-gpu1 guest
++ ip netns exec gpu1 ping -c 3 -i 0.5 -W 2 -M do -s 8972 -e 5205 10.21.2.12
+PING 10.21.2.12 (10.21.2.12) 8972(9000) bytes of data.
+8980 bytes from 10.21.2.12: icmp_seq=1 ttl=63 time=2.43 ms
+8980 bytes from 10.21.2.12: icmp_seq=2 ttl=63 time=2.21 ms
+8980 bytes from 10.21.2.12: icmp_seq=3 ttl=63 time=2.20 ms
+
+--- 10.21.2.12 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 2.204/2.282/2.430/0.104 ms
+
+### 2026-11-01T19:51:49Z k8s-gpu1 guest
++ ip netns exec gpu1 ping -c 3 -i 0.5 -W 2 -M do -s 8973 -e 5206 10.21.2.12
+PING 10.21.2.12 (10.21.2.12) 8973(9001) bytes of data.
+
+--- 10.21.2.12 ping statistics ---
+3 packets transmitted, 0 received, +3 errors, 100% packet loss, time 1004ms
+ping: local error: message too long, mtu=9000
+ping: local error: message too long, mtu=9000
+ping: local error: message too long, mtu=9000
+
+### 2026-11-01T19:51:51Z k8s-gpu2 guest
++ ip netns exec gpu2 ping -c 3 -i 0.5 -W 2 -M do -s 8972 -e 5207 10.21.1.11
+PING 10.21.1.11 (10.21.1.11) 8972(9000) bytes of data.
+8980 bytes from 10.21.1.11: icmp_seq=1 ttl=63 time=2.26 ms
+8980 bytes from 10.21.1.11: icmp_seq=2 ttl=63 time=2.49 ms
+8980 bytes from 10.21.1.11: icmp_seq=3 ttl=63 time=2.44 ms
+
+--- 10.21.1.11 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 2.261/2.397/2.492/0.098 ms
+
+### 2026-11-01T19:51:53Z k8s-gpu2 guest
++ ip netns exec gpu2 ping -c 3 -i 0.5 -W 2 -M do -s 8973 -e 5208 10.21.1.11
+PING 10.21.1.11 (10.21.1.11) 8973(9001) bytes of data.
+
+--- 10.21.1.11 ping statistics ---
+3 packets transmitted, 0 received, +3 errors, 100% packet loss, time 1009ms
+ping: local error: message too long, mtu=9000
+ping: local error: message too long, mtu=9000
+ping: local error: message too long, mtu=9000
+
+### 2026-11-01T19:51:56Z k8s-gpu1 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-captures-df-1-k8s-gpu1-relay0.pcap > /tmp/sfab-rail-captures-df-1-k8s-gpu1-relay0.txt 2>&1; wc -l < /tmp/sfab-rail-captures-df-1-k8s-gpu1-relay0.txt
+13
+
+### 2026-11-01T19:52:00Z k8s-gpu2 guest
++ tcpdump -nn -e -tttt -v -r /tmp/sfab-rail-captures-df-4-k8s-gpu2-relay0.pcap > /tmp/sfab-rail-captures-df-4-k8s-gpu2-relay0.txt 2>&1; wc -l < /tmp/sfab-rail-captures-df-4-k8s-gpu2-relay0.txt
+13
+

@@ -1,0 +1,385 @@
+== preflight, as run at 2026-11-01T19:36:28Z
+  PASS  identity: lab sfab-ch05 in ch05, prefix sfab-ch05-, network sfab-a-mgmt
+  PASS  topo.clab.yml present
+  PASS  docker 29.5.2 answers
+  PASS  containerlab at the pinned 0.82.0
+  PASS  python3 3.12 (3.10 or later)
+  PASS  tools: sshpass tcpdump nsenter ethtool openssl and the rest present
+  PASS  /dev/kvm read-write
+  PASS  host tick 10000
+  PASS  no other sfab lab's container running
+  PASS  containerlab knows no other sfab lab
+  PASS  no containerlab deploy in progress
+  PASS  subnet 172.21.40.0/24 held by no docker network or host interface (sfab-a-mgmt not created yet)
+  PASS  image sfab/vm-node:6-k8s1.35.8 present (f3c5c06ad669)
+  PASS  image vrnetlab/dell_sonic:4.6.0 present (c0214f532277)
+  PASS  free memory: MemAvailable 304.4 GiB covers 55.0 GiB for the nodes not yet running plus the 16.0 GiB floor
+  PASS  vCPUs: 26.0 for the lab within 2 x 96 host CPUs
+  PASS  disk: 205.3 GiB free covers 25.0 GiB under state/ (budget 25.0 GiB, 0.0 GiB of it already there) and 40.0 GiB of container layers under /var/lib/docker for the nodes not yet running, one filesystem (65.0 GiB)
+  PASS  module bonding loaded
+  PASS  state/secrets.env (0600) and the lab SSH key present
+  PASS  guest login user admin (no guest disk yet)
+  PASS  render: sfab check clean
+== preflight, read again now
+  PASS  host tick 10000
+  PASS  no other sfab lab's container running
+  PASS  containerlab knows no other sfab lab
+  PASS  no containerlab deploy in progress
+== collect (2026-11-01T20:03:02Z, 7 nodes)
+  PASS  collect fe-sw1: 26 of 26 commands saved
+  PASS  collect fe-sw2: 26 of 26 commands saved
+  PASS  collect rail-sw1: 21 of 21 commands saved
+  PASS  collect rail-sw2: 21 of 21 commands saved
+  PASS  collect oob-sw: 18 of 18 commands saved
+  PASS  collect k8s-gpu1: 52 of 52 commands saved
+  PASS  collect k8s-gpu2: 52 of 52 commands saved
+== fe-sw1: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 13
+  PASS  CLAB_MGMT_PASSTHROUGH is true
+  PASS  data NICs inside the switch VM: 13
+  PASS  GRO, rx-gro-hw and LRO off on all 13 data NICs
+  PASS  IPv6 off on the container's 5 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (84 of 84 rendered lines present)
+== fe-sw2: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 13
+  PASS  CLAB_MGMT_PASSTHROUGH is true
+  PASS  data NICs inside the switch VM: 13
+  PASS  GRO, rx-gro-hw and LRO off on all 13 data NICs
+  PASS  IPv6 off on the container's 5 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (84 of 84 rendered lines present)
+== oob-sw: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 2
+  PASS  data NICs inside the switch VM: 2
+  PASS  GRO, rx-gro-hw and LRO off on all 2 data NICs
+  PASS  IPv6 off on the container's 2 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (10 of 10 rendered lines present)
+== rail-sw1: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 8
+  PASS  data NICs inside the switch VM: 8
+  PASS  GRO, rx-gro-hw and LRO off on all 8 data NICs
+  PASS  IPv6 off on the container's 8 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (86 of 86 rendered lines present)
+== rail-sw2: switch
+  PASS  launcher log: KLISH startup config applied
+  PASS  NUM_NICS in the container env is 8
+  PASS  data NICs inside the switch VM: 8
+  PASS  GRO, rx-gro-hw and LRO off on all 8 data NICs
+  PASS  IPv6 off on the container's 8 data veths
+  PASS  ip vrf mgmt present
+  PASS  parity: 0 missing lines (86 of 86 rendered lines present)
+== fe-sw1: VLAN membership
+  PASS  Vlan100: PortChannel1(T),PortChannel21(A),PortChannel22(A)
+  PASS  Vlan110: PortChannel1(T)
+  PASS  Vlan120: PortChannel1(T),PortChannel21(T),PortChannel22(T)
+  PASS  Vlan130: PortChannel1(T)
+  PASS  Vlan131: PortChannel1(T)
+  PASS  Vlan200: PortChannel1(T)
+  PASS  Vlan300: PortChannel1(T)
+  PASS  Vlan3966: PortChannel1(T)
+  PASS  no VLAN outside the render
+== fe-sw2: VLAN membership
+  PASS  Vlan100: PortChannel1(T),PortChannel21(A),PortChannel22(A)
+  PASS  Vlan110: PortChannel1(T)
+  PASS  Vlan120: PortChannel1(T),PortChannel21(T),PortChannel22(T)
+  PASS  Vlan130: PortChannel1(T)
+  PASS  Vlan131: PortChannel1(T)
+  PASS  Vlan200: PortChannel1(T)
+  PASS  Vlan300: PortChannel1(T)
+  PASS  Vlan3966: PortChannel1(T)
+  PASS  no VLAN outside the render
+== oob-sw: VLAN membership
+  PASS  Vlan90: Ethernet0(A),Ethernet1(A)
+  PASS  no VLAN outside the render
+== rail-sw1: VLAN membership
+  PASS  Vlan101: Ethernet0(A),Ethernet4(A)
+  PASS  Vlan103: Ethernet1(A),Ethernet5(A)
+  PASS  Vlan105: Ethernet2(A),Ethernet6(A)
+  PASS  Vlan107: Ethernet3(A),Ethernet7(A)
+  PASS  no VLAN outside the render
+== rail-sw2: VLAN membership
+  PASS  Vlan102: Ethernet0(A),Ethernet4(A)
+  PASS  Vlan104: Ethernet1(A),Ethernet5(A)
+  PASS  Vlan106: Ethernet2(A),Ethernet6(A)
+  PASS  Vlan108: Ethernet3(A),Ethernet7(A)
+  PASS  no VLAN outside the render
+== fe-sw1: MAC table
+  PASS  MAC table holds host MACs only (4 entries; 0 VLAN 1 or container veth entries set aside; 1 on PortChannel1 in Vlan3966, the partner's backup keepalive)
+== fe-sw2: MAC table
+  PASS  MAC table holds host MACs only (4 entries; 0 VLAN 1 or container veth entries set aside; 1 on PortChannel1 in Vlan3966, the partner's backup keepalive)
+== oob-sw: MAC table
+  PASS  MAC table holds host MACs only (0 entries; 0 VLAN 1 or container veth entries set aside)
+== rail-sw1: MAC table
+  PASS  MAC table holds host MACs only (16 entries; 8 VLAN 1 or container veth entries set aside)
+== rail-sw2: MAC table
+  PASS  MAC table holds host MACs only (16 entries; 0 VLAN 1 or container veth entries set aside)
+== k8s-gpu1: guest
+  PASS  sfab-netsetup.service ran in this boot and succeeded
+  PASS  bond0 has 2 slaves
+  PASS  bond0 slaves under one aggregator ID
+  PASS  bond0 partner MAC is the mclag-system-mac
+  PASS  TX checksum offload off on the container's 11 data NICs
+  PASS  TX checksum offload off on the guest's 10 data NICs
+  PASS  management default in table 150 via 172.21.40.1
+  PASS  k8s-gpu1: the BMC address 10.20.9.21/24 on eth3 in namespace bmc
+  PASS  k8s-gpu1: the host OS holds no address on the BMC VLAN (10.20.9.21 is the namespace's)
+  PASS  k8s-gpu1: namespace bmc listens on ssh (22)
+  PASS  k8s-gpu1: namespace bmc listens on https (443)
+== k8s-gpu2: guest
+  PASS  sfab-netsetup.service ran in this boot and succeeded
+  PASS  bond0 has 2 slaves
+  PASS  bond0 slaves under one aggregator ID
+  PASS  bond0 partner MAC is the mclag-system-mac
+  PASS  TX checksum offload off on the container's 11 data NICs
+  PASS  TX checksum offload off on the guest's 10 data NICs
+  PASS  management default in table 150 via 172.21.40.1
+  PASS  k8s-gpu2: the BMC address 10.20.9.22/24 on eth3 in namespace bmc
+  PASS  k8s-gpu2: the host OS holds no address on the BMC VLAN (10.20.9.22 is the namespace's)
+  PASS  k8s-gpu2: namespace bmc listens on ssh (22)
+  PASS  k8s-gpu2: namespace bmc listens on https (443)
+== k8s-gpu1: relay and rails
+  PASS  8 relay namespaces (gpu1,gpu2,gpu3,gpu4,gpu5,gpu6,gpu7,gpu8)
+  PASS  gpu1: no default route
+  PASS  gpu1: rp_filter 2 on rail1,relay
+  PASS  rail 1: 9000-byte DF ping k8s-gpu1 to k8s-gpu2 (10.21.1.12)
+  PASS  rail 1 to rail 2: k8s-gpu1 to k8s-gpu2 (10.21.2.12)
+  PASS  rail 1 to rail 2 leaves gpu1 through the relay (10.21.250.0/24)
+  PASS  gpu2: no default route
+  PASS  gpu2: rp_filter 2 on rail2,relay
+  PASS  rail 2: 9000-byte DF ping k8s-gpu1 to k8s-gpu2 (10.21.2.12)
+  PASS  rail 2 to rail 3: k8s-gpu1 to k8s-gpu2 (10.21.3.12)
+  PASS  rail 2 to rail 3 leaves gpu2 through the relay (10.21.250.0/24)
+  PASS  gpu3: no default route
+  PASS  gpu3: rp_filter 2 on rail3,relay
+  PASS  rail 3: 9000-byte DF ping k8s-gpu1 to k8s-gpu2 (10.21.3.12)
+  PASS  rail 3 to rail 4: k8s-gpu1 to k8s-gpu2 (10.21.4.12)
+  PASS  rail 3 to rail 4 leaves gpu3 through the relay (10.21.250.0/24)
+  PASS  gpu4: no default route
+  PASS  gpu4: rp_filter 2 on rail4,relay
+  PASS  rail 4: 9000-byte DF ping k8s-gpu1 to k8s-gpu2 (10.21.4.12)
+  PASS  rail 4 to rail 5: k8s-gpu1 to k8s-gpu2 (10.21.5.12)
+  PASS  rail 4 to rail 5 leaves gpu4 through the relay (10.21.250.0/24)
+  PASS  gpu5: no default route
+  PASS  gpu5: rp_filter 2 on rail5,relay
+  PASS  rail 5: 9000-byte DF ping k8s-gpu1 to k8s-gpu2 (10.21.5.12)
+  PASS  rail 5 to rail 6: k8s-gpu1 to k8s-gpu2 (10.21.6.12)
+  PASS  rail 5 to rail 6 leaves gpu5 through the relay (10.21.250.0/24)
+  PASS  gpu6: no default route
+  PASS  gpu6: rp_filter 2 on rail6,relay
+  PASS  rail 6: 9000-byte DF ping k8s-gpu1 to k8s-gpu2 (10.21.6.12)
+  PASS  rail 6 to rail 7: k8s-gpu1 to k8s-gpu2 (10.21.7.12)
+  PASS  rail 6 to rail 7 leaves gpu6 through the relay (10.21.250.0/24)
+  PASS  gpu7: no default route
+  PASS  gpu7: rp_filter 2 on rail7,relay
+  PASS  rail 7: 9000-byte DF ping k8s-gpu1 to k8s-gpu2 (10.21.7.12)
+  PASS  rail 7 to rail 8: k8s-gpu1 to k8s-gpu2 (10.21.8.12)
+  PASS  rail 7 to rail 8 leaves gpu7 through the relay (10.21.250.0/24)
+  PASS  gpu8: no default route
+  PASS  gpu8: rp_filter 2 on rail8,relay
+  PASS  rail 8: 9000-byte DF ping k8s-gpu1 to k8s-gpu2 (10.21.8.12)
+  PASS  rail 8 to rail 1: k8s-gpu1 to k8s-gpu2 (10.21.1.12)
+  PASS  rail 8 to rail 1 leaves gpu8 through the relay (10.21.250.0/24)
+== k8s-gpu2: relay and rails
+  PASS  8 relay namespaces (gpu1,gpu2,gpu3,gpu4,gpu5,gpu6,gpu7,gpu8)
+  PASS  gpu1: no default route
+  PASS  gpu1: rp_filter 2 on rail1,relay
+  PASS  rail 1: 9000-byte DF ping k8s-gpu2 to k8s-gpu1 (10.21.1.11)
+  PASS  rail 1 to rail 2: k8s-gpu2 to k8s-gpu1 (10.21.2.11)
+  PASS  rail 1 to rail 2 leaves gpu1 through the relay (10.21.250.0/24)
+  PASS  gpu2: no default route
+  PASS  gpu2: rp_filter 2 on rail2,relay
+  PASS  rail 2: 9000-byte DF ping k8s-gpu2 to k8s-gpu1 (10.21.2.11)
+  PASS  rail 2 to rail 3: k8s-gpu2 to k8s-gpu1 (10.21.3.11)
+  PASS  rail 2 to rail 3 leaves gpu2 through the relay (10.21.250.0/24)
+  PASS  gpu3: no default route
+  PASS  gpu3: rp_filter 2 on rail3,relay
+  PASS  rail 3: 9000-byte DF ping k8s-gpu2 to k8s-gpu1 (10.21.3.11)
+  PASS  rail 3 to rail 4: k8s-gpu2 to k8s-gpu1 (10.21.4.11)
+  PASS  rail 3 to rail 4 leaves gpu3 through the relay (10.21.250.0/24)
+  PASS  gpu4: no default route
+  PASS  gpu4: rp_filter 2 on rail4,relay
+  PASS  rail 4: 9000-byte DF ping k8s-gpu2 to k8s-gpu1 (10.21.4.11)
+  PASS  rail 4 to rail 5: k8s-gpu2 to k8s-gpu1 (10.21.5.11)
+  PASS  rail 4 to rail 5 leaves gpu4 through the relay (10.21.250.0/24)
+  PASS  gpu5: no default route
+  PASS  gpu5: rp_filter 2 on rail5,relay
+  PASS  rail 5: 9000-byte DF ping k8s-gpu2 to k8s-gpu1 (10.21.5.11)
+  PASS  rail 5 to rail 6: k8s-gpu2 to k8s-gpu1 (10.21.6.11)
+  PASS  rail 5 to rail 6 leaves gpu5 through the relay (10.21.250.0/24)
+  PASS  gpu6: no default route
+  PASS  gpu6: rp_filter 2 on rail6,relay
+  PASS  rail 6: 9000-byte DF ping k8s-gpu2 to k8s-gpu1 (10.21.6.11)
+  PASS  rail 6 to rail 7: k8s-gpu2 to k8s-gpu1 (10.21.7.11)
+  PASS  rail 6 to rail 7 leaves gpu6 through the relay (10.21.250.0/24)
+  PASS  gpu7: no default route
+  PASS  gpu7: rp_filter 2 on rail7,relay
+  PASS  rail 7: 9000-byte DF ping k8s-gpu2 to k8s-gpu1 (10.21.7.11)
+  PASS  rail 7 to rail 8: k8s-gpu2 to k8s-gpu1 (10.21.8.11)
+  PASS  rail 7 to rail 8 leaves gpu7 through the relay (10.21.250.0/24)
+  PASS  gpu8: no default route
+  PASS  gpu8: rp_filter 2 on rail8,relay
+  PASS  rail 8: 9000-byte DF ping k8s-gpu2 to k8s-gpu1 (10.21.8.11)
+  PASS  rail 8 to rail 1: k8s-gpu2 to k8s-gpu1 (10.21.1.11)
+  PASS  rail 8 to rail 1 leaves gpu8 through the relay (10.21.250.0/24)
+== fe-sw1: forwarding only
+  PASS  show ip interfaces lists only Management0 and the keepalive addresses (Ethernet12,Management0,Vlan3966)
+  PASS  Ethernet12 holds 10.20.255.0/31 in VRF VrfMclagKa
+  PASS  Vlan3966 holds 10.20.255.4/31 in VRF VrfMclagKa
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route (the default table) prints nothing
+  PASS  VRF VrfMclagKa holds only its connected keepalive /31s
+  PASS  no router line in the running configuration
+  PASS  no address on any served VLAN's interface Vlan block (only Vlan3966, the backup keepalive)
+  PASS  no address on any PortChannel or host port (only Ethernet12, the keepalive link)
+  PASS  Vlan3966 is in VRF VrfMclagKa
+  PASS  Ethernet12 is in VRF VrfMclagKa
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev but the keepalive addresses (Ethernet12 10.20.255.0/31, Vlan3966 10.20.255.4/31; lo-m, docker-mgmt, redirect, docker0 set aside)
+== fe-sw2: forwarding only
+  PASS  show ip interfaces lists only Management0 and the keepalive addresses (Ethernet12,Management0,Vlan3966)
+  PASS  Ethernet12 holds 10.20.255.1/31 in VRF VrfMclagKa
+  PASS  Vlan3966 holds 10.20.255.5/31 in VRF VrfMclagKa
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route (the default table) prints nothing
+  PASS  VRF VrfMclagKa holds only its connected keepalive /31s
+  PASS  no router line in the running configuration
+  PASS  no address on any served VLAN's interface Vlan block (only Vlan3966, the backup keepalive)
+  PASS  no address on any PortChannel or host port (only Ethernet12, the keepalive link)
+  PASS  Vlan3966 is in VRF VrfMclagKa
+  PASS  Ethernet12 is in VRF VrfMclagKa
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev but the keepalive addresses (Ethernet12 10.20.255.1/31, Vlan3966 10.20.255.5/31; lo-m, docker-mgmt, redirect, docker0 set aside)
+== rail-sw1: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route (the default table) prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any served VLAN's interface Vlan block
+  PASS  no address on any PortChannel or host port
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== rail-sw2: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route (the default table) prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any served VLAN's interface Vlan block
+  PASS  no address on any PortChannel or host port
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== oob-sw: forwarding only
+  PASS  show ip interfaces lists only Management0
+  PASS  Management0 in VRF mgmt
+  PASS  show ip route (the default table) prints nothing
+  PASS  no router line in the running configuration
+  PASS  no address on any served VLAN's interface Vlan block
+  PASS  no address on any PortChannel or host port
+  PASS  FRR view holds no router block
+  PASS  kernel holds no address on any Vlan, PortChannel or Ethernet netdev (lo-m, docker-mgmt, redirect, docker0 set aside)
+== pair fe-sw1 fe-sw2
+  PASS  fe-sw1: MCLAG domain
+  PASS  fe-sw1: session up
+  PASS  fe-sw1: peer link up
+  PASS  fe-sw1: peer link PortChannel1
+  PASS  fe-sw1: keepalive in VRF VrfMclagKa
+  PASS  fe-sw1: keepalive source is its address on the keepalive link Ethernet12, 10.20.255.0
+  PASS  fe-sw1: keepalive peer is 10.20.255.1
+  PASS  fe-sw1: backup keepalive session up on Vlan3966, 10.20.255.4 to 10.20.255.5 in VRF VrfMclagKa
+  PASS  fe-sw1: mclag-system-mac 02:5a:00:00:00:01
+  PASS  fe-sw1: MLAG interface PortChannel21 up/up
+  PASS  fe-sw1: MLAG interface PortChannel22 up/up
+  PASS  fe-sw1: PortChannel1 up with Ethernet0,Ethernet1
+  PASS  fe-sw1: PortChannel21 up with Ethernet6
+  PASS  fe-sw1: PortChannel22 up with Ethernet7
+  PASS  fe-sw2: MCLAG domain
+  PASS  fe-sw2: session up
+  PASS  fe-sw2: peer link up
+  PASS  fe-sw2: peer link PortChannel1
+  PASS  fe-sw2: keepalive in VRF VrfMclagKa
+  PASS  fe-sw2: keepalive source is its address on the keepalive link Ethernet12, 10.20.255.1
+  PASS  fe-sw2: keepalive peer is 10.20.255.0
+  PASS  fe-sw2: backup keepalive session up on Vlan3966, 10.20.255.5 to 10.20.255.4 in VRF VrfMclagKa
+  PASS  fe-sw2: mclag-system-mac 02:5a:00:00:00:01
+  PASS  fe-sw2: MLAG interface PortChannel21 up/up
+  PASS  fe-sw2: MLAG interface PortChannel22 up/up
+  PASS  fe-sw2: PortChannel1 up with Ethernet0,Ethernet1
+  PASS  fe-sw2: PortChannel21 up with Ethernet6
+  PASS  fe-sw2: PortChannel22 up with Ethernet7
+  PASS  roles: one active, one standby
+== rail-sw1: the rail backend's absences (chapter 5)
+  PASS  rails 1, 3, 5, 7 are VLANs 101, 103, 105, 107, one interface Vlan block each
+  PASS  no VLAN interface address: none of the 4 interface Vlan blocks holds an ip, ipv6 or anycast address line
+  PASS  show ip interfaces lists no Vlan interface
+  PASS  no gateway: no static route in the running configuration, and show ip route (the default VRF) prints nothing
+  PASS  no router bgp: neither the KLISH running configuration nor FRR's own view holds a router bgp line
+  PASS  only Management0 in the mgmt VRF, and no interface in any other VRF
+  PASS  no inter-switch link: only the 8 rendered GPU access ports are up, and the other 48 ports are admin down
+  PASS  each up port's description names the GPU NIC the render cables there
+  PASS  the 8 rail ports at MTU 9216 as rendered (the l2 policy's port MTU), above the GPU NICs' 9000
+  PASS  every MAC learned on a rail port is a GPU NIC or relay macvlan the render cables to that port (16 entries)
+  PASS  every rail port runs no shutdown (the factory profile leaves all ports admin down), and each mtu line the render types is the rendered port MTU
+== rail-sw2: the rail backend's absences (chapter 5)
+  PASS  rails 2, 4, 6, 8 are VLANs 102, 104, 106, 108, one interface Vlan block each
+  PASS  no VLAN interface address: none of the 4 interface Vlan blocks holds an ip, ipv6 or anycast address line
+  PASS  show ip interfaces lists no Vlan interface
+  PASS  no gateway: no static route in the running configuration, and show ip route (the default VRF) prints nothing
+  PASS  no router bgp: neither the KLISH running configuration nor FRR's own view holds a router bgp line
+  PASS  only Management0 in the mgmt VRF, and no interface in any other VRF
+  PASS  no inter-switch link: only the 8 rendered GPU access ports are up, and the other 48 ports are admin down
+  PASS  each up port's description names the GPU NIC the render cables there
+  PASS  the 8 rail ports at MTU 9216 as rendered (the l2 policy's port MTU), above the GPU NICs' 9000
+  PASS  every MAC learned on a rail port is a GPU NIC or relay macvlan the render cables to that port (16 entries)
+  PASS  every rail port runs no shutdown (the factory profile leaves all ports admin down), and each mtu line the render types is the rendered port MTU
+== k8s-gpu1: GPU namespaces and their relay (chapter 5)
+  PASS  the 8 GPU namespaces (gpu1,gpu2,gpu3,gpu4,gpu5,gpu6,gpu7,gpu8) hold no default route
+  PASS  each holds its connected rail and 7 relay routes, one to each other rail via that rail's namespace, every one pinned to the namespace's own rail address, as rendered
+  PASS  reverse-path filtering loose (rp_filter 2) on every interface of every GPU namespace
+  PASS  the 8 rail NICs and the relay bridge relay0 at MTU 9000
+  PASS  in each GPU namespace the rail macvlan and the relay veth at MTU 9000: the cross-rail ceiling is the relay's 9000 (8 namespaces read)
+== k8s-gpu2: GPU namespaces and their relay (chapter 5)
+  PASS  the 8 GPU namespaces (gpu1,gpu2,gpu3,gpu4,gpu5,gpu6,gpu7,gpu8) hold no default route
+  PASS  each holds its connected rail and 7 relay routes, one to each other rail via that rail's namespace, every one pinned to the namespace's own rail address, as rendered
+  PASS  reverse-path filtering loose (rp_filter 2) on every interface of every GPU namespace
+  PASS  the 8 rail NICs and the relay bridge relay0 at MTU 9000
+  PASS  in each GPU namespace the rail macvlan and the relay veth at MTU 9000: the cross-rail ceiling is the relay's 9000 (8 namespaces read)
+== fe-sw1: Layer 2 hygiene
+  PASS  spanning-tree mode pvst
+  PASS  every used port (5) at its rendered MTU (9216)
+  PASS  every PortChannel (3) at its rendered MTU
+  PASS  BPDU guard with port-shutdown on every edge port (2)
+  PASS  no port shut by BPDU guard
+  PASS  BPDU guard on no other port (the peer link and the firewall's trunk are not edge ports)
+  PASS  storm control on every member and access port (2): broadcast 10000 kbps, unknown-multicast 10000 kbps, unknown-unicast 10000 kbps
+== fe-sw2: Layer 2 hygiene
+  PASS  spanning-tree mode pvst
+  PASS  every used port (5) at its rendered MTU (9216)
+  PASS  every PortChannel (3) at its rendered MTU
+  PASS  BPDU guard with port-shutdown on every edge port (2)
+  PASS  no port shut by BPDU guard
+  PASS  BPDU guard on no other port (the peer link and the firewall's trunk are not edge ports)
+  PASS  storm control on every member and access port (2): broadcast 10000 kbps, unknown-multicast 10000 kbps, unknown-unicast 10000 kbps
+== rail-sw1: Layer 2 hygiene
+  PASS  spanning-tree mode pvst
+  PASS  every used port (8) at its rendered MTU (9216)
+  PASS  BPDU guard with port-shutdown on every edge port (8)
+  PASS  no port shut by BPDU guard
+  PASS  BPDU guard on no other port
+  PASS  storm control on every member and access port (8): broadcast 10000 kbps, unknown-multicast 10000 kbps, unknown-unicast 10000 kbps
+== rail-sw2: Layer 2 hygiene
+  PASS  spanning-tree mode pvst
+  PASS  every used port (8) at its rendered MTU (9216)
+  PASS  BPDU guard with port-shutdown on every edge port (8)
+  PASS  no port shut by BPDU guard
+  PASS  BPDU guard on no other port
+  PASS  storm control on every member and access port (8): broadcast 10000 kbps, unknown-multicast 10000 kbps, unknown-unicast 10000 kbps
+== repository
+  SKIP  namecheck (no scrub list)
+  PASS  sfab check clean
+== RESULT: 346 passed, 0 failed, 0 known platform limitation(s), 1 skipped

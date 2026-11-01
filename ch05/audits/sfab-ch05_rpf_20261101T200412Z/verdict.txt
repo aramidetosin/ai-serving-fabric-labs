@@ -1,0 +1,22 @@
+== rp_filter on k8s-gpu2's namespace gpu2: the cross-rail request from 10.21.1.11 arrives on rail2, its route back leaves on relay
+  PASS  gpu2's route back to 10.21.1.11 leaves on relay, not on rail2 where the request arrives
+  PASS  as built, all is 2 (loose), the render's value
+  PASS  as built, rail2 is 2
+  PASS  as built, relay is 2
+  PASS  as built, default is 2
+== case a, as built: all 2, rail2 2 (loose): the request is answered
+  PASS  k8s-gpu2, namespace gpu2: all 2, rail2 2 (default 2, relay 2)
+  PASS  k8s-gpu1 gpu1 to 10.21.2.12 (rail 1 to rail 2): 3 of 3 answered
+  PASS  IPReversePathFilter in k8s-gpu2's namespace gpu2 unchanged (0 before, 0 after)
+== case b: all 1, rail2 0: the max is 1 (strict), so the request is dropped
+  PASS  k8s-gpu2, namespace gpu2: all 1, rail2 0 (default 2, relay 2)
+  PASS  k8s-gpu1 gpu1 to 10.21.2.12 (rail 1 to rail 2): none of 3 answered
+  PASS  IPReversePathFilter in k8s-gpu2's namespace gpu2 rose by at least 3 (0 before, 3 after)
+== case c: all 1, rail2 2: the max is 2 (loose), so the request is answered
+  PASS  k8s-gpu2, namespace gpu2: all 1, rail2 2 (default 2, relay 2)
+  PASS  k8s-gpu1 gpu1 to 10.21.2.12 (rail 1 to rail 2): 3 of 3 answered
+  PASS  IPReversePathFilter in k8s-gpu2's namespace gpu2 unchanged (3 before, 3 after)
+== restored: all 2, rail2 2, as built
+  PASS  k8s-gpu2, namespace gpu2: all 2, rail2 2 (default 2, relay 2)
+  PASS  k8s-gpu1 gpu1 to 10.21.2.12: 3 of 3 answered again
+== RESULT: 16 passed, 0 failed, 0 known platform limitation(s), 0 skipped

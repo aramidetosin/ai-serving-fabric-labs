@@ -1,0 +1,30 @@
+Script started on 2026-11-01 20:04:12+00:00 [COMMAND="make rpf" TERM="tmux-256color" TTY="/dev/pts/0" COLUMNS="-1" LINES="-1"]
+/root/sfab/clean/ai-serving-fabric-labs/common/stages/run.sh rpf
+== stage rpf 2026-11-01T20:04:12Z (log state/logs/rpf-20261101T200412Z.log)
+rpf: the IP relay between rails is the lab's stand-in that lets captures show PXN's path: production GPU hosts do not IP-forward between rails (NCCL moves cross-rail collective data over NVLink with PXN, and its IP control traffic uses the frontend), and rp_filter 2 belongs to the relay; production keeps 1 with per-rail policy routing
+== rp_filter on k8s-gpu2's namespace gpu2: the cross-rail request from 10.21.1.11 arrives on rail2, its route back leaves on relay
+  PASS  gpu2's route back to 10.21.1.11 leaves on relay, not on rail2 where the request arrives
+  PASS  as built, all is 2 (loose), the render's value
+  PASS  as built, rail2 is 2
+  PASS  as built, relay is 2
+  PASS  as built, default is 2
+== case a, as built: all 2, rail2 2 (loose): the request is answered
+  PASS  k8s-gpu2, namespace gpu2: all 2, rail2 2 (default 2, relay 2)
+  PASS  k8s-gpu1 gpu1 to 10.21.2.12 (rail 1 to rail 2): 3 of 3 answered
+  PASS  IPReversePathFilter in k8s-gpu2's namespace gpu2 unchanged (0 before, 0 after)
+== case b: all 1, rail2 0: the max is 1 (strict), so the request is dropped
+  PASS  k8s-gpu2, namespace gpu2: all 1, rail2 0 (default 2, relay 2)
+  PASS  k8s-gpu1 gpu1 to 10.21.2.12 (rail 1 to rail 2): none of 3 answered
+  PASS  IPReversePathFilter in k8s-gpu2's namespace gpu2 rose by at least 3 (0 before, 3 after)
+== case c: all 1, rail2 2: the max is 2 (loose), so the request is answered
+  PASS  k8s-gpu2, namespace gpu2: all 1, rail2 2 (default 2, relay 2)
+  PASS  k8s-gpu1 gpu1 to 10.21.2.12 (rail 1 to rail 2): 3 of 3 answered
+  PASS  IPReversePathFilter in k8s-gpu2's namespace gpu2 unchanged (3 before, 3 after)
+== restored: all 2, rail2 2, as built
+  PASS  k8s-gpu2, namespace gpu2: all 2, rail2 2 (default 2, relay 2)
+  PASS  k8s-gpu1 gpu1 to 10.21.2.12: 3 of 3 answered again
+== RESULT: 16 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+== result set: ch05/audits/sfab-ch05_rpf_20261101T200412Z
+== stage rpf done in 13s
+
+Script done on 2026-11-01 20:04:25+00:00 [COMMAND_EXIT_CODE="0"]

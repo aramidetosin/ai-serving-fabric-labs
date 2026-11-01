@@ -1,0 +1,42 @@
+19:36:12 chain start, set sfab-ch05_record-run_20261101T193612Z
+19:36:12 reading before -> host-before-clean.txt
+git-clone: git clone https://github.com/aramidetosin/ai-serving-fabric-labs.git -> typescripts/rec-git-clone.typescript
+19:36:12..19:36:23 git clone https://github.com/aramidetosin/ai-serving-fabric-labs.git rc=0 
+19:36:23 reading clone -> clone-check.txt
+clean-down: make down -> typescripts/rec-clean-down.typescript
+19:36:23..19:36:24 make down rc=0 == RESULT: 3 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+clean-wipe: make wipe -> typescripts/rec-clean-wipe.typescript
+19:36:24..19:36:25 make wipe rc=0 == RESULT: 4 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+19:36:25 memory guard: MemAvailable 304 GiB >= 111.0 GiB
+19:36:25 reading before -> host-before-up.txt
+19:36:25 memory watcher started (rec-ch05-memwatch)
+make-up: make up -> typescripts/rec-make-up.typescript
+19:36:25..19:49:54 make up rc=0 == RESULT: 346 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+19:49:55 reading starts -> startedat-after-up.txt
+19:49:56 reading timesync -> guest-timesync-after-up.txt
+19:49:56 reading layers -> container-layers.txt
+make-audit: make audit -> typescripts/rec-make-audit.typescript
+19:49:56..19:51:06 make audit rc=0 == RESULT: 346 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+make-trace: make trace -> typescripts/rec-make-trace.typescript
+19:51:06..19:52:02 make trace rc=0 == RESULT: 49 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+make-drills: make drills PASSES=3 -> typescripts/rec-make-drills.typescript
+19:52:02..20:00:43 make drills PASSES=3 rc=0 == RESULT: 153 passed, 0 failed, 3 known platform limitation(s), 0 skipped
+make-break-5a: make break-5a -> typescripts/rec-make-break-5a.typescript
+20:00:43..20:02:15 make break-5a rc=0 == RESULT: 32 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+make-heal-5a: make heal-5a -> typescripts/rec-make-heal-5a.typescript
+20:02:15..20:04:12 make heal-5a rc=0 == RESULT: 19 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+make-rpf: make rpf -> typescripts/rec-make-rpf.typescript
+20:04:12..20:04:25 make rpf rc=0 == RESULT: 16 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+20:04:26 reading starts -> startedat-before-record.txt
+make-record: make record -> typescripts/rec-make-record.typescript
+20:04:26..20:06:32 make record rc=0 == RESULT: 12 passed, 0 failed, 0 known platform limitation(s), 5 skipped
+20:06:33 reading starts -> startedat-after-record.txt
+20:06:34 reading timesync -> guest-timesync-before-down.txt
+20:06:34 reading du -> state-du.txt
+20:06:34 reading clabwrites -> clab-writes-before-down.txt
+20:06:34 reading after -> host-after-record.txt
+make-down: make down -> typescripts/rec-make-down.typescript
+20:06:34..20:06:44 make down rc=0 == RESULT: 4 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+20:06:44 reading after -> host-after-down.txt
+20:06:44 memory watcher stopped
+20:06:44 CHAIN DONE

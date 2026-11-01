@@ -1,0 +1,24 @@
+== heal-5a: the source pin of k8s-gpu1's relay route from rail 1 to rail 2 removed
+  PASS  k8s-gpu1, namespace gpu1: ip -n gpu1 route replace 10.21.2.0/24 via 10.21.250.2 dev relay src 10.21.1.11 (reads back: 10.21.2.0/24 via 10.21.250.2 dev relay src 10.21.1.11 )
+== heal-5a: recorded
+  PASS  rail1-to-rail2, heal, pass 1: 0 of 10 pings from k8s-gpu1 (namespace gpu1) to 10.21.2.12 unanswered (recorded)
+  PASS  rail1-to-rail3, heal, pass 1: 0 of 10 pings from k8s-gpu1 (namespace gpu1) to 10.21.3.12 unanswered (recorded)
+  PASS  same-rail-k8s-gpu1, heal, pass 1: 0 of 3 pings from k8s-gpu1 (namespace gpu1) to 10.21.1.12 unanswered (recorded)
+  PASS  same-rail-k8s-gpu1, heal, pass 1: 0 of 3 pings from k8s-gpu1 (namespace gpu2) to 10.21.2.12 unanswered (recorded)
+  PASS  same-rail-k8s-gpu1, heal, pass 1: 0 of 3 pings from k8s-gpu1 (namespace gpu3) to 10.21.3.12 unanswered (recorded)
+  PASS  same-rail-k8s-gpu1, heal, pass 1: 0 of 3 pings from k8s-gpu1 (namespace gpu4) to 10.21.4.12 unanswered (recorded)
+  PASS  same-rail-k8s-gpu1, heal, pass 1: 0 of 3 pings from k8s-gpu1 (namespace gpu5) to 10.21.5.12 unanswered (recorded)
+  PASS  same-rail-k8s-gpu1, heal, pass 1: 0 of 3 pings from k8s-gpu1 (namespace gpu6) to 10.21.6.12 unanswered (recorded)
+  PASS  same-rail-k8s-gpu1, heal, pass 1: 0 of 3 pings from k8s-gpu1 (namespace gpu7) to 10.21.7.12 unanswered (recorded)
+  PASS  same-rail-k8s-gpu1, heal, pass 1: 0 of 3 pings from k8s-gpu1 (namespace gpu8) to 10.21.8.12 unanswered (recorded)
+== heal-5a: healed
+  PASS  k8s-gpu1, namespace gpu1: the route to rail 2 carries its rendered source pin, src 10.21.1.11 (10.21.2.0/24 via 10.21.250.2 dev relay src 10.21.1.11 )
+  PASS  rail1-to-rail2: every ping succeeds (10 of 10)
+  PASS  rail1-to-rail2: k8s-gpu2 saw 10 requests arrive on rail2 from 10.21.1.11, and its 10 replies go into its relay bridge relay0 toward 10.21.1.11 (1 pass captured): the pinned source 10.21.1.11, answered through k8s-gpu2's relay toward the source's rail
+  PASS  rail1-to-rail3: every ping succeeds (10 of 10)
+  PASS  same-rail-k8s-gpu1: every ping succeeds (24 of 24)
+  PASS  rail-sw1: parity, 0 missing lines
+  PASS  rail-sw2: parity, 0 missing lines
+== the chapter audit after the heal
+  PASS  audit.sh after the heal: RESULT: 346 passed, 0 failed, 0 known platform limitation(s), 1 skipped (ch05/audits/sfab-ch05_audit_20261101T200301Z)
+== RESULT: 19 passed, 0 failed, 0 known platform limitation(s), 0 skipped

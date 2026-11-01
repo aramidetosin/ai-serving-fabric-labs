@@ -1,0 +1,160 @@
+== pass 1, drill dark-switch: every port of rail-sw1 shut with interface range, held, then no shutdown
+  PASS  pass 1 dark-switch: the rails whole before the fault: every rail answers its same-rail ping and every rail switch's rendered ports are up (poll 2)
+  PASS  pass 1 dark-switch: KLISH interface range Ethernet0-7, shutdown accepted on rail-sw1: every port it uses (Ethernet0,Ethernet1,Ethernet2,Ethernet3,Ethernet4,Ethernet5,Ethernet6,Ethernet7)
+  PASS  pass 1 dark-switch: no shutdown accepted on rail-sw1 after 30 s
+  PASS  pass 1 dark-switch: the rails whole again after the drill: every rail answers its same-rail ping and every rail switch's rendered ports are up (poll 2)
+  PASS  pass 1 dark-switch: rail-sw1 after the restore: parity, 0 missing lines
+  PASS  pass 1 dark-switch: audit.sh --quick after the drill: RESULT: 178 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+  PASS  pass 1 dark-switch: same-1 (rail 1, rail-sw1): before the cut, 48 of 48 answered
+  PASS  pass 1 dark-switch: same-1 (rail 1, rail-sw1): while rail-sw1 was dark, 0 of 130 answered (dark, as planned: nothing routes around it)
+  PASS  pass 1 dark-switch: ... its requests left k8s-gpu1 on rail 1 (130) and none reached k8s-gpu2 (0): the dead rail is silent
+  PASS  pass 1 dark-switch: ... after the no shutdown it answered again: the first answered request sent 6.295 s after the restore's session began (3.456 s after it returned; an event, host clock)
+  PASS  pass 1 dark-switch: ... after the restore, from its first answered request on, 86 of 86 answered
+  PASS  pass 1 dark-switch: same-2 (rail 2, rail-sw2): before the cut, 48 of 48 answered
+  PASS  pass 1 dark-switch: same-2 (rail 2, rail-sw2): while rail-sw1 was dark, 135 of 135 answered
+  PASS  pass 1 dark-switch: ... after the restore, from its first answered request on, 117 of 117 answered
+  PASS  pass 1 dark-switch: same-3 (rail 3, rail-sw1): before the cut, 48 of 48 answered
+  PASS  pass 1 dark-switch: same-3 (rail 3, rail-sw1): while rail-sw1 was dark, 0 of 130 answered (dark, as planned: nothing routes around it)
+  PASS  pass 1 dark-switch: ... its requests left k8s-gpu1 on rail 3 (130) and none reached k8s-gpu2 (0): the dead rail is silent
+  PASS  pass 1 dark-switch: ... after the no shutdown it answered again: the first answered request sent 6.503 s after the restore's session began (3.664 s after it returned; an event, host clock)
+  PASS  pass 1 dark-switch: ... after the restore, from its first answered request on, 85 of 85 answered
+  PASS  pass 1 dark-switch: same-4 (rail 4, rail-sw2): before the cut, 48 of 48 answered
+  PASS  pass 1 dark-switch: same-4 (rail 4, rail-sw2): while rail-sw1 was dark, 135 of 135 answered
+  PASS  pass 1 dark-switch: ... after the restore, from its first answered request on, 117 of 117 answered
+  PASS  pass 1 dark-switch: same-5 (rail 5, rail-sw1): before the cut, 48 of 48 answered
+  PASS  pass 1 dark-switch: same-5 (rail 5, rail-sw1): while rail-sw1 was dark, 0 of 130 answered (dark, as planned: nothing routes around it)
+  PASS  pass 1 dark-switch: ... its requests left k8s-gpu1 on rail 5 (130) and none reached k8s-gpu2 (0): the dead rail is silent
+  PASS  pass 1 dark-switch: ... after the no shutdown it answered again: the first answered request sent 6.52 s after the restore's session began (3.681 s after it returned; an event, host clock)
+  PASS  pass 1 dark-switch: ... after the restore, from its first answered request on, 90 of 90 answered
+  PASS  pass 1 dark-switch: same-6 (rail 6, rail-sw2): before the cut, 48 of 48 answered
+  PASS  pass 1 dark-switch: same-6 (rail 6, rail-sw2): while rail-sw1 was dark, 135 of 135 answered
+  PASS  pass 1 dark-switch: ... after the restore, from its first answered request on, 117 of 117 answered
+  PASS  pass 1 dark-switch: same-7 (rail 7, rail-sw1): before the cut, 48 of 48 answered
+  PASS  pass 1 dark-switch: same-7 (rail 7, rail-sw1): while rail-sw1 was dark, 0 of 119 answered (dark, as planned: nothing routes around it)
+  PASS  pass 1 dark-switch: ... its requests left k8s-gpu1 on rail 7 (119) and none reached k8s-gpu2 (0): the dead rail is silent
+  PASS  pass 1 dark-switch: ... after the no shutdown it answered again: the first answered request sent 7.419 s after the restore's session began (4.58 s after it returned; an event, host clock)
+  PASS  pass 1 dark-switch: ... after the restore, from its first answered request on, 81 of 81 answered
+  PASS  pass 1 dark-switch: same-8 (rail 8, rail-sw2): before the cut, 48 of 48 answered
+  PASS  pass 1 dark-switch: same-8 (rail 8, rail-sw2): while rail-sw1 was dark, 135 of 135 answered
+  PASS  pass 1 dark-switch: ... after the restore, from its first answered request on, 117 of 117 answered
+  PASS  pass 1 dark-switch: cross-2-1 (rail 2 to rail 1: request on rail-sw1, reply on rail-sw2): before the cut, 48 of 48 answered
+  PASS  pass 1 dark-switch: cross-2-1 (rail 2 to rail 1: request on rail-sw1, reply on rail-sw2): while rail-sw1 was dark, 0 of 130 answered (dark, as planned: nothing routes around it)
+  PASS  pass 1 dark-switch: ... its requests left k8s-gpu1 on rail 1 (130) and none reached k8s-gpu2 (0): the dead rail is silent
+  PASS  pass 1 dark-switch: ... after the no shutdown it answered again: the first answered request sent 6.303 s after the restore's session began (3.464 s after it returned; an event, host clock)
+  PASS  pass 1 dark-switch: ... after the restore, from its first answered request on, 86 of 86 answered
+  PASS  pass 1 dark-switch: cross-1-2 (rail 1 to rail 2: request on rail-sw2, reply on rail-sw1): before the cut, 48 of 48 answered
+  PASS  pass 1 dark-switch: cross-1-2 (rail 1 to rail 2: request on rail-sw2, reply on rail-sw1): while rail-sw1 was dark, 0 of 130 answered (dark, as planned: nothing routes around it)
+  PASS  pass 1 dark-switch: ... its requests reached k8s-gpu2 on rail 2 (130 of 130), k8s-gpu2's replies left on rail 1 (130) and none reached k8s-gpu1: the reply rides the dead rail
+  PASS  pass 1 dark-switch: ... after the no shutdown it answered again: the first answered request sent 6.303 s after the restore's session began (3.464 s after it returned; an event, host clock)
+  PASS  pass 1 dark-switch: ... after the restore, from its first answered request on, 86 of 86 answered
+  PASS  pass 1 dark-switch: cross-2-4 (rail 2 to rail 4: request on rail-sw2, reply on rail-sw2): before the cut, 48 of 48 answered
+  PASS  pass 1 dark-switch: cross-2-4 (rail 2 to rail 4: request on rail-sw2, reply on rail-sw2): while rail-sw1 was dark, 135 of 135 answered
+  PASS  pass 1 dark-switch: ... after the restore, from its first answered request on, 117 of 117 answered
+  KNOWN pass 1 dark-switch: a KLISH shutdown drops no carrier at the GPU NICs, so the dark rail shows only as silence (rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP): L9
+== pass 2, drill dark-switch: every port of rail-sw1 shut with interface range, held, then no shutdown
+  PASS  pass 2 dark-switch: the rails whole before the fault: every rail answers its same-rail ping and every rail switch's rendered ports are up (poll 2)
+  PASS  pass 2 dark-switch: KLISH interface range Ethernet0-7, shutdown accepted on rail-sw1: every port it uses (Ethernet0,Ethernet1,Ethernet2,Ethernet3,Ethernet4,Ethernet5,Ethernet6,Ethernet7)
+  PASS  pass 2 dark-switch: no shutdown accepted on rail-sw1 after 30 s
+  PASS  pass 2 dark-switch: the rails whole again after the drill: every rail answers its same-rail ping and every rail switch's rendered ports are up (poll 2)
+  PASS  pass 2 dark-switch: rail-sw1 after the restore: parity, 0 missing lines
+  PASS  pass 2 dark-switch: audit.sh --quick after the drill: RESULT: 178 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+  PASS  pass 2 dark-switch: same-1 (rail 1, rail-sw1): before the cut, 48 of 48 answered
+  PASS  pass 2 dark-switch: same-1 (rail 1, rail-sw1): while rail-sw1 was dark, 0 of 63 answered (dark, as planned: nothing routes around it)
+  PASS  pass 2 dark-switch: ... its requests left k8s-gpu1 on rail 1 (63) and none reached k8s-gpu2 (0): the dead rail is silent
+  PASS  pass 2 dark-switch: ... after the no shutdown it answered again: the first answered request sent 7.033 s after the restore's session began (4.025 s after it returned; an event, host clock)
+  PASS  pass 2 dark-switch: ... after the restore, from its first answered request on, 95 of 95 answered
+  PASS  pass 2 dark-switch: same-2 (rail 2, rail-sw2): before the cut, 48 of 48 answered
+  PASS  pass 2 dark-switch: same-2 (rail 2, rail-sw2): while rail-sw1 was dark, 134 of 134 answered
+  PASS  pass 2 dark-switch: ... after the restore, from its first answered request on, 119 of 119 answered
+  PASS  pass 2 dark-switch: same-3 (rail 3, rail-sw1): before the cut, 48 of 48 answered
+  PASS  pass 2 dark-switch: same-3 (rail 3, rail-sw1): while rail-sw1 was dark, 0 of 82 answered (dark, as planned: nothing routes around it)
+  PASS  pass 2 dark-switch: ... its requests left k8s-gpu1 on rail 3 (82) and none reached k8s-gpu2 (0): the dead rail is silent
+  PASS  pass 2 dark-switch: ... after the no shutdown it answered again: the first answered request sent 7.097 s after the restore's session began (4.089 s after it returned; an event, host clock)
+  PASS  pass 2 dark-switch: ... after the restore, from its first answered request on, 90 of 90 answered
+  PASS  pass 2 dark-switch: same-4 (rail 4, rail-sw2): before the cut, 48 of 48 answered
+  PASS  pass 2 dark-switch: same-4 (rail 4, rail-sw2): while rail-sw1 was dark, 134 of 134 answered
+  PASS  pass 2 dark-switch: ... after the restore, from its first answered request on, 119 of 119 answered
+  PASS  pass 2 dark-switch: same-5 (rail 5, rail-sw1): before the cut, 48 of 48 answered
+  PASS  pass 2 dark-switch: same-5 (rail 5, rail-sw1): while rail-sw1 was dark, 0 of 41 answered (dark, as planned: nothing routes around it)
+  PASS  pass 2 dark-switch: ... its requests left k8s-gpu1 on rail 5 (41) and none reached k8s-gpu2 (0): the dead rail is silent
+  PASS  pass 2 dark-switch: ... after the no shutdown it answered again: the first answered request sent 6.788 s after the restore's session began (3.78 s after it returned; an event, host clock)
+  PASS  pass 2 dark-switch: ... after the restore, from its first answered request on, 86 of 86 answered
+  PASS  pass 2 dark-switch: same-6 (rail 6, rail-sw2): before the cut, 48 of 48 answered
+  PASS  pass 2 dark-switch: same-6 (rail 6, rail-sw2): while rail-sw1 was dark, 134 of 134 answered
+  PASS  pass 2 dark-switch: ... after the restore, from its first answered request on, 119 of 119 answered
+  PASS  pass 2 dark-switch: same-7 (rail 7, rail-sw1): before the cut, 48 of 48 answered
+  PASS  pass 2 dark-switch: same-7 (rail 7, rail-sw1): while rail-sw1 was dark, 0 of 119 answered (dark, as planned: nothing routes around it)
+  PASS  pass 2 dark-switch: ... its requests left k8s-gpu1 on rail 7 (119) and none reached k8s-gpu2 (0): the dead rail is silent
+  PASS  pass 2 dark-switch: ... after the no shutdown it answered again: the first answered request sent 6.586 s after the restore's session began (3.578 s after it returned; an event, host clock)
+  PASS  pass 2 dark-switch: ... after the restore, from its first answered request on, 97 of 97 answered
+  PASS  pass 2 dark-switch: same-8 (rail 8, rail-sw2): before the cut, 48 of 48 answered
+  PASS  pass 2 dark-switch: same-8 (rail 8, rail-sw2): while rail-sw1 was dark, 134 of 134 answered
+  PASS  pass 2 dark-switch: ... after the restore, from its first answered request on, 119 of 119 answered
+  PASS  pass 2 dark-switch: cross-2-1 (rail 2 to rail 1: request on rail-sw1, reply on rail-sw2): before the cut, 48 of 48 answered
+  PASS  pass 2 dark-switch: cross-2-1 (rail 2 to rail 1: request on rail-sw1, reply on rail-sw2): while rail-sw1 was dark, 0 of 63 answered (dark, as planned: nothing routes around it)
+  PASS  pass 2 dark-switch: ... its requests left k8s-gpu1 on rail 1 (63) and none reached k8s-gpu2 (0): the dead rail is silent
+  PASS  pass 2 dark-switch: ... after the no shutdown it answered again: the first answered request sent 7.033 s after the restore's session began (4.025 s after it returned; an event, host clock)
+  PASS  pass 2 dark-switch: ... after the restore, from its first answered request on, 95 of 95 answered
+  PASS  pass 2 dark-switch: cross-1-2 (rail 1 to rail 2: request on rail-sw2, reply on rail-sw1): before the cut, 48 of 48 answered
+  PASS  pass 2 dark-switch: cross-1-2 (rail 1 to rail 2: request on rail-sw2, reply on rail-sw1): while rail-sw1 was dark, 0 of 129 answered (dark, as planned: nothing routes around it)
+  PASS  pass 2 dark-switch: ... its requests reached k8s-gpu2 on rail 2 (129 of 129), k8s-gpu2's replies left on rail 1 (129) and none reached k8s-gpu1: the reply rides the dead rail
+  PASS  pass 2 dark-switch: ... after the no shutdown it answered again: the first answered request sent 6.68 s after the restore's session began (3.672 s after it returned; an event, host clock)
+  PASS  pass 2 dark-switch: ... after the restore, from its first answered request on, 87 of 87 answered
+  PASS  pass 2 dark-switch: cross-2-4 (rail 2 to rail 4: request on rail-sw2, reply on rail-sw2): before the cut, 48 of 48 answered
+  PASS  pass 2 dark-switch: cross-2-4 (rail 2 to rail 4: request on rail-sw2, reply on rail-sw2): while rail-sw1 was dark, 134 of 134 answered
+  PASS  pass 2 dark-switch: ... after the restore, from its first answered request on, 119 of 119 answered
+  KNOWN pass 2 dark-switch: a KLISH shutdown drops no carrier at the GPU NICs, so the dark rail shows only as silence (rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP): L9
+== pass 3, drill dark-switch: every port of rail-sw1 shut with interface range, held, then no shutdown
+  PASS  pass 3 dark-switch: the rails whole before the fault: every rail answers its same-rail ping and every rail switch's rendered ports are up (poll 2)
+  PASS  pass 3 dark-switch: KLISH interface range Ethernet0-7, shutdown accepted on rail-sw1: every port it uses (Ethernet0,Ethernet1,Ethernet2,Ethernet3,Ethernet4,Ethernet5,Ethernet6,Ethernet7)
+  PASS  pass 3 dark-switch: no shutdown accepted on rail-sw1 after 30 s
+  PASS  pass 3 dark-switch: the rails whole again after the drill: every rail answers its same-rail ping and every rail switch's rendered ports are up (poll 2)
+  PASS  pass 3 dark-switch: rail-sw1 after the restore: parity, 0 missing lines
+  PASS  pass 3 dark-switch: audit.sh --quick after the drill: RESULT: 178 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+  PASS  pass 3 dark-switch: same-1 (rail 1, rail-sw1): before the cut, 48 of 48 answered
+  PASS  pass 3 dark-switch: same-1 (rail 1, rail-sw1): while rail-sw1 was dark, 0 of 63 answered (dark, as planned: nothing routes around it)
+  PASS  pass 3 dark-switch: ... its requests left k8s-gpu1 on rail 1 (63) and none reached k8s-gpu2 (0): the dead rail is silent
+  PASS  pass 3 dark-switch: ... after the no shutdown it answered again: the first answered request sent 7.07 s after the restore's session began (4.282 s after it returned; an event, host clock)
+  PASS  pass 3 dark-switch: ... after the restore, from its first answered request on, 92 of 92 answered
+  PASS  pass 3 dark-switch: same-2 (rail 2, rail-sw2): before the cut, 48 of 48 answered
+  PASS  pass 3 dark-switch: same-2 (rail 2, rail-sw2): while rail-sw1 was dark, 134 of 134 answered
+  PASS  pass 3 dark-switch: ... after the restore, from its first answered request on, 117 of 117 answered
+  PASS  pass 3 dark-switch: same-3 (rail 3, rail-sw1): before the cut, 48 of 48 answered
+  PASS  pass 3 dark-switch: same-3 (rail 3, rail-sw1): while rail-sw1 was dark, 0 of 85 answered (dark, as planned: nothing routes around it)
+  PASS  pass 3 dark-switch: ... its requests left k8s-gpu1 on rail 3 (85) and none reached k8s-gpu2 (0): the dead rail is silent
+  PASS  pass 3 dark-switch: ... after the no shutdown it answered again: the first answered request sent 6.705 s after the restore's session began (3.917 s after it returned; an event, host clock)
+  PASS  pass 3 dark-switch: ... after the restore, from its first answered request on, 84 of 84 answered
+  PASS  pass 3 dark-switch: same-4 (rail 4, rail-sw2): before the cut, 48 of 48 answered
+  PASS  pass 3 dark-switch: same-4 (rail 4, rail-sw2): while rail-sw1 was dark, 134 of 134 answered
+  PASS  pass 3 dark-switch: ... after the restore, from its first answered request on, 117 of 117 answered
+  PASS  pass 3 dark-switch: same-5 (rail 5, rail-sw1): before the cut, 48 of 48 answered
+  PASS  pass 3 dark-switch: same-5 (rail 5, rail-sw1): while rail-sw1 was dark, 0 of 45 answered (dark, as planned: nothing routes around it)
+  PASS  pass 3 dark-switch: ... its requests left k8s-gpu1 on rail 5 (45) and none reached k8s-gpu2 (0): the dead rail is silent
+  PASS  pass 3 dark-switch: ... after the no shutdown it answered again: the first answered request sent 6.815 s after the restore's session began (4.027 s after it returned; an event, host clock)
+  PASS  pass 3 dark-switch: ... after the restore, from its first answered request on, 93 of 93 answered
+  PASS  pass 3 dark-switch: same-6 (rail 6, rail-sw2): before the cut, 48 of 48 answered
+  PASS  pass 3 dark-switch: same-6 (rail 6, rail-sw2): while rail-sw1 was dark, 134 of 134 answered
+  PASS  pass 3 dark-switch: ... after the restore, from its first answered request on, 117 of 117 answered
+  PASS  pass 3 dark-switch: same-7 (rail 7, rail-sw1): before the cut, 48 of 48 answered
+  PASS  pass 3 dark-switch: same-7 (rail 7, rail-sw1): while rail-sw1 was dark, 0 of 117 answered (dark, as planned: nothing routes around it)
+  PASS  pass 3 dark-switch: ... its requests left k8s-gpu1 on rail 7 (117) and none reached k8s-gpu2 (0): the dead rail is silent
+  PASS  pass 3 dark-switch: ... after the no shutdown it answered again: the first answered request sent 7.21 s after the restore's session began (4.422 s after it returned; an event, host clock)
+  PASS  pass 3 dark-switch: ... after the restore, from its first answered request on, 81 of 81 answered
+  PASS  pass 3 dark-switch: same-8 (rail 8, rail-sw2): before the cut, 48 of 48 answered
+  PASS  pass 3 dark-switch: same-8 (rail 8, rail-sw2): while rail-sw1 was dark, 134 of 134 answered
+  PASS  pass 3 dark-switch: ... after the restore, from its first answered request on, 117 of 117 answered
+  PASS  pass 3 dark-switch: cross-2-1 (rail 2 to rail 1: request on rail-sw1, reply on rail-sw2): before the cut, 48 of 48 answered
+  PASS  pass 3 dark-switch: cross-2-1 (rail 2 to rail 1: request on rail-sw1, reply on rail-sw2): while rail-sw1 was dark, 0 of 63 answered (dark, as planned: nothing routes around it)
+  PASS  pass 3 dark-switch: ... its requests left k8s-gpu1 on rail 1 (63) and none reached k8s-gpu2 (0): the dead rail is silent
+  PASS  pass 3 dark-switch: ... after the no shutdown it answered again: the first answered request sent 7.07 s after the restore's session began (4.282 s after it returned; an event, host clock)
+  PASS  pass 3 dark-switch: ... after the restore, from its first answered request on, 92 of 92 answered
+  PASS  pass 3 dark-switch: cross-1-2 (rail 1 to rail 2: request on rail-sw2, reply on rail-sw1): before the cut, 48 of 48 answered
+  PASS  pass 3 dark-switch: cross-1-2 (rail 1 to rail 2: request on rail-sw2, reply on rail-sw1): while rail-sw1 was dark, 0 of 129 answered (dark, as planned: nothing routes around it)
+  PASS  pass 3 dark-switch: ... its requests reached k8s-gpu2 on rail 2 (129 of 129), k8s-gpu2's replies left on rail 1 (129) and none reached k8s-gpu1: the reply rides the dead rail
+  PASS  pass 3 dark-switch: ... after the no shutdown it answered again: the first answered request sent 6.669 s after the restore's session began (3.881 s after it returned; an event, host clock)
+  PASS  pass 3 dark-switch: ... after the restore, from its first answered request on, 84 of 84 answered
+  PASS  pass 3 dark-switch: cross-2-4 (rail 2 to rail 4: request on rail-sw2, reply on rail-sw2): before the cut, 48 of 48 answered
+  PASS  pass 3 dark-switch: cross-2-4 (rail 2 to rail 4: request on rail-sw2, reply on rail-sw2): while rail-sw1 was dark, 134 of 134 answered
+  PASS  pass 3 dark-switch: ... after the restore, from its first answered request on, 117 of 117 answered
+  KNOWN pass 3 dark-switch: a KLISH shutdown drops no carrier at the GPU NICs, so the dark rail shows only as silence (rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP rail1=UP rail2=UP rail3=UP rail4=UP rail5=UP rail6=UP rail7=UP rail8=UP): L9
+== RESULT: 153 passed, 0 failed, 3 known platform limitation(s), 0 skipped

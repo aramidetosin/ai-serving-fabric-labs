@@ -1,10 +1,12 @@
 # Chapter 5 results
 
-What lab `sfab-ch05` proved on its recorded deployment under build A revision 2, the verdict lines that prove each part, the RESULT line of every set, and how to reproduce them. `audits/INDEX.md` maps the book's exhibits to the same sets and lines.
+What lab `sfab-ch05` proved on its two recorded deployments under build A revision 2, the verdict lines that prove each part, the RESULT line of every set, and how to reproduce them. `audits/INDEX.md` maps the book's exhibits to the same sets and lines.
 
-The deployment ran on 2026-10-29 from wiped disks, at host tick 10000 on containerlab 0.82.0, with the images `vrnetlab/dell_sonic:4.6.0` (c0214f532277) and `sfab/vm-node:6-k8s1.35.8` (f3c5c06ad669). Every command ran in tmux under `script`, so each journal shows the command exactly as typed: `make down` and `make wipe` at 00:00:46, `make up` from 00:02:47 to 00:10:29, `make audit`, `make trace`, `make drills PASSES=3`, `make break-5a`, `make heal-5a`, `make rpf`, `make record` from 00:20:21 to 00:21:50, and `make down` to 00:21:58 (`audits/sfab-ch05_record-run_20261029T000046Z/chain.log`). No container restarted between the end of `make up` and the end of `make record` (the start times in `audits/sfab-ch05_record-run_20261029T000046Z/startedat-*.txt` are identical, every one `restarts=0`). Times are the lab host's clock, UTC. The deployment ran on the first of the book's two lab hosts, the one where the serving timers were measured; preflight read 116.6 GiB available against the lab's 55.0 GiB and the 16.0 GiB floor (N/rec-make-up.txt:19).
+The earlier deployment ran on 2026-10-29 from wiped disks, at host tick 10000 on containerlab 0.82.0, with the images `vrnetlab/dell_sonic:4.6.0` (c0214f532277) and `sfab/vm-node:6-k8s1.35.8` (f3c5c06ad669). Every command ran in tmux under `script`, so each journal shows the command exactly as typed: `make down` and `make wipe` at 00:00:46, `make up` from 00:02:47 to 00:10:29, `make audit`, `make trace`, `make drills PASSES=3`, `make break-5a`, `make heal-5a`, `make rpf`, `make record` from 00:20:21 to 00:21:50, and `make down` to 00:21:58 (`audits/sfab-ch05_record-run_20261029T000046Z/chain.log`). No container restarted between the end of `make up` and the end of `make record` (the start times in `audits/sfab-ch05_record-run_20261029T000046Z/startedat-*.txt` are identical, every one `restarts=0`). Times are the lab host's clock, UTC. The deployment ran on the first of the book's two lab hosts, the one where the serving timers were measured; preflight read 116.6 GiB available against the lab's 55.0 GiB and the 16.0 GiB floor (N/rec-make-up.txt:19).
 
-The short names are the index's: N is `audits/sfab-ch05_record-run_20261029T000046Z/`, U `audits/sfab-ch05_audit_20261029T000940Z/` (the audit `make up` ran), A `audits/sfab-ch05_audit_20261029T001030Z/`, T `audits/sfab-ch05_trace_20261029T001119Z/`, R `audits/sfab-ch05_drills_20261029T001158Z/`, B `audits/sfab-ch05_break-5a_20261029T001754Z/`, H `audits/sfab-ch05_heal-5a_20261029T001855Z/`, HA the chapter audit H ran, PF `audits/sfab-ch05_rpf_20261029T002014Z/`, RA and RT the audit and trace `make record` ran.
+The deployment from the public repository ran on 2026-11-01 from wiped disks, from a clone of https://github.com/aramidetosin/ai-serving-fabric-labs at commit `ebc79b42ed8e7c27efd526eb0362447cb260e449` with no tracked file changed (every `RUN.json` of its sets reads that commit, `dirty: false`), at host tick 10000 on containerlab 0.82.0, with the same images at the same IDs, on the second of the book's two lab hosts. Its chain began with the reader's `git clone` of that URL, recorded under `script` (`audits/sfab-ch05_record-run_20261101T193612Z/rec-git-clone.txt`), then `make down`, `make wipe`, `make up`, `make audit`, `make trace`, `make drills PASSES=3`, `make break-5a`, `make heal-5a`, `make rpf`, `make record` and `make down`, each in tmux under `script` (`audits/sfab-ch05_record-run_20261101T193612Z/chain.log`). No container restarted between the end of `make up` and the end of `make record`. Its short names start with C: CN is `audits/sfab-ch05_record-run_20261101T193612Z/`, CU `audits/sfab-ch05_audit_20261101T194844Z/`, CA `audits/sfab-ch05_audit_20261101T194956Z/`, CT `audits/sfab-ch05_trace_20261101T195106Z/`, CR `audits/sfab-ch05_drills_20261101T195202Z/`, CB `audits/sfab-ch05_break-5a_20261101T200044Z/`, CH `audits/sfab-ch05_heal-5a_20261101T200215Z/`, CHA `audits/sfab-ch05_audit_20261101T200301Z/`, CPF `audits/sfab-ch05_rpf_20261101T200412Z/`, and CRA `audits/sfab-ch05_audit_20261101T200426Z/` and CRT `audits/sfab-ch05_trace_20261101T200536Z/`, the audit and trace its `make record` ran. It carries the book's Examples 5-1, 5-2 and 5-11; the earlier deployment carries every other exhibit (`audits/INDEX.md`).
+
+The earlier deployment's short names are the index's: N is `audits/sfab-ch05_record-run_20261029T000046Z/`, U `audits/sfab-ch05_audit_20261029T000940Z/` (the audit `make up` ran), A `audits/sfab-ch05_audit_20261029T001030Z/`, T `audits/sfab-ch05_trace_20261029T001119Z/`, R `audits/sfab-ch05_drills_20261029T001158Z/`, B `audits/sfab-ch05_break-5a_20261029T001754Z/`, H `audits/sfab-ch05_heal-5a_20261029T001855Z/`, HA the chapter audit H ran, PF `audits/sfab-ch05_rpf_20261029T002014Z/`, RA and RT the audit and trace `make record` ran.
 
 ## Revision 2, against revision 1
 
@@ -39,6 +41,14 @@ Revision 1's sets (a deployment on 2026-10-21 and a second, for `make rpf` alone
 | A KLISH shutdown drops no carrier: while rail-sw1's ports read `down admin-down`, both nodes' kernels read all sixteen rail NICs `UP` | R/verdict.txt:53, :107, :160 (KNOWN L9); R/pass1/dark-switch/klish/during-rail-sw1.txt:12 to :19, links-during-k8s-gpu1.txt, links-during-k8s-gpu2.txt |
 | break-5a: with the source pin removed from one relay route on one node, rail 1 to rail 2 fails from that node only, its requests reaching the far node from the relay address 10.21.250.1 and the far node's replies going into its own relay bridge; rail 1 to rail 3, the reverse direction and the same rail everywhere keep working, and parity holds on both rail switches; the heal puts the pin back and the requests arrive from 10.21.1.11 again | B/verdict.txt:26 to :35; H/verdict.txt:15 to :23 |
 | The trace and the audit after the drills, the break, the heal and `make rpf`, on the same deployment, as before them | RA/verdict.txt:1 to :385; RT/verdict.txt:1 to :54 |
+| From a clone of the public repository with no tracked file changed, the same lab deploys from wiped disks and passes the same audit, trace, drills, break, heal and rp_filter run: every set 0 failed, the audits and traces with the same verdict lines at the same numbers | CA/verdict.txt:1 to :385, CRA/verdict.txt:1 to :385 (`audits/INDEX.md` lists what differs); CT/verdict.txt:1 to :54, CRT/verdict.txt:1 to :54; CR/verdict.txt:1 to :160; CPF/verdict.txt:1 to :22; CN/chain.log:1 to :42; CN/clone-check.txt:2 to :7 |
+
+Facts the deployment from the public repository shows and a reader should know (`audits/INDEX.md`, "The deployment from the public repository", has the lines):
+
+- **The drill's sessions and return** were slower on this host than on the first: the shut session took 2.73 to 2.91 s and the restore session 2.79 to 3.01 s, the switch was dark 26.92 to 27.10 s between them, and each dark row's first answered request was sent 6.295 to 7.419 s after the restore's session began (CR/pass1/dark-switch/analysis.txt:1, pass2/dark-switch/analysis.txt:1, pass3/dark-switch/analysis.txt:1; the return lines in CR/verdict.txt). The same rows went dark in every pass, as in the earlier deployment (CR/DRILLS.md:45).
+- **The second witness agreed in every pass.** The earlier deployment's one disagreement, in pass 2, has no counterpart here, so CR reads 153 passed where R read 154.
+- **Node sync replaced `netsetup.sh` on both guests** at boot and ran it again (CN/rec-make-up.txt:140 to :147); the guests then matched the repository, and every audit passed.
+- **Boot's dns-zones step** found no secondary DNS zone in this lab and said so, so boot reads 24 passed where the earlier deployment read 23 (CN/rec-make-up.txt:148 to :151).
 
 ## The RESULT lines
 
@@ -56,12 +66,26 @@ Revision 1's sets (a deployment on 2026-10-21 and a second, for `make rpf` alone
 | RT, `sfab-ch05_trace_20261029T002111Z` (the trace `make record` ran) | `== RESULT: 49 passed, 0 failed, 0 known platform limitation(s), 0 skipped` |
 | the gate `make record` ran on RA and RT and the repository | `== RESULT: 12 passed, 0 failed, 0 known platform limitation(s), 5 skipped` (N/rec-make-record.txt:478) |
 | the gate on U, A, T, R, B, H, HA and PF | `== RESULT: 48 passed, 0 failed, 0 known platform limitation(s), 17 skipped` (N/gate-sets.txt) |
+| CU, `sfab-ch05_audit_20261101T194844Z` (the audit `make up` ran, from the public repository) | `== RESULT: 346 passed, 0 failed, 0 known platform limitation(s), 1 skipped` |
+| CA, `sfab-ch05_audit_20261101T194956Z` (`make audit`) | `== RESULT: 346 passed, 0 failed, 0 known platform limitation(s), 1 skipped` |
+| CT, `sfab-ch05_trace_20261101T195106Z` (`make trace`) | `== RESULT: 49 passed, 0 failed, 0 known platform limitation(s), 0 skipped` |
+| CR, `sfab-ch05_drills_20261101T195202Z` (`make drills PASSES=3`) | `== RESULT: 153 passed, 0 failed, 3 known platform limitation(s), 0 skipped` |
+| CB, `sfab-ch05_break-5a_20261101T200044Z` (`make break-5a`) | `== RESULT: 32 passed, 0 failed, 0 known platform limitation(s), 0 skipped` |
+| CH, `sfab-ch05_heal-5a_20261101T200215Z` (`make heal-5a`) | `== RESULT: 19 passed, 0 failed, 0 known platform limitation(s), 0 skipped` |
+| CHA, `sfab-ch05_audit_20261101T200301Z` (the chapter audit heal-5a ran) | `== RESULT: 346 passed, 0 failed, 0 known platform limitation(s), 1 skipped` |
+| CPF, `sfab-ch05_rpf_20261101T200412Z` (`make rpf`) | `== RESULT: 16 passed, 0 failed, 0 known platform limitation(s), 0 skipped` |
+| CRA, `sfab-ch05_audit_20261101T200426Z` (the audit `make record` ran) | `== RESULT: 346 passed, 0 failed, 0 known platform limitation(s), 1 skipped` |
+| CRT, `sfab-ch05_trace_20261101T200536Z` (the trace `make record` ran) | `== RESULT: 49 passed, 0 failed, 0 known platform limitation(s), 0 skipped` |
+| the gate `make record` ran on CRA, CRT and the repository | `== RESULT: 12 passed, 0 failed, 0 known platform limitation(s), 5 skipped` (CN/rec-make-record.txt:476) |
+| the gate on CU, CA, CT, CR, CB, CH, CHA and CPF | `== RESULT: 48 passed, 0 failed, 0 known platform limitation(s), 17 skipped` (CN/gate-sets.txt:75) |
+| the clean-up `make down` and `make wipe` of that deployment | `== RESULT: 3 passed, 0 failed, 0 known platform limitation(s), 1 skipped` (CN/rec-clean-down.txt:9, nothing deployed yet in the new clone); `== RESULT: 4 passed, 0 failed, 0 known platform limitation(s), 0 skipped` (CN/rec-clean-wipe.txt:10) |
+| its closing `make down` | `== RESULT: 4 passed, 0 failed, 0 known platform limitation(s), 0 skipped` (CN/rec-make-down.txt:336) |
 
-The three KNOWN lines are L9, one in each drill pass: a KLISH shutdown drops no carrier at the far end. The one SKIP in every audit is namecheck, which the lab host runs without the author's scrub list; the gates' SKIPs are namecheck and the literal scan for the same reason. A run with the scrub and literals lists, over every committed set, found nothing (`audits/INDEX.md`).
+The three KNOWN lines in each deployment's drills are L9, one in each drill pass: a KLISH shutdown drops no carrier at the far end. The one SKIP in every audit is namecheck, which the lab host runs without the author's scrub list; the gates' SKIPs are namecheck and the literal scan for the same reason. A run with the scrub and literals lists, over every committed set, found nothing (`audits/INDEX.md`).
 
 ## The result sets
 
-All under `audits/`, each with its `RUN.json` (lab, spec and render sha256, image ids, containerlab version, host tick 10000, UTC start and end), `verdict.txt`, `RESULT.txt` and `commands.txt`. Each `RUN.json` names, from the copy's stamp, a commit of the pre-release history, which is not in this repository, with `dirty: true`; `audits/INDEX.md` says why, and names the later changes the repository's first public commit holds on this lab's path.
+All under `audits/`, each with its `RUN.json` (lab, spec and render sha256, image ids, containerlab version, host tick 10000, UTC start and end), `verdict.txt`, `RESULT.txt` and `commands.txt`. Each of the earlier deployment's `RUN.json` files names, from the copy's stamp, a commit of the pre-release history, which is not in this repository, with `dirty: true`; `audits/INDEX.md` says why, and names the later changes the repository's first public commit holds on this lab's path.
 
 | Directory | What it holds |
 |---|---|
@@ -71,13 +95,16 @@ All under `audits/`, each with its `RUN.json` (lab, spec and render sha256, imag
 | `sfab-ch05_drills_20261029T001158Z/` | the drill's three passes, `pass<N>/dark-switch/` (timeline, host-side captures and decodes, the guest's ping logs, KLISH snapshots, the nodes' link reads, parity, the analysis), and `DRILLS.md` |
 | `sfab-ch05_break-5a_20261029T001754Z/`, `sfab-ch05_heal-5a_20261029T001855Z/` | the break and the heal: the route reads, the pings, the far node's captures, parity |
 | `sfab-ch05_rpf_20261029T002014Z/` | `make rpf`: `FOLLOWED.txt`, the reads of each case, each opening with the command at `admin`'s prompt |
+| `sfab-ch05_record-run_20261101T193612Z/` and the ten `..._20261101T...` sets | the deployment from the public repository, laid out as the sets above, with the recorded `git clone` and `clone-check.txt` in its plain files; every `RUN.json` names the public commit `ebc79b42` with `dirty: false` |
 
 ## How to reproduce
 
 On a Linux host with KVM, Docker, containerlab 0.82.0, the host tick at 10000, the images `vrnetlab/dell_sonic:4.6.0` and `sfab/vm-node:6-k8s1.35.8`, 71 GiB of MemAvailable and no other `sfab-` lab running:
 
 ```
-cd ch05
+git clone https://github.com/aramidetosin/ai-serving-fabric-labs.git
+cd ai-serving-fabric-labs/ch05
+make down && make wipe
 make up
 make audit
 make trace
@@ -89,13 +116,13 @@ make record
 make down
 ```
 
-`make up` took 7 min 42 s here, its switches' boot 271 s of it. A full audit took 49 s without the author's scrub list; with it, the repository's namecheck takes most of an audit's time. `make drills` took 5 min 56 s for three passes.
+On the earlier deployment, `make up` took 7 min 42 s, its switches' boot 271 s of it. A full audit took 49 s without the author's scrub list; with it, the repository's namecheck takes most of an audit's time. `make drills` took 5 min 56 s for three passes.
 
 ## What the recordings do not show
 
 - **The pod half of Example 5-4.** This lab runs no cluster and renders no rail attachment, so no pod's rail leg or relay leg comes from it.
-- **A `git clone` line.** No recording ran `git clone`: the clone line is the repository README's; Example 5-1 opens at `cd ch05`.
-- **Why the return took longer than in revision 1.** Revision 2's dark rows answered again 3.942 to 6.079 s after the restore's session began, against revision 1's 0.488 to 1.809 s on the same rails and rows; revision 2 adds PVST with edge ports, BPDU guard and storm control on the rail ports. No read in the drill shows the switch's spanning-tree or port state between the `no shutdown` and the first answer, so the recordings time the return and do not say where those seconds went.
+- **A `git clone` line in the earlier deployment.** Its chain began at `make down`; the recorded clone is the deployment from the public repository's (CN/rec-git-clone.txt), which made a clone of its own in an empty directory and deployed from a clone of the same commit and tree (CN/clone-check.txt:2 to :7).
+- **Why the return took longer than in revision 1.** Revision 2's dark rows answered again 3.942 to 6.079 s after the restore's session began, against revision 1's 0.488 to 1.809 s on the same rails and rows; revision 2 adds PVST with edge ports, BPDU guard and storm control on the rail ports. No read in the drill shows the switch's spanning-tree or port state between the `no shutdown` and the first answer, so the recordings time the return and do not say where those seconds went. The deployment from the public repository's return, 6.295 to 7.419 s on the second lab host, is no more explained.
 - **A switch refusing an oversized frame.** Every 9001-byte DF ping was refused at the sender's own 9000-byte interface, so no frame larger than 9014 bytes ever reached a rail switch, and the switch ports' 9216 was never the limit on either path.
 - **A BPDU guard trip.** No BPDU reached a rail port; the audit reads BPDU guard configured and no port shut by it.
 - **The VM nodes' tc redirect.** The lab host's kernel accepted `group_fwd_mask 0x4004`, so every data NIC of every VM node took its bridge. A stock kernel refuses that mask, and on such a host `vm-init.sh` joins the data NICs, the bond members among them, to their taps with a tc mirred redirect instead. No recorded run exercised that path; `guest.nic_link: tc` in `spec/common.yaml`, with the lab rendered again, forces it, for testing (`../README.md`, "The host").
