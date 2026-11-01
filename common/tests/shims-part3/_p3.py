@@ -772,6 +772,11 @@ def p3_client(s, ctr, argv, stdin, now):
         return curl_p3(s, ctr, argv, now)
     if argv[:1] == ["sfab-dns"] and argv[1:2] == ["reload"]:
         d = argv[2] if len(argv) > 2 else "/sfab/bootstrap"
+        if c.get("reload_busy", 0) > 0:
+            # the restart met the listening address still held: sfab-dns puts the previous one back
+            c["reload_busy"] -= 1
+            return 1, ("[sfab-dns] put the previous configuration back\n[sfab-dns] FAIL: the reload failed; the previous configuration serves\n\n"
+                       "dnsmasq: failed to create listening socket for 10.24.10.53: Address in use")
         if d.startswith("/tmp/sfab-break"):
             conf = files.get(f"{d}/dnsmasq.conf") or ""
             names = {f"{m.group(1)}": m.group(2) for m in re.finditer(r"(?m)^address=/([^/]+)/(\S+)$", conf)}

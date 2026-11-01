@@ -64,7 +64,7 @@ dnsmasq_pin_action() {
   X "$node" sh -c "rm -rf $dir && mkdir -p $dir && cp -R /sfab/bootstrap/. $dir/" >"$RS/record/$tag-$node-copy.txt" 2>&1 || true
   _evid "$node" container "+ cat >$dir/$f (record/$(basename "$rec"))"
   dk exec -i "$c" sh -c "cat >$dir/$f" <"$rec" || { bad "$node: dnsmasq.conf written" "docker exec failed"; return 1; }
-  if X "$node" sfab-dns reload "$dir" >"$RS/record/$tag-$node-reload.txt" 2>&1; then
+  if dns_reload "$node" "$dir" "$RS/record/$tag-$node-reload.txt"; then
     ok "$node: the platform's zone no longer forwarded; $(jf "$js" names | paste -sd ' ' -) pinned to $(jf "$js" address) with address=; dnsmasq restarted on the copy ($(tail -n 1 "$RS/record/$tag-$node-reload.txt"))"
   else
     bad "$node: dnsmasq restarted with the pins" "$(tail -n 2 "$RS/record/$tag-$node-reload.txt" | paste -sd ';' -)"

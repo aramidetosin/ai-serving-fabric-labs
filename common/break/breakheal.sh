@@ -371,7 +371,7 @@ dns_answer_action() {
   X "$node" sh -c "rm -rf $dir && mkdir -p $dir && cp -R /sfab/bootstrap/. $dir/" >"$RS/record/$tag-$node-copy.txt" 2>&1 || true
   _evid "$node" container "+ cat >$dir/$f (record/$tag-$node-$(basename "$f").txt)"
   dk exec -i "$c" sh -c "cat >$dir/$f" <"$RS/record/$tag-$node-$(basename "$f").txt" || { bad "$node: the zone written" "docker exec failed"; return 1; }
-  if X "$node" sfab-dns reload "$dir" >"$RS/record/$tag-$node-reload.txt" 2>&1; then
+  if dns_reload "$node" "$dir" "$RS/record/$tag-$node-reload.txt"; then
     ok "$node: view $(jf "$js" view) answers $(jf "$js" names | paste -sd ' ' -) with $(jf "$js" address) ($(jf "$js" answer)), rendered $(jf "$js" rendered); BIND reloaded on the copy ($(tail -n 1 "$RS/record/$tag-$node-reload.txt"))"
   else
     bad "$node: BIND reloaded with the moved answer" "$(tail -n 2 "$RS/record/$tag-$node-reload.txt" | paste -sd ';' -)"
@@ -440,10 +440,28 @@ serial_behind() {
   [ "$d" -gt 0 ] && [ "$d" -lt 2147483648 ]
 }
 
+# dns_reload NODE DIR OUT: sfab-dns reload of DIR on NODE, its output in OUT. dnsmasq reads its
+# configuration only at start, so sfab-dns stops it and starts it again, and the new process can
+# find the listening address still held ("Address in use": the resolver image's own supervisor can
+# start the server again in the second between the two, met on chapter 9's lab); sfab-dns then puts
+# the previous configuration back. Such a reload is tried again after 3 s, twice at most, each retry
+# written into OUT with its reason; any other failure is returned at once.
+dns_reload() {
+  local node="$1" dir="$2" out="$3" n=1
+  : >"$out"
+  while :; do
+    if X "$node" sfab-dns reload "$dir" >>"$out" 2>&1; then return 0; fi
+    { [ "$n" -lt 3 ] && grep -q 'Address in use' "$out"; } || return 1
+    n=$((n + 1))
+    sleep 3
+    printf '[breakheal] the reload met a listening socket still in use; reload attempt %s\n' "$n" >>"$out"
+  done
+}
+
 # restore_dns NODE: the DNS server's render installed again and reloaded, the break's copy removed
 restore_dns() {
   local node="$1"
-  if X "$node" sfab-dns reload /sfab/bootstrap >"$RS/record/restore-$node.txt" 2>&1; then
+  if dns_reload "$node" /sfab/bootstrap "$RS/record/restore-$node.txt"; then
     ok "$node: the rendered zones installed again and reloaded ($(tail -n 1 "$RS/record/restore-$node.txt"))"
   else
     bad "$node: the rendered zones reloaded" "$(tail -n 2 "$RS/record/restore-$node.txt" | paste -sd ';' -)"

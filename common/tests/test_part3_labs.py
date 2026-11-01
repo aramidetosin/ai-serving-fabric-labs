@@ -553,6 +553,16 @@ class Break9aTest(BreakMixin, P3LabTest):
         self.assertRegex(vb, r"  PASS  staff: AAAA: REFUSED with 0 answer\(s\), not NOERROR with 0 answer\(s\)")
         self.assertIsNone(load(self.t / "world.json")["p3"]["pinned"])
 
+    def test_a_reload_that_meets_a_busy_socket_is_tried_again(self):
+        """dnsmasq's restart finding its listening address still held fails the reload once; the break
+        tries it again and says so in its record."""
+        self.world_p3(reload_busy=1)
+        vb, _vh = self.broke_and_healed("9a")
+        self.assertRegex(vb, r"  PASS  ent-dns: the platform's zone no longer forwarded")
+        rec = (self.last_set("break-9a") / "record" / "break-ent-dns-reload.txt").read_text()
+        self.assertIn("Address in use", rec)
+        self.assertIn("[breakheal] the reload met a listening socket still in use; reload attempt 2", rec)
+
     def test_a_local_line_over_the_zone_gives_no_symptom(self):
         """With local=/tarnwick.example/ kept, the server answers the pinned name's AAAA itself (NODATA):
         the break check sees no symptom and fails."""
