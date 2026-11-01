@@ -23,7 +23,8 @@
 #                                population's held connections (lib-tenancy.sh hold_start), then
 #                                probe_isolation.py in each client (its own Gateway's /echo and the
 #                                matrix's cells it must not reach, rounds times), the session counts
-#                                read while held, the load stopped; p3drill.py analyze-isolation
+#                                read while held before the tries and again after them (recorded,
+#                                not judged), the load stopped; p3drill.py analyze-isolation
 #                                prints one line a population with its allowed count and its zeros
 #
 # Every restore is pushed before its change and runs last-in first-out from the EXIT trap whatever
@@ -256,6 +257,10 @@ isodrill() {
     for ((i = 0; i < rows; i++)); do hold_wait "$dir" "$i" 120 || true; done
     p3d_tl HELD "x$factor"
     sleep "$(p3d_get timing.lead_s)"
+    # the plan's load alone, before the tries: the probes' own connections to the same VIP (its own
+    # Gateway's /echo, an allowed cell) stay listed by their closing timeouts after they end, so a
+    # count read after them is not the held load's; that one is saved too, with the entries' states
+    hold_counts "$dir" held
     for ((i = 0; i < rows; i++)); do
       client="$(p3d_get "list.$DRILL_ID.rows.$i.client")"
       py "$P3D" iso-plan --plan "$P3D_PLAN" --drill "$DRILL_ID" --row "$i" | dk exec -i "$(ctr "$client")" sh -c "umask 077; mkdir -p $P3D_DIR; cat >$P3D_DIR/iso-plan.json"
@@ -265,7 +270,7 @@ isodrill() {
     done
     p3d_tl TRIES "x$factor"
     py -c 'import sys, time; time.sleep(float(sys.argv[1]) * float(sys.argv[2]) + 15)' "$(p3d_get "list.$DRILL_ID.rounds")" "$(p3d_get "list.$DRILL_ID.interval_s")"
-    hold_counts "$dir" held
+    hold_counts "$dir" tries
     for ((i = 0; i < rows; i++)); do
       client="$(p3d_get "list.$DRILL_ID.rows.$i.client")"
       for _ in $(seq 1 60); do

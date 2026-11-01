@@ -485,6 +485,12 @@ class Ch11Test(P3LabTest):
         self.assertRegex(v, r"  PASS  pass 1 isolation-under-load x1 internet \(inet-client\): its own Gateway 2 of 2 answered 200; "
                             r"gw-internal 0/2 through; gw-users 0/2 through; gw-inet 2/2 allowed; staff 0/2 through; admin 0/2 through")
         self.assertRegex(v, r"  PASS  pass 1 isolation-under-load x2 enterprise: 4 connection\(s\) from ent-client held")
+        # the held load counted before the tries, and again after them with the entries' states (recorded)
+        for f in ("x1", "x2"):
+            sub = rs / "pass1" / "isolation-under-load" / f
+            for tag in ("held", "tries"):
+                self.assertTrue((sub / f"counts-{tag}-internet.txt").is_file(), f"{f} counts-{tag}")
+            self.assertTrue((sub / "sessions-tries-internet.txt").is_file(), f"{f} sessions-tries")
 
     def test_leaked_key_drill(self):
         def fast(d):
