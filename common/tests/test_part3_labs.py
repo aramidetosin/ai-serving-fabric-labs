@@ -620,5 +620,34 @@ class SettleTargetsTest(unittest.TestCase):
                                                 "client ops-client 10.20.11.200 operator"])
 
 
+class Ch09PopulationsTest(unittest.TestCase):
+    """The populations group in chapter 9's lab: the internet users' requests to the published
+    address are refused by deny-all-log at this step (gen/tenancy.json audiences.reach), so the
+    judge wants them unanswered, and an answer there fails."""
+
+    def run_judge(self, users: str, admin: str) -> str:
+        with tempfile.TemporaryDirectory() as td:
+            d = Path(td) / "inet-client"
+            d.mkdir()
+            for name, text in (("09_pop_dns_users", "198.51.100.10\n"), ("10_pop_dns_admin", ""), ("11_pop_dns_infra", ""),
+                               ("12_pop_https_users", users), ("13_pop_https_admin", admin)):
+                (d / f"{name}.txt").write_text(text, encoding="utf-8")
+            return subprocess.run([sys.executable, str(COMMON / "audit" / "judge.py"), "run", "--set", td,
+                                   "--inv", str(ROOT / "ch09" / "gen" / "inventory.json"), "--render", str(ROOT / "ch09"),
+                                   "populations", "inet-client"], capture_output=True, text=True).stdout
+
+    def test_refused_requests_pass(self):
+        out = self.run_judge("curl: (28) Connection timed out after 20002 milliseconds\n",
+                             "curl: (28) Connection timed out after 20002 milliseconds\n")
+        self.assertIn("  PASS  inet-client: https://llm.ai.tarnwick.example/echo: no answer, refused at fw by deny-all-log at "
+                      "198.51.100.10 (no translation or rule at this step)", out)
+        self.assertRegex(out, r"  PASS  inet-client: https://admin\.ai\.tarnwick\.example/echo: no answer, refused at fw")
+        self.assertNotIn("FAIL", out)
+
+    def test_an_answer_fails(self):
+        out = self.run_judge("HTTP/1.1 200 OK\r\nserver: envoy\r\n\r\nsfab\n", "curl: (28) Connection timed out\n")
+        self.assertRegex(out, r"  FAIL  inet-client: https://llm\.ai\.tarnwick\.example/echo: no answer, .* -> HTTP 200")
+
+
 if __name__ == "__main__":
     unittest.main()

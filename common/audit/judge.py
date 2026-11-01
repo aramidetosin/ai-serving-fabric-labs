@@ -2754,6 +2754,15 @@ class Judge:
     def g_populations(self, names):
         dns = self.inv.get("dns") or {}
         gws = self.inv.get("gateways") or {}
+        # from chapter 8 gen/tenancy.json's audiences.reach gives each population's connect to its own
+        # Gateway at this step: one the firewall does not yet let through (the internet users in
+        # chapter 9, before the translation) is judged unanswered there, its log line the
+        # split-horizon group's
+        try:
+            reach = {r["population"]: r for r in (json.load(open(self.render / "gen" / "tenancy.json", encoding="utf-8"))
+                                                  .get("audiences") or {}).get("reach") or []}
+        except (OSError, ValueError):
+            reach = {}
         for pname, pop in sorted((self.inv.get("populations") or {}).items()):
             ps = [p for p in probers(self.inv, pop) if not names or p in names]
             # a population with no audience probes no Gateway (population_ctx plans nothing for it)
@@ -2805,7 +2814,12 @@ class Judge:
                     if t is None:
                         continue
                     code, headers, body = p_curl_i(t)
-                    if name in (gw.get("hostnames") or []):
+                    r = reach.get(pname) or {}
+                    if r and r.get("outcome") != "reached":
+                        self.v.check(f"{p}: https://{name}{path}: no answer, refused at {r.get('device') or 'the firewall'} by "
+                                     f"{r.get('rule')} at {r.get('address')} (no translation or rule at this step){pinned_admin if name == admin else pinned}",
+                                     not code, f"HTTP {code}, server {headers.get('server', '') or 'none'}")
+                    elif name in (gw.get("hostnames") or []):
                         self.v.check(f"{p}: https://{name}{path}: 200, the message echoed, the chain verified against the lab root{pinned}",
                                      code == 200 and ctx["echo_msg"] in body, f"HTTP {code}" if code else (t.strip().splitlines() or ["no answer"])[-1][:100])
                     else:
