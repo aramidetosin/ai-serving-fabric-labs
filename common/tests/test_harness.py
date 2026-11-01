@@ -944,6 +944,17 @@ class RedactThroughputTest(unittest.TestCase):
                            ("3 MB/sync", "3 MB/sync")):
             self.assertEqual(redact.redact_text(text, []), want, text)
 
+    def test_firewall_session_info_throughput(self):
+        # PAN-OS show session info's rate line; its packet and connection rates and a configured rate are kept
+        m = "[redacted: throughput]"
+        text = ("Packet rate:                                     6/s\nThroughput:                                      5 kbps\n"
+                "New connection establish rate:                   0 cps\nInterface Name      Storm-type          Rate (kbps)\n")
+        want = ("Packet rate:                                     6/s\nThroughput:                                      " + m + "\n"
+                "New connection establish rate:                   0 cps\nInterface Name      Storm-type          Rate (kbps)\n")
+        self.assertEqual(redact.redact_text(text, []), want)
+        self.assertEqual(redact.redact_text(want, []), want, "a second run changes nothing")
+        self.assertEqual(redact.redact_text("Throughput: 1.5 Mbps\r\n", []), f"Throughput: {m}\r\n")
+
     def test_never_joins_lines(self):
         self.assertEqual(redact.redact_text("111 MBytes\n1.11 Gbits/sec\n", []), "111 MBytes\n[redacted: throughput]\n")
         self.assertEqual(redact.redact_text("111 MBytes\r\n", []), "111 MBytes\r\n")

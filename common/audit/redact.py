@@ -57,7 +57,8 @@ iperf3, dd, scp, apt, fio, rsync), on the line that held it (redact_tree.THROUGH
 the congestion window, a packet rate and a link's configured speed (Mbps, Mb/s) are kept. The
 timings llama-server adds to an answer's JSON (prompt_ms, prompt_per_token_ms, prompt_per_second
 and the predicted_ ones) are the other form caught: each value becomes the marker
-(redact_tree.TIMINGS), and the token counts beside them are kept. A rate written another way (in
+(redact_tree.TIMINGS), and the token counts beside them are kept. The firewall's own rate on show
+session info's "Throughput:" line (bps, kbps, Mbps) becomes the marker too (redact_tree.FW_THROUGHPUT). A rate written another way (in
 words, or in another JSON field such as iperf3 --json's bits_per_second) is not caught, so a check
 reads such output before the set is closed and records only whether the run completed. The rule is
 always on.
@@ -92,6 +93,7 @@ HOST_CPUID = re.compile(redact_tree_mod.HOST_CPUID)
 THROUGHPUT_MARK = redact_tree_mod.MARK.format("throughput")
 THROUGHPUT = re.compile(redact_tree_mod.THROUGHPUT)
 TIMINGS = re.compile(redact_tree_mod.TIMINGS)
+FW_THROUGHPUT = re.compile(redact_tree_mod.FW_THROUGHPUT)
 # a release stands as a whole token: no letter, digit or dot before it (a hyphen, an underscore or
 # a slash may stand there: linux-image-<release>, /boot/vmlinuz-<release>, kver_<release>), except
 # the "v" the bonding driver puts before it; after it no letter, digit or _ + ~ -, and a full stop
@@ -205,6 +207,9 @@ def redact_text(text: str, values: list, kernel=None, key: bytes | None = None) 
     if '_ms"' in text or '_per_second"' in text:
         # llama-server's timings: group 1, the value, ends the match
         text = TIMINGS.sub(lambda m: m.group(0)[:m.start(1) - m.start(0)] + THROUGHPUT_MARK, text)
+    if "Throughput:" in text:
+        # PAN-OS show session info's own rate line: group 2, the value, ends the match
+        text = FW_THROUGHPUT.sub(lambda m: m.group(1) + THROUGHPUT_MARK, text)
     # every unit the expression knows ends in /sec or /s
     return THROUGHPUT.sub(THROUGHPUT_MARK, text) if "/s" in text else text
 

@@ -211,6 +211,11 @@ MARK = "[redacted: {}]"
 # packet rate and a link's configured speed (Mbps, Mb/s, ethtool's 10000Mb/s, whose lowercase b
 # the expression leaves alone) are not throughput figures and are kept.
 THROUGHPUT = r"(?:\d+(?:\.\d+)? [KMGT]?Bytes[ \t]+)?\d+(?:\.\d+)? ?(?:[kKMGT]?bits?|[kKMGT]?i?[Bb]ytes|[kKMGT]?i?B)/s(?:ec)?\b"
+# the firewall's own measured throughput (group 2), as PAN-OS show session info prints it
+# ("Throughput:                                      5 kbps"): the dataplane's rate at the read, in
+# bits per second written as bps, kbps, Mbps or Gbps. Only that labelled line: a configured rate
+# (storm control's "Rate (kbps)", a link's Mbps) is kept.
+FW_THROUGHPUT = r"(?m)^([ \t]*Throughput:[ \t]+)(\d+(?:\.\d+)?[ \t]*[kKMGT]?bps)\b"
 # the timings llama-server adds to an answer's JSON (each value, group 1): the prompt's and the
 # prediction's milliseconds, milliseconds per token and tokens per second, from which a token rate
 # reads directly (chapter 7's keyed captures and the answers a trace or a drill saves). The token
