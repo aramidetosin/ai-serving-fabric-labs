@@ -15,6 +15,11 @@
 #                                  (musl) and curl (its own resolver library), each timed, with its
 #                                  output and exit status, into probes/<id>-<mode>/
 #   lookup_check JSON              what a lookup answered, against the check (breakheal.py lookup)
+#   vip_arp_check JSON             a Gateway's VIP asked for by ARP from the ingress node that does
+#                                  not hold its lease (its neighbour entry flushed first), in the
+#                                  VIP's VLAN: the holder's bond MAC, or no answer
+#   route_set_check JSON           a model route as the cluster holds it: its rules' paths against
+#                                  its audience's row (breakheal.py routeset)
 #
 # Nothing here prints a credential; the patches name objects and fields only.
 
@@ -102,5 +107,44 @@ lookup_check() {
     ok "$(jf "$js" probe): $out"
   else
     bad "$(jf "$js" probe): $(py -c 'import json, sys; c = json.loads(sys.argv[1]); print(c.get("tool") or c["type"], "as the check wants")' "$js")" "$out"
+  fi
+}
+
+vip_arp_check() {
+  local js="$1" g vip holder asker="" n iface out mac want
+  g="$(jf "$js" gateway)" vip="$(jf "$js" vip)"
+  holder="$(K -n "$(jf "$js" lease_namespace)" get lease "$(jf "$js" lease)" -o jsonpath='{.spec.holderIdentity}' 2>/dev/null || true)"
+  for n in $(jf "$js" ingress); do
+    if [ "$n" != "$holder" ]; then asker="$n"; break; fi
+  done
+  iface="$(jf "$js" "ifaces.$asker")"
+  out="$RS/record/check-$MODE-arp-$g.txt"
+  H "$asker" "ip neigh flush to $vip dev $iface 2>/dev/null; ping -c 2 -W 1 $vip >/dev/null 2>&1; ip neigh show to $vip dev $iface" >"$out" 2>&1 || true
+  mac="$(grep -oE 'lladdr [0-9a-f:]{17}' "$out" | head -n 1 | cut -d' ' -f2 || true)"
+  if [ "$(jf "$js" answered)" = True ]; then
+    want="$(jf "$js" "macs.${holder:-none}" 2>/dev/null || true)"
+    if [ -n "$holder" ] && [ -n "$mac" ] && [ "$mac" = "$want" ]; then
+      ok "$g: $vip asked for by ARP from $asker on $iface: answered with $holder's bond MAC $mac (the lease holder)"
+    else
+      bad "$g: $vip asked for by ARP from $asker on $iface answered with the lease holder ${holder:-none}'s bond MAC ${want:-?}" \
+        "$(tr -s ' ' <"$out" | tail -n 1)"
+    fi
+  else
+    if [ -n "$asker" ] && [ -z "$mac" ]; then
+      ok "$g: $vip asked for by ARP from $asker on $iface: no answer ($(tr -s ' ' <"$out" | tail -n 1)); the lease names ${holder:-nobody}"
+    else
+      bad "$g: $vip asked for by ARP from ${asker:-an ingress node} gets no answer" "answered with ${mac:-?}"
+    fi
+  fi
+}
+
+route_set_check() {
+  local js="$1" out res
+  out="$RS/record/check-$MODE-route-$(jf "$js" route).json"
+  EVID_OFF=1 K -n "$(jf "$js" namespace)" get httproute "$(jf "$js" route)" -o json >"$out" 2>/dev/null || true
+  if res="$(py "$BH" routeset --file "$out" --check "$js")"; then
+    ok "$(jf "$js" route): $res"
+  else
+    bad "$(jf "$js" route): its rules $( [ "$(jf "$js" rendered)" = True ] && echo "are" || echo "are not") its audience's row ($(jf "$js" paths | paste -sd ' ' -))" "$res"
   fi
 }

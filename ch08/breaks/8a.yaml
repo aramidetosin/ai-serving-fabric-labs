@@ -9,9 +9,14 @@
 # the internal and the users' Gateways keep theirs.
 #
 # record: the policy, the internet Gateway's lease and the Gateway with its Service, each read whole,
-# and the firewall's ARP table. What the lease shows while the policy matches no device (present,
-# its holder, renewed or not) is recorded before the exercise text names it; the expectations here are only what the render knows. The heal patches the rendered
-# interfaces back.
+# the firewall's ARP table, and requests from the staff client through the users' Gateway. What the
+# lease shows while the policy matches no device (present, its holder, renewed or not) is recorded
+# before the exercise text names it; the expectations here are only what the render knows. No
+# population reaches 10.20.11.220 through the firewall in chapter 8, so the symptom is checked where
+# it shows: the VIP asked for by ARP from the ingress node that does not hold its lease, on its VLAN
+# 110 unit, gets no answer while the users' VIP keeps its holder's, and the staff's requests keep
+# their answers. The heal patches the rendered interfaces back, and the internet VIP is answered by
+# its lease holder's bond MAC again.
 title: the internet audience's announcement policy names an interface no ingress node has
 exercise: 5
 since: 8
@@ -20,5 +25,13 @@ break:
 record:
   - k8s_read: {objects: ["l2_policy:gw-inet", "lease:gw-inet", "gateway:gw-inet", "l2_policy:gw-users", "lease:gw-users"]}
   - fw_show: {lines: [show arp all]}
+  - probe_http: {id: staff, from: ent-client, hostname: llm, path: "/echo?msg=sfab-break-8a", count: 10, interval_s: 0.5, timeout_s: 5, passes: 1}
+expect_broken:
+  - vip_arp: {gateway: gw-inet, answered: false}
+  - vip_arp: {gateway: gw-users, answered: true}
+  - probe_share: {probe: staff, failing: none}
 heal:
   - l2_policy: {gateway: gw-inet, interfaces: rendered}
+expect_healed:
+  - vip_arp: {gateway: gw-inet, answered: true}
+  - probe_share: {probe: staff, failing: none}

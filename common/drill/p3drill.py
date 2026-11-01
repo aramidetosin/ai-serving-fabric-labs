@@ -273,10 +273,18 @@ def analyze_lease(v, dr: dict, d: Path, pas: str) -> dict:
             v.ok(f"{lab}: {c} through {e['gateway']}, a lease the cut node did not hold: {gp['lost']} of {gp['sent']} echo requests lost, "
                  f"{tcp['lost']} of {tcp['sent']} connects failed")
     during = read(d / "arp-during.txt")
+    # the firewall learns a VIP's MAC only from traffic it forwards to it: the entry is judged for a
+    # Gateway an echo probe drives through the firewall, and recorded for any other (the internet
+    # Gateway in chapter 8, which no population reaches yet)
+    driven = {e["gateway"] for e in dr["echo"]}
     for g in held_by_cut:
         new = out["gateways"][g].get("new")
         want = ((dr["candidates"].get(new) or {}).get("mac") or "").lower() if new else ""
         got = arp_mac(during, dr["vips"][g])
+        if g not in driven:
+            v.ok(f"{lab}: the firewall's ARP entry for {g}'s VIP {dr['vips'][g]} while {cut} is cut names {got or 'nothing'} (recorded, not "
+                 f"judged: no probe of the drill reaches {g} through the firewall)")
+            continue
         v.check(f"{lab}: the firewall's ARP entry for {g}'s VIP {dr['vips'][g]} names {new or 'the new holder'}'s bond MAC {want or '?'} while "
                 f"{cut} is cut (arp-during.txt)", bool(want) and got == want, f"names {got or 'nothing'}")
     m = jsonl(d / "probes" / "model.jsonl")

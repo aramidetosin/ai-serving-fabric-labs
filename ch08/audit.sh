@@ -19,7 +19,9 @@
 #                   admits within their audiences, a key per Gateway, the three leases on ingress
 #                   nodes at the tuned duration, cilium-config's tuned timers, a policy per audience,
 #                   and the refused mint (a key for a model outside its caller's audience, refused
-#                   by the key tool with the Secret left as it was)
+#                   by the key tool with the Secret left as it was), and the internet Gateway's
+#                   column (its VIP from every other population with a client in the lab:
+#                   deny-all-log for the staff and the operator, the nodes answered)
 #
 # SFAB_AUDIT_CLEAN=0 leaves the repository checks out.
 set -euo pipefail

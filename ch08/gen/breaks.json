@@ -21,8 +21,80 @@
         }
       ],
       "exercise": 5,
-      "expect_broken": [],
-      "expect_healed": [],
+      "expect_broken": [
+        {
+          "answered": false,
+          "gateway": "gw-inet",
+          "ifaces": {
+            "k8s-ingress1": "bond0.110",
+            "k8s-ingress2": "bond0.110"
+          },
+          "ingress": [
+            "k8s-ingress1",
+            "k8s-ingress2"
+          ],
+          "kind": "vip_arp",
+          "lease": "cilium-l2announce-gateways-cilium-gateway-gw-inet",
+          "lease_namespace": "kube-system",
+          "macs": {
+            "k8s-ingress1": "02:5a:68:00:00:01",
+            "k8s-ingress2": "02:5a:69:00:00:01"
+          },
+          "vip": "10.20.11.220"
+        },
+        {
+          "answered": true,
+          "gateway": "gw-users",
+          "ifaces": {
+            "k8s-ingress1": "bond0.110",
+            "k8s-ingress2": "bond0.110"
+          },
+          "ingress": [
+            "k8s-ingress1",
+            "k8s-ingress2"
+          ],
+          "kind": "vip_arp",
+          "lease": "cilium-l2announce-gateways-cilium-gateway-gw-users",
+          "lease_namespace": "kube-system",
+          "macs": {
+            "k8s-ingress1": "02:5a:68:00:00:01",
+            "k8s-ingress2": "02:5a:69:00:00:01"
+          },
+          "vip": "10.20.11.210"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "staff"
+        }
+      ],
+      "expect_healed": [
+        {
+          "answered": true,
+          "gateway": "gw-inet",
+          "ifaces": {
+            "k8s-ingress1": "bond0.110",
+            "k8s-ingress2": "bond0.110"
+          },
+          "ingress": [
+            "k8s-ingress1",
+            "k8s-ingress2"
+          ],
+          "kind": "vip_arp",
+          "lease": "cilium-l2announce-gateways-cilium-gateway-gw-inet",
+          "lease_namespace": "kube-system",
+          "macs": {
+            "k8s-ingress1": "02:5a:68:00:00:01",
+            "k8s-ingress2": "02:5a:69:00:00:01"
+          },
+          "vip": "10.20.11.220"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "staff"
+        }
+      ],
       "heal": [
         {
           "gateway": "gw-inet",
@@ -92,6 +164,17 @@
             "show arp all"
           ],
           "node": "fw"
+        },
+        {
+          "client_addr": "10.24.10.10",
+          "count": 10,
+          "id": "staff",
+          "interval_s": 0.5,
+          "kind": "probe_http",
+          "node": "ent-client",
+          "passes": 1,
+          "timeout_s": 5,
+          "url": "https://llm.ai.tarnwick.example/echo?msg=sfab-break-8a"
         }
       ],
       "title": "the internet audience's announcement policy names an interface no ingress node has"

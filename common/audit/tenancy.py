@@ -21,6 +21,10 @@ audiences (audiences/, chapter 8): a Gateway per audience
                 on the rendered interfaces
   refused mint  the key Job for a model outside its caller's audience failed with the key tool's
                 refusal, and the key Secret holds the same fields and fingerprints after it
+  the column    the internet Gateway's VIP from every other population with a client in the lab,
+                as the render says at this step: refused by deny-all-log for the staff, the
+                operator and the internet host, answered for the nodes by their own datapath; a
+                population with no client in the lab's slice is named and skipped
 
 split-horizon (split-horizon/, chapter 9): one hostname, an answer per population
 
@@ -38,8 +42,10 @@ split-horizon (split-horizon/, chapter 9): one hostname, an answer per populatio
   the SYN       the internet client's connect to the published address meets the firewall as the
                 render says at this step (deny-all-log from isp to isp before the translation is
                 configured, the translation and isp-to-internet-gateway after)
-  Envoy's       Cilium's copies of the Gateway certificates recorded (a KNOWN-free record: every
-  copies        node's Envoy holds every Gateway's key, Chapter 8; the audit does not fail on it)
+  Envoy's       Cilium's copies of the Gateway certificates recorded, and the certificates each
+  copies        recorded node's Envoy has loaded (both ingress nodes and the first control node):
+                every node's Envoy holds every Gateway's key, Chapter 8; the audit records it and
+                does not fail on it
 
 zone-nat (zone-nat/, chapter 10): translation keyed on the arrival zone
 
@@ -60,8 +66,9 @@ isolation (chapter 11): the negative checks, from the three groups' files
   Gateway's pool; the isp zone translated to the internet Gateway alone; the ISP router with no route
   into the inside prefixes.
 
-As a command:  tenancy.py tlog-missing --plan gen/tenancy.json --dir D   (zone-nat's inside connects
-the traffic log in D does not hold yet: 0 when every refused one is there). Standard library only.
+As a command:  tenancy.py tlog-missing --plan gen/tenancy.json --dir D [--rows audiences.column.rows
+--tsv column.tsv]   (zone-nat's inside connects, or the internet Gateway's column, the traffic log in D
+does not hold yet: 0 when every refused one is there). Standard library only.
 """
 
 from __future__ import annotations
@@ -385,6 +392,36 @@ def g_audiences(self, names):
         b, a = _fields(_text(d / "keys-before.txt")), _fields(_text(d / "keys-after.txt"))
         v.check(f"the key Secret holds the same {len(b)} fields and fingerprints after the refused mint, and no {rm['caller']}.{rm['id']}",
                 bool(b) and a == b and f"{rm['caller']}.{rm['id']}" not in a, f"before {len(b)}, after {len(a)}")
+    col = p.get("column")
+    if col:
+        judge_column(v, d, plan_of(self.render), col)
+
+
+def judge_column(v, d: Path, tp: dict, col: dict):
+    """The internet Gateway's column: each other population's connect to its VIP as the render says."""
+    import panos_parse as PP  # noqa: PLC0415
+
+    tl = _text(d / "traffic-log-443.txt")
+    want = {x[0]: x for x in inside_wanted(tp, d, "audiences.column.rows", "column.tsv")}
+    gw, addr = col["gateway"], col["address"]
+    for r in col["rows"]:
+        c = connect_line(_text(d / f"column-{r['population']}.txt"))
+        where = f"{r['population']} ({r['client']}) to {gw}'s VIP {addr}:443"
+        if r["outcome"] == "reached":
+            how = "its own datapath answering" if r.get("rule") is None else f"allowed by {r['rule']}"
+            v.check(f"{where}: connected, {how} (the client: {c['outcome']})", c["outcome"] == "CONNECTED", f"client {c['outcome']}")
+        elif r["outcome"] == "log-line":
+            x = want.get(r["population"])
+            hits = PP.tlog_find(tl, src=x[1], sport=x[2]) if x else []
+            e = hits[0] if hits else {}
+            v.check(f"{where}: refused by {r['rule']} from {r['from_zone']} to {r['to_zone']} (the client: {c['outcome']})",
+                    c["outcome"] != "CONNECTED" and e.get("rule") == r["rule"][:19] and e.get("from") == r["from_zone"]
+                    and e.get("to") == r["to_zone"],
+                    f"client {c['outcome']}, log {e.get('rule')} {e.get('from')} to {e.get('to')}" if e else f"client {c['outcome']}, no log line")
+        else:
+            v.check(f"{where}: silence at {r.get('device')} (the client: {c['outcome']})", c["outcome"] != "CONNECTED", f"client {c['outcome']}")
+    for pid in col.get("no_client") or []:
+        v.skip(f"{pid} to {gw}'s VIP {addr}:443", f"no client of the {pid} population in this lab's slice; its cell is chapter 11's matrix")
 
 
 # --------------------------------------------------------------------------------------------
@@ -478,6 +515,12 @@ def g_split_horizon(self, names):
     have = [x for x in ec["secrets"] if re.search(rf"(?m)^{re.escape(x)}\s", t)]
     v.ok(f"Cilium's copies of the Gateway certificates in {ec['namespace']} recorded ({len(have)} of {len(ec['secrets'])}: "
          f"{', '.join(have) or 'none'}); every node's Envoy loads them, which the audit records and does not judge")
+    for n in ec.get("nodes") or []:
+        t = _text(d / f"envoy-certs-{n}.txt")
+        seen = [x for x in ec["secrets"] if x.split("-", 1)[-1] in t or x in t]
+        what = (f"{len(seen)} of the {len(ec['secrets'])} Gateway certificates named" if t.strip() else "nothing read")
+        v.ok(f"{n}'s Envoy: its loaded certificates as {' '.join(ec.get('command') or [])} lists them recorded "
+             f"(envoy-certs-{n}.txt, {what}), not judged")
 
 
 # --------------------------------------------------------------------------------------------
@@ -513,11 +556,19 @@ def _members(v: str) -> list:
     return [v] if v else []
 
 
-def inside_wanted(plan: dict, d: Path) -> list:
-    """(population, src, sport) of every inside connect the firewall refuses with a log line."""
-    rows = {r["population"]: r for r in (plan.get("firewall") or {}).get("inside") or []}
+def _at(plan: dict, path: str):
+    cur = plan
+    for k in path.split("."):
+        cur = cur.get(k) if isinstance(cur, dict) else None
+    return cur
+
+
+def inside_wanted(plan: dict, d: Path, rows_at: str = "firewall.inside", tsv: str = "inside.tsv") -> list:
+    """(population, src, sport) of every connect of a plan's rows (zone-nat's inside connects, or the
+    internet Gateway's column) the firewall refuses with a log line."""
+    rows = {r["population"]: r for r in _at(plan, rows_at) or []}
     out = []
-    for line in _text(d / "inside.tsv").splitlines():
+    for line in _text(d / tsv).splitlines():
         x = line.split("\t")
         if len(x) >= 4 and (rows.get(x[0]) or {}).get("outcome") == "log-line":
             out.append((x[0], x[2], int(x[3])))
@@ -651,7 +702,7 @@ def cmd_tlog_missing(a) -> int:
     d = Path(a.dir)
     plan = json.loads(Path(a.plan).read_text())
     tl = _text(d / "traffic-log-443.txt")
-    print(sum(1 for _p, src, sp in inside_wanted(plan, d) if not PP.tlog_find(tl, src=src, sport=sp)))
+    print(sum(1 for _p, src, sp in inside_wanted(plan, d, a.rows, a.tsv) if not PP.tlog_find(tl, src=src, sport=sp)))
     return 0
 
 
@@ -661,6 +712,8 @@ def main(argv=None) -> int:
     s = sub.add_parser("tlog-missing")
     s.add_argument("--plan", required=True)
     s.add_argument("--dir", required=True)
+    s.add_argument("--rows", default="firewall.inside")
+    s.add_argument("--tsv", default="inside.tsv")
     a = ap.parse_args(argv)
     return {"tlog-missing": cmd_tlog_missing}[a.cmd](a)
 

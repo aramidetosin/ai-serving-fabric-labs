@@ -376,6 +376,54 @@ class Chapter11(unittest.TestCase):
 
 
 @unittest.skipUnless(HAVE_YAML, "PyYAML is needed to render")
+class Refusals(unittest.TestCase):
+    """The render's refusals Part III added, each made to fire once."""
+
+    def test_an_answer_on_a_firewall_interface_without_an_address(self):
+        import dataclasses  # noqa: PLC0415
+
+        from sfab.spec import SpecError, load, load_chapter, select  # noqa: PLC0415
+
+        spec = load(ROOT)
+        bad = json.loads(json.dumps(spec.profiles["a"]))
+        v = next(x for x in bad["dns"]["views"] if x["id"] == "public-internet")
+        v["answer"] = "fw:ethernet1/9"
+        with self.assertRaisesRegex(SpecError, "the firewall has no interface 'ethernet1/9' with an address"):
+            select(dataclasses.replace(spec, profiles=dict(spec.profiles, a=bad)), load_chapter(ROOT / "ch09"))
+
+    def test_a_policy_per_audience_needs_one_audience_a_gateway(self):
+        import dataclasses  # noqa: PLC0415
+
+        from sfab.render import k8s  # noqa: PLC0415
+
+        m = lab("ch08")["m"]
+        gws = dict(m.gateways)
+        try:
+            object.__setattr__(m, "gateways", dict(gws, **{"gw-inet": dataclasses.replace(gws["gw-inet"], audience="")}))
+            with self.assertRaisesRegex(RenderError, "gateway gw-inet: a policy per audience needs the Gateway's audience"):
+                k8s.l2_policies(m)
+            object.__setattr__(m, "gateways", dict(gws, **{"gw-inet": dataclasses.replace(gws["gw-inet"], audience="enterprise")}))
+            with self.assertRaisesRegex(RenderError, "per-audience: two Gateways share an audience"):
+                k8s.l2_policies(m)
+        finally:
+            object.__setattr__(m, "gateways", gws)
+        self.assertEqual(k8s.l2_policies(m)["gw-inet"], "gateways-internet")
+
+    def test_lease_block_takes_its_own_keys_only(self):
+        from sfab.render import k8s  # noqa: PLC0415
+
+        m = lab("ch08")["m"]
+        saved = dict(m.k8s.l2_announce)
+        try:
+            m.k8s.l2_announce["lease"] = dict(saved["lease"], jitter="1s")
+            with self.assertRaisesRegex(RenderError, "spec k8s.l2_announce.lease: tuned and duration, renew_deadline, retry_period only"):
+                k8s.lease_timers(m)
+        finally:
+            m.k8s.l2_announce.clear()
+            m.k8s.l2_announce.update(saved)
+
+
+@unittest.skipUnless(HAVE_YAML, "PyYAML is needed to render")
 class Breaks(unittest.TestCase):
     def load(self, name, bid):
         from sfab.spec import read_yaml  # noqa: PLC0415
@@ -396,6 +444,18 @@ class Breaks(unittest.TestCase):
         self.assertEqual([o["id"] for o in rd["objects"]][:3], ["l2_policy:gw-inet", "lease:gw-inet", "gateway:gw-inet"])
         lease = rd["objects"][1]
         self.assertEqual((lease["namespace"], lease["name"]), ("kube-system", "cilium-l2announce-gateways-cilium-gateway-gw-inet"))
+        # the symptom where chapter 8 shows it: ARP for the VIP on VLAN 110, the staff's requests answered
+        arp = b["expect_broken"][0]
+        self.assertEqual((arp["kind"], arp["vip"], arp["answered"], arp["ingress"], arp["ifaces"]),
+                         ("vip_arp", "10.20.11.220", False, ["k8s-ingress1", "k8s-ingress2"],
+                          {"k8s-ingress1": "bond0.110", "k8s-ingress2": "bond0.110"}))
+        self.assertEqual(arp["lease"], "cilium-l2announce-gateways-cilium-gateway-gw-inet")
+        self.assertEqual([(x["kind"], x.get("gateway"), x.get("answered")) for x in b["expect_healed"]],
+                         [("vip_arp", "gw-inet", True), ("probe_share", None, None)])
+        bad = copy.deepcopy(raw)
+        bad["expect_broken"] = [{"vip_arp": {"gateway": "gw-inet"}}]
+        with self.assertRaisesRegex(RenderError, "answered: true"):
+            RD._break(c["inv"], "8a", bad, c["m"])
         bad = copy.deepcopy(raw)
         bad["heal"] = [{"l2_policy": {"gateway": "gw-users", "interfaces": "rendered"}}]
         with self.assertRaisesRegex(RenderError, "puts no patched object back"):
@@ -418,7 +478,15 @@ class Breaks(unittest.TestCase):
         self.assertNotIn("server=/ai.tarnwick.example/", pin["content"])
         self.assertIn("address=/llm.ai.tarnwick.example/10.20.11.210\n", pin["content"])
         self.assertIn("address=/id.ai.tarnwick.example/10.20.11.210\n", pin["content"])
-        self.assertIn("local=/tarnwick.example/\n", pin["content"])
+        # no local= over the platform's zone while the break is applied (the corporate domain's goes)
+        self.assertFalse([x for x in pin["content"].splitlines() if x.startswith("local=")])
+        self.assertEqual(pin["local_removed"], ["local=/tarnwick.example/"])
+        self.assertEqual(b["expect_broken"][1], {"kind": "lookup_answer", "probe": "staff", "type": "AAAA", "rcode": "NOERROR", "answers": 0,
+                                                 "not": True})
+        bad = copy.deepcopy(raw)
+        bad["expect_broken"] = [{"lookup_answer": {"probe": "staff", "tool": "curl", "ok": True, "not": True}}]
+        with self.assertRaisesRegex(RenderError, "tool: getaddrinfo or curl"):
+            RD._break(c["inv"], "9a", bad, c["m"])
         lk = b["record"][0]
         self.assertEqual((lk["kind"], lk["name"], lk["tools"]), ("probe_lookup", "llm.ai.tarnwick.example", ["dig-a", "dig-aaaa", "getaddrinfo", "curl"]))
         self.assertEqual(b["heal"][0], {"kind": "restore", "node": "ent-dns", "what": "dns"})
@@ -452,6 +520,18 @@ class Breaks(unittest.TestCase):
         self.assertEqual(paths, [f"/models/{m.models['chat'].route_id}", f"/models/{m.models['staff'].route_id}"])
         self.assertEqual((p["resource"], p["namespace"], p["name"]), ("httproutes.gateway.networking.k8s.io", "inference", "models-gw-inet"))
         self.assertEqual(len(b["heal"][0]["patch"]["spec"]["rules"]), 1)
+        self.assertEqual(b["expect_broken"][0], {"kind": "cell_mode", "probe": "cells", "cell": "internet/staff", "mode": "404", "not": True})
+        rs = b["expect_broken"][1]
+        self.assertEqual((rs["kind"], rs["route"], rs["paths"], rs["rendered"]),
+                         ("route_set", "models-gw-inet", [f"/models/{m.models['chat'].route_id}"], False))
+        self.assertTrue(b["expect_healed"][-1]["rendered"])
+        bad = copy.deepcopy(raw)
+        bad["expect_broken"] = [{"cell_mode": {"probe": "cells", "cell": "internet/staff", "mode": "log-line", "rule": "deny-all-log", "not": True}}]
+        with self.assertRaisesRegex(RenderError, "no rule to name"):
+            RD._break(c["inv"], "11a", bad, c["m"])
+        bad["expect_broken"] = [{"route_set": {"route": "models-gw-nowhere", "rendered": True}}]
+        with self.assertRaisesRegex(RenderError, "is not one of"):
+            RD._break(c["inv"], "11a", bad, c["m"])
         bad = copy.deepcopy(raw)
         bad["break"] = [{"route_rules": {"route": "models-gw-inet", "add": ["chat"]}}]
         with self.assertRaisesRegex(RenderError, "does not carry"):
@@ -494,8 +574,31 @@ class LookupReader(unittest.TestCase):
         self.assertEqual(run({"probe": "x", "type": "AAAA", "rcode": "REFUSED"}), 0)
         self.assertEqual(run({"probe": "x", "tool": "getaddrinfo", "ok": False}), 0)
         self.assertEqual(run({"probe": "x", "tool": "curl", "ok": False}), 1)
+        # not: any answer but the healthy NODATA
+        self.assertEqual(run({"probe": "x", "type": "AAAA", "rcode": "NOERROR", "answers": 0, "not": True}), 0)
+        self.assertEqual(run({"probe": "x", "type": "AAAA", "rcode": "REFUSED", "answers": 0, "not": True}), 1)
         (self.d / "dig-a.txt").write_text(";; connection timed out; no servers could be reached\nexit 9 start 1.0 end 6.0\n")
         self.assertEqual(run({"probe": "x", "type": "A", "rcode": "timeout"}), 0)
+
+    def test_route_set(self):
+        f = self.d / "route.json"
+        f.write_text(json.dumps({"spec": {"rules": [{"matches": [{"path": {"type": "PathPrefix", "value": "/models/a"}}]},
+                                                    {"matches": [{"path": {"type": "PathPrefix", "value": "/models/b"}}]}]}}))
+
+        def run(check):
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                rc = self.bh.main(["routeset", "--file", str(f), "--check", json.dumps(check)])
+            return rc, out.getvalue()
+
+        base = {"route": "r", "models": ["chat"], "paths": ["/models/a"]}
+        rc, out = run(dict(base, rendered=False))
+        self.assertEqual(rc, 0)
+        self.assertIn("beyond its audience's row: /models/b", out)
+        self.assertEqual(run(dict(base, rendered=True))[0], 1)
+        self.assertEqual(run(dict(base, paths=["/models/a", "/models/b"], rendered=True))[0], 0)
+        f.write_text("not json")
+        self.assertEqual(run(dict(base, rendered=False))[0], 1)
 
 
 if __name__ == "__main__":

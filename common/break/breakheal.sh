@@ -599,6 +599,8 @@ check_action() {
     key_pods) key_check "$js" ;;
     cell_mode) cell_check "$js" ;;
     lookup_answer) lookup_check "$js" ;;
+    vip_arp) vip_arp_check "$js" ;;
+    route_set) route_set_check "$js" ;;
     rule_order)
       if fwapi order >"$RS/record/check-order-$MODE.txt" 2>&1; then
         ok "fw: the running rulebase in the render's order ($(paste -sd ';' "$RS/record/check-order-$MODE.txt"))"

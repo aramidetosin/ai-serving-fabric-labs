@@ -21,6 +21,8 @@
     breakheal.py cellmode --dir DIR --plan gen/matrix.json --check JSON a matrix cell's mode as its evidence shows (chapter 2)
     breakheal.py lookup --dir DIR (--check JSON | --summary)         a probe_lookup's answers: each dig's status and records,
                                                                         each stub's result and time (Part III, chapter 9)
+    breakheal.py routeset --file ROUTE_JSON --check JSON                 a model route's rules against its audience's row
+                                                                        (Part III, chapter 11)
 
 Run from a lab directory (make break-3a does). The breaks are the lab's breaks/<id>.yaml, rendered
 to gen/breaks.json (sfab.render.drills), so nothing here needs PyYAML. break and heal hand over to
@@ -351,6 +353,10 @@ def cmd_cellmode(a) -> int:
     elif first.get("remote"):
         what += f"; answered from {first['remote']}"
     good = got == chk["mode"] and (not chk.get("rule") or (first.get("tlog") or {}).get("rule") == chk["rule"][:19])
+    if chk.get("not"):
+        good = got is not None and got != chk["mode"]
+        print(f"{what}, not {chk['mode']}" if good else f"want any mode but {chk['mode']}, got {what}")
+        return 0 if good else 1
     print(what if good else f"want {chk['mode']}" + (f" ({chk['rule']})" if chk.get("rule") else "") + f", got {what}")
     return 0 if good else 1
 
@@ -474,9 +480,32 @@ def cmd_lookup(a) -> int:
     if r is None:
         print(f"{t}: not recorded")
         return 1
-    print(f"{c['type']}: {r['rcode']} with {r['answers']} answer(s)")
     want = r["rcode"] == c["rcode"] and (c.get("answers") is None or r["answers"] == c["answers"])
+    if c.get("not"):
+        print(f"{c['type']}: {r['rcode']} with {r['answers']} answer(s), not {c['rcode']}"
+              + (f" with {c['answers']} answer(s)" if c.get("answers") is not None else ""))
+        return 1 if want else 0
+    print(f"{c['type']}: {r['rcode']} with {r['answers']} answer(s)")
     return 0 if want else 1
+
+
+def cmd_routeset(a) -> int:
+    """A model route as the cluster holds it (kubectl get httproute -o json) against the check: its
+    rules' paths equal its audience's row (rendered: true) or not (rendered: false)."""
+    c = json.loads(a.check)
+    try:
+        doc = json.loads(Path(a.file).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        print("the route was not read")
+        return 1
+    got = sorted({m["path"]["value"] for r in (doc.get("spec") or {}).get("rules") or [] for m in r.get("matches") or [] if m.get("path")})
+    row = got == sorted(c["paths"])
+    extra, missing = sorted(set(got) - set(c["paths"])), sorted(set(c["paths"]) - set(got))
+    what = (f"its rules carry {', '.join(got) or 'nothing'}"
+            + (f", the audience's row ({', '.join(c['models'])})" if row else f"; beyond its audience's row: {', '.join(extra) or 'none'}, "
+               f"missing: {', '.join(missing) or 'none'}"))
+    print(what)
+    return 0 if row == c["rendered"] else 1
 
 
 def main(argv=None) -> int:
@@ -552,6 +581,9 @@ def main(argv=None) -> int:
     s.add_argument("--file", required=True)
     s = sub.add_parser("gwshare")
     s.add_argument("--file", required=True)
+    s = sub.add_parser("routeset")
+    s.add_argument("--file", required=True)
+    s.add_argument("--check", required=True)
     s = sub.add_parser("lookup")
     s.add_argument("--dir", required=True)
     g = s.add_mutually_exclusive_group(required=True)
@@ -564,7 +596,7 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
     return {"steps": cmd_steps, "vlan": cmd_vlan, "mclag": cmd_mclag, "share": cmd_share, "pingshare": cmd_pingshare, "counter": cmd_counter,
             "farcap": cmd_farcap, "netstatus": cmd_netstatus, "epready": cmd_epready, "gwshare": cmd_gwshare, "synat": cmd_synat,
-            "tlogcmd": cmd_tlogcmd, "tlogrule": cmd_tlogrule, "cellmode": cmd_cellmode, "lookup": cmd_lookup}[a.cmd](a)
+            "tlogcmd": cmd_tlogcmd, "tlogrule": cmd_tlogrule, "cellmode": cmd_cellmode, "lookup": cmd_lookup, "routeset": cmd_routeset}[a.cmd](a)
 
 
 if __name__ == "__main__":

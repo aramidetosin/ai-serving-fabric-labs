@@ -50,6 +50,66 @@
         ]
       }
     ],
+    "column": {
+      "address": "10.20.11.220",
+      "gateway": "gw-inet",
+      "no_client": [
+        "web"
+      ],
+      "rows": [
+        {
+          "action": "deny",
+          "address": "10.20.11.220",
+          "client": "ent-client",
+          "device": "fw",
+          "from_zone": "enterprise",
+          "hops": [
+            "in on ethernet1/4 (zone enterprise): 10.20.11.0/24 connected on ae1.110, zone ingress",
+            "no NAT rule from zone enterprise: no translation",
+            "deny-all-log: deny, zone enterprise to ingress"
+          ],
+          "kind": "client",
+          "layer": "policy",
+          "outcome": "log-line",
+          "population": "enterprise",
+          "port": 443,
+          "rule": "deny-all-log",
+          "to_zone": "ingress"
+        },
+        {
+          "address": "10.20.11.220",
+          "at": "10.20.11.220",
+          "client": "k8s-cp2",
+          "hops": [
+            "10.20.11.220 is a LoadBalancer address of k8s-cp2's own cluster: Cilium translates it to a Gateway pod at connect(), so nothing to it leaves the node and no firewall sees it"
+          ],
+          "kind": "vm-node",
+          "outcome": "reached",
+          "population": "nodes",
+          "port": 443
+        },
+        {
+          "action": "deny",
+          "address": "10.20.11.220",
+          "client": "ops-client",
+          "device": "fw",
+          "from_zone": "operator-vpn",
+          "hops": [
+            "into the IPsec tunnel to the firewall (ops-gw, proxy ID ingress): 10.20.11.220 is in its remote selector",
+            "in on tunnel.1 (zone operator-vpn): 10.20.11.0/24 connected on ae1.110, zone ingress",
+            "no NAT rule from zone operator-vpn: no translation",
+            "deny-all-log: deny, zone operator-vpn to ingress"
+          ],
+          "kind": "client",
+          "layer": "policy",
+          "outcome": "log-line",
+          "population": "operator",
+          "port": 443,
+          "rule": "deny-all-log",
+          "to_zone": "ingress"
+        }
+      ]
+    },
     "gateway_namespace": "gateways",
     "gateways": {
       "gw-inet": {
@@ -169,6 +229,38 @@
       "staff"
     ],
     "policy_mode": "per-audience",
+    "reach": [
+      {
+        "address": "10.20.11.210",
+        "client": "ent-client",
+        "device": null,
+        "gateway": "gw-users",
+        "kind": "client",
+        "outcome": "reached",
+        "population": "enterprise",
+        "rule": "staff-to-users-gateway"
+      },
+      {
+        "address": "198.51.100.10",
+        "client": "inet-client",
+        "device": "fw",
+        "gateway": "gw-inet",
+        "kind": "client",
+        "outcome": "log-line",
+        "population": "internet",
+        "rule": "deny-all-log"
+      },
+      {
+        "address": "10.20.11.200",
+        "client": "ops-client",
+        "device": null,
+        "gateway": "gw-internal",
+        "kind": "client",
+        "outcome": "reached",
+        "population": "operator",
+        "rule": "operator-to-internal-gateway"
+      }
+    ],
     "refused_mint": {
       "audience": "internet",
       "audience_models": [
@@ -177,6 +269,26 @@
       "caller": "inetapp",
       "id": "fe000000",
       "model": "staff"
+    },
+    "tls_from": {
+      "gw-inet": {
+        "address": "10.20.11.220",
+        "kind": "vm-node",
+        "node": "k8s-cp2",
+        "population": "nodes"
+      },
+      "gw-internal": {
+        "address": "10.20.11.200",
+        "kind": "client",
+        "node": "ops-client",
+        "population": "operator"
+      },
+      "gw-users": {
+        "address": "10.20.11.210",
+        "kind": "client",
+        "node": "ent-client",
+        "population": "enterprise"
+      }
     }
   },
   "dns": {
@@ -234,7 +346,18 @@
       }
     ],
     "envoy_certs": {
+      "command": [
+        "cilium-dbg",
+        "envoy",
+        "admin",
+        "certs"
+      ],
       "namespace": "cilium-secrets",
+      "nodes": [
+        "k8s-ingress1",
+        "k8s-ingress2",
+        "k8s-cp1"
+      ],
       "secrets": [
         "gateways-gw-inet-tls",
         "gateways-gw-internal-tls",

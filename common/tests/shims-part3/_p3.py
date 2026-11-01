@@ -238,7 +238,9 @@ def dns_answer(s, client, server_addr, name, qtype, rd=True):
             return "REFUSED", [], ["qr", "rd", "ra"], None
         pin = c.get("pinned") if server == (c.get("pinned") or {}).get("node") else None
         if pin and name in pin["names"]:
-            return ("NOERROR", [pin["names"][name]], ["qr", "aa", "rd", "ra"], None) if qtype == "A" else ("REFUSED", [], ["qr", "rd", "ra"], None)
+            if qtype == "A":
+                return "NOERROR", [pin["names"][name]], ["qr", "aa", "rd", "ra"], None
+            return ("NOERROR", [], ["qr", "aa", "rd", "ra"], None) if pin.get("local") else ("REFUSED", [], ["qr", "rd", "ra"], None)
         _vid, v = view_for_addr(addr_of(server))
         fwd = None
         key = f"{server}|{name}"
@@ -425,6 +427,8 @@ def arp_text(s, now):
     rows = ["maximum of entries supported :      2500", "default timeout:                    1800 seconds", "total ARP entries in table :        3", "",
             "interface         ip address      hw address        port         status   ttl", "-" * 80]
     for vip, g in sorted(F["vips"].items()):
+        if vip in (p3(s).get("arp_omit") or []):
+            continue  # a VIP no traffic through the firewall has reached: no entry learned
         rows.append(f"ae1.110           {vip:<16}{mac_of(holder(s, g, now)):<18}ae1          c        1782")
     return "\n".join(rows)
 
@@ -709,12 +713,15 @@ def curl_p3(s, ctr, argv, now):
         # a model request with a caller's key at the API gateway (chapter 7's stand-in decides the
         # answer), logged under the key's caller
         key = W7.client_key(files, argv)
+        if key and key.count(".") == 2:
+            return None  # a person's token, reached through the firewall: chapter 7's stand-in answers it
         st, msg = W7.answer_at(s, W7.pick(s), now, model, key)
         fld = W7.field_of(s, key) if key else None
         W7.log_access(s, now, model, st, f"{fld.split('.')[0]}_key_{fld.split('.')[1]}" if fld and st == 200 else "",
                       fld.split(".")[0] if fld and st == 200 else "")
         if hdr:
             files[hdr] = (f"HTTP/1.1 {st} {'OK' if st == 200 else 'Unauthorized'}\r\nserver: envoy\r\n"
+                          + (f"x-litellm-model-name: openai/{model}\r\n" if st == 200 else "")
                           + (f"www-authenticate: {K8S['inference']['www_authenticate']}\r\n" if st == 401 and K8S["inference"].get("www_authenticate") else "")
                           + "\r\n")
         if out and out != "/dev/null":
@@ -732,6 +739,21 @@ def curl_p3(s, ctr, argv, now):
     return None
 
 
+CHAIN = ("depth=2 CN = Tarnwick Lab Root CA\ndepth=1 CN = Tarnwick Platform CA\ndepth=0 \n 0 s:\n   i:CN = Tarnwick Platform CA\n"
+         " 1 s:CN = Tarnwick Platform CA\n   i:CN = Tarnwick Lab Root CA\nVerify return code: 0 (ok)")
+
+
+def tls_text(s, node, sc):
+    """The gateway layer's chain read: the chain when the facts let the node reach the address it
+    connects to, else nothing (the grep keeps no line of a connect that timed out)."""
+    m = re.search(r"openssl s_client -connect (\S+):443 ", sc)
+    if not m:
+        return None
+    f = connect_fact(s, node, m.group(1), 443)
+    p3(s).setdefault("tls", []).append({"node": node, "address": m.group(1), "outcome": f["outcome"]})
+    return CHAIN if f["outcome"] == "reached" else ""
+
+
 def p3_client(s, ctr, argv, stdin, now):
     c = p3(s)
     files = file_store(s, ctr)
@@ -747,7 +769,9 @@ def p3_client(s, ctr, argv, stdin, now):
         if d.startswith("/tmp/sfab-break"):
             conf = files.get(f"{d}/dnsmasq.conf") or ""
             names = {f"{m.group(1)}": m.group(2) for m in re.finditer(r"(?m)^address=/([^/]+)/(\S+)$", conf)}
-            c["pinned"] = {"node": node, "names": names}
+            # a local= over the platform's zone answers the pinned names' other types from the server
+            local = any(ZONE == d or ZONE.endswith("." + d) for d in re.findall(r"(?m)^local=/([^/]+)/$", conf))
+            c["pinned"] = {"node": node, "names": names, "local": local}
         else:
             c["pinned"] = None
         c["cache"] = {}
@@ -779,6 +803,8 @@ def p3_client(s, ctr, argv, stdin, now):
         return 0, "\n".join(lines)
     if argv[:2] == ["sh", "-c"]:
         sc = argv[2]
+        if "openssl s_client -connect " in sc:
+            return 0, tls_text(s, node, sc)
         if " -w '%{http_code} %{remote_ip}" in sc and "curl " in sc:
             # matrix.sh's request: curl from a pinned port, the pin taken when the client's resolver has no answer
             pin = None
@@ -970,6 +996,16 @@ def kube_p3(s, cmd, stdin, now):
                                                                  "route": a["route"], "request": f"POST {paths.get(a['route'], '/models')}/v1/chat/completions",
                                                                  "status": a["status"], "consumer": a["consumer"], "caller": a["caller"]}))
         return 0, "\n".join(lines)
+    if words[:2] == ["get", "pods"] and ns == "kube-system" and W.opt(args, "-l") == "k8s-app=cilium":
+        # one Cilium agent pod a node of the cluster
+        vms = [n for n in NODES if NODES[n]["kind"] == "vm-node"]
+        return 0, json.dumps({"items": [{"metadata": {"name": f"cilium-{i:05x}"}, "spec": {"nodeName": n}} for i, n in enumerate(vms, 0x1a2b)]})
+    if words[:1] == ["exec"] and ns == "kube-system" and "--" in args and args[args.index("--") + 1:][:4] == ["cilium-dbg", "envoy", "admin", "certs"]:
+        # Envoy's admin /certs as the stand-in lists it: each Gateway certificate's name and serial, no key
+        rows = [{"ca_cert": [], "cert_chain": [{"path": f"<inline:{K8S['gateway_namespace']}/{x['listener']['secret']}>",
+                                                "serial_number": hashlib.sha256(g.encode()).hexdigest()[:16]}]}
+                for g, x in sorted(K8S["gateways"].items())]
+        return 0, json.dumps({"certificates": rows}, indent=1)
     if words[:2] == ["get", "ciliuml2announcementpolicies"]:
         d = l2_policies(s)
         return (0, json.dumps(d)) if o == "json" else (0, "NAME   AGE\n" + "\n".join(f"{i['metadata']['name']}   9m" for i in d["items"]))
@@ -1088,8 +1124,21 @@ def guest_p3(s, node, script, now):
             x = g.get(tag)
             return frames_at(s, node, iface=x["iface"], start=x["start"], stop=x.get("stop")) if x else ""
         return ""
+    m = re.match(r"^ip neigh flush to (\S+) dev (\S+) 2>/dev/null; ping -c \d+ -W 1 \S+ >/dev/null 2>&1; ip neigh show to \S+ dev \S+$", sc)
+    if m and node in F["ingress"]:
+        # break-8a's ARP check: the lease holder answers when its audience's policy names the unit
+        vip, iface = m.group(1), m.group(2)
+        g = gateway_of_vip(vip)
+        pol = (K8S["gateways"].get(g) or {}).get("l2_policy")
+        pats = c["policy"].get(pol) or list(F["l2_interfaces"])
+        h = holder(s, g, now)
+        if h != node and any(re.search(x, iface) for x in pats):
+            return f"{vip} dev {iface} lladdr {mac_of(h)} REACHABLE"
+        return f"{vip} dev {iface} FAILED"
     if node not in F["clients"]:
         return None
+    if "openssl s_client -connect " in sc:
+        return tls_text(s, node, sc)
     files = file_store(s, ctr)
     if "read -r k; read -r h" in sc:
         return None

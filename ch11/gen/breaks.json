@@ -64,7 +64,28 @@
         }
       ],
       "exercise": 4,
-      "expect_broken": [],
+      "expect_broken": [
+        {
+          "cell": "internet/staff",
+          "kind": "cell_mode",
+          "mode": "404",
+          "not": true,
+          "probe": "cells"
+        },
+        {
+          "gateway": "gw-inet",
+          "kind": "route_set",
+          "models": [
+            "chat"
+          ],
+          "namespace": "inference",
+          "paths": [
+            "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7"
+          ],
+          "rendered": false,
+          "route": "models-gw-inet"
+        }
+      ],
       "expect_healed": [
         {
           "cell": "internet/staff",
@@ -77,6 +98,19 @@
           "kind": "cell_mode",
           "mode": "allowed",
           "probe": "cells"
+        },
+        {
+          "gateway": "gw-inet",
+          "kind": "route_set",
+          "models": [
+            "chat"
+          ],
+          "namespace": "inference",
+          "paths": [
+            "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7"
+          ],
+          "rendered": true,
+          "route": "models-gw-inet"
         }
       ],
       "heal": [

@@ -11,7 +11,9 @@
 #                         Gateway certificate's public key fingerprint (never the key); the key
 #                         Secret's fields and fingerprints before and after the refused mint, and the
 #                         refused mint's Job log and phase (a key for a model outside its caller's
-#                         audience, which the key tool refuses before it reads the Secret)
+#                         audience, which the key tool refuses before it reads the Secret); the
+#                         internet Gateway's column (every other population's connect to its VIP,
+#                         with the firewall's traffic log line for each it refuses)
 #   audit_split_horizon   chapter 9: the public server asked for each name it must answer and each
 #                         it must not, a name under no record (no wildcard) and a name outside its
 #                         zone with recursion asked (refused); the ISP resolver from its customer
@@ -20,7 +22,8 @@
 #                         names, A and AAAA, through its own resolver; the uplink side's public
 #                         server for the platform's names; the ISP router's routing table; the
 #                         internet client's connect to the published address and its traffic log
-#                         line; Cilium's copies of the Gateway certificates (recorded, not judged)
+#                         line; Cilium's copies of the Gateway certificates and the certificates
+#                         each recorded node's Envoy has loaded (recorded, not judged)
 #   audit_zone_nat        chapter 10: the running NAT and security rulebases; each inside
 #                         population's connect to the published address and its traffic log line
 #                         (or, for a silent one, the routing tables in front of the firewall); and,
@@ -155,6 +158,28 @@ audit_audiences() {
     printf '%s\n' "$phase" >"$d/refused-mint.phase"
     EVID_OFF=1 K -n "$ns" get secret "$sec" -o json 2>/dev/null | py "$SFAB_COMMON/trace/servekeys.py" list >"$d/keys-after.txt" 2>&1 || true
   fi
+  # the internet Gateway's column: every other population's connect to its VIP, and the firewall's
+  # line for each one it refuses
+  if tn_has audiences.column; then
+    local row pop client kind addr i=0 sp k
+    : >"$d/column.tsv"
+    while read -r row; do
+      [ -n "$row" ] || continue
+      read -r pop client kind addr <<<"$(py -c 'import json, sys; r = json.loads(sys.argv[1]); print(r["population"], r["client"], r["kind"], r["address"])' "$row")"
+      sp=$((42370 + 2 * i))
+      t_connect "$d/column-$pop.txt" "$client" "$kind" "$addr" 443 "$sp"
+      printf '%s\t%s\t%s\t%s\n' "$pop" "$client" "$(inv get nodes."$client".address | cut -d/ -f1)" "$sp" >>"$d/column.tsv"
+      i=$((i + 1))
+    done < <(tn_get audiences.column.rows)
+    if [ -n "${FW_NODE:-}" ]; then
+      for k in 1 2 3 4 5 6 7 8 9; do
+        FW "show log traffic direction equal backward receive_time in last-15-minutes dport equal 443" |
+          fwt_body "show log traffic direction equal backward receive_time in last-15-minutes dport equal 443" >"$d/traffic-log-443.txt" 2>/dev/null || true
+        [ "$(py "$SFAB_COMMON/audit/tenancy.py" tlog-missing --plan "$TN_PLAN" --dir "$d" --rows audiences.column.rows --tsv column.tsv)" != 0 ] || break
+        sleep "${SFAB_TRACE_TLOG_PAUSE_S:-10}"
+      done
+    fi
+  fi
   _judge audiences
 }
 
@@ -215,8 +240,22 @@ audit_split_horizon() {
     fwt_tlog "$d/traffic-log.txt" "show log traffic direction equal backward receive_time in last-15-minutes dport equal 443" \
       --src "$(inv get nodes."$c".address | cut -d/ -f1)" --sport "$sp" >/dev/null 2>&1 || true
   fi
-  # Cilium's copies of the Gateway certificates, which every node's Envoy loads (recorded)
+  # Cilium's copies of the Gateway certificates, which every node's Envoy loads (recorded), and
+  # the certificates each recorded node's Envoy has loaded, listed from its Cilium agent pod
   K -n "$(tn_get dns.envoy_certs.namespace)" get secrets >"$d/cilium-secrets.txt" 2>&1 || true
+  local pod node ecmd
+  ecmd="$(tn_get dns.envoy_certs.command | paste -sd ' ' -)"
+  while read -r pod node; do
+    [ -n "$pod" ] || continue
+    tn_get dns.envoy_certs.nodes | grep -qx "$node" || continue
+    # shellcheck disable=SC2086
+    K -n kube-system exec "$pod" -c cilium-agent -- $ecmd >"$d/envoy-certs-$node.txt" 2>&1 || true
+  done < <(EVID_OFF=1 K -n kube-system get pods -l k8s-app=cilium -o json 2>/dev/null | py -c 'import json, sys
+try:
+    for i in json.load(sys.stdin).get("items") or []:
+        print(i["metadata"]["name"], (i.get("spec") or {}).get("nodeName", ""))
+except ValueError:
+    pass')
   _judge split-horizon
 }
 

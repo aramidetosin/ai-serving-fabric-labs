@@ -186,7 +186,24 @@ class Ch08AudiencesTest(P3LabTest):
                               r"key tool's refusal")
         self.assertRegex(out, r"  PASS  the key Secret holds the same \d+ fields and fingerprints after the refused mint, and no inetapp\.fe000000")
         self.assertIn("refused: caller inetapp is in audience internet", (rs / "audiences" / "refused-mint.log").read_text())
+        # the internet Gateway's column for the Part II rows
+        self.assertIn("  PASS  enterprise (ent-client) to gw-inet's VIP 10.20.11.220:443: refused by deny-all-log from enterprise to ingress", out)
+        self.assertIn("  PASS  operator (ops-client) to gw-inet's VIP 10.20.11.220:443: refused by deny-all-log from operator-vpn to ingress", out)
+        self.assertIn("  PASS  nodes (k8s-cp2) to gw-inet's VIP 10.20.11.220:443: connected, its own datapath answering", out)
+        self.assertIn("  SKIP  web to gw-inet's VIP 10.20.11.220:443", out)
         self.no_key_in(rs)
+
+    def test_column_fails_when_the_staff_reach_the_internet_vip(self):
+        """A staff connect to 10.20.11.220 that the firewall lets through fails the column."""
+        self.world_p3(rule_dst={})
+        facts = load(self.env["SHIM_P3_FACTS"])
+        facts["connects"]["ent-client|10.20.11.220|443"].update(outcome="reached", rule="staff-to-users-gateway", at="10.20.11.220")
+        f2 = self.t / "facts.json"
+        f2.write_text(json.dumps(facts))
+        self.env["SHIM_P3_FACTS"] = str(f2)
+        r, _rs = self.group("audit_audiences")
+        self.assertTrue(any(l.startswith("  FAIL  enterprise (ent-client) to gw-inet's VIP 10.20.11.220:443: refused by deny-all-log")
+                            for l in self.fails(r.stdout)), r.stdout[-5000:])
 
     def test_a_route_for_staff_on_the_internet_gateway_fails(self):
         """break-11a's fault seen by chapter 8's group: the internet Gateway's route set is not its row."""
@@ -194,6 +211,58 @@ class Ch08AudiencesTest(P3LabTest):
         r, _rs = self.group("audit_audiences")
         bad = self.fails(r.stdout)
         self.assertTrue(any(l.startswith("  FAIL  gw-inet (internet): its routes are its audience's row") for l in bad), r.stdout[-5000:])
+
+
+class GatewayLayerMixin:
+    """Chapter 7's placement, keys and gateway-layer groups as a full audit runs them on a Part III
+    lab: every key check asks through a Gateway its client reaches at this step, and each Gateway's
+    chain is read from a node that reaches it (tenancy.json audiences.reach and tls_from)."""
+
+    def gateway_layer(self):
+        subprocess.run([str(COMMON / "ca" / "sfab-ca"), "-C", str(self.lab), "init"], check=True, capture_output=True, timeout=120)
+        r, rs = self.group("audit_placement; audit_gateway_layer")
+        out = r.stdout
+        self.assertIn("== keys: the callers' keys at the API gateway (chapter 7)", out, out[-4000:] + r.stderr[-3000:])
+        bad = [l for l in self.fails(out) if "gw-" in l or "through" in l or "chain" in l]
+        self.assertEqual(bad, [], out[-8000:])
+        targets = [json.loads(l) for l in (rs / "keys" / "targets.jsonl").read_text().splitlines() if l.strip()]
+        tls = {g: (rs / "gateway-layer" / f"tls-from-{g}.txt").read_text().strip() for g in ("gw-inet", "gw-internal", "gw-users")}
+        for g in tls:
+            self.assertRegex(out, rf"  PASS  {g}: the chain for llm\.ai\.tarnwick\.example verifies against the lab root")
+        return out, targets, tls, load(self.t / "world.json")["p3"].get("tls") or []
+
+
+class Ch08GatewayLayerTest(GatewayLayerMixin, P3LabTest):
+    LAB = "ch08"
+
+    def test_gateway_layer_reaches_every_gateway(self):
+        _out, targets, tls, reads = self.gateway_layer()
+        self.assertEqual(sorted({t["gateway"] for t in targets}), ["gw-internal", "gw-users"])
+        # no population reaches the internet Gateway in chapter 8: its chain is read from k8s-cp2
+        self.assertEqual(tls, {"gw-inet": "k8s-cp2", "gw-internal": "ops-client", "gw-users": "ent-client"})
+        self.assertIn({"node": "k8s-cp2", "address": "10.20.11.220", "outcome": "reached"}, reads)
+
+
+class Ch09GatewayLayerTest(GatewayLayerMixin, P3LabTest):
+    LAB = "ch09"
+
+    def test_no_key_check_through_the_untranslated_internet_gateway(self):
+        _out, targets, tls, reads = self.gateway_layer()
+        # the internet users meet deny-all-log until chapter 10: no key check asks from inet-client
+        self.assertNotIn("inet-client", {t["client"] for t in targets})
+        self.assertEqual(tls["gw-inet"], "k8s-cp2")
+        self.assertFalse([x for x in reads if x["outcome"] != "reached"], reads)
+
+
+class Ch10GatewayLayerTest(GatewayLayerMixin, P3LabTest):
+    LAB = "ch10"
+
+    def test_internet_gateway_through_the_published_address(self):
+        _out, targets, tls, reads = self.gateway_layer()
+        inet = [t for t in targets if t["gateway"] == "gw-inet"]
+        self.assertTrue(inet and all(t["client"] == "inet-client" for t in inet), targets)
+        self.assertEqual(tls["gw-inet"], "inet-client")
+        self.assertIn({"node": "inet-client", "address": "198.51.100.10", "outcome": "reached"}, reads)
 
 
 class Ch08TraceTest(P3LabTest):
@@ -242,6 +311,19 @@ class Ch08LeaseDrillTest(P3LabTest):
         self.assertTrue((rs / "DRILLS.md").is_file())
         self.no_key_in(rs)
 
+    def test_no_arp_entry_for_a_vip_no_probe_drives(self):
+        """The cut node holds gw-inet's lease, and the firewall has learned no MAC for 10.20.11.220,
+        which no population reaches in chapter 8: recorded, not a failure."""
+        self.edit("gen/drills.json", lambda d: d["timing"].update({"lead_s": 2, "hold_s": 4, "tail_s": 2, "settle_max_s": 20, "whole_polls": 1}))
+        self.world_p3(arp_omit=["10.20.11.220"])
+        r = self.run_cmd([self.lab / "drills.sh", "--passes", "1"], timeout=900)
+        self.assertEqual(r.returncode, 0, r.stdout[-8000:] + r.stderr[-3000:])
+        v = (self.last_set("drills") / "verdict.txt").read_text()
+        self.assertEqual(self.fails(v), [], v)
+        self.assertIn("  PASS  pass 1 lease-holder-loss: the firewall's ARP entry for gw-inet's VIP 10.20.11.220 while k8s-ingress2 is cut names "
+                      "nothing (recorded, not judged: no probe of the drill reaches gw-inet through the firewall)", v)
+        self.assertRegex(v, r"  PASS  pass 1 lease-holder-loss: the firewall's ARP entry for gw-internal's VIP 10\.20\.11\.200 names k8s-ingress1's bond MAC")
+
 
 # --------------------------------------------------------------------------------------------
 # chapter 9
@@ -265,6 +347,10 @@ class Ch09Test(P3LabTest):
         self.assertRegex(out, r"  PASS  ops-dns \(192\.0\.2\.10\), the uplink side's public server, holds no platform name")
         self.assertRegex(out, r"  PASS  isp-rtr holds no route into 10\.0\.0\.0/8 \(4 routes read\)")
         self.assertIn("  PASS  inet-client's connect to 198.51.100.10:443 from port 42390 refused (TIMEOUT), logged by deny-all-log from isp to isp", out)
+        for n in ("k8s-ingress1", "k8s-ingress2", "k8s-cp1"):
+            self.assertIn(f"  PASS  {n}'s Envoy: its loaded certificates as cilium-dbg envoy admin certs lists them recorded "
+                          f"(envoy-certs-{n}.txt, 3 of the 3 Gateway certificates named), not judged", out)
+            self.assertNotIn("PRIVATE KEY", (rs / "split-horizon" / f"envoy-certs-{n}.txt").read_text())
 
     def test_dns_trace(self):
         r = self.run_cmd([self.lab / "trace.sh"], timeout=600)
@@ -441,6 +527,12 @@ class Break8aTest(BreakMixin, P3LabTest):
     def test_break_heal(self):
         vb, vh = self.broke_and_healed("8a")
         self.assertRegex(vb, r"  PASS  .*gateways-internet")
+        # the symptom where chapter 8 shows it: the internet VIP unanswered on VLAN 110, the users' VIP
+        # answered by its holder, the staff's requests answered; healed, the internet VIP answered again
+        self.assertIn("  PASS  gw-inet: 10.20.11.220 asked for by ARP from k8s-ingress1 on bond0.110: no answer", vb)
+        self.assertIn("  PASS  gw-users: 10.20.11.210 asked for by ARP from k8s-ingress2 on bond0.110: answered with k8s-ingress1's bond MAC", vb)
+        self.assertRegex(vb, r"  PASS  staff: every \S+ succeeds")
+        self.assertIn("  PASS  gw-inet: 10.20.11.220 asked for by ARP from k8s-ingress1 on bond0.110: answered with k8s-ingress2's bond MAC", vh)
         rec = self.last_set("break-8a") / "record"
         self.assertTrue(any(p.name.startswith("broken-l2-policy-gw-inet") for p in rec.iterdir()), sorted(p.name for p in rec.iterdir()))
         w = load(self.t / "world.json")
@@ -455,7 +547,21 @@ class Break9aTest(BreakMixin, P3LabTest):
         self.assertRegex(vb, r"  PASS  ent-dns: the platform's zone no longer forwarded; llm\.ai\.tarnwick\.example id\.ai\.tarnwick\.example pinned to 10\.20\.11\.210 with address=")
         self.assertRegex(vb, r"  PASS  staff: ")
         self.assertRegex(vh, r"  PASS  staff: .*AAAA")
+        self.assertRegex(vb, r"  PASS  staff: AAAA: REFUSED with 0 answer\(s\), not NOERROR with 0 answer\(s\)")
         self.assertIsNone(load(self.t / "world.json")["p3"]["pinned"])
+
+    def test_a_local_line_over_the_zone_gives_no_symptom(self):
+        """With local=/tarnwick.example/ kept, the server answers the pinned name's AAAA itself (NODATA):
+        the break check sees no symptom and fails."""
+        def keep_local(d):
+            a = d["breaks"]["9a"]["break"][0]
+            self.assertFalse([x for x in a["content"].splitlines() if x.startswith("local=")], a["content"])
+            a["content"] = a["content"].replace("host-record=", "local=/tarnwick.example/\nhost-record=", 1)
+        self.edit("gen/breaks.json", keep_local)
+        r = self.bh("break", "9a")
+        vb = (self.last_set("break-9a") / "verdict.txt").read_text()
+        self.assertTrue(any("AAAA as the check wants" in l for l in self.fails(vb)), vb)
+        self.bh("heal", "9a")
 
 
 class Break10aTest(BreakMixin, P3LabTest):
@@ -480,6 +586,9 @@ class Break11aTest(BreakMixin, P3LabTest):
 
     def test_break_heal(self):
         vb, vh = self.broke_and_healed("11a")
+        self.assertRegex(vb, r"  PASS  internet/staff: mode \S+.*, not 404")
+        self.assertRegex(vb, r"  PASS  models-gw-inet: its rules carry .*; beyond its audience's row: /models/")
+        self.assertRegex(vh, r"  PASS  models-gw-inet: its rules carry /models/[0-9a-f-]+, the audience's row \(chat\)")
         self.assertRegex(vh, r"  PASS  internet/staff: ")
         self.assertRegex(vh, r"  PASS  internet/chat: ")
         self.assertEqual(load(self.t / "world.json")["p3"]["route_add"].get("models-gw-inet"), [])

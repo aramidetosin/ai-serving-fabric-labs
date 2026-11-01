@@ -4,10 +4,13 @@
       "break": [
         {
           "address": "10.20.11.210",
-          "content": "# sfab-ch09 ent-dns: rendered from spec/profile-a.yaml by render/dns.py; edit the spec and run make render\n# resolver corporate: the corporate names of tarnwick.example answered here; the platform's zone\n# ai.tarnwick.example forwarded to its authoritative servers (dns-auth1, dns-auth2); no other upstream.\nport=53\nlisten-address=127.0.0.1,10.24.10.53\nbind-interfaces\nno-resolv\nno-hosts\nno-poll\ndomain-needed\nbogus-priv\nlog-queries\nlog-facility=/var/log/dnsmasq.log\nlocal=/tarnwick.example/\nhost-record=ent-client.tarnwick.example,10.24.10.10\nhost-record=ent-dns.tarnwick.example,10.24.10.53\n# break: the platform's zone no longer forwarded; llm.ai.tarnwick.example, id.ai.tarnwick.example pinned with address=, and no local= for the platform's zone\naddress=/llm.ai.tarnwick.example/10.20.11.210\naddress=/id.ai.tarnwick.example/10.20.11.210\n",
+          "content": "# sfab-ch09 ent-dns: rendered from spec/profile-a.yaml by render/dns.py; edit the spec and run make render\n# resolver corporate: the corporate names of tarnwick.example answered here; the platform's zone\n# ai.tarnwick.example forwarded to its authoritative servers (dns-auth1, dns-auth2); no other upstream.\nport=53\nlisten-address=127.0.0.1,10.24.10.53\nbind-interfaces\nno-resolv\nno-hosts\nno-poll\ndomain-needed\nbogus-priv\nlog-queries\nlog-facility=/var/log/dnsmasq.log\nhost-record=ent-client.tarnwick.example,10.24.10.10\nhost-record=ent-dns.tarnwick.example,10.24.10.53\n# break: the platform's zone no longer forwarded; llm.ai.tarnwick.example, id.ai.tarnwick.example pinned with address=, and no local= for the platform's zone (local=/tarnwick.example/ removed)\naddress=/llm.ai.tarnwick.example/10.20.11.210\naddress=/id.ai.tarnwick.example/10.20.11.210\n",
           "dir": "/tmp/sfab-break-dns",
           "file": "dnsmasq.conf",
           "kind": "dnsmasq_pin",
+          "local_removed": [
+            "local=/tarnwick.example/"
+          ],
           "names": [
             "llm.ai.tarnwick.example",
             "id.ai.tarnwick.example"
@@ -24,6 +27,14 @@
           "probe": "staff",
           "rcode": "NOERROR",
           "type": "A"
+        },
+        {
+          "answers": 0,
+          "kind": "lookup_answer",
+          "not": true,
+          "probe": "staff",
+          "rcode": "NOERROR",
+          "type": "AAAA"
         }
       ],
       "expect_healed": [

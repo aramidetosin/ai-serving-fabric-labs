@@ -610,6 +610,11 @@ hosts:
     requires: [fw]
     when: "many>=9"
     since: 9
+  # The internet user's host. Like every container of the lab it is named under the platform's
+  # domain and searches it (inet-client.ai.tarnwick.example, search ai.tarnwick.example): a lab
+  # simplification, labeled. A real internet user's host has a domain of its own and nothing to do
+  # with the platform's; the lab's checks always ask for the full name, so the search list answers
+  # nothing they rely on.
   inet-client:
     kind: client
     group: internet
@@ -625,7 +630,10 @@ hosts:
   # The platform's public authoritative server on the internet side: the public names only
   # (dns.views public-internet), recursion off. One server, on a customer port of the ISP router,
   # outside the firewall: a lab simplification (production runs at least two, on different
-  # networks, usually a hosted service or servers in the enterprise's DMZ).
+  # networks, usually a hosted service or servers in the enterprise's DMZ). Its own name is in the
+  # public zone too, inet-dns-auth.ai.tarnwick.example A 203.0.113.6, the NS record's host: also a
+  # lab simplification, labeled; production names its public servers under a domain of their own
+  # (the provider's, or a separate one), so the public zone holds the users' name alone.
   inet-dns-auth:
     kind: resolver
     group: internet

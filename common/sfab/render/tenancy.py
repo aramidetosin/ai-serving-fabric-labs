@@ -13,7 +13,15 @@ what it checks:
                 may call; the ingress nodes that may hold a lease; the lease timers and the
                 cilium-config keys Cilium's chart writes them to; and the refused mint the audit
                 asks the key tool for (an application caller's key for a model outside its
-                audience, which sfab/keys:4 refuses with exit 3 before it reads the Secret)
+                audience, which sfab/keys:4 refuses with exit 3 before it reads the Secret);
+                the internet Gateway's column for every other population with a client in the
+                lab (each one's connect to its VIP, with the outcome the firewall gives it,
+                render/decisions.py's path); each population's connect to its own Gateway at
+                its answer address at this step (reach), so chapter 7's key and placement
+                checks ask only through a Gateway the population reaches; and the node each
+                Gateway's certificate chain is read from (tls_from: a population's client that
+                reaches it at its answer address, else the nodes' client, k8s-cp2, whose own
+                datapath answers every VIP)
     dns         step 9 on (the internet side): the public server and the names it must answer and
                 must not; the ISP's resolver, the clients it recurses for and a source outside them
                 (the ISP router's own link address toward the firewall); every population's typed
@@ -21,7 +29,9 @@ what it checks:
                 publishes no platform name; the ISP router, which must hold no route into the
                 inside prefixes; the Envoy certificate Secrets Cilium copies (recorded, not judged);
                 and the internet client's connect to the published address, with the outcome the
-                firewall gives it at this step (render/decisions.py's path)
+                firewall gives it at this step (render/decisions.py's path); the nodes whose
+                Envoy's loaded certificates the audit records (both ingress nodes and the first
+                control node)
     firewall    step 10 on (the zone-keyed translation): the NAT and security rulebases in order, the
                 published address with its interface, zone, NAT rule, translated address and
                 security rule, the only rules that may name the isp zone, and each inside
@@ -62,6 +72,10 @@ SESSION_TIMEOUTS = {"tcp": 3600, "tcp_handshake": 10, "tcp_init": 5, "tcp_half_c
                     "discard_tcp": 90}
 HOLD_KEYS = {"n", "hold_s", "every_s", "sport", "chat", "slack", "populations"}
 INSIDE = ("10.0.0.0/8",)
+# what the audit runs in each recorded node's Cilium agent pod to list the certificates its Envoy has
+# loaded (Envoy's admin /certs: names, serials and expiry, never a key); the subcommand is the
+# design's first choice and is confirmed on the pinned agent before the chapter quotes it
+ENVOY_CERTS_CMD = ("cilium-dbg", "envoy", "admin", "certs")
 
 
 def _err(where: str, msg: str):
@@ -234,6 +248,64 @@ def dns_plan(model, inv: dict, v) -> dict | None:
         "isp_router": {"node": rtr, "inside": list(INSIDE)},
         "internet_syn": dict(syn, client=client, address=inet["answer_address"], port=443, sport=42390),
     }
+
+
+def reach_plan(model, inv: dict, k: dict, v) -> tuple:
+    """(reach, tls_from): each population's connect to its own Gateway at its answer address, with
+    the firewall's outcome at this step, from its first client in the lab; and per Gateway the node
+    its certificate chain is read from: a client container of a population that reaches it, at
+    that population's answer address, else the nodes' client (the spec's matrix names k8s-cp2) at
+    the VIP, which the node's own datapath answers."""
+    pops = inv.get("populations") or {}
+    nodes = inv["nodes"]
+    gws = k.get("gateways") or {}
+    reach = []
+    for pid, p in sorted(pops.items()):
+        g = p.get("gateway")
+        c = next((x for x in p.get("clients") or [] if x in nodes), None)
+        if not g or g not in gws or c is None:
+            continue
+        addr = p.get("answer_address") or _bare(gws[g]["vip"])
+        r = _connect(model, v, c, addr, 443)
+        reach.append({"population": pid, "gateway": g, "client": c, "kind": nodes[c]["kind"], "address": addr, "outcome": r["outcome"],
+                      "rule": r.get("rule"), "device": r.get("device")})
+    prefer = matrix_clients(model)
+    tls = {}
+    for g in sorted(gws):
+        row = next((r for r in reach if r["gateway"] == g and r["outcome"] == "reached" and r["kind"] == "client"), None)
+        if row is not None:
+            tls[g] = {"node": row["client"], "kind": "client", "address": row["address"], "population": row["population"]}
+            continue
+        node, kind = _pop_client(inv, pops.get("nodes") or {}, prefer.get("nodes"))
+        vip = _bare(gws[g]["vip"])
+        if node is None:
+            _err("tenancy audiences", f"no client of the lab reaches {g}: no population's client, and no node of the cluster")
+        r = _connect(model, v, node, vip, 443)
+        if r["outcome"] != "reached":
+            _err("tenancy audiences", f"{node} does not reach {g} at {vip}: {r['outcome']}")
+        tls[g] = {"node": node, "kind": kind, "address": vip, "population": "nodes"}
+    return reach, tls
+
+
+def column_plan(model, inv: dict, k: dict, v, gateway: str) -> dict:
+    """The internet Gateway's column: every population but the one whose Gateway it is, from its
+    client in the lab, connecting to the Gateway's VIP, with the firewall's outcome (the staff, the
+    operator and the internet host refused by deny-all-log, the nodes answered by their own
+    datapath). A population with no client in the lab's slice is named, unchecked."""
+    pops = inv.get("populations") or {}
+    prefer = matrix_clients(model)
+    vip = _bare(((k.get("gateways") or {}).get(gateway) or {}).get("vip"))
+    rows, none = [], []
+    for pid, p in sorted(pops.items()):
+        if p.get("gateway") == gateway:
+            continue
+        c, kind = _pop_client(inv, p, prefer.get(pid))
+        if c is None:
+            none.append(pid)
+            continue
+        r = _connect(model, v, c, vip, 443)
+        rows.append(dict(r, population=pid, client=c, kind=kind, address=vip, port=443))
+    return {"gateway": gateway, "address": vip, "rows": rows, "no_client": none}
 
 
 def _view_id(inv: dict, view) -> str | None:
@@ -424,10 +496,19 @@ def plan(model, ctx) -> dict:
     v = view(model) if model.firewall is not None else None
     step = model.step or 0
     out = {"schema": SCHEMA, "lab": model.lab, "step": step, "audiences": audiences(model, inv, k)}
+    if v is not None:
+        a = out["audiences"]
+        a["reach"], a["tls_from"] = reach_plan(model, inv, k, v)
+        inet = next((g for g, x in a["gateways"].items() if x["audience"] == "internet"), None)
+        if inet is not None:
+            a["column"] = column_plan(model, inv, k, v, inet)
     d = dns_plan(model, inv, v) if v is not None else None
     if d is not None:
+        ctrl = [n for n in (inv.get("groups") or {}).get("ctrl") or [] if n in inv["nodes"]]
+        ing = [n for n in (inv.get("groups") or {}).get("ingress") or [] if n in inv["nodes"]]
         d["envoy_certs"] = {"namespace": "cilium-secrets",
-                            "secrets": sorted(f"{k['gateway_namespace']}-{g['listener']['secret']}" for g in k["gateways"].values())}
+                            "secrets": sorted(f"{k['gateway_namespace']}-{g['listener']['secret']}" for g in k["gateways"].values()),
+                            "nodes": ing + ctrl[:1], "command": list(ENVOY_CERTS_CMD)}
         out["dns"] = d
     fwp = firewall_plan(model, inv, v) if v is not None else None
     if fwp is not None:

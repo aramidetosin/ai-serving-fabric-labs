@@ -20,14 +20,17 @@
 #                   admits within their audiences, a key per Gateway, the three leases on ingress
 #                   nodes at the tuned duration, cilium-config's tuned timers, a policy per audience,
 #                   and the refused mint (a key for a model outside its caller's audience, refused
-#                   by the key tool with the Secret left as it was)
+#                   by the key tool with the Secret left as it was), and the internet Gateway's
+#                   column (its VIP from every other population with a client in the lab:
+#                   deny-all-log for the staff and the operator, the nodes answered)
 #   split-horizon   the public server's names and nothing else (no admin, internal, identity or
 #                   infrastructure name, no wildcard, recursion refused), the ISP resolver for its
 #                   customer and refusing the ISP router's link address, every population's typed
 #                   names answered A and AAAA NODATA through its own resolver, the uplink side's
 #                   server holding no platform name, the ISP router with no inside route, the
 #                   internet client's connect to the published address as the firewall's render
-#                   says, and Cilium's copies of the Gateway certificates recorded
+#                   says, and Cilium's copies of the Gateway certificates and each recorded
+#                   node's loaded certificates recorded
 #   zone-nat        the NAT and security rulebases in the rendered order, the isp zone's one
 #                   translation (to the internet Gateway's VIP) and one rule (the published address,
 #                   ssl), the published address refused from every inside zone, and each zone's

@@ -127,7 +127,9 @@ def write_md(d: Path, plan: dict, rows: list, factor: int, stamp, timeouts: dict
     L += ["", "A denied TCP attempt holds its entry for the discard timeout"
           + (f" ({timeouts['discard_tcp']} s as show session info prints it)" if "discard_tcp" in timeouts else
              f" ({hp['timeouts']['discard_tcp']} s in PAN-OS 12.1's help; show session info did not print it)")
-          + ", so a zone's denied arrivals add their own term to its total.", ""]
+          + ", so a zone's denied arrivals add their own term to its total. The counts above do not hold that term: each "
+          "population's filter names its zone and its own Gateway's address and port, so a denied attempt to any other address, "
+          "held for the discard timeout, is outside every count here.", ""]
     verdict = read(d / "verdict.txt")
     L += ["## Verdict", "", "```"] + [x for x in verdict.splitlines() if x.strip()] + ["```", ""]
     L += ["## Files", "", "- `hold-<population>.jsonl`: each client's events (open, reply, held, closed, done), on the client's clock",

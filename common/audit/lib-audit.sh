@@ -673,18 +673,26 @@ for i in d.get("items") or []:
 }
 
 # audit_gateway_targets: one line a model route and model a client of the lab reaches, tab-separated:
-# route, Gateway, client, URL, model, and the --resolve pin (- when the client's resolver is in the lab)
+# route, Gateway, client, URL, model, and the --resolve pin (- when the client's resolver is in the lab).
+# From chapter 8 gen/tenancy.json's audiences.reach gives each population's connect to its own
+# Gateway at this step: a population the firewall does not yet let through (the internet users in
+# chapter 9, before the translation) is no target
 audit_gateway_targets() {
-  py - "$RENDERDIR/gen/k8s.json" "$INV" <<'PY'
+  py - "$RENDERDIR/gen/k8s.json" "$INV" "$RENDERDIR/gen/tenancy.json" <<'PY'
 import json, sys
 k8s, inv = (json.load(open(p, encoding="utf-8")) for p in sys.argv[1:3])
+try:
+    reach = {r["population"]: r for r in (json.load(open(sys.argv[3], encoding="utf-8")).get("audiences") or {}).get("reach") or []}
+except (OSError, ValueError):
+    reach = {}
 inf = k8s.get("inference") or {}
 nodes, gws = inv.get("nodes") or {}, inv.get("gateways") or {}
 for rt in inf.get("routes") or []:
     g = gws.get(rt["gateway"]) or {}
     vip = (g.get("vip") or "").split("/")[0]
-    pop = next((p for p in (inv.get("populations") or {}).values() if p.get("gateway") == rt["gateway"]
-                and any(c in nodes for c in p.get("clients") or [])), None)
+    pop = next((p for pid, p in sorted((inv.get("populations") or {}).items()) if p.get("gateway") == rt["gateway"]
+                and any(c in nodes for c in p.get("clients") or [])
+                and (pid not in reach or reach[pid]["outcome"] == "reached")), None)
     if pop is None:
         continue
     client = next(c for c in pop["clients"] if c in nodes)
@@ -817,21 +825,36 @@ PY
     [ -z "$gfrom" ] || H "$gfrom" "ping -c 3 -W 1 $vip; if timeout 5 bash -c '</dev/tcp/$vip/443' 2>/dev/null; then echo tcp-open; else echo tcp-failed; fi; ip neigh show $vip" \
       >"$dir/vip-$g.txt" 2>&1 || true
     # the chain read from a client the firewall lets reach this Gateway: a population's client of
-    # it, else the bastion (whose rules reach the internal Gateway only)
-    local tfrom
-    tfrom="$(py -c 'import json, sys
+    # it, else the bastion (whose rules reach the internal Gateway only). From chapter 8
+    # gen/tenancy.json's audiences.tls_from names the node and the address: a client of a
+    # population that reaches the Gateway, at its answer address (the published one for a
+    # translated population), else the nodes' client at the VIP, which its own datapath answers
+    local tfrom tkind taddr
+    read -r tfrom tkind taddr < <(py -c 'import json, sys
 inv = json.load(open(sys.argv[1]))
+try:
+    t = ((json.load(open(sys.argv[4])).get("audiences") or {}).get("tls_from") or {}).get(sys.argv[2])
+except (OSError, ValueError):
+    t = None
+if t:
+    print(t["node"], t["kind"], t["address"])
+    sys.exit(0)
 nodes = inv.get("nodes") or {}
 for p in (inv.get("populations") or {}).values():
     if p.get("gateway") == sys.argv[2]:
         c = next((x for x in p.get("clients") or [] if (nodes.get(x) or {}).get("kind") == "client"), None)
         if c:
-            print(c)
-            break' "$INV" "$g" 2>/dev/null || true)"
-    tfrom="${tfrom:-$BASTION}"
+            print(c, "client", sys.argv[3])
+            sys.exit(0)
+print("-", "client", sys.argv[3])' "$INV" "$g" "$vip" "$RENDERDIR/gen/tenancy.json" 2>/dev/null || echo "- client $vip")
+    [ "$tfrom" != - ] || tfrom="$BASTION"
     printf '%s\n' "$tfrom" >"$dir/tls-from-$g.txt"
-    X "$tfrom" sh -c "openssl s_client -connect $vip:443 -servername $host -CAfile /shared/ca/root.crt -verify_return_error -showcerts </dev/null 2>&1 | grep -E '^(depth=|verify error|Verify return code| *[0-9]+ s:| *i:)'" \
-      >"$dir/tls-$g.txt" 2>&1 || true
+    local tcmd="openssl s_client -connect $taddr:443 -servername $host -CAfile /shared/ca/root.crt -verify_return_error -showcerts </dev/null 2>&1 | grep -E '^(depth=|verify error|Verify return code| *[0-9]+ s:| *i:)'"
+    if [ "$tkind" = vm-node ]; then
+      H "$tfrom" "$tcmd" >"$dir/tls-$g.txt" 2>&1 || true
+    else
+      X "$tfrom" sh -c "$tcmd" >"$dir/tls-$g.txt" 2>&1 || true
+    fi
   done
   # the CA's proof, on the lab host where the CA lives (common/ca/sfab-ca), and its refused leaves
   "$SFAB_COMMON/ca/sfab-ca" -C "$RENDERDIR" proof >"$dir/ca-proof.txt" 2>&1 || true

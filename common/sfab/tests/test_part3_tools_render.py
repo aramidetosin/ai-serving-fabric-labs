@@ -58,6 +58,30 @@ class TenancyPlanTest(unittest.TestCase):
         self.assertEqual(a["lease"]["config"], {"l2-announcements-lease-duration": "3s", "l2-announcements-renew-deadline": "1s",
                                                 "l2-announcements-retry-period": "200ms"})
         self.assertEqual(a["ingress_nodes"], ["k8s-ingress1", "k8s-ingress2"])
+        # the internet Gateway's column for the Part II rows; the internet host has no client in ch08
+        col = {r["population"]: r for r in a["column"]["rows"]}
+        self.assertEqual(a["column"]["address"], "10.20.11.220")
+        self.assertEqual({k: (r["client"], r["outcome"], r.get("rule")) for k, r in col.items()},
+                         {"enterprise": ("ent-client", "log-line", "deny-all-log"), "operator": ("ops-client", "log-line", "deny-all-log"),
+                          "nodes": ("k8s-cp2", "reached", None)})
+        self.assertEqual(a["column"]["no_client"], ["web"])
+        # no population reaches gw-inet in ch08: its chain is read from k8s-cp2 at the VIP
+        self.assertEqual(a["tls_from"]["gw-inet"], {"node": "k8s-cp2", "kind": "vm-node", "address": "10.20.11.220", "population": "nodes"})
+        self.assertEqual(a["tls_from"]["gw-users"]["node"], "ent-client")
+        self.assertEqual(sorted(r["population"] for r in a["reach"]), ["enterprise", "operator"])
+
+    def test_reach_by_step(self):
+        r9 = {r["population"]: r for r in self.plan("ch09")["audiences"]["reach"]}
+        self.assertEqual((r9["internet"]["outcome"], r9["internet"]["rule"]), ("log-line", "deny-all-log"))
+        a10 = self.plan("ch10")["audiences"]
+        r10 = {r["population"]: r for r in a10["reach"]}
+        self.assertEqual((r10["internet"]["outcome"], r10["internet"]["address"]), ("reached", "198.51.100.10"))
+        self.assertEqual(a10["tls_from"]["gw-inet"], {"node": "inet-client", "kind": "client", "address": "198.51.100.10",
+                                                     "population": "internet"})
+        col11 = {r["population"]: r for r in self.plan("ch11")["audiences"]["column"]["rows"]}
+        self.assertEqual((col11["web"]["client"], col11["web"]["rule"]), ("web-client", "deny-all-log"))
+        self.assertNotIn("internet", col11)
+        self.assertEqual(self.plan("ch09")["dns"]["envoy_certs"]["nodes"], ["k8s-ingress1", "k8s-ingress2", "k8s-cp1"])
 
     def test_ch09_dns(self):
         d = self.plan("ch09")["dns"]

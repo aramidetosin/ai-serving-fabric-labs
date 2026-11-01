@@ -169,9 +169,10 @@ images:
     ref: debian:12-slim
     digest: sha256:7ff6ba31527b9e336162fa061746c366c4b2032f4d2cff2078bea43f78efe3f8
     pulled: true
-  # The two images the cluster pulls that this repository builds (mirror: local): the model server
-  # and its RPC workers (serving-layer/image, its inputs pinned under serving: below) and the API
-  # key tool (images/keys, built on sfab/client, its one library pinned under keys: below).
+  # The images the cluster pulls that this repository builds (mirror: local): the model server and
+  # its RPC workers (serving-layer/image, its inputs pinned under serving: below) and the API key
+  # tool in its two tags, sfab/keys:3 and sfab/keys:4 (images/keys, built on sfab/client, its one
+  # library pinned under keys: below).
   # `make -C images registry-seed` pushes each from the lab host's Docker into the in-lab registry
   # as <mirror>/<repository>:<tag>, and the nodes pull it from there by that name.
   serving:
@@ -196,8 +197,8 @@ images:
     base: client
     mirror: local
     pulled: false
-    # PENDING (lab host): not built from this source yet; the build and its image ID wait for the
-    # lab host, and no image ID is written here until that build has run
+    # PENDING (lab host): not built from this source yet. No mirror: local entry stores an image ID;
+    # once built, its ID is what the lab's preflight prints and RUN.json records for each run
 
 tools:
   # The release preflight (pf_tools) wants exactly, always the latest release (the author's rule,

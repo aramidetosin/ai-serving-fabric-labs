@@ -1495,8 +1495,11 @@ DNS_ACTIONS = ("dns_answer", "matrix_cells", "cell_mode")
 # Part III: a cluster object changed in place (l2_policy: an audience's announcement policy's
 # interfaces; route_rules: a Gateway's model route with another model's rule added), both rendered
 # as the merge patch kubectl applies (kind k8s_patch), the heal's the rendered fields; k8s_read: the
-# objects behind a Gateway read whole (the policy, the lease, the Gateway, a route)
-K8S_ACTIONS = ("l2_policy", "route_rules", "k8s_read")
+# objects behind a Gateway read whole (the policy, the lease, the Gateway, a route); the checks
+# vip_arp (a Gateway's VIP asked for by ARP from the ingress node that does not hold its lease, in
+# the VIP's VLAN: answered with the holder's bond MAC, or by nobody) and route_set (a model route's
+# rules as the cluster holds them, against its audience's row)
+K8S_ACTIONS = ("l2_policy", "route_rules", "k8s_read", "vip_arp", "route_set")
 # Part III: the corporate resolver's forwarding replaced by address= pins (dnsmasq_pin), a client's
 # lookups of one name by every stub it has (probe_lookup: dig for A and AAAA, python3's getaddrinfo
 # through musl, curl through its own resolver library), and the check lookup_answer
@@ -1645,10 +1648,15 @@ def _dns_break_action(inv: dict, model, kind: str, body, where: str) -> dict:
             _err(f"{where}.matrix_cells.cells", f"each a cell of the lab's matrix, once (not one: {', '.join(bad) or 'a repeat'})")
         return {"kind": "matrix_cells", "id": str(b.get("id") or "cells"), "cells": cells}
     # cell_mode
-    extra = set(b) - {"probe", "cell", "mode", "rule"}
-    if extra or not b.get("probe") or not b.get("cell") or str(b.get("mode")) not in decisions.MODES:
-        _err(f"{where}.cell_mode", f"probe: a matrix_cells, cell: one of its cells, mode: one of {', '.join(decisions.MODES)}, rule: for a log line")
+    extra = set(b) - {"probe", "cell", "mode", "rule", "not"}
+    if extra or not b.get("probe") or not b.get("cell") or str(b.get("mode")) not in decisions.MODES or not isinstance(b.get("not", False), bool):
+        _err(f"{where}.cell_mode", f"probe: a matrix_cells, cell: one of its cells, mode: one of {', '.join(decisions.MODES)}, rule: for a log line, "
+                                   "not: true for any mode but that one")
     out = {"kind": "cell_mode", "probe": str(b["probe"]), "cell": str(b["cell"]), "mode": str(b["mode"])}
+    if b.get("not"):
+        if b.get("rule"):
+            _err(f"{where}.cell_mode.not", "a mode other than one: no rule to name")
+        out["not"] = True
     if b.get("rule"):
         if out["mode"] != "log-line":
             _err(f"{where}.cell_mode.rule", "names the rule of a log line")
@@ -1722,6 +1730,39 @@ def _k8s_break_action(inv: dict, model, kind: str, body, where: str) -> dict:
                 "patch": {"spec": {"rules": doc["spec"]["rules"]}}, "rendered": not add, "models": have + add,
                 "summary": f"HTTPRoute {st['namespace']}/{rt['name']} ({rt['gateway']}) carries the rules of {', '.join(have + add)}"
                            + (" (rendered)" if not add else f" (rendered {', '.join(have)})")}
+    if kind == "vip_arp":
+        if set(b) - {"gateway", "answered"} or not b.get("gateway") or not isinstance(b.get("answered"), bool):
+            _err(f"{where}.vip_arp", "gateway: a Gateway, answered: true (the lease holder's bond MAC) or false (nobody answers)")
+        g = _k8s_gateway(model, b["gateway"], f"{where}.vip_arp.gateway")
+        vip = ipaddress.ip_address(str(g.vip).split("/")[0])
+        names = K.gateway_names(model)
+        ns, _, nm = names[g.name]["lease"].partition("/")
+        ing, macs, ifs = [], {}, {}
+        for n in (inv.get("groups") or {}).get("ingress") or []:
+            x = (inv.get("nodes") or {}).get(n) or {}
+            bd = x.get("bond") or {}
+            u = next((u for u in bd.get("vlan_ifs") or [] if u.get("address") and vip in ipaddress.ip_interface(u["address"]).network), None)
+            if u is None or not bd.get("mac"):
+                continue
+            ing.append(n)
+            macs[n], ifs[n] = bd["mac"].lower(), u["name"]
+        if len(ing) < 2:
+            _err(f"{where}.vip_arp", f"needs two ingress nodes with a unit in {g.name}'s VLAN: one holds the lease, the other asks")
+        return {"kind": "vip_arp", "gateway": g.name, "vip": str(vip), "lease_namespace": ns, "lease": nm, "ingress": ing, "macs": macs,
+                "ifaces": ifs, "answered": bool(b["answered"])}
+    if kind == "route_set":
+        if set(b) - {"route", "rendered"} or not b.get("route") or not isinstance(b.get("rendered"), bool):
+            _err(f"{where}.route_set", "route: a Gateway's model route, rendered: true (its rules are its audience's row) or false")
+        if not inference.enabled(model):
+            _err(where, "route_set needs the API gateway's model routes (serving on)")
+        st = inference.settings(model)
+        rt = next((x for x in st["routes"] if x["name"] == str(b["route"])), None)
+        if rt is None:
+            _err(f"{where}.route_set.route", f"{b['route']!r} is not one of {', '.join(x['name'] for x in st['routes'])}")
+        doc = next(d for d in inference.route_docs(model, st) if d["metadata"]["name"] == rt["name"])
+        paths = sorted({m["path"]["value"] for r in doc["spec"].get("rules") or [] for m in r.get("matches") or [] if m.get("path")})
+        return {"kind": "route_set", "route": rt["name"], "namespace": st["namespace"], "gateway": rt["gateway"],
+                "models": [x["model"] for x in rt["rules"]], "paths": paths, "rendered": bool(b["rendered"])}
     # k8s_read
     objs = [str(x) for x in b.get("objects") or []]
     if set(b) - {"objects"} or not objs:
@@ -1779,13 +1820,25 @@ def _lookup_break_action(inv: dict, model, kind: str, body, where: str) -> dict:
         ctx = type("Ctx", (), {"profile_file": staticmethod(lambda m: f"spec/profile-{m.profile}.yaml"),
                                "warn": staticmethod(lambda *_a: None)})()
         text = D.dnsmasq_conf(model, h, r, ctx)
-        kept = [x for x in text.splitlines() if not x.startswith(f"server=/{model.dns.zone}/")]
+        zone = model.dns.zone
+        kept = [x for x in text.splitlines() if not x.startswith(f"server=/{zone}/")]
         if len(kept) == len(text.splitlines()):
             _err(f"{where}.dnsmasq_pin", f"{node}'s render forwards no zone to remove")
-        kept.append(f"# break: the platform's zone no longer forwarded; {', '.join(names)} pinned with address=, and no local= for the platform's zone")
+        # no local= over the platform's zone either: a local= for a parent domain (the corporate one)
+        # would answer the pinned names' other types from the server itself, where the break wants
+        # them sent upstream, which the server no longer has for the zone (dnsmasq man page, --address)
+        def covers(line):
+            if not line.startswith("local=/"):
+                return False
+            dom = line[len("local=/"):].strip("/")
+            return bool(dom) and (zone == dom or zone.endswith("." + dom))
+        dropped = [x for x in kept if covers(x)]
+        kept = [x for x in kept if not covers(x)]
+        kept.append(f"# break: the platform's zone no longer forwarded; {', '.join(names)} pinned with address=, and no local= for the platform's zone"
+                    + (f" ({', '.join(dropped)} removed)" if dropped else ""))
         kept += [f"address=/{x}/{ref.answer_address}" for x in names]
         return {"kind": "dnsmasq_pin", "node": node, "names": names, "address": ref.answer_address, "view": ref.name,
-                "file": "dnsmasq.conf", "content": "\n".join(kept) + "\n", "dir": DNS_BREAK_DIR}
+                "file": "dnsmasq.conf", "content": "\n".join(kept) + "\n", "dir": DNS_BREAK_DIR, "local_removed": dropped}
     if kind == "probe_lookup":
         if set(b) - {"id", "from", "name", "path", "tools", "timeout_s"} or not b.get("from") or not b.get("name"):
             _err(f"{where}.probe_lookup", "id, from: a client, name: a hostname of the platform zone, path, tools, timeout_s")
@@ -1807,11 +1860,11 @@ def _lookup_break_action(inv: dict, model, kind: str, body, where: str) -> dict:
         return {"kind": "probe_lookup", "id": str(b.get("id") or "lookup"), "node": src, "name": fqdn, "tools": tools,
                 "url": f"https://{fqdn}{path}", "timeout_s": _num(b.get("timeout_s", 60), f"{where}.probe_lookup.timeout_s")}
     # lookup_answer
-    keys = {"probe", "type", "rcode", "answers", "tool", "ok"}
+    keys = {"probe", "type", "rcode", "answers", "tool", "ok", "not"}
     if set(b) - keys or not b.get("probe"):
         _err(f"{where}.lookup_answer", "probe: a probe_lookup, and type (A or AAAA) with rcode and answers, or tool with ok")
     if b.get("tool"):
-        if b["tool"] not in ("getaddrinfo", "curl") or not isinstance(b.get("ok"), bool) or b.get("type") or b.get("rcode"):
+        if b["tool"] not in ("getaddrinfo", "curl") or not isinstance(b.get("ok"), bool) or b.get("type") or b.get("rcode") or "not" in b:
             _err(f"{where}.lookup_answer", "tool: getaddrinfo or curl, ok: true or false (whether it resolved and, for curl, connected)")
         return {"kind": "lookup_answer", "probe": str(b["probe"]), "tool": str(b["tool"]), "ok": bool(b["ok"])}
     if str(b.get("type")) not in ("A", "AAAA") or str(b.get("rcode")) not in LOOKUP_RCODES:
@@ -1819,7 +1872,12 @@ def _lookup_break_action(inv: dict, model, kind: str, body, where: str) -> dict:
     ans = b.get("answers")
     if ans is not None and (not isinstance(ans, int) or ans < 0):
         _err(f"{where}.lookup_answer.answers", "how many records the answer section holds")
-    return {"kind": "lookup_answer", "probe": str(b["probe"]), "type": str(b["type"]), "rcode": str(b["rcode"]), "answers": ans}
+    if not isinstance(b.get("not", False), bool):
+        _err(f"{where}.lookup_answer.not", "true: the check passes on any answer but this rcode with these answers")
+    out = {"kind": "lookup_answer", "probe": str(b["probe"]), "type": str(b["type"]), "rcode": str(b["rcode"]), "answers": ans}
+    if b.get("not"):
+        out["not"] = True
+    return out
 
 
 def _gw_break_action(inv: dict, model, kind: str, body, where: str) -> dict:
@@ -2182,7 +2240,7 @@ def _break(inv: dict, bid: str, raw: dict, model=None) -> dict:
     if not out["heal"]:
         _err(where, "heal: names no action")
     checks = {"vlan_member", "parity", "probe_share", "counter", "rule_order", "route_src", "far_capture", "endpoints", "placement",
-              "mac_gone", "key_pods", "syn_at", "tlog_rule", "cell_mode", "reply_path", "mclag_iface", "lookup_answer"}
+              "mac_gone", "key_pods", "syn_at", "tlog_rule", "cell_mode", "reply_path", "mclag_iface", "lookup_answer", "vip_arp", "route_set"}
     allowed = {"break": {"klish", "panos_api", "relay_route", "pod_rail", "pod_route", "key_hold", "key_mint", "dns_answer", "k8s_patch",
                          "dnsmasq_pin"},
                "record": {"show", "probe_tcp", "fw_show", "probe_ping", "probe_http", "ns_show", "probe_rail", "k8s_show", "pod_net",
