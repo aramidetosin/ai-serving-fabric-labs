@@ -244,7 +244,9 @@ p3d_klish() {
 isodrill() {
   p3d_begin "$1" "$2"
   local f n i client rows rc=0 factor dir
-  TN_PLAN="$P3D_PLAN.hold.json"
+  # the drill's hold plan, in its own pass directory (never in the lab's gen/, which a run leaves as
+  # rendered: a file written there makes every later run's tree differ from its stamp)
+  TN_PLAN="$D/hold-plan.json"
   py -c 'import json, sys; d = json.load(open(sys.argv[1])); x = next(i for i in d["list"] if i["id"] == sys.argv[2]); json.dump({"hold": x["hold"]}, open(sys.argv[3], "w"))' \
     "$P3D_PLAN" "$DRILL_ID" "$TN_PLAN"
   rows="$(p3d_get "list.$DRILL_ID.rows" | grep -c .)"
