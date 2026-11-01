@@ -258,8 +258,9 @@ isodrill() {
     p3d_tl HELD "x$factor"
     sleep "$(p3d_get timing.lead_s)"
     # the plan's load alone, before the tries: the probes' own connections to the same VIP (its own
-    # Gateway's /echo, an allowed cell) stay listed by their closing timeouts after they end, so a
-    # count read after them is not the held load's; that one is saved too, with the entries' states
+    # Gateway's /echo, an allowed cell) stay listed, still ACTIVE on the pinned release, for a time
+    # after they close, so a count read after them is not the held load's; that one is saved too,
+    # with the entries' states
     hold_counts "$dir" held
     for ((i = 0; i < rows; i++)); do
       client="$(p3d_get "list.$DRILL_ID.rows.$i.client")"
