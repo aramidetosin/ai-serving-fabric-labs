@@ -1,0 +1,20 @@
+== the held connections: 8 a population, held 120 s, each used again every 20 s
+== the held connections: 8 a population for 120 s (chapter 10)
+  PASS  enterprise: 8 connection(s) from ent-client held to gw-users at 10.20.11.210:443 (llm.ai.tarnwick.example), 48 replies, every one 200
+  PASS  enterprise: the firewall counts 8 session(s) from enterprise destination 10.20.11.210 destination-port 443 while they are held, within the plan's bound 8 to 11
+  PASS  internet: 8 connection(s) from inet-client held to gw-inet at 198.51.100.10:443 (llm.ai.tarnwick.example), 48 replies, every one 200
+  PASS  internet: the firewall counts 8 session(s) from isp destination 198.51.100.10 destination-port 443 while they are held, within the plan's bound 8 to 11
+  PASS  operator: 8 connection(s) from ops-client held to gw-internal at 10.20.11.200:443 (llm.ai.tarnwick.example), 48 replies, every one 200
+  PASS  operator: the firewall counts 8 session(s) from operator-vpn destination 10.20.11.200 destination-port 443 while they are held, within the plan's bound 8 to 11
+== one chat completion a population, with its own caller's key
+  PASS  enterprise: chat through gw-users with batch's key (batch.93af07a0): HTTP 200
+  PASS  internet: chat through gw-inet with inetapp's key (inetapp.543fa213): HTTP 200
+  PASS  operator: chat through gw-internal with batch's key (batch.93af07a0): HTTP 200
+== the firewall's session timeouts (the pinned PA-VM 12.1.2's defaults)
+  PASS  show session info: discard tcp 90 s, the plan's 90 s
+  PASS  show session info: tcp 3600 s, the plan's 3600 s
+  PASS  show session info: tcp half closed 30 s, the plan's 30 s
+  PASS  show session info: tcp handshake 10 s, the plan's 10 s
+  PASS  show session info: tcp init 5 s, the plan's 5 s
+  PASS  show session info: tcp time wait 15 s, the plan's 15 s
+== RESULT: 15 passed, 0 failed, 0 known platform limitation(s), 0 skipped

@@ -1,0 +1,19 @@
+Script started on 2026-10-31 19:25:29+00:00 [COMMAND="make break-10a" TERM="tmux-256color" TTY="/dev/pts/6" COLUMNS="-1" LINES="-1"]
+PYTHONDONTWRITEBYTECODE=1 python3 /root/sfab/labs/ai-serving-fabric-labs/common/breakheal.py break 10a
+== break-10a: the internet users' rule names the translated destination instead of the published address
+  PASS  fw: security rule isp-to-internet-gateway's destination set to 10.20.11.220 through the XML API (the render's: 198.51.100.10; success: command succeeded)
+  PASS  fw: committed (commit job 10: OK (Configuration committed successfully; Local configuration size: 58 KB; Predefined configuration size: 13 MB; Merged configuration size(local, panorama pushed, predefined): 16 MB; Maximum recommended merged configuration size: 47 MB (34% configured); Warning: Default master-key configured please change to custom master-key))
+== break-10a: recorded
+  PASS  internet, break, pass 1: 10 of 10 requests from inet-client to https://llm.ai.tarnwick.example/echo?msg=sfab-break-10a answered other than 200 (recorded)
+  PASS  staff, break, pass 1: 0 of 10 requests from ent-client to https://llm.ai.tarnwick.example/echo?msg=sfab-break-10a answered other than 200 (recorded)
+  PASS  syn, break, pass 1: 3 of 3 connects from inet-client (source ports 42310 to 42312) to 198.51.100.10:443 failed (recorded)
+== break-10a: broken as designed
+  PASS  internet: every request fails (10 of 10 across the passes)
+  PASS  staff: every request succeeds (10 of 10)
+  PASS  syn: every connect fails (3 of 3 across the passes)
+  PASS  syn: SYNs from 203.0.113.2 (source ports 42310 to 42312) to 198.51.100.10:443 (past the firewall 10.20.11.220:443): isp-rtr-eth1 15, fw-ethernet1-1 0, fw-ethernet1-2 0: seen at isp-rtr-eth1; at none of fw-ethernet1-1, fw-ethernet1-2
+  PASS  fw: the traffic log: 3 connects from 203.0.113.2 (source ports 42310 to 42312) to 198.51.100.10:443, each under deny-all-log (shown as deny-all-log), deny, zone isp to ingress
+== RESULT: 10 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+== result set: ch10/audits/sfab-ch10_break-10a_20261031T192529Z
+
+Script done on 2026-10-31 19:27:42+00:00 [COMMAND_EXIT_CODE="0"]

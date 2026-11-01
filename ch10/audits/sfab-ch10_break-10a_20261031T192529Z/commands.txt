@@ -1,0 +1,1261 @@
+### 2026-10-31T19:27:05Z inet-client container
++ bash -c for i in $(seq 0 9); do t=$(date +%s.%N); c=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 'https://llm.ai.tarnwick.example/echo?msg=sfab-break-10a'); if [ "$c" = 200 ]; then ok=1; else ok=0; fi; echo "$t $i $ok $c"; sleep 0.5; done
+1793474769. 0 0 000
+1793474775. 1 0 000
+1793474781. 2 0 000
+1793474786. 3 0 000
+1793474792. 4 0 000
+1793474797. 5 0 000
+1793474803. 6 0 000
+1793474808. 7 0 000
+1793474814. 8 0 000
+1793474819. 9 0 000
+
+### 2026-10-31T19:27:10Z ent-client container
++ bash -c for i in $(seq 0 9); do t=$(date +%s.%N); c=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 'https://llm.ai.tarnwick.example/echo?msg=sfab-break-10a'); if [ "$c" = 200 ]; then ok=1; else ok=0; fi; echo "$t $i $ok $c"; sleep 0.5; done
+1793474825. 0 1 200
+1793474825. 1 1 200
+1793474826. 2 1 200
+1793474826. 3 1 200
+1793474827. 4 1 200
+1793474827. 5 1 200
+1793474828. 6 1 200
+1793474828. 7 1 200
+1793474829. 8 1 200
+1793474829. 9 1 200
+
+### 2026-10-31T19:27:10Z isp-rtr capture
++ nsenter -t 805079 -n timeout 300 tcpdump -i eth1 -nn -s 96 -U -w probes/syn-break-pass1-isp-rtr-eth1.pcap '(host 203.0.113.2 and (host 198.51.100.10 or host 10.20.11.220) and tcp port 443) or (vlan and (host 203.0.113.2 and (host 198.51.100.10 or host 10.20.11.220) and tcp port 443))'
+
+### 2026-10-31T19:27:10Z fw capture
++ nsenter -t 805070 -n timeout 300 tcpdump -i eth1 -nn -s 96 -U -w probes/syn-break-pass1-fw-ethernet1-1.pcap '(host 203.0.113.2 and (host 198.51.100.10 or host 10.20.11.220) and tcp port 443) or (vlan and (host 203.0.113.2 and (host 198.51.100.10 or host 10.20.11.220) and tcp port 443))'
+
+### 2026-10-31T19:27:10Z fw capture
++ nsenter -t 805070 -n timeout 300 tcpdump -i eth2 -nn -s 96 -U -w probes/syn-break-pass1-fw-ethernet1-2.pcap '(host 203.0.113.2 and (host 198.51.100.10 or host 10.20.11.220) and tcp port 443) or (vlan and (host 203.0.113.2 and (host 198.51.100.10 or host 10.20.11.220) and tcp port 443))'
+
+### 2026-10-31T19:27:14Z inet-client container
++ python3 - 198.51.100.10 443 42310 3 5 0.5 < common/trace/syn_connect.py
+
+### 2026-10-31T19:27:30Z inet-client container
+1793474834.840088 0 0 42310 TIMEOUT 5.004
+1793474840.343863 1 0 42311 TIMEOUT 5.004
+1793474845.847849 2 0 42312 TIMEOUT 5.005
+
+### 2026-10-31T19:27:37Z fw panos-cli
+Last login: Sat Oct 31 19:25:25 2026 from 172.21.40.1
+set cli pager off
+show running security-policy
+show running nat-policy
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show running 
+admin@fw> show running security-policy
+
+"staff-to-users-gateway; index: 1" {
+        from enterprise;
+        source 10.24.10.0/24;
+        source-region none;
+        to ingress;
+        destination 10.20.11.210;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"ent-dns-to-platform-dns; index: 2" {
+        from enterprise;
+        source 10.24.10.53;
+        source-region none;
+        to services;
+        destination [ 10.20.13.11 10.20.14.11 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"staff-to-enterprise-dns; index: 3" {
+        from enterprise;
+        source 10.24.10.0/24;
+        source-region none;
+        to enterprise;
+        destination 10.24.10.53;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"admins-to-bastion; index: 4" {
+        from [ enterprise operator-vpn ];
+        source [ 10.24.10.10 192.0.2.0/30 ];
+        source-region none;
+        to bastion;
+        destination 10.20.3.10;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssh/tcp/any/22;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-firewall-admin; index: 5" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to bastion;
+        destination 10.20.3.1;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ssl/tcp/any/443 1:ssh/tcp/any/22 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-nodes; index: 6" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to k8s-nodes;
+        destination 10.20.1.0/24;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssh/tcp/any/22;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-api; index: 7" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to k8s-nodes;
+        destination 10.20.1.0/24;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/6443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-internal-gateway; index: 8" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to ingress;
+        destination 10.20.11.200;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-stor-mgmt; index: 9" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to stor-mgmt;
+        destination 10.20.2.31;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-bmc; index: 10" {
+        from bastion;
+        source [ 10.20.3.20 10.20.3.10 ];
+        source-region none;
+        to oob;
+        destination 10.20.9.0/24;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ssl/tcp/any/443 1:ssh/tcp/any/22 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-services-admin; index: 11" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to services;
+        destination [ 10.20.13.21 10.20.14.21 10.20.13.11 10.20.14.11 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssh/tcp/any/22;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"inside-to-gateway-ping; index: 12" {
+        from [ k8s-nodes ingress stor-mgmt bastion services oob enterprise ];
+        source [ 10.20.11.0/24 10.20.3.0/24 10.24.10.0/24 10.20.1.0/24 10.20.14.0/24 10.20.13.0/24 10.20.2.0/24 10.20.9.0/24 ];
+        source-region none;
+        to [ k8s-nodes ingress stor-mgmt bastion services oob enterprise ];
+        destination [ 10.24.10.9 10.20.2.1 10.20.14.1 10.20.3.1 10.24.10.54 10.20.11.1 10.20.9.254 10.20.1.1 10.20.13.1 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ping/icmp/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"inside-to-resolvers; index: 13" {
+        from [ k8s-nodes ingress stor-mgmt bastion services oob ];
+        source [ 10.20.11.0/24 10.20.3.0/24 10.20.1.0/24 10.20.14.0/24 10.20.13.0/24 10.20.2.0/24 10.20.9.0/24 ];
+        source-region none;
+        to services;
+        destination [ 10.20.13.21 10.20.14.21 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"inside-to-ntp; index: 14" {
+        from [ k8s-nodes ingress stor-mgmt bastion services oob ];
+        source [ 10.20.11.0/24 10.20.3.0/24 10.20.1.0/24 10.20.14.0/24 10.20.13.0/24 10.20.2.0/24 10.20.9.0/24 ];
+        source-region none;
+        to services;
+        destination [ 10.20.13.21 10.20.14.21 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ntp-base/tcp/any/123 1:ntp-base/udp/any/123 2:ntp-non-rfc/tcp/any/123 3:ntp-non-rfc/udp/any/123 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"resolvers-to-auth; index: 15" {
+        from services;
+        source [ 10.20.13.21 10.20.14.21 ];
+        source-region none;
+        to services;
+        destination [ 10.20.13.11 10.20.14.11 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"auth-zone-transfer; index: 16" {
+        from services;
+        source [ 10.20.13.11 10.20.14.11 ];
+        source-region none;
+        to services;
+        destination [ 10.20.13.11 10.20.14.11 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"ntp-upstream; index: 17" {
+        from services;
+        source [ 10.20.13.21 10.20.14.21 ];
+        source-region none;
+        to uplink;
+        destination 192.0.2.14;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ntp-base/tcp/any/123 1:ntp-base/udp/any/123 2:ntp-non-rfc/tcp/any/123 3:ntp-non-rfc/udp/any/123 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"nts-ke-upstream; index: 18" {
+        from services;
+        source [ 10.20.13.21 10.20.14.21 ];
+        source-region none;
+        to uplink;
+        destination 192.0.2.14;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/4460;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"nodes-to-registry; index: 19" {
+        from k8s-nodes;
+        source 10.20.1.0/24;
+        source-region none;
+        to uplink;
+        destination 192.0.2.6;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/5000;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"nodes-to-internal-gateway; index: 20" {
+        from k8s-nodes;
+        source 10.20.1.0/24;
+        source-region none;
+        to ingress;
+        destination 10.20.11.200;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"csi-to-storage-api; index: 21" {
+        from k8s-nodes;
+        source 10.20.1.0/24;
+        source-region none;
+        to stor-mgmt;
+        destination 10.20.2.31;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"operator-ike; index: 22" {
+        from uplink;
+        source 192.0.2.22;
+        source-region none;
+        to uplink;
+        destination 198.51.100.2;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ike/tcp/any/500 1:ike/udp/any/500 2:ipsec-esp/50/any/any 3:ipsec-esp-udp/udp/any/4500 4:ipsec-esp-udp/udp/any/4501 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"operator-to-internal-gateway; index: 23" {
+        from operator-vpn;
+        source 192.0.2.0/30;
+        source-region none;
+        to ingress;
+        destination 10.20.11.200;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"isp-to-internet-gateway; index: 24" {
+        from isp;
+        source any;
+        source-region none;
+        to ingress;
+        destination 10.20.11.220;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"deny-all-log; index: 25" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal no;
+}
+
+"vsys1+intrazone-default; index: 26" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal yes;
+        type intrazone;
+}
+
+"vsys1+interzone-default; index: 27" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal yes;
+        type interzone;
+}
+
+dynamic url: no
+
+
+admin@fw> show 
+admin@fw> show running 
+admin@fw> show running nat-policy
+
+Nat policy configured on vsys1:
+"dnat-internet-gateway; index: 1" {
+        nat-type ipv4;
+        from isp;
+        source any;
+        source-region none;
+        to isp;
+        to-interface  ;
+        destination 198.51.100.10;
+        destination-region none;
+        service 0:tcp/any/443;
+        translate-to "dst: 10.20.11.220";
+        terminal no;
+}
+
+"no-nat-public; index: 2" {
+        nat-type ipv4;
+        from [ k8s-nodes services ];
+        source any;
+        source-region none;
+        to uplink;
+        to-interface  ;
+        destination 198.51.100.2;
+        destination-region none;
+        service 0:any/any/any;
+        terminal no;
+}
+
+"internet-snat; index: 3" {
+        nat-type ipv4;
+        from [ k8s-nodes services ];
+        source any;
+        source-region none;
+        to uplink;
+        to-interface  ;
+        destination any;
+        destination-region none;
+        service 0:any/any/any;
+        translate-to "src: ethernet1/5 198.51.100.2 (dynamic-ip-and-port) (pool idx: 1)";
+        terminal no;
+}
+
+
+
+admin@fw> exit
+
+### 2026-10-31T19:27:42Z fw panos-cli
+Last login: Sat Oct 31 19:27:33 2026 from 172.21.40.1
+set cli pager off
+show log traffic direction equal backward receive_time in last-15-minutes dport equal 443
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show log 
+admin@fw> show log traffic 
+admin@fw> show log traffic direction 
+admin@fw> show log traffic direction equal 
+admin@fw> show log traffic direction equal backward 
+admin@fw> show log traffic direction equal backward receive_time 
+admin@fw> show log traffic direction equal backward receive_time in 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 
+admin@fw> show log traffic direction equal backward receive_time in last-15-minutes dport equal 443
+Time                App             From                            Src Port          Source
+Rule                Action          To                              Dst Port          Destination
+Src User        Dst User                        End Reason
+Rule_UUid
+====================================================================================================
+2026/10/31 19:27:29 not-applicable  isp                             42312             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:27:28 not-applicable  isp                             42312             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:27:27 not-applicable  isp                             42312             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:27:26 not-applicable  isp                             42312             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:27:24 not-applicable  isp                             42312             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:27:24 ssl             enterprise                      53338             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:27:23 not-applicable  isp                             42311             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:27:23 ssl             enterprise                      53326             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:27:23 ssl             enterprise                      53312             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:27:22 not-applicable  isp                             42311             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:27:22 ssl             enterprise                      53308             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:27:22 ssl             enterprise                      42864             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:27:21 not-applicable  isp                             42311             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:27:21 ssl             enterprise                      42854             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:27:21 ssl             enterprise                      42838             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:27:20 not-applicable  isp                             42311             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:27:20 ssl             enterprise                      42824             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:27:20 ssl             enterprise                      42808             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:27:19 not-applicable  isp                             42311             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:27:19 ssl             enterprise                      42792             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:27:18 not-applicable  isp                             42310             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:27:17 not-applicable  isp                             42310             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:27:16 not-applicable  isp                             42310             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:27:15 not-applicable  isp                             42310             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:27:13 not-applicable  isp                             42310             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:27:02 not-applicable  isp                             48104             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:27:01 not-applicable  isp                             48104             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:27:00 not-applicable  isp                             48104             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:59 not-applicable  isp                             48104             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:58 not-applicable  isp                             48104             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:57 not-applicable  isp                             41860             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:56 not-applicable  isp                             41860             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:55 not-applicable  isp                             41860             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:54 not-applicable  isp                             41860             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:53 not-applicable  isp                             41860             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:51 not-applicable  isp                             41844             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:50 not-applicable  isp                             41844             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:49 not-applicable  isp                             41844             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:48 not-applicable  isp                             41844             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:47 not-applicable  isp                             41844             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:46 not-applicable  isp                             57278             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:45 not-applicable  isp                             57278             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:44 not-applicable  isp                             57278             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:43 not-applicable  isp                             57278             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:42 not-applicable  isp                             57278             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:40 not-applicable  isp                             52432             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:39 not-applicable  isp                             52432             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:38 not-applicable  isp                             52432             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:37 not-applicable  isp                             52432             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:36 not-applicable  isp                             52432             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:35 not-applicable  isp                             52424             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:34 not-applicable  isp                             52424             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:33 not-applicable  isp                             52424             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:32 not-applicable  isp                             52424             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:31 not-applicable  isp                             52424             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:29 not-applicable  isp                             50768             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:28 not-applicable  isp                             50768             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:27 not-applicable  isp                             50768             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:26 not-applicable  isp                             50768             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:25 not-applicable  isp                             50768             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:24 not-applicable  isp                             50764             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:23 not-applicable  isp                             50764             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:22 not-applicable  isp                             50764             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:21 not-applicable  isp                             50764             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:20 not-applicable  isp                             50764             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:18 not-applicable  isp                             48728             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:17 not-applicable  isp                             48728             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:16 not-applicable  isp                             48728             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:15 not-applicable  isp                             48728             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:14 not-applicable  isp                             48728             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:13 not-applicable  isp                             48722             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:12 not-applicable  isp                             48722             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:11 not-applicable  isp                             48722             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:10 not-applicable  isp                             48722             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:26:09 not-applicable  isp                             48722             203.0.113.2
+deny-all-log        deny            ingress                         443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:25:05 ssl             operator-vpn                    44701             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+637ecffc-a52b-4c85-b1bf-3a701a6274da
+2026/10/31 19:25:05 ssl             operator-vpn                    44705             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+637ecffc-a52b-4c85-b1bf-3a701a6274da
+2026/10/31 19:25:04 ssl             operator-vpn                    44704             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+637ecffc-a52b-4c85-b1bf-3a701a6274da
+2026/10/31 19:25:04 ssl             operator-vpn                    44700             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+637ecffc-a52b-4c85-b1bf-3a701a6274da
+2026/10/31 19:25:04 ssl             operator-vpn                    44703             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+637ecffc-a52b-4c85-b1bf-3a701a6274da
+2026/10/31 19:25:04 ssl             operator-vpn                    44702             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+637ecffc-a52b-4c85-b1bf-3a701a6274da
+2026/10/31 19:25:04 ssl             operator-vpn                    44707             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+637ecffc-a52b-4c85-b1bf-3a701a6274da
+2026/10/31 19:25:04 ssl             operator-vpn                    44706             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+637ecffc-a52b-4c85-b1bf-3a701a6274da
+2026/10/31 19:25:04 ssl             enterprise                      44500             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:25:04 ssl             enterprise                      44501             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:25:04 ssl             enterprise                      44504             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:25:04 ssl             enterprise                      44502             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:25:04 ssl             enterprise                      44505             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:25:04 ssl             enterprise                      44507             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:25:04 ssl             enterprise                      44506             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:25:04 ssl             enterprise                      44503             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:25:03 ssl             isp                             44605             203.0.113.2
+isp-to-internet-gat allow           ingress                         443               198.51.100.10
+                                                tcp-rst-from-client
+24b18ab7-39d6-47ae-b2dc-6ffdc047dcd7
+2026/10/31 19:25:03 ssl             isp                             44607             203.0.113.2
+isp-to-internet-gat allow           ingress                         443               198.51.100.10
+                                                tcp-rst-from-client
+24b18ab7-39d6-47ae-b2dc-6ffdc047dcd7
+2026/10/31 19:25:03 ssl             isp                             44600             203.0.113.2
+isp-to-internet-gat allow           ingress                         443               198.51.100.10
+                                                tcp-rst-from-client
+24b18ab7-39d6-47ae-b2dc-6ffdc047dcd7
+2026/10/31 19:25:03 ssl             isp                             44604             203.0.113.2
+isp-to-internet-gat allow           ingress                         443               198.51.100.10
+                                                tcp-rst-from-client
+24b18ab7-39d6-47ae-b2dc-6ffdc047dcd7
+2026/10/31 19:25:03 ssl             isp                             44603             203.0.113.2
+isp-to-internet-gat allow           ingress                         443               198.51.100.10
+                                                tcp-rst-from-client
+24b18ab7-39d6-47ae-b2dc-6ffdc047dcd7
+2026/10/31 19:25:03 ssl             isp                             44606             203.0.113.2
+isp-to-internet-gat allow           ingress                         443               198.51.100.10
+                                                tcp-rst-from-client
+24b18ab7-39d6-47ae-b2dc-6ffdc047dcd7
+2026/10/31 19:25:03 ssl             isp                             44601             203.0.113.2
+isp-to-internet-gat allow           ingress                         443               198.51.100.10
+                                                tcp-rst-from-client
+24b18ab7-39d6-47ae-b2dc-6ffdc047dcd7
+2026/10/31 19:25:03 ssl             isp                             44602             203.0.113.2
+isp-to-internet-gat allow           ingress                         443               198.51.100.10
+                                                tcp-rst-from-client
+24b18ab7-39d6-47ae-b2dc-6ffdc047dcd7
+2026/10/31 19:23:26 ssl             operator-vpn                    33896             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+637ecffc-a52b-4c85-b1bf-3a701a6274da
+2026/10/31 19:23:25 ssl             enterprise                      47224             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:23:24 ssl             isp                             36834             203.0.113.2
+isp-to-internet-gat allow           ingress                         443               198.51.100.10
+                                                tcp-rst-from-client
+24b18ab7-39d6-47ae-b2dc-6ffdc047dcd7
+2026/10/31 19:22:24 ssl             operator-vpn                    42938             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+637ecffc-a52b-4c85-b1bf-3a701a6274da
+2026/10/31 19:21:38 ssl             enterprise                      42937             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:20:52 ssl             isp                             42936             203.0.113.2
+isp-to-internet-gat allow           ingress                         443               198.51.100.10
+                                                tcp-rst-from-client
+24b18ab7-39d6-47ae-b2dc-6ffdc047dcd7
+2026/10/31 19:20:28 incomplete      operator-vpn                    42948             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-fin
+637ecffc-a52b-4c85-b1bf-3a701a6274da
+2026/10/31 19:20:28 incomplete      isp                             42946             203.0.113.2
+isp-to-internet-gat allow           ingress                         443               198.51.100.10
+                                                tcp-fin
+24b18ab7-39d6-47ae-b2dc-6ffdc047dcd7
+2026/10/31 19:20:28 incomplete      enterprise                      42947             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-fin
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:20:26 ssl             operator-vpn                    44705             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+637ecffc-a52b-4c85-b1bf-3a701a6274da
+2026/10/31 19:20:26 ssl             operator-vpn                    44701             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+637ecffc-a52b-4c85-b1bf-3a701a6274da
+2026/10/31 19:20:26 ssl             isp                             44603             203.0.113.2
+isp-to-internet-gat allow           ingress                         443               198.51.100.10
+                                                tcp-rst-from-client
+24b18ab7-39d6-47ae-b2dc-6ffdc047dcd7
+2026/10/31 19:20:26 ssl             isp                             44606             203.0.113.2
+isp-to-internet-gat allow           ingress                         443               198.51.100.10
+                                                tcp-rst-from-client
+24b18ab7-39d6-47ae-b2dc-6ffdc047dcd7
+2026/10/31 19:20:26 ssl             operator-vpn                    44700             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+637ecffc-a52b-4c85-b1bf-3a701a6274da
+2026/10/31 19:20:26 ssl             operator-vpn                    44702             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+637ecffc-a52b-4c85-b1bf-3a701a6274da
+2026/10/31 19:20:26 ssl             operator-vpn                    44704             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+637ecffc-a52b-4c85-b1bf-3a701a6274da
+2026/10/31 19:20:26 ssl             operator-vpn                    44707             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+637ecffc-a52b-4c85-b1bf-3a701a6274da
+2026/10/31 19:20:26 ssl             operator-vpn                    44703             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+637ecffc-a52b-4c85-b1bf-3a701a6274da
+2026/10/31 19:20:26 ssl             operator-vpn                    44706             192.0.2.2
+operator-to-interna allow           ingress                         443               10.20.11.200
+                                                tcp-rst-from-client
+637ecffc-a52b-4c85-b1bf-3a701a6274da
+2026/10/31 19:20:25 ssl             isp                             44602             203.0.113.2
+isp-to-internet-gat allow           ingress                         443               198.51.100.10
+                                                tcp-rst-from-client
+24b18ab7-39d6-47ae-b2dc-6ffdc047dcd7
+2026/10/31 19:20:25 ssl             isp                             44601             203.0.113.2
+isp-to-internet-gat allow           ingress                         443               198.51.100.10
+                                                tcp-rst-from-client
+24b18ab7-39d6-47ae-b2dc-6ffdc047dcd7
+2026/10/31 19:20:25 ssl             isp                             44605             203.0.113.2
+isp-to-internet-gat allow           ingress                         443               198.51.100.10
+                                                tcp-rst-from-client
+24b18ab7-39d6-47ae-b2dc-6ffdc047dcd7
+2026/10/31 19:20:25 ssl             isp                             44600             203.0.113.2
+isp-to-internet-gat allow           ingress                         443               198.51.100.10
+                                                tcp-rst-from-client
+24b18ab7-39d6-47ae-b2dc-6ffdc047dcd7
+2026/10/31 19:20:25 ssl             isp                             44607             203.0.113.2
+isp-to-internet-gat allow           ingress                         443               198.51.100.10
+                                                tcp-rst-from-client
+24b18ab7-39d6-47ae-b2dc-6ffdc047dcd7
+2026/10/31 19:20:25 ssl             isp                             44604             203.0.113.2
+isp-to-internet-gat allow           ingress                         443               198.51.100.10
+                                                tcp-rst-from-client
+24b18ab7-39d6-47ae-b2dc-6ffdc047dcd7
+2026/10/31 19:20:25 ssl             enterprise                      44501             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:20:25 ssl             enterprise                      44503             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:20:25 ssl             enterprise                      44502             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:20:25 ssl             enterprise                      44505             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:20:25 ssl             enterprise                      44500             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:20:25 ssl             enterprise                      44506             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:20:25 ssl             enterprise                      44504             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:20:25 ssl             enterprise                      44507             10.24.10.10
+staff-to-users-gate allow           ingress                         443               10.20.11.210
+                                                tcp-rst-from-client
+fa4a1d04-eaa7-4916-a17d-3b8a9bdc3184
+2026/10/31 19:19:45 not-applicable  k8s-nodes                       42394             10.20.1.12
+deny-all-log        deny            isp                             443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:19:44 not-applicable  k8s-nodes                       42394             10.20.1.12
+deny-all-log        deny            isp                             443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:19:43 not-applicable  k8s-nodes                       42394             10.20.1.12
+deny-all-log        deny            isp                             443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:19:42 not-applicable  k8s-nodes                       42394             10.20.1.12
+deny-all-log        deny            isp                             443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:19:40 not-applicable  enterprise                      42392             10.24.10.10
+deny-all-log        deny            isp                             443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:19:39 not-applicable  enterprise                      42392             10.24.10.10
+deny-all-log        deny            isp                             443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:19:38 not-applicable  enterprise                      42392             10.24.10.10
+deny-all-log        deny            isp                             443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:19:37 not-applicable  enterprise                      42392             10.24.10.10
+deny-all-log        deny            isp                             443               198.51.100.10
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:19:36 incomplete      isp                             42390             203.0.113.2
+isp-to-internet-gat allow           ingress                         443               198.51.100.10
+                                                tcp-fin
+24b18ab7-39d6-47ae-b2dc-6ffdc047dcd7
+2026/10/31 19:19:08 not-applicable  operator-vpn                    42374             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.220
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:19:07 not-applicable  operator-vpn                    42374             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.220
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:19:06 not-applicable  operator-vpn                    42374             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.220
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:19:05 not-applicable  operator-vpn                    42374             192.0.2.2
+deny-all-log        deny            ingress                         443               10.20.11.220
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:19:04 not-applicable  enterprise                      42370             10.24.10.10
+deny-all-log        deny            ingress                         443               10.20.11.220
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:19:03 not-applicable  enterprise                      42370             10.24.10.10
+deny-all-log        deny            ingress                         443               10.20.11.220
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:19:02 not-applicable  enterprise                      42370             10.24.10.10
+deny-all-log        deny            ingress                         443               10.20.11.220
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+2026/10/31 19:19:01 not-applicable  enterprise                      42370             10.24.10.10
+deny-all-log        deny            ingress                         443               10.20.11.220
+                                                policy-deny
+24993297-ea70-486b-9531-341a0a7d86e6
+admin@fw> exit
+

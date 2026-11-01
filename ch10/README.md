@@ -2,7 +2,7 @@
 
 Lab `sfab-ch10`, the companion lab of the book's Chapter 10, "Tenant Isolation on the Firewall". It runs build A's state many at step 10: chapter 9's deployment with the internet users' translation and rule. Three populations share one firewall and one routing table, and the zone each arrives in keeps them apart: internet users translated, the staff routed, the operator tunneled.
 
-Status: rendered, unit-tested (`common/sfab/tests/test_part3_render.py`, `test_part3_tools_render.py`) and run against the stand-ins (`common/tests/test_part3_labs.py`); not deployed or recorded yet. The formats of `show session info` and `show session all ... count yes` on the pinned PA-VM are the documented shapes until a deploy records them.
+Status: recorded under build A revision 2 on 2026-10-31 on the first lab host, one deployment from wiped disks that ran `make up`, `make audit`, `make trace`, `make hold`, break-10a and its heal, and `make record`, every set green (`RESULTS.md`; `audits/INDEX.md` maps the chapter's exhibits to their files and lines); tested against the stand-ins too (`common/sfab/tests/test_part3_render.py`, `test_part3_tools_render.py`, `common/tests/test_part3_labs.py`). The outputs of `show session info` and `show session all ... count yes` are the pinned PA-VM 12.1.2's as recorded; the measured rate on `show session info`'s `Throughput:` line is redacted, as every throughput figure is.
 
 | Selection | Value |
 |---|---|
@@ -27,8 +27,8 @@ Chapter 7's lab's (`ch07/README.md`), and `sfab/keys:4` built on the lab host (`
 ## The audit, the trace and the measurement
 
 - `audit.sh` runs chapter 9's, then the `zone-nat` group: both rulebases in the rendered order, the `isp` zone's one translation and one rule, the published address refused from every inside zone (`deny-all-log` from the population's own zone to `isp`, or silence at the uplink router), and each zone's session count under the held connections within the plan's bound.
-- `trace.sh` (`chapter.yaml` `trace.nat`): one held HTTPS request per population with its capture pair, each SYN followed by its sequence number to the one leg that carries it.
-- `hold.sh` (`make hold`, `chapter.yaml` `tenancy.hold`, `common/trace/lib-hold.sh`): 8 keep-alive connections a population held 120 s, each zone's session count and `show session info` before, while held, after a chat request per population with its own caller's key and after the stop; `HOLD.md` with Little's law per zone. `HOLD_FACTOR=2` doubles the connections.
+- `trace.sh` (`chapter.yaml` `trace.nat`): one uncaptured warm-up connect per population, then one held HTTPS request per population with its capture pair, each SYN followed by its sequence number to the one leg that carries it.
+- `hold.sh` (`make hold`, `chapter.yaml` `tenancy.hold`, `common/trace/lib-hold.sh`): 8 keep-alive connections a population held the whole 120 s, each zone's session count and `show session info` before, while held, after a chat request per population with its own caller's key and after the stop; `HOLD.md` with Little's law per zone. `HOLD_FACTOR=2` doubles the connections.
 
 ## Running it
 
@@ -46,4 +46,4 @@ make down
 
 ## break-10a
 
-`breaks/10a.yaml`: `isp-to-internet-gateway` edited through the firewall's API to name 10.20.11.220, the translated destination, in place of the published address (`panos_api`, as chapter 1's break edits a destination). The NAT rule still translates; no rule then matches the internet users' sessions. The break records requests from the internet client and from the staff client to `llm.ai.tarnwick.example`, three connects from the internet client to 198.51.100.10 from pinned source ports (42310 on) captured on the ISP router's link and both legs of the bundle, and the running security and NAT rulebases. It passes when every internet request fails, every staff request answers, the SYNs are seen on the ISP link and on neither bundle leg, and the traffic log names `deny-all-log`. `make heal-10a` writes the rendered destination back and checks the reverse, the log naming `isp-to-internet-gateway`.
+`breaks/10a.yaml`: `isp-to-internet-gateway` edited through the firewall's API to name 10.20.11.220, the translated destination, in place of the published address (`panos_api`, as chapter 1's break edits a destination). The NAT rule still translates; no rule then matches the internet users' sessions. The break records requests from the internet client and from the staff client to `llm.ai.tarnwick.example`, three connects from the internet client to 198.51.100.10 from pinned source ports (42310 on) captured on the ISP router's link and both legs of the bundle, and the running security and NAT rulebases. It passes when every internet request fails, every staff request answers, the SYNs are seen on the ISP link and on neither bundle leg, and the traffic log names `deny-all-log` (recorded from zone `isp` to `ingress`: the translation still applies, so the denied sessions carry the post-NAT zone). `make heal-10a` writes the rendered destination back and checks the reverse, the log naming `isp-to-internet-gateway`.

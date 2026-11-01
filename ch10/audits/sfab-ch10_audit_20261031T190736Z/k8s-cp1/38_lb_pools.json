@@ -1,0 +1,201 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "cilium.io/v2",
+            "kind": "CiliumLoadBalancerIPPool",
+            "metadata": {
+                "creationTimestamp": "2026-10-31T18:46:43Z",
+                "generation": 1,
+                "labels": {
+                    "decision.tarnwick.example/id": "dec-routeset-internet"
+                },
+                "name": "gw-inet",
+                "resourceVersion": "2153",
+                "uid": "3f946ec9-303f-464f-aaca-527cc482eb50"
+            },
+            "spec": {
+                "blocks": [
+                    {
+                        "start": "10.20.11.220",
+                        "stop": "10.20.11.224"
+                    }
+                ],
+                "disabled": false,
+                "serviceSelector": {
+                    "matchLabels": {
+                        "tarnwick.example/lb-pool": "gw-inet"
+                    }
+                }
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-31T18:46:43Z",
+                        "message": "",
+                        "observedGeneration": 1,
+                        "reason": "resolved",
+                        "status": "False",
+                        "type": "cilium.io/PoolConflict"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-31T18:46:43Z",
+                        "message": "5",
+                        "observedGeneration": 1,
+                        "reason": "noreason",
+                        "status": "Unknown",
+                        "type": "cilium.io/IPsTotal"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-31T18:46:43Z",
+                        "message": "4",
+                        "observedGeneration": 1,
+                        "reason": "noreason",
+                        "status": "Unknown",
+                        "type": "cilium.io/IPsAvailable"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-31T18:46:43Z",
+                        "message": "1",
+                        "observedGeneration": 1,
+                        "reason": "noreason",
+                        "status": "Unknown",
+                        "type": "cilium.io/IPsUsed"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "cilium.io/v2",
+            "kind": "CiliumLoadBalancerIPPool",
+            "metadata": {
+                "creationTimestamp": "2026-10-31T18:46:43Z",
+                "generation": 1,
+                "labels": {
+                    "decision.tarnwick.example/id": "dec-routeset-internal"
+                },
+                "name": "gw-internal",
+                "resourceVersion": "2172",
+                "uid": "96454eb0-73e2-48b4-9a09-61c19b283a16"
+            },
+            "spec": {
+                "blocks": [
+                    {
+                        "start": "10.20.11.200",
+                        "stop": "10.20.11.209"
+                    }
+                ],
+                "disabled": false,
+                "serviceSelector": {
+                    "matchLabels": {
+                        "tarnwick.example/lb-pool": "gw-internal"
+                    }
+                }
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-31T18:46:43Z",
+                        "message": "",
+                        "observedGeneration": 1,
+                        "reason": "resolved",
+                        "status": "False",
+                        "type": "cilium.io/PoolConflict"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-31T18:46:43Z",
+                        "message": "10",
+                        "observedGeneration": 1,
+                        "reason": "noreason",
+                        "status": "Unknown",
+                        "type": "cilium.io/IPsTotal"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-31T18:46:43Z",
+                        "message": "9",
+                        "observedGeneration": 1,
+                        "reason": "noreason",
+                        "status": "Unknown",
+                        "type": "cilium.io/IPsAvailable"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-31T18:46:43Z",
+                        "message": "1",
+                        "observedGeneration": 1,
+                        "reason": "noreason",
+                        "status": "Unknown",
+                        "type": "cilium.io/IPsUsed"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "cilium.io/v2",
+            "kind": "CiliumLoadBalancerIPPool",
+            "metadata": {
+                "creationTimestamp": "2026-10-31T18:46:43Z",
+                "generation": 1,
+                "labels": {
+                    "decision.tarnwick.example/id": "dec-routeset-enterprise"
+                },
+                "name": "gw-users",
+                "resourceVersion": "2164",
+                "uid": "f86aa99d-7ac9-4370-8f64-edbb8aa73c5e"
+            },
+            "spec": {
+                "blocks": [
+                    {
+                        "start": "10.20.11.210",
+                        "stop": "10.20.11.214"
+                    }
+                ],
+                "disabled": false,
+                "serviceSelector": {
+                    "matchLabels": {
+                        "tarnwick.example/lb-pool": "gw-users"
+                    }
+                }
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-31T18:46:43Z",
+                        "message": "",
+                        "observedGeneration": 1,
+                        "reason": "resolved",
+                        "status": "False",
+                        "type": "cilium.io/PoolConflict"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-31T18:46:43Z",
+                        "message": "5",
+                        "observedGeneration": 1,
+                        "reason": "noreason",
+                        "status": "Unknown",
+                        "type": "cilium.io/IPsTotal"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-31T18:46:43Z",
+                        "message": "4",
+                        "observedGeneration": 1,
+                        "reason": "noreason",
+                        "status": "Unknown",
+                        "type": "cilium.io/IPsAvailable"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-31T18:46:43Z",
+                        "message": "1",
+                        "observedGeneration": 1,
+                        "reason": "noreason",
+                        "status": "Unknown",
+                        "type": "cilium.io/IPsUsed"
+                    }
+                ]
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

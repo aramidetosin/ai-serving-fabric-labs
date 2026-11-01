@@ -1,0 +1,70 @@
+Last login: Sat Oct 31 19:20:19 2026 from 172.21.40.1
+set cli pager off
+show session id 1365
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show session 
+admin@fw> show session id 
+admin@fw> show session id 1365
+
+Session            1365
+
+        c2s flow:
+                source:      203.0.113.2 [isp]
+                dst:         198.51.100.10
+                proto:       6
+                sport:       42936           dport:      443
+                state:       ACTIVE          type:       FLOW
+                src user:    unknown
+                dst user:    unknown
+
+        s2c flow:
+                source:      10.20.11.220 [ingress]
+                dst:         203.0.113.2
+                proto:       6
+                sport:       443             dport:      42936
+                state:       ACTIVE          type:       FLOW
+                src user:    unknown
+                dst user:    unknown
+
+        start time                           : Sat Oct 31 19:20:17 2026
+        timeout                              : 1800 sec
+        time to live                         : 1791 sec 
+        total byte count(c2s)                : 1222
+        total byte count(s2c)                : 2381
+        layer7 packet count(c2s)             : 7
+        layer7 packet count(s2c)             : 6
+        vsys                                 : vsys1
+        application                          : ssl  
+        rule                                 : isp-to-internet-gateway
+        service timeout override(index)      : False
+        session is promoted                  : False
+        session to be logged at end          : True
+        session in session ager              : True
+        session updated by HA peer           : False
+        address/port translation             : destination
+        nat-rule                             : dnat-internet-gateway(vsys1)
+        layer7 processing                    : enabled
+        ctd version                          : 1
+        URL filtering enabled                : False
+        session via syn-cookies              : False
+        session terminated on host           : False
+        session traverses tunnel             : False
+        session terminate tunnel             : False
+        captive portal session               : False
+        ingress interface                    : ethernet1/6
+        egress interface                     : ae1.110
+        session QoS rule                     : N/A (class 4)
+        end-reason                           : unknown
+admin@fw> exit

@@ -1,0 +1,34 @@
+== the nat trace
+== session internet: inet-client (203.0.113.2) to https://llm.ai.tarnwick.example/echo?msg=sfab-trace-nat at 198.51.100.10:443, translated to 10.20.11.220
+  PASS  the reply: HTTP 200 with the echoed message sfab-trace-nat
+  PASS  the connection held 20 s after the reply, so the session table still lists it
+  PASS  show session all lists it: 203.0.113.2[42936] to 198.51.100.10[443] (id 1990)
+  PASS  ... zone isp to zone ingress, state ACTIVE
+  PASS  ... destination after translation 10.20.11.220 (the destination NAT), source unchanged 203.0.113.2
+  PASS  show session id names the security rule isp-to-internet-gateway
+  PASS  ... and the NAT rule dnat-internet-gateway
+  PASS  the traffic log line: isp-to-internet-gateway (shown as isp-to-internet-gat), allow, zone isp to zone ingress, the pre-NAT destination 198.51.100.10
+  PASS  internet: the SYN at 1-isp-rtr-eth1, 203.0.113.2:42936 to 198.51.100.10:443, sequence number 2479623066 (`captures/internet/1-isp-rtr-eth1.txt:2`)
+  PASS  internet: the same SYN on exactly one leg (3-fw-ae1-leg1), tagged 110: destination rewritten to 10.20.11.220, source and sequence number kept (`captures/internet/3-fw-ae1-leg1.txt:2`)
+== session enterprise: ent-client (10.24.10.10) to https://llm.ai.tarnwick.example/echo?msg=sfab-trace-nat at 10.20.11.210:443
+  PASS  the reply: HTTP 200 with the echoed message sfab-trace-nat
+  PASS  the connection held 20 s after the reply, so the session table still lists it
+  PASS  show session all lists it: 10.24.10.10[42937] to 10.20.11.210[443] (id 2240)
+  PASS  ... zone enterprise to zone ingress, state ACTIVE
+  PASS  ... destination after translation 10.20.11.210 (none), source unchanged 10.24.10.10
+  PASS  show session id names the security rule staff-to-users-gateway
+  PASS  ... and no NAT rule
+  PASS  the traffic log line: staff-to-users-gateway (shown as staff-to-users-gate), allow, zone enterprise to zone ingress, the pre-NAT destination 10.20.11.210
+  PASS  enterprise: the SYN at 2-fw-ethernet1-4, 10.24.10.10:42937 to 10.20.11.210:443, sequence number 3803433110 (`captures/enterprise/2-fw-ethernet1-4.txt:2`)
+  PASS  enterprise: the same SYN on exactly one leg (3-fw-ae1-leg1), tagged 110: destination 10.20.11.210 as sent, untranslated, sequence number kept (`captures/enterprise/3-fw-ae1-leg1.txt:2`)
+== session operator: ops-client (192.0.2.2) to https://llm.ai.tarnwick.example/echo?msg=sfab-trace-nat at 10.20.11.200:443
+  PASS  the reply: HTTP 200 with the echoed message sfab-trace-nat
+  PASS  the connection held 20 s after the reply, so the session table still lists it
+  PASS  show session all lists it: 192.0.2.2[42938] to 10.20.11.200[443] (id 2194)
+  PASS  ... zone operator-vpn to zone ingress, state ACTIVE
+  PASS  ... destination after translation 10.20.11.200 (none), source unchanged 192.0.2.2
+  PASS  show session id names the security rule operator-to-internal-gateway
+  PASS  ... and no NAT rule
+  PASS  the traffic log line: operator-to-internal-gateway (shown as operator-to-interna), allow, zone operator-vpn to zone ingress, the pre-NAT destination 10.20.11.200
+  PASS  operator: the same SYN on exactly one leg (3-fw-ae1-leg1), tagged 110: destination 10.20.11.200 as sent, untranslated (`captures/operator/3-fw-ae1-leg1.txt:2`)
+== RESULT: 29 passed, 0 failed, 0 known platform limitation(s), 0 skipped
