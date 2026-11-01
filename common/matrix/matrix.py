@@ -39,9 +39,13 @@ The evidence matrix.sh saves under D (the result set, or a break's record/matrix
                                 header is ever saved, so no key is)
     fw/traffic-log-<port>.txt   the firewall's traffic log for that destination port, read after the cells
     fw/routing-route.txt        the firewall's routing table (show routing route)
-    fw/drops.txt                the firewall's drop counters over the run (show counter global filter delta
-                                yes severity drop, its delta view read before the requests and after them),
-                                when a cell of the plan is dropped by zone protection's strict IP check
+    fw/counters-before.txt      every counter's value before the requests and after them (show counter
+    fw/counters-after.txt       global filter value all), when a cell of the plan is dropped by zone
+                                protection's strict IP check: the judge reads the drop from their difference
+    fw/drops.txt                the drop counters' delta view over the run (show counter global filter delta
+                                yes severity drop, read before the requests and after them, between the two
+                                value reads), recorded beside them: the firewall can start a new sampling
+                                between its two reads, so the view is not what the judge decides by
     routers/<node>-ip-route.txt each router's routing table (show ip route)
     api-gateway/access.txt      the API gateway pods' access log over the run
 
@@ -416,6 +420,12 @@ def drop_count(text: str, name: str) -> int | None:
     return int(m.group(1)) if m else None
 
 
+def sampling(text: str) -> str:
+    """The delta view's own account of its window ("sampled over the last N s"), or that it was not read."""
+    m = re.search(r"Elapsed time since last sampling:\s*([\d.]+)\s*seconds", text or "")
+    return f"its sampling began {m.group(1)} s before it was read" if m else "not read"
+
+
 def router_routes(text: str) -> list:
     out = []
     for i, l in enumerate((text or "").splitlines(), 1):
@@ -571,15 +581,25 @@ def judge_cell(v, d: Path, plan: dict, c: dict, ob: dict, rows: dict, cols: dict
                      "interface the request arrived on")
                 res["cites"].append(cite(p, ln))
             cname = str(c["expect"].get("counter") or "")
-            dp = "fw/drops.txt"
-            got = drop_count(read(d / dp), cname)
-            if not got:
+            pb, pa, dp = "fw/counters-before.txt", "fw/counters-after.txt", "fw/drops.txt"
+            cb, ca = PP.counters_cli(read(d / pb)), PP.counters_cli(read(d / pa))
+            vb, va = (cb.get(cname) or {}).get("value"), (ca.get(cname) or {}).get("value")
+            dv = drop_count(read(d / dp), cname)
+            dtext = (f"the delta view lists it +{dv}" if dv else
+                     f"the delta view does not list it ({sampling(read(d / dp))})")
+            if not cb or not ca:
                 fail(f"zone protection's strict IP check dropped it ({cname} counted)",
-                     f"{cname} {'not in' if got is None else '0 in'} {dp}, the drop counters read around the run")
+                     f"no counter values read in {pb if not cb else pa}, the counters read around the run")
+            elif va is None:
+                fail(f"zone protection's strict IP check dropped it ({cname} counted)",
+                     f"{cname} not among the {len(ca)} counters in {pa}")
+            elif va - (vb or 0) <= 0:
+                fail(f"zone protection's strict IP check dropped it ({cname} counted)",
+                     f"{cname} {vb or 0} in {pb} and {va} in {pa}: it did not rise over the run")
             else:
-                v.ok(f"[routing] {name}: zone protection's strict IP check dropped it before any rule ({cname} {got} over the run, "
-                     f"{dp})")
-                res["cites"].append(cite(dp, line_of(read(d / dp), rf"^\s*{re.escape(cname)}\s")))
+                v.ok(f"[routing] {name}: zone protection's strict IP check dropped it before any rule ({cname} rose by "
+                     f"{va - (vb or 0)} over the run, {vb or 0} to {va}, {pb}, {pa}; {dtext}, {dp})")
+                res["cites"].append(cite(pa, line_of(read(d / pa), rf"^\s*{re.escape(cname)}\s")))
         elif dev == plan.get("firewall"):
             p = "fw/routing-route.txt"
             dr = fw_discards(read(d / p))

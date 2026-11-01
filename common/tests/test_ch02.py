@@ -138,6 +138,18 @@ class World:
                 "flow_dos_pf_strictip                      12        0 drop      flow      dos       "
                 "Packets dropped: Zone protection option 'strict-ip-check'\n"
                 "--------------------------------------------------------------------------------\nTotal counters shown: 2\n")
+        # every counter's value before and after the requests, as show counter global filter value
+        # all prints it: the strict IP check's counter rose by the cells' drops (or did not, drops=False)
+        def values(strict: int, deny: int) -> str:
+            return ("Global counters:\nElapsed time since last sampling: 3.010 seconds\n\n"
+                    "name                                   value     rate severity  category  aspect    description\n"
+                    "--------------------------------------------------------------------------------\n"
+                    f"flow_policy_deny                        {deny:4d}        0 drop      flow      session   Session setup: denied by policy\n"
+                    f"flow_dos_pf_strictip                    {strict:4d}        0 drop      flow      dos       "
+                    "Packets dropped: Zone protection option 'strict-ip-check'\n"
+                    "--------------------------------------------------------------------------------\nTotal counters shown: 2\n")
+        (d / "fw" / "counters-before.txt").write_text(values(30, 100))
+        (d / "fw" / "counters-after.txt").write_text(values(42 if drops else 30, 128))
         if gwlog:
             (d / "api-gateway" / "access.txt").write_text(
                 '[pod/api-gateway-1/apisix] 10.22.0.5 - - [27/Oct/2026:10:00:00 +0000] llm.ai.tarnwick.example "POST /models/x/v1/chat/completions HTTP/1.1" 200\n')
@@ -201,7 +213,8 @@ class Judge(Tmp):
         self.assertIn("PASS  [routing] Operator / API server: fw routes the source 192.0.2.2 by 192.0.2.0/30 out tunnel.1 (operator-site), "
                       "not over the interface the request arrived on", r.stdout)
         self.assertIn("PASS  [routing] Operator / API server: zone protection's strict IP check dropped it before any rule "
-                      "(flow_dos_pf_strictip 12 over the run, fw/drops.txt)", r.stdout)
+                      "(flow_dos_pf_strictip rose by 12 over the run, 30 to 42, fw/counters-before.txt, fw/counters-after.txt; "
+                      "the delta view lists it +12, fw/drops.txt)", r.stdout)
         self.assertIn("uplink-rtr holds no route to 10.20.12.31", r.stdout)
         md = (self.d / "MATRIX.md").read_text()
         self.assertIn("| Admin hostnames |", md)
@@ -242,7 +255,8 @@ class Judge(Tmp):
         World(self.d, drops=False)
         r = World.judge(type("W", (), {"d": self.d})(), "operator/node")
         self.assertEqual(r.returncode, 1)
-        self.assertIn("flow_dos_pf_strictip not in fw/drops.txt", r.stdout)
+        self.assertIn("flow_dos_pf_strictip 30 in fw/counters-before.txt and 30 in fw/counters-after.txt: it did not rise over the run",
+                      r.stdout)
         World(self.d)
         f = self.d / "fw" / "routing-route.txt"
         f.write_text("\n".join(l for l in f.read_text().splitlines() if "tunnel.1" not in l) + "\n")
@@ -252,6 +266,25 @@ class Judge(Tmp):
         World(self.d, override={"operator/node": "log-line"})
         r = World.judge(type("W", (), {"d": self.d})(), "operator/node")
         self.assertEqual(r.returncode, 1, "a deny-all-log line where the strict IP check drops it is another mode")
+
+    def test_strict_ip_counter_rise_decides_not_the_delta_view(self):
+        # the firewall started a new delta sampling after the cells' drops: the view does not list
+        # the counter, and the values read around the run still show the rise
+        World(self.d)
+        (self.d / "fw" / "drops.txt").write_text(
+            "Global counters:\nElapsed time since last sampling: 76.911 seconds\n\n"
+            "name                                   value     rate severity  category  aspect    description\n"
+            "--------------------------------------------------------------------------------\n"
+            "flow_policy_deny                          44        0 drop      flow      session   Session setup: denied by policy\n"
+            "--------------------------------------------------------------------------------\nTotal counters shown: 1\n")
+        r = World.judge(type("W", (), {"d": self.d})(), "operator/node")
+        self.assertEqual(r.returncode, 0, r.stdout[-2000:])
+        self.assertIn("flow_dos_pf_strictip rose by 12 over the run, 30 to 42, fw/counters-before.txt, fw/counters-after.txt; "
+                      "the delta view does not list it (its sampling began 76.911 s before it was read), fw/drops.txt)", r.stdout)
+        (self.d / "fw" / "counters-after.txt").write_text("")
+        r = World.judge(type("W", (), {"d": self.d})(), "operator/node")
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("no counter values read in fw/counters-after.txt", r.stdout)
 
     def test_the_other_key_needs_the_message(self):
         World(self.d)

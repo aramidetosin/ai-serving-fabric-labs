@@ -181,10 +181,15 @@ matrix_cells() {
       "$bm" | mx_put "$n" "$kind" "$MX_DIR/body-$bm.json"
   done
   # 3. requests; where a cell of them is dropped by zone protection's strict IP check, which no log
-  # line records, the firewall's drop counters are read around them (the delta view: the first read
-  # starts the sampling, the second holds what was dropped since)
+  # line records, the firewall's drop counters are read around them: every counter's value
+  # (show counter global filter value all) before and after, which the judge compares, and between
+  # those two reads the delta view (its first read starts the sampling, the second holds what was
+  # dropped since), recorded beside them. The values decide: the firewall can start a new delta
+  # sampling between the two delta reads, and the view then misses what came before it.
   local sip=""
   [ -z "${FW_NODE:-}" ] || sip="$(py "$MXP" strict-ip --plan "$MX_PLAN" "${only[@]+"${only[@]}"}")"
+  [ -z "$sip" ] || FW "show counter global filter value all" | fwt_body "show counter global filter value all" \
+    >"$d/fw/counters-before.txt" 2>/dev/null || true
   [ -z "$sip" ] || FW "show counter global filter delta yes severity drop" >"$d/fw/drops-before.txt" 2>&1 || true
   while IFS=$'\t' read -r -u 3 cell req rk c ck ca a p sp m url key mk want bm pin kc; do
     [ -n "$cell" ] || continue
@@ -206,6 +211,8 @@ matrix_cells() {
   done 3< <(py "$MXP" requests --plan "$MX_PLAN" "${only[@]+"${only[@]}"}")
   [ -z "$sip" ] || FW "show counter global filter delta yes severity drop" | fwt_body "show counter global filter delta yes severity drop" \
     >"$d/fw/drops.txt" 2>/dev/null || true
+  [ -z "$sip" ] || FW "show counter global filter value all" | fwt_body "show counter global filter value all" \
+    >"$d/fw/counters-after.txt" 2>/dev/null || true
   # 4. the evidence: the traffic log until it holds every unanswered attempt that crossed the firewall
   if [ -n "${FW_NODE:-}" ]; then
     for i in $(seq 1 "${SFAB_MATRIX_TLOG_TRIES:-9}"); do
