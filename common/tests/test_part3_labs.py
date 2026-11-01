@@ -410,6 +410,9 @@ class Ch10Test(P3LabTest):
         self.assertRegex(v, r"  PASS  operator: the same SYN on exactly one leg \(3-fw-ae1-leg\d\), tagged 110: destination 10\.20\.11\.200 as sent")
         self.assertRegex(v, r"  PASS  show session id names the security rule isp-to-internet-gateway")
         self.assertRegex(v, r"  PASS  \.\.\. and the NAT rule dnat-internet-gateway")
+        # the warm-up before the captures: one connect per session, from its own port
+        self.assertEqual(sorted(p.name for p in (rs / "warmup").iterdir()), ["enterprise.txt", "internet.txt", "operator.txt"])
+        self.assertIn(" 42946 ", (rs / "warmup" / "internet.txt").read_text())
 
     def test_hold_measurement(self):
         self.edit("gen/tenancy.json", lambda d: d["hold"].update({"n": 2, "every_s": 1, "hold_s": 30}))

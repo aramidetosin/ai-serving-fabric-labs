@@ -15,7 +15,8 @@
 #           resolver (dig, the container's or the guest's) and connects toward the answer from its
 #           pinned source port (common/trace/syn_connect.py); the captures stop, and the traffic log
 #           is read until it holds every connect that crossed the firewall
-#   nat     chapter 10. For each population in turn: its capture points start (the point outside the
+#   nat     chapter 10. A warm-up connect, not captured, per session to its address (warmup/), as
+#           for dns. For each population in turn: its capture points start (the point outside the
 #           firewall and both legs), then chapter 4's held session (lib-fwtrace.sh fwtrace_session:
 #           the request held after the reply while show session all and show session id are read,
 #           the traffic log after it closes), then its captures stop, into captures/<population>/
@@ -96,9 +97,18 @@ p3trace_dns() {
 }
 
 p3trace_nat() {
-  local id
+  local id client addr sport
   [ -n "${FW_NODE:-}" ] || die "trace: the lab has no firewall"
   FWT_PLAN="$P3_PLAN"
+  mkdir -p "$RS/warmup"
+  # the warm-up, not captured: one connect per session to its address from a source port the
+  # sessions do not use, so the pair's MAC tables hold each lease holder's MAC in VLAN 110 before
+  # the captures start (KNOWN L1: a frame to an aged-out MAC is flooded and comes back on the other
+  # leg of the bundle, as in the dns trace)
+  while read -r id client addr sport; do
+    [ -n "$id" ] || continue
+    t_connect "$RS/warmup/$id.txt" "$client" container "$addr" 443 "$((sport + 10))"
+  done < <(py -c 'import json, sys; [print(s["id"], s["client"], s["dst_addr"], s["sport"]) for s in json.load(open(sys.argv[1]))["sessions"]]' "$P3_PLAN")
   while read -r id; do
     [ -n "$id" ] || continue
     p3_captures "$RS/captures/$id" "$id"
