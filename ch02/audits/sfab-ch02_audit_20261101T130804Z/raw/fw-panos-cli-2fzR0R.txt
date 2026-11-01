@@ -1,0 +1,1097 @@
+Last login: Sun Nov  1 13:07:48 2026 from 172.21.40.1
+set cli pager off
+show system info
+show interface all
+show lacp aggregate-ethernet all
+show interface ae1.100
+show interface ae1.110
+show interface ae1.130
+show interface ae1.131
+show interface ae1.200
+show interface ae1.300
+show routing route
+show running security-policy
+show running nat-policy
+show vpn ike-sa
+show vpn ipsec-sa
+show ntp
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show system 
+admin@fw> show system info
+
+hostname: fw
+ip-address: 10.0.0.15
+public-ip-address: unknown
+netmask: 255.255.255.0
+default-gateway: 10.0.0.2
+ip-assignment: dhcp
+ip6-assignment: static
+ipv6-address: unknown
+ipv6-link-local-address: fe80::e00:f2ff:fe0d:4100/64
+ipv6-default-gateway: 
+mac-address: 0c:00:f2:0d:41:00
+time: Sun Nov  1 13:08:17 2026
+uptime: 0 days, 1:38:16
+family: vm
+model: PA-VM
+serial: unknown
+vm-mac-base: BA:DB:EE:FB:AD:00
+vm-mac-count: 255
+vm-uuid: AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA
+vm-cpuid: [redacted: host-cpuid]
+vm-license: none
+vm-cap-tier: unknown
+vm-cpu-count: 8
+vm-memory: 16356260
+vm-mode: KVM
+cloud-mode: non-cloud
+sw-version: 12.1.2
+global-protect-client-package-version: 0.0.0
+device-dictionary-version: 82-406
+device-dictionary-release-date: 
+app-version: 9010-9583
+app-release-date: 
+av-version: 0
+av-release-date: 
+threat-version: 0
+threat-release-date: 
+wf-private-version: 0
+wf-private-release-date: unknown
+url-db: paloaltonetworks
+wildfire-version: 0
+wildfire-release-date: 
+wildfire-rt: Disabled
+url-filtering-version: 0000.00.00.000
+global-protect-datafile-version: 0
+global-protect-datafile-release-date: unknown
+global-protect-clientless-vpn-version: 0
+global-protect-clientless-vpn-release-date: 
+logdb-version: 12.1.4
+vm_series: vm_series-6.1.0
+dlp: dlp-6.0.1
+platform-family: vm
+vpn-disable-mode: off
+multi-vsys: off
+operational-mode: normal
+advanced-routing: off
+duplicate-ip: Disabled
+device-certificate-status: None
+
+admin@fw> show 
+admin@fw> show interface 
+admin@fw> show interface all
+
+total configured hardware interfaces: 8
+
+name                    id    speed/duplex/state            mac address       
+--------------------------------------------------------------------------------
+ethernet1/1             16    10000/full/up                 ba:db:ee:fb:ad:f0 
+ethernet1/2             17    10000/full/up                 ba:db:ee:fb:ad:f0 
+ethernet1/3             18    10000/full/up                 aa:c1:ab:f6:3f:4e 
+ethernet1/4             19    10000/full/up                 aa:c1:ab:c1:ad:4a 
+ethernet1/5             20    10000/full/up                 aa:c1:ab:24:48:18 
+ethernet1/7             22    10000/full/up                 aa:c1:ab:e7:04:5a 
+ae1                     240   [n/a]/[n/a]/up                ba:db:ee:fb:ad:f0 
+tunnel                  4     [n/a]/[n/a]/up                ba:db:ee:fb:ad:04 
+
+aggregation groups: 1
+ae1 members:
+  ethernet1/1 ethernet1/2 
+
+
+total configured logical interfaces: 13
+
+name                      id    vsys zone             forwarding               tag    address                                         
+------------------------- ----- ---- ---------------- ------------------------ ------ ------------------
+ethernet1/3               18    1    oob              vr:core                  0      10.20.9.254/24    
+ethernet1/4               19    1    enterprise       vr:core                  0      10.24.10.9/30     
+ethernet1/5               20    1    uplink           vr:core                  0      198.51.100.2/29   
+ethernet1/7               22    1    enterprise       vr:core                  0      10.24.10.54/30    
+ae1                       240   1                     N/A                      0      N/A               
+ae1.100                   256   1    k8s-nodes        vr:core                  100    10.20.1.1/24      
+ae1.110                   257   1    ingress          vr:core                  110    10.20.11.1/24     
+ae1.130                   260   1    services         vr:core                  130    10.20.13.1/24     
+ae1.131                   261   1    services         vr:core                  131    10.20.14.1/24     
+ae1.200                   258   1    stor-mgmt        vr:core                  200    10.20.2.1/24      
+ae1.300                   259   1    bastion          vr:core                  300    10.20.3.1/24      
+tunnel                    4     1                     N/A                      0      N/A               
+tunnel.1                  262   1    operator-vpn     vr:core                  0      N/A               
+
+admin@fw> show 
+admin@fw> show lacp 
+admin@fw> show lacp aggregate-ethernet 
+admin@fw> show lacp aggregate-ethernet all
+
+LACP:
+
+**********************************************************************************
+AE group: ae1
+Members:                Bndl Rx state       Mux state  Sel state
+  ethernet1/1           yes  Current        Tx_Rx      Selected
+  ethernet1/2           yes  Current        Tx_Rx      Selected
+Status:           Enabled
+Mode:             Active
+Rate:             Fast
+Max-port:         8
+Fast-failover:    Disabled
+Pre-negotiation:  Disabled
+Local:            System Priority: 32768
+                  System MAC:      ba:db:ee:fb:ad:01
+                  Key:             240
+Partner:          System Priority: 65535
+                  System MAC:      02:5a:00:00:00:01
+                  Key:             10
+Port State
+--------------------------------------------------------------------------------
+Interface                       Port                                
+                    Number Priority  Mode    Rate  Key      State
+--------------------------------------------------------------------------------
+ethernet1/1          16     32768    Active  Fast  240      0x3F                          
+Partner              3      255      Active  Fast  10       0x3F
+
+ethernet1/2          17     32768    Active  Fast  240      0x3F                          
+Partner              3      255      Active  Fast  10       0x3F
+
+Port Counters
+--------------------------------------------------------------------------------
+Interface               LACPDUs         Marker      Marker Response       Error        
+                    Sent     Recv     Sent Recv     Sent     Recv     Unknown  Illegal 
+--------------------------------------------------------------------------------
+ethernet1/1          5614     5615     0    0        0        0        0        0       
+ethernet1/2          5616     5621     0    0        0        0        0        0       
+
+admin@fw> show 
+admin@fw> show interface 
+admin@fw> show interface ae1.100
+
+--------------------------------------------------------------------------------
+Name: ae1.100, ID: 256, 802.1q tag: 100
+Operation mode: layer3
+Virtual router core
+Interface MTU 9000
+Interface IP address: 10.20.1.1/24
+Interface management profile: ping-only
+  ping: yes  telnet: no  ssh: no  http: no  https: no  
+  snmp: no  response-pages: no  userid-service: no
+Service configured: 
+Zone: k8s-nodes, virtual system: vsys1
+Adjust TCP MSS: no
+Ignore IPv4 DF: no
+Policing: no
+--------------------------------------------------------------------------------
+Logical interface counters read from CPU:
+--------------------------------------------------------------------------------
+bytes received                           122571830
+bytes transmitted                        8607459076
+packets received                         1706837
+packets transmitted                      5676630
+receive errors                           0
+packets dropped                          3243
+packets dropped by flow state check      0
+forwarding errors                        0
+no route                                 0
+arp not found                            0
+neighbor not found                       0
+neighbor info pending                    0
+mac not found                            0
+packets routed to different zone         0
+land attacks                             0
+ping-of-death attacks                    0
+teardrop attacks                         0
+ip spoof attacks                         0
+mac spoof attacks                        0
+ICMP fragment                            0
+layer2 encapsulated packets              0
+layer2 decapsulated packets              0
+tcp cps                                  0
+udp cps                                  0
+sctp cps                                 0
+other cps                                0
+--------------------------------------------------------------------------------
+
+
+admin@fw> show 
+admin@fw> show interface 
+admin@fw> show interface ae1.110
+
+--------------------------------------------------------------------------------
+Name: ae1.110, ID: 257, 802.1q tag: 110
+Operation mode: layer3
+Virtual router core
+Interface MTU 1500
+Interface IP address: 10.20.11.1/24
+Interface management profile: ping-only
+  ping: yes  telnet: no  ssh: no  http: no  https: no  
+  snmp: no  response-pages: no  userid-service: no
+Service configured: 
+Zone: ingress, virtual system: vsys1
+Adjust TCP MSS: yes (IPv4: 140, IPv6: 60)
+Ignore IPv4 DF: no
+Policing: no
+--------------------------------------------------------------------------------
+Logical interface counters read from CPU:
+--------------------------------------------------------------------------------
+bytes received                           670836
+bytes transmitted                        266325
+packets received                         4132
+packets transmitted                      1615
+receive errors                           0
+packets dropped                          2804
+packets dropped by flow state check      0
+forwarding errors                        0
+no route                                 0
+arp not found                            0
+neighbor not found                       0
+neighbor info pending                    0
+mac not found                            0
+packets routed to different zone         0
+land attacks                             0
+ping-of-death attacks                    0
+teardrop attacks                         0
+ip spoof attacks                         0
+mac spoof attacks                        0
+ICMP fragment                            0
+layer2 encapsulated packets              0
+layer2 decapsulated packets              0
+tcp cps                                  0
+udp cps                                  0
+sctp cps                                 0
+other cps                                0
+--------------------------------------------------------------------------------
+
+
+admin@fw> show 
+admin@fw> show interface 
+admin@fw> show interface ae1.130
+
+--------------------------------------------------------------------------------
+Name: ae1.130, ID: 260, 802.1q tag: 130
+Operation mode: layer3
+Virtual router core
+Interface MTU 1500
+Interface IP address: 10.20.13.1/24
+Interface management profile: ping-only
+  ping: yes  telnet: no  ssh: no  http: no  https: no  
+  snmp: no  response-pages: no  userid-service: no
+Service configured: 
+Zone: services, virtual system: vsys1
+Adjust TCP MSS: no
+Ignore IPv4 DF: no
+Policing: no
+--------------------------------------------------------------------------------
+Logical interface counters read from CPU:
+--------------------------------------------------------------------------------
+bytes received                           391527
+bytes transmitted                        112722
+packets received                         4360
+packets transmitted                      1116
+receive errors                           0
+packets dropped                          2807
+packets dropped by flow state check      0
+forwarding errors                        0
+no route                                 0
+arp not found                            27
+neighbor not found                       0
+neighbor info pending                    0
+mac not found                            0
+packets routed to different zone         0
+land attacks                             0
+ping-of-death attacks                    0
+teardrop attacks                         0
+ip spoof attacks                         0
+mac spoof attacks                        0
+ICMP fragment                            0
+layer2 encapsulated packets              0
+layer2 decapsulated packets              0
+tcp cps                                  0
+udp cps                                  0
+sctp cps                                 0
+other cps                                0
+--------------------------------------------------------------------------------
+
+
+admin@fw> show 
+admin@fw> show interface 
+admin@fw> show interface ae1.131
+
+--------------------------------------------------------------------------------
+Name: ae1.131, ID: 261, 802.1q tag: 131
+Operation mode: layer3
+Virtual router core
+Interface MTU 1500
+Interface IP address: 10.20.14.1/24
+Interface management profile: ping-only
+  ping: yes  telnet: no  ssh: no  http: no  https: no  
+  snmp: no  response-pages: no  userid-service: no
+Service configured: 
+Zone: services, virtual system: vsys1
+Adjust TCP MSS: no
+Ignore IPv4 DF: no
+Policing: no
+--------------------------------------------------------------------------------
+Logical interface counters read from CPU:
+--------------------------------------------------------------------------------
+bytes received                           251015
+bytes transmitted                        65110
+packets received                         3378
+packets transmitted                      546
+receive errors                           0
+packets dropped                          2806
+packets dropped by flow state check      0
+forwarding errors                        0
+no route                                 0
+arp not found                            21
+neighbor not found                       0
+neighbor info pending                    0
+mac not found                            0
+packets routed to different zone         0
+land attacks                             0
+ping-of-death attacks                    0
+teardrop attacks                         0
+ip spoof attacks                         0
+mac spoof attacks                        0
+ICMP fragment                            0
+layer2 encapsulated packets              0
+layer2 decapsulated packets              0
+tcp cps                                  0
+udp cps                                  0
+sctp cps                                 0
+other cps                                0
+--------------------------------------------------------------------------------
+
+
+admin@fw> show 
+admin@fw> show interface 
+admin@fw> show interface ae1.200
+
+--------------------------------------------------------------------------------
+Name: ae1.200, ID: 258, 802.1q tag: 200
+Operation mode: layer3
+Virtual router core
+Interface MTU 1500
+Interface IP address: 10.20.2.1/24
+Interface management profile: ping-only
+  ping: yes  telnet: no  ssh: no  http: no  https: no  
+  snmp: no  response-pages: no  userid-service: no
+Service configured: 
+Zone: stor-mgmt, virtual system: vsys1
+Adjust TCP MSS: no
+Ignore IPv4 DF: no
+Policing: no
+--------------------------------------------------------------------------------
+Logical interface counters read from CPU:
+--------------------------------------------------------------------------------
+bytes received                           396965
+bytes transmitted                        219767
+packets received                         4312
+packets transmitted                      2363
+receive errors                           0
+packets dropped                          2804
+packets dropped by flow state check      0
+forwarding errors                        0
+no route                                 0
+arp not found                            0
+neighbor not found                       0
+neighbor info pending                    0
+mac not found                            0
+packets routed to different zone         0
+land attacks                             0
+ping-of-death attacks                    0
+teardrop attacks                         0
+ip spoof attacks                         0
+mac spoof attacks                        0
+ICMP fragment                            0
+layer2 encapsulated packets              0
+layer2 decapsulated packets              0
+tcp cps                                  0
+udp cps                                  0
+sctp cps                                 0
+other cps                                0
+--------------------------------------------------------------------------------
+
+
+admin@fw> show 
+admin@fw> show interface 
+admin@fw> show interface ae1.300
+
+--------------------------------------------------------------------------------
+Name: ae1.300, ID: 259, 802.1q tag: 300
+Operation mode: layer3
+Virtual router core
+Interface MTU 1500
+Interface IP address: 10.20.3.1/24
+Interface management profile: bastion-admin
+  ping: yes  telnet: no  ssh: yes  http: no  https: yes  
+  snmp: no  response-pages: no  userid-service: no
+Service configured: 
+Zone: bastion, virtual system: vsys1
+Adjust TCP MSS: no
+Ignore IPv4 DF: no
+Policing: no
+--------------------------------------------------------------------------------
+Logical interface counters read from CPU:
+--------------------------------------------------------------------------------
+bytes received                           314701
+bytes transmitted                        237505
+packets received                         3407
+packets transmitted                      504
+receive errors                           0
+packets dropped                          2804
+packets dropped by flow state check      0
+forwarding errors                        0
+no route                                 0
+arp not found                            0
+neighbor not found                       0
+neighbor info pending                    0
+mac not found                            0
+packets routed to different zone         0
+land attacks                             0
+ping-of-death attacks                    0
+teardrop attacks                         0
+ip spoof attacks                         0
+mac spoof attacks                        0
+ICMP fragment                            0
+layer2 encapsulated packets              0
+layer2 decapsulated packets              0
+tcp cps                                  0
+udp cps                                  0
+sctp cps                                 0
+other cps                                0
+--------------------------------------------------------------------------------
+
+
+admin@fw> show 
+admin@fw> show routing 
+admin@fw> show routing route
+
+flags: A:active, ?:loose, C:connect, H:host, S:static, ~:internal, R:rip, O:ospf, B:bgp, 
+       Oi:ospf intra-area, Oo:ospf inter-area, O1:ospf ext-type-1, O2:ospf ext-type-2, E:ecmp, M:multicast
+
+  
+VIRTUAL ROUTER: core (id 2)
+  ==========
+destination                                 nexthop                                 metric flags      age   interface          next-AS    
+0.0.0.0/0                                   198.51.100.1                            10     A S              ethernet1/5                   
+10.0.0.0/8                                  discard                                 10     A S                                            
+10.20.1.0/24                                10.20.1.1                               0      A C              ae1.100                       
+10.20.1.1/32                                0.0.0.0                                 0      A H                                            
+10.20.2.0/24                                10.20.2.1                               0      A C              ae1.200                       
+10.20.2.1/32                                0.0.0.0                                 0      A H                                            
+10.20.3.0/24                                10.20.3.1                               0      A C              ae1.300                       
+10.20.3.1/32                                0.0.0.0                                 0      A H                                            
+10.20.9.0/24                                10.20.9.254                             0      A C              ethernet1/3                   
+10.20.9.254/32                              0.0.0.0                                 0      A H                                            
+10.20.11.0/24                               10.20.11.1                              0      A C              ae1.110                       
+10.20.11.1/32                               0.0.0.0                                 0      A H                                            
+10.20.13.0/24                               10.20.13.1                              0      A C              ae1.130                       
+10.20.13.1/32                               0.0.0.0                                 0      A H                                            
+10.20.14.0/24                               10.20.14.1                              0      A C              ae1.131                       
+10.20.14.1/32                               0.0.0.0                                 0      A H                                            
+10.24.10.8/30                               10.24.10.9                              0      A C              ethernet1/4                   
+10.24.10.9/32                               0.0.0.0                                 0      A H                                            
+10.24.10.52/30                              10.24.10.54                             0      A C              ethernet1/7                   
+10.24.10.54/32                              0.0.0.0                                 0      A H                                            
+172.16.0.0/12                               discard                                 10     A S                                            
+192.0.2.0/30                                0.0.0.0                                 10     A S              tunnel.1                      
+192.168.0.0/16                              discard                                 10     A S                                            
+198.51.100.0/29                             198.51.100.2                            0      A C              ethernet1/5                   
+198.51.100.2/32                             0.0.0.0                                 0      A H                                            
+total routes shown: 25
+
+admin@fw> show 
+admin@fw> show running 
+admin@fw> show running security-policy
+
+"staff-to-users-gateway; index: 1" {
+        from enterprise;
+        source 10.24.10.0/24;
+        source-region none;
+        to ingress;
+        destination 10.20.11.210;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"ent-dns-to-platform-dns; index: 2" {
+        from enterprise;
+        source 10.24.10.53;
+        source-region none;
+        to services;
+        destination [ 10.20.13.11 10.20.14.11 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"staff-to-enterprise-dns; index: 3" {
+        from enterprise;
+        source 10.24.10.0/24;
+        source-region none;
+        to enterprise;
+        destination 10.24.10.53;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"admins-to-bastion; index: 4" {
+        from [ enterprise operator-vpn ];
+        source [ 10.24.10.10 192.0.2.0/30 ];
+        source-region none;
+        to bastion;
+        destination 10.20.3.10;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssh/tcp/any/22;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-firewall-admin; index: 5" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to bastion;
+        destination 10.20.3.1;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ssl/tcp/any/443 1:ssh/tcp/any/22 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-nodes; index: 6" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to k8s-nodes;
+        destination 10.20.1.0/24;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssh/tcp/any/22;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-api; index: 7" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to k8s-nodes;
+        destination 10.20.1.0/24;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/6443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-internal-gateway; index: 8" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to ingress;
+        destination 10.20.11.200;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-stor-mgmt; index: 9" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to stor-mgmt;
+        destination 10.20.2.31;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-bmc; index: 10" {
+        from bastion;
+        source [ 10.20.3.20 10.20.3.10 ];
+        source-region none;
+        to oob;
+        destination 10.20.9.0/24;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ssl/tcp/any/443 1:ssh/tcp/any/22 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"bastion-to-services-admin; index: 11" {
+        from bastion;
+        source 10.20.3.10;
+        source-region none;
+        to services;
+        destination [ 10.20.14.21 10.20.13.11 10.20.14.11 10.20.13.21 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssh/tcp/any/22;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"inside-to-gateway-ping; index: 12" {
+        from [ k8s-nodes ingress stor-mgmt bastion services oob enterprise ];
+        source [ 10.20.1.0/24 10.24.10.0/24 10.20.3.0/24 10.20.11.0/24 10.20.14.0/24 10.20.9.0/24 10.20.2.0/24 10.20.13.0/24 ];
+        source-region none;
+        to [ k8s-nodes ingress stor-mgmt bastion services oob enterprise ];
+        destination [ 10.20.2.1 10.20.9.254 10.24.10.54 10.20.1.1 10.20.13.1 10.20.14.1 10.24.10.9 10.20.3.1 10.20.11.1 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ping/icmp/any/any;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"inside-to-resolvers; index: 13" {
+        from [ k8s-nodes ingress stor-mgmt bastion services oob ];
+        source [ 10.20.1.0/24 10.20.3.0/24 10.20.11.0/24 10.20.14.0/24 10.20.9.0/24 10.20.2.0/24 10.20.13.0/24 ];
+        source-region none;
+        to services;
+        destination [ 10.20.14.21 10.20.13.21 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"inside-to-ntp; index: 14" {
+        from [ k8s-nodes ingress stor-mgmt bastion services oob ];
+        source [ 10.20.1.0/24 10.20.3.0/24 10.20.11.0/24 10.20.14.0/24 10.20.9.0/24 10.20.2.0/24 10.20.13.0/24 ];
+        source-region none;
+        to services;
+        destination [ 10.20.14.21 10.20.13.21 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ntp-base/tcp/any/123 1:ntp-base/udp/any/123 2:ntp-non-rfc/tcp/any/123 3:ntp-non-rfc/udp/any/123 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"resolvers-to-auth; index: 15" {
+        from services;
+        source [ 10.20.14.21 10.20.13.21 ];
+        source-region none;
+        to services;
+        destination [ 10.20.13.11 10.20.14.11 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"auth-zone-transfer; index: 16" {
+        from services;
+        source [ 10.20.13.11 10.20.14.11 ];
+        source-region none;
+        to services;
+        destination [ 10.20.13.11 10.20.14.11 ];
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:dns-base/tcp/any/53 1:dns-base/tcp/any/853 2:dns-base/udp/any/53 3:dns-base/udp/any/5353 4:dns-non-rfc/tcp/any/53 5:dns-non-rfc/udp/any/53 6:dns-non-rfc/udp/any/5353 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"ntp-upstream; index: 17" {
+        from services;
+        source [ 10.20.14.21 10.20.13.21 ];
+        source-region none;
+        to uplink;
+        destination 192.0.2.14;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ntp-base/tcp/any/123 1:ntp-base/udp/any/123 2:ntp-non-rfc/tcp/any/123 3:ntp-non-rfc/udp/any/123 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"nts-ke-upstream; index: 18" {
+        from services;
+        source [ 10.20.14.21 10.20.13.21 ];
+        source-region none;
+        to uplink;
+        destination 192.0.2.14;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/4460;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"nodes-to-registry; index: 19" {
+        from k8s-nodes;
+        source 10.20.1.0/24;
+        source-region none;
+        to uplink;
+        destination 192.0.2.6;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/5000;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"nodes-to-internal-gateway; index: 20" {
+        from k8s-nodes;
+        source 10.20.1.0/24;
+        source-region none;
+        to ingress;
+        destination 10.20.11.200;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"csi-to-storage-api; index: 21" {
+        from k8s-nodes;
+        source 10.20.1.0/24;
+        source-region none;
+        to stor-mgmt;
+        destination 10.20.2.31;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"operator-ike; index: 22" {
+        from uplink;
+        source 192.0.2.22;
+        source-region none;
+        to uplink;
+        destination 198.51.100.2;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service [0:ike/tcp/any/500 1:ike/udp/any/500 2:ipsec-esp/50/any/any 3:ipsec-esp-udp/udp/any/4500 4:ipsec-esp-udp/udp/any/4501 ];
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"operator-to-internal-gateway; index: 23" {
+        from operator-vpn;
+        source 192.0.2.0/30;
+        source-region none;
+        to ingress;
+        destination 10.20.11.200;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:ssl/tcp/any/443;
+        action allow;
+        icmp-unreachable: no
+        terminal yes;
+}
+
+"deny-all-log; index: 24" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        user any;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal no;
+}
+
+"vsys1+intrazone-default; index: 25" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal yes;
+        type intrazone;
+}
+
+"vsys1+interzone-default; index: 26" {
+        from any;
+        source any;
+        source-region none;
+        to any;
+        destination any;
+        destination-region none;
+        source-device any;
+        destination-device any;
+        source-advanced-device any;
+        destination-advanced-device any;
+        category any;
+        application/service 0:any/any/any/any;
+        action deny;
+        icmp-unreachable: no
+        terminal yes;
+        type interzone;
+}
+
+dynamic url: no
+
+
+admin@fw> show 
+admin@fw> show running 
+admin@fw> show running nat-policy
+
+Nat policy configured on vsys1:
+"no-nat-public; index: 1" {
+        nat-type ipv4;
+        from [ k8s-nodes services ];
+        source any;
+        source-region none;
+        to uplink;
+        to-interface  ;
+        destination 198.51.100.2;
+        destination-region none;
+        service 0:any/any/any;
+        terminal no;
+}
+
+"internet-snat; index: 2" {
+        nat-type ipv4;
+        from [ k8s-nodes services ];
+        source any;
+        source-region none;
+        to uplink;
+        to-interface  ;
+        destination any;
+        destination-region none;
+        service 0:any/any/any;
+        translate-to "src: ethernet1/5 198.51.100.2 (dynamic-ip-and-port) (pool idx: 1)";
+        terminal no;
+}
+
+
+
+admin@fw> show 
+admin@fw> show vpn 
+admin@fw> show vpn ike-sa
+
+There is no IKEv1 phase-1 SA found.
+
+There is no IKEv1 phase-2 SA found.
+
+
+IKEv2 SAs
+Gateway ID      Peer-Address                            Gateway Name                                                    Role SN       Algorithm                                                        Established     Expiration      Xt Child  ST                  
+----------      ------------                            ------------                                                    ---- --       ---------                                                        -----------     ----------      -- -----  --                  
+1               192.0.2.22                              ops-gw                                                          Resp 1        PSK/DH14/A256/SHA256                                             Nov.01 11:36:17 Nov.01 19:36:17 0  3      Established          
+
+IKEv2 IPSec Child SAs
+Gateway Name                                                    TnID     Tunnel                                                          ID       Parent   Role SPI(in)  SPI(out) MsgID    ST              
+------------                                                    ----     ------                                                          --       ------   ---- -------  -------- -----    --              
+ops-gw                                                          2        ops-gw:bastion                                                  679      1        Resp 9D0DBD2A CFD037E4 00000003 Mature           
+ops-gw                                                          1        ops-gw:ingress                                                  692      1        Resp 984B0F88 CF26A99C 00000005 Mature           
+
+Show IKEv2 SA: Total 1 gateways found. 1 ike sa found.
+
+
+admin@fw> show 
+admin@fw> show vpn 
+admin@fw> show vpn ipsec-sa
+
+GwID/client IP  TnID   Peer-Address                            Tunnel(Gateway)                                                                                                                  Algorithm                                                        SPI(in)  SPI(out) life(Sec/KB)             remain-time(Sec)        
+--------------  ----   ------------                            ---------------                                                                                                                  ---------                                                        -------  -------- ------------             ----------------        
+1               1      192.0.2.22                              ops-gw:ingress(ops-gw)                                                                                                           ESP/A256/SHA256/DH14                                             984B0F88 CF26A99C 3600/Unlimited           1523                     
+1               2      192.0.2.22                              ops-gw:bastion(ops-gw)                                                                                                           ESP/A256/SHA256/DH14                                             9D0DBD2A CFD037E4 3600/Unlimited           1460                     
+
+Show IPSec SA: Total 2 tunnels found. 2 ipsec sa found.
+
+
+admin@fw> show 
+admin@fw> show ntp
+
+NTP state:
+    NTP synched to 10.20.14.21
+    NTP server: 10.20.13.21
+        status: available
+        reachable: yes
+        authentication-type: none
+    NTP server: 10.20.14.21
+        status: synched
+        reachable: yes
+        authentication-type: none
+
+admin@fw> exit

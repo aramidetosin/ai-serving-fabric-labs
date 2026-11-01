@@ -1,0 +1,24 @@
+Script started on 2026-11-01 12:49:27+00:00 [COMMAND="make heal-2a" TERM="tmux-256color" TTY="/dev/pts/0" COLUMNS="-1" LINES="-1"]
+PYTHONDONTWRITEBYTECODE=1 python3 /root/sfab/clean/ai-serving-fabric-labs/common/breakheal.py heal 2a
+== heal-2a: the enterprise view answers the admin hostnames with the internal Gateway's VIP
+  PASS  dns-auth1: the rendered zones installed again and reloaded ([sfab-dns] reloaded from /etc/sfab/dns)
+  PASS  dns-auth2, the secondary: view enterprise's ai.tarnwick.example at the primary's serial 261946292 (the primary's serial behind the 756238120 it held, so taken by rndc retransfer)
+  PASS  dns-auth2, the secondary: view internal's ai.tarnwick.example at the primary's serial 846505745 (taken by transfer)
+breakheal: the resolvers' caches dropped
+== heal-2a: recorded
+  PASS  users, heal, pass 1: 0 of 10 requests from ent-client to https://llm.ai.tarnwick.example/echo?msg=sfab-break-2a answered other than 200 (recorded)
+matrix: chat's key handed to ent-client (batch.152f9c75 sha256:3cfa9bbe9d6a)
+matrix: staff's key handed to ent-client (helpdesk.cb9856d2 sha256:3e1e239aa9cd)
+  PASS  cells, heal: 4 cells of the matrix tried from their own source ports (recorded in probes/cells-heal/)
+== heal-2a: healed
+  PASS  users: every request succeeds (10 of 10)
+  PASS  enterprise/admin: mode 404; the client: HTTP 404; answered from 10.20.11.210
+  PASS  enterprise/gw-users: mode allowed; the client: CONNECTED
+  PASS  enterprise/chat: mode allowed; the client: HTTP 200; answered from 10.20.11.210
+  PASS  enterprise/staff: mode allowed; the client: HTTP 200; answered from 10.20.11.210
+== the chapter audit after the heal
+  PASS  audit.sh after the heal: RESULT: 1036 passed, 0 failed, 0 known platform limitation(s), 3 skipped (ch02/audits/sfab-ch02_audit_20261101T125037Z)
+== RESULT: 11 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+== result set: ch02/audits/sfab-ch02_heal-2a_20261101T124927Z
+
+Script done on 2026-11-01 13:08:03+00:00 [COMMAND_EXIT_CODE="0"]

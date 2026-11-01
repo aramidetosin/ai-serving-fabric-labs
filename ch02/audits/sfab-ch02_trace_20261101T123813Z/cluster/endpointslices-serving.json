@@ -1,0 +1,478 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "addressType": "IPv4",
+            "apiVersion": "discovery.k8s.io/v1",
+            "endpoints": [
+                {
+                    "addresses": [
+                        "10.22.1.71"
+                    ],
+                    "conditions": {
+                        "ready": true,
+                        "serving": true,
+                        "terminating": false
+                    },
+                    "nodeName": "k8s-gpu1",
+                    "targetRef": {
+                        "kind": "Pod",
+                        "name": "chat-c-server-0",
+                        "namespace": "serving",
+                        "uid": "09be80a5-0035-43a2-8906-a914bae55bb0"
+                    }
+                },
+                {
+                    "addresses": [
+                        "10.22.1.246"
+                    ],
+                    "conditions": {
+                        "ready": true,
+                        "serving": true,
+                        "terminating": false
+                    },
+                    "nodeName": "k8s-gpu1",
+                    "targetRef": {
+                        "kind": "Pod",
+                        "name": "chat-a-server-0",
+                        "namespace": "serving",
+                        "uid": "6afee102-9451-489e-aa92-ab261ff2f811"
+                    }
+                },
+                {
+                    "addresses": [
+                        "10.22.3.43"
+                    ],
+                    "conditions": {
+                        "ready": true,
+                        "serving": true,
+                        "terminating": false
+                    },
+                    "nodeName": "k8s-gpu2",
+                    "targetRef": {
+                        "kind": "Pod",
+                        "name": "chat-b-server-0",
+                        "namespace": "serving",
+                        "uid": "49cc3cfe-0329-4932-876e-1dacd86dbaf2"
+                    }
+                }
+            ],
+            "kind": "EndpointSlice",
+            "metadata": {
+                "annotations": {
+                    "endpoints.kubernetes.io/last-change-trigger-time": "2026-11-01T11:52:15Z"
+                },
+                "creationTimestamp": "2026-11-01T11:52:15Z",
+                "generateName": "chat-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/name": "serving",
+                    "endpointslice.kubernetes.io/managed-by": "endpointslice-controller.k8s.io",
+                    "kubernetes.io/service-name": "chat",
+                    "tarnwick.example/model": "chat"
+                },
+                "name": "chat-9qxl5",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Service",
+                        "name": "chat",
+                        "uid": "59d859f1-d1d2-4ecf-998e-6133cf269677"
+                    }
+                ],
+                "resourceVersion": "6584",
+                "uid": "e7f70432-3172-4e94-9e86-19b5cd0e3c7a"
+            },
+            "ports": [
+                {
+                    "name": "http",
+                    "port": 8080,
+                    "protocol": "TCP"
+                }
+            ]
+        },
+        {
+            "addressType": "IPv4",
+            "apiVersion": "discovery.k8s.io/v1",
+            "endpoints": [
+                {
+                    "addresses": [
+                        "10.22.1.246"
+                    ],
+                    "conditions": {
+                        "ready": true,
+                        "serving": true,
+                        "terminating": false
+                    },
+                    "nodeName": "k8s-gpu1",
+                    "targetRef": {
+                        "kind": "Pod",
+                        "name": "chat-a-server-0",
+                        "namespace": "serving",
+                        "uid": "6afee102-9451-489e-aa92-ab261ff2f811"
+                    }
+                }
+            ],
+            "kind": "EndpointSlice",
+            "metadata": {
+                "annotations": {
+                    "endpoints.kubernetes.io/last-change-trigger-time": "2026-11-01T11:52:16Z"
+                },
+                "creationTimestamp": "2026-11-01T11:52:16Z",
+                "generateName": "chat-a-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/name": "serving",
+                    "endpointslice.kubernetes.io/managed-by": "endpointslice-controller.k8s.io",
+                    "kubernetes.io/service-name": "chat-a",
+                    "tarnwick.example/copy": "a",
+                    "tarnwick.example/model": "chat"
+                },
+                "name": "chat-a-kzjwb",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Service",
+                        "name": "chat-a",
+                        "uid": "ad7e92b7-1967-4eda-b6be-6806a85d3f63"
+                    }
+                ],
+                "resourceVersion": "6592",
+                "uid": "14b033d2-2e26-4885-bb5d-66a9003eaef7"
+            },
+            "ports": [
+                {
+                    "name": "http",
+                    "port": 8080,
+                    "protocol": "TCP"
+                }
+            ]
+        },
+        {
+            "addressType": "IPv4",
+            "apiVersion": "discovery.k8s.io/v1",
+            "endpoints": [
+                {
+                    "addresses": [
+                        "10.22.3.43"
+                    ],
+                    "conditions": {
+                        "ready": true,
+                        "serving": true,
+                        "terminating": false
+                    },
+                    "nodeName": "k8s-gpu2",
+                    "targetRef": {
+                        "kind": "Pod",
+                        "name": "chat-b-server-0",
+                        "namespace": "serving",
+                        "uid": "49cc3cfe-0329-4932-876e-1dacd86dbaf2"
+                    }
+                }
+            ],
+            "kind": "EndpointSlice",
+            "metadata": {
+                "annotations": {
+                    "endpoints.kubernetes.io/last-change-trigger-time": "2026-11-01T11:52:16Z"
+                },
+                "creationTimestamp": "2026-11-01T11:52:16Z",
+                "generateName": "chat-b-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/name": "serving",
+                    "endpointslice.kubernetes.io/managed-by": "endpointslice-controller.k8s.io",
+                    "kubernetes.io/service-name": "chat-b",
+                    "tarnwick.example/copy": "b",
+                    "tarnwick.example/model": "chat"
+                },
+                "name": "chat-b-5tdcp",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Service",
+                        "name": "chat-b",
+                        "uid": "4ba43424-1253-4af4-a9cb-c0fb2db27333"
+                    }
+                ],
+                "resourceVersion": "6597",
+                "uid": "eb431dd0-f30e-4c1f-8415-fac03e6e4085"
+            },
+            "ports": [
+                {
+                    "name": "http",
+                    "port": 8080,
+                    "protocol": "TCP"
+                }
+            ]
+        },
+        {
+            "addressType": "IPv4",
+            "apiVersion": "discovery.k8s.io/v1",
+            "endpoints": [
+                {
+                    "addresses": [
+                        "10.22.1.71"
+                    ],
+                    "conditions": {
+                        "ready": true,
+                        "serving": true,
+                        "terminating": false
+                    },
+                    "nodeName": "k8s-gpu1",
+                    "targetRef": {
+                        "kind": "Pod",
+                        "name": "chat-c-server-0",
+                        "namespace": "serving",
+                        "uid": "09be80a5-0035-43a2-8906-a914bae55bb0"
+                    }
+                }
+            ],
+            "kind": "EndpointSlice",
+            "metadata": {
+                "annotations": {
+                    "endpoints.kubernetes.io/last-change-trigger-time": "2026-11-01T11:52:16Z"
+                },
+                "creationTimestamp": "2026-11-01T11:52:16Z",
+                "generateName": "chat-c-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/name": "serving",
+                    "endpointslice.kubernetes.io/managed-by": "endpointslice-controller.k8s.io",
+                    "kubernetes.io/service-name": "chat-c",
+                    "tarnwick.example/copy": "c",
+                    "tarnwick.example/model": "chat"
+                },
+                "name": "chat-c-vx8bh",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Service",
+                        "name": "chat-c",
+                        "uid": "0bb334e5-da02-464a-8ae9-47f33bc4d730"
+                    }
+                ],
+                "resourceVersion": "6600",
+                "uid": "1ea1dab3-979a-49fa-a3d3-238df5fd8f9c"
+            },
+            "ports": [
+                {
+                    "name": "http",
+                    "port": 8080,
+                    "protocol": "TCP"
+                }
+            ]
+        },
+        {
+            "addressType": "IPv4",
+            "apiVersion": "discovery.k8s.io/v1",
+            "endpoints": [
+                {
+                    "addresses": [
+                        "10.22.1.254"
+                    ],
+                    "conditions": {
+                        "ready": true,
+                        "serving": true,
+                        "terminating": false
+                    },
+                    "nodeName": "k8s-gpu1",
+                    "targetRef": {
+                        "kind": "Pod",
+                        "name": "staff-a-server-0",
+                        "namespace": "serving",
+                        "uid": "b9d7cdd7-9504-45cf-aa30-76061edd4f7c"
+                    }
+                }
+            ],
+            "kind": "EndpointSlice",
+            "metadata": {
+                "annotations": {
+                    "endpoints.kubernetes.io/last-change-trigger-time": "2026-11-01T11:52:16Z"
+                },
+                "creationTimestamp": "2026-11-01T11:52:16Z",
+                "generateName": "staff-a-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/name": "serving",
+                    "endpointslice.kubernetes.io/managed-by": "endpointslice-controller.k8s.io",
+                    "kubernetes.io/service-name": "staff-a",
+                    "tarnwick.example/copy": "a",
+                    "tarnwick.example/model": "staff"
+                },
+                "name": "staff-a-456m8",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Service",
+                        "name": "staff-a",
+                        "uid": "66ee578d-0ee5-49b4-875c-f31f8d4b570b"
+                    }
+                ],
+                "resourceVersion": "6605",
+                "uid": "87d575ec-c0ef-4f74-a1bf-37b98645210f"
+            },
+            "ports": [
+                {
+                    "name": "http",
+                    "port": 8080,
+                    "protocol": "TCP"
+                }
+            ]
+        },
+        {
+            "addressType": "IPv4",
+            "apiVersion": "discovery.k8s.io/v1",
+            "endpoints": [
+                {
+                    "addresses": [
+                        "10.22.3.170"
+                    ],
+                    "conditions": {
+                        "ready": true,
+                        "serving": true,
+                        "terminating": false
+                    },
+                    "nodeName": "k8s-gpu2",
+                    "targetRef": {
+                        "kind": "Pod",
+                        "name": "staff-b-server-0",
+                        "namespace": "serving",
+                        "uid": "3904cf88-866a-4828-b324-b008b39cf226"
+                    }
+                }
+            ],
+            "kind": "EndpointSlice",
+            "metadata": {
+                "annotations": {
+                    "endpoints.kubernetes.io/last-change-trigger-time": "2026-11-01T11:52:16Z"
+                },
+                "creationTimestamp": "2026-11-01T11:52:16Z",
+                "generateName": "staff-b-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/name": "serving",
+                    "endpointslice.kubernetes.io/managed-by": "endpointslice-controller.k8s.io",
+                    "kubernetes.io/service-name": "staff-b",
+                    "tarnwick.example/copy": "b",
+                    "tarnwick.example/model": "staff"
+                },
+                "name": "staff-b-z9k95",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Service",
+                        "name": "staff-b",
+                        "uid": "4dd198eb-8ca2-4712-a87a-5f6980eaad5d"
+                    }
+                ],
+                "resourceVersion": "6609",
+                "uid": "79c23b33-d8e8-4ba0-996f-31b9dbc6b495"
+            },
+            "ports": [
+                {
+                    "name": "http",
+                    "port": 8080,
+                    "protocol": "TCP"
+                }
+            ]
+        },
+        {
+            "addressType": "IPv4",
+            "apiVersion": "discovery.k8s.io/v1",
+            "endpoints": [
+                {
+                    "addresses": [
+                        "10.22.1.254"
+                    ],
+                    "conditions": {
+                        "ready": true,
+                        "serving": true,
+                        "terminating": false
+                    },
+                    "nodeName": "k8s-gpu1",
+                    "targetRef": {
+                        "kind": "Pod",
+                        "name": "staff-a-server-0",
+                        "namespace": "serving",
+                        "uid": "b9d7cdd7-9504-45cf-aa30-76061edd4f7c"
+                    }
+                },
+                {
+                    "addresses": [
+                        "10.22.3.170"
+                    ],
+                    "conditions": {
+                        "ready": true,
+                        "serving": true,
+                        "terminating": false
+                    },
+                    "nodeName": "k8s-gpu2",
+                    "targetRef": {
+                        "kind": "Pod",
+                        "name": "staff-b-server-0",
+                        "namespace": "serving",
+                        "uid": "3904cf88-866a-4828-b324-b008b39cf226"
+                    }
+                }
+            ],
+            "kind": "EndpointSlice",
+            "metadata": {
+                "annotations": {
+                    "endpoints.kubernetes.io/last-change-trigger-time": "2026-11-01T11:52:15Z"
+                },
+                "creationTimestamp": "2026-11-01T11:52:16Z",
+                "generateName": "staff-",
+                "generation": 1,
+                "labels": {
+                    "app.kubernetes.io/name": "serving",
+                    "endpointslice.kubernetes.io/managed-by": "endpointslice-controller.k8s.io",
+                    "kubernetes.io/service-name": "staff",
+                    "tarnwick.example/model": "staff"
+                },
+                "name": "staff-tzv95",
+                "namespace": "serving",
+                "ownerReferences": [
+                    {
+                        "apiVersion": "v1",
+                        "blockOwnerDeletion": true,
+                        "controller": true,
+                        "kind": "Service",
+                        "name": "staff",
+                        "uid": "d978016c-e7a5-4c33-a1f9-2c7c90ec3a94"
+                    }
+                ],
+                "resourceVersion": "6588",
+                "uid": "f4ab6c93-2841-4d0e-8005-e6ef2d8677b4"
+            },
+            "ports": [
+                {
+                    "name": "http",
+                    "port": 8080,
+                    "protocol": "TCP"
+                }
+            ]
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

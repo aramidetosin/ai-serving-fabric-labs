@@ -1,0 +1,267 @@
+### 2026-11-01T12:49:28Z dns-auth1 container
++ sfab-dns reload /sfab/bootstrap
+[sfab-dns] checked: named.conf, 9 zone files, 0 secondary and 0 static-stub zones
+[sfab-dns] reloaded from /etc/sfab/dns
+
+### 2026-11-01T12:49:29Z dns-auth1 container
++ rm -rf /tmp/sfab-break-dns
+
+
+### 2026-11-01T12:49:29Z dns-auth1 container
++ rndc -k /run/named/rndc.key zonestatus ai.tarnwick.example IN enterprise
+name: ai.tarnwick.example
+type: primary
+files: /etc/sfab/dns/zones/db.enterprise.ai.tarnwick.example
+serial: 261946292
+nodes: 5
+last loaded: Sun, 01 Nov 2026 12:49:28 GMT
+secure: no
+dynamic: no
+reconfigurable via modzone: no
+
+### 2026-11-01T12:49:38Z dns-auth2 container
++ rndc -k /run/named/rndc.key retransfer ai.tarnwick.example IN enterprise
+
+
+### 2026-11-01T12:49:40Z dns-auth2 container
++ rndc -k /run/named/rndc.key zonestatus ai.tarnwick.example IN enterprise
+name: ai.tarnwick.example
+type: secondary
+files: secondary/db.enterprise.ai.tarnwick.example
+serial: 261946292
+nodes: 5
+last loaded: Sun, 01 Nov 2026 12:49:38 GMT
+next refresh: Sun, 01 Nov 2026 13:39:20 GMT
+expires: Mon, 02 Nov 2026 12:49:38 GMT
+secure: no
+dynamic: no
+reconfigurable via modzone: no
+
+### 2026-11-01T12:49:41Z dns-auth1 container
++ rndc -k /run/named/rndc.key zonestatus ai.tarnwick.example IN internal
+name: ai.tarnwick.example
+type: primary
+files: /etc/sfab/dns/zones/db.internal.ai.tarnwick.example
+serial: 846505745
+nodes: 21
+last loaded: Sun, 01 Nov 2026 12:49:28 GMT
+secure: no
+dynamic: no
+reconfigurable via modzone: no
+
+### 2026-11-01T12:49:41Z dns-auth2 container
++ rndc -k /run/named/rndc.key zonestatus ai.tarnwick.example IN internal
+name: ai.tarnwick.example
+type: secondary
+files: secondary/db.internal.ai.tarnwick.example
+serial: 846505745
+nodes: 21
+last loaded: Sun, 01 Nov 2026 11:43:22 GMT
+next refresh: Sun, 01 Nov 2026 13:22:25 GMT
+expires: Mon, 02 Nov 2026 12:35:34 GMT
+secure: no
+dynamic: no
+reconfigurable via modzone: no
+
+### 2026-11-01T12:49:41Z ent-dns container
++ sh -c kill -HUP "$(cat /run/dnsmasq.pid)"
+
+
+### 2026-11-01T12:49:41Z dns-res1 container
++ rndc -k /run/named/rndc.key flush
+
+
+### 2026-11-01T12:49:42Z dns-res2 container
++ rndc -k /run/named/rndc.key flush
+
+
+### 2026-11-01T12:49:53Z ent-client container
++ bash -c for i in $(seq 0 9); do t=$(date +%s.%N); c=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 'https://llm.ai.tarnwick.example/echo?msg=sfab-break-2a'); if [ "$c" = 200 ]; then ok=1; else ok=0; fi; echo "$t $i $ok $c"; sleep 0.5; done
+1793537387. 0 1 200
+1793537388. 1 1 200
+1793537389. 2 1 200
+1793537389. 3 1 200
+1793537390. 4 1 200
+1793537390. 5 1 200
+1793537391. 6 1 200
+1793537391. 7 1 200
+1793537392. 8 1 200
+1793537392. 9 1 200
+
+### 2026-11-01T12:49:54Z ent-client container
++ dig llm.ai.tarnwick.example
+
+; <<>> DiG 9.18.49 <<>> llm.ai.tarnwick.example
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 12053
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+;; QUESTION SECTION:
+;llm.ai.tarnwick.example.	IN	A
+
+;; ANSWER SECTION:
+llm.ai.tarnwick.example. 293	IN	A	10.20.11.210
+
+;; Query time: 4 msec
+;; SERVER: 10.24.10.53#53(10.24.10.53) (UDP)
+;; WHEN: Sun Nov 01 12:49:54 UTC 2026
+;; MSG SIZE  rcvd: 68
+
+### 2026-11-01T12:49:54Z ent-client container
++ dig admin.ai.tarnwick.example
+
+; <<>> DiG 9.18.49 <<>> admin.ai.tarnwick.example
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NXDOMAIN, id: 19319
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: f1989925ff1235d5010000006ae73572bd9dcee36d985a47 (good)
+;; QUESTION SECTION:
+;admin.ai.tarnwick.example.	IN	A
+
+;; AUTHORITY SECTION:
+ai.tarnwick.example.	60	IN	SOA	dns-auth1.ai.tarnwick.example. hostmaster.ai.tarnwick.example. 261946292 3600 600 86400 60
+
+;; Query time: 4 msec
+;; SERVER: 10.24.10.53#53(10.24.10.53) (UDP)
+;; WHEN: Sun Nov 01 12:49:54 UTC 2026
+;; MSG SIZE  rcvd: 139
+
+### 2026-11-01T12:49:57Z ent-client container
++ python3 - 10.20.11.210 443 43004 1 4 0 < common/trace/syn_connect.py
+
+### 2026-11-01T12:49:57Z ent-client container
+1793537397.181596 0 1 43004 CONNECTED 0.002
+
+### 2026-11-01T12:49:58Z ent-client container
++ sh -c curl -sS --connect-timeout 4 --max-time 120 --local-port 43008 --cacert /shared/ca/root.crt -o /tmp/sfab-matrix/enterprise-chat-own-a1-body -D /tmp/sfab-matrix/enterprise-chat-own-a1-headers -w '%{http_code} %{remote_ip}\n' -H 'Content-Type: application/json' --data @/tmp/sfab-matrix/body-chat.json -H @/tmp/sfab-matrix/hdr-chat 'https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions'; echo "exit $?"
+200 10.20.11.210
+exit 0
+
+### 2026-11-01T12:49:58Z ent-client container
++ sh -c curl -sS --connect-timeout 4 --max-time 120 --local-port 43010 --cacert /shared/ca/root.crt -o /tmp/sfab-matrix/enterprise-chat-other-a1-body -D /tmp/sfab-matrix/enterprise-chat-other-a1-headers -w '%{http_code} %{remote_ip}\n' -H 'Content-Type: application/json' --data @/tmp/sfab-matrix/body-chat.json -H @/tmp/sfab-matrix/hdr-staff 'https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions'; echo "exit $?"
+401 10.20.11.210
+exit 0
+
+### 2026-11-01T12:50:18Z ent-client container
++ sh -c curl -sS --connect-timeout 4 --max-time 120 --local-port 43012 --cacert /shared/ca/root.crt -o /tmp/sfab-matrix/enterprise-staff-own-a1-body -D /tmp/sfab-matrix/enterprise-staff-own-a1-headers -w '%{http_code} %{remote_ip}\n' -H 'Content-Type: application/json' --data @/tmp/sfab-matrix/body-staff.json -H @/tmp/sfab-matrix/hdr-staff 'https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions'; echo "exit $?"
+200 10.20.11.210
+exit 0
+
+### 2026-11-01T12:50:18Z ent-client container
++ sh -c curl -sS --connect-timeout 4 --max-time 120 --local-port 43014 --cacert /shared/ca/root.crt -o /tmp/sfab-matrix/enterprise-staff-other-a1-body -D /tmp/sfab-matrix/enterprise-staff-other-a1-headers -w '%{http_code} %{remote_ip}\n' -H 'Content-Type: application/json' --data @/tmp/sfab-matrix/body-staff.json -H @/tmp/sfab-matrix/hdr-chat 'https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions'; echo "exit $?"
+401 10.20.11.210
+exit 0
+
+### 2026-11-01T12:50:19Z ent-client container
++ sh -c if getent hosts admin.ai.tarnwick.example >/dev/null 2>&1; then p=; else p='--resolve admin.ai.tarnwick.example:443:10.20.11.210'; fi; curl -sS --connect-timeout 4 --max-time 120 --local-port 43016 --cacert /shared/ca/root.crt -o /tmp/sfab-matrix/enterprise-admin-request-a1-body -D /tmp/sfab-matrix/enterprise-admin-request-a1-headers $p -w '%{http_code} %{remote_ip}\n' 'https://admin.ai.tarnwick.example/echo?msg=sfab-matrix-enterprise-admin'; echo "exit $?"
+404 10.20.11.210
+exit 0
+
+### 2026-11-01T12:50:20Z uplink-rtr frr
++ vtysh -c 'show ip route'
+Codes: K - kernel route, C - connected, L - local, S - static,
+       R - RIP, O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric, t - Table-Direct,
+       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+IPv4 unicast VRF default:
+S>* 10.20.1.0/24 [1/0] via 198.51.100.2, eth1, weight 1, 01:30:43
+S>* 10.20.2.0/24 [1/0] via 198.51.100.2, eth1, weight 1, 01:30:43
+S>* 10.20.3.0/24 [1/0] via 198.51.100.2, eth1, weight 1, 01:30:43
+S>* 10.20.9.0/24 [1/0] via 198.51.100.2, eth1, weight 1, 01:30:43
+S>* 10.20.11.0/24 [1/0] via 198.51.100.2, eth1, weight 1, 01:30:43
+S>* 10.20.13.0/24 [1/0] via 198.51.100.2, eth1, weight 1, 01:30:43
+S>* 10.20.14.0/24 [1/0] via 198.51.100.2, eth1, weight 1, 01:30:43
+S>* 10.24.10.0/24 [1/0] via 198.51.100.2, eth1, weight 1, 01:30:43
+S>* 192.0.2.0/30 [1/0] via 192.0.2.22, eth7, weight 1, 01:30:43
+C>* 192.0.2.4/30 is directly connected, eth3, weight 1, 01:30:44
+L>* 192.0.2.5/32 is directly connected, eth3, weight 1, 01:30:44
+C>* 192.0.2.8/30 is directly connected, eth4, weight 1, 01:30:43
+L>* 192.0.2.9/32 is directly connected, eth4, weight 1, 01:30:43
+C>* 192.0.2.12/30 is directly connected, eth5, weight 1, 01:30:44
+L>* 192.0.2.13/32 is directly connected, eth5, weight 1, 01:30:44
+C>* 192.0.2.16/30 is directly connected, eth6, weight 1, 01:30:44
+L>* 192.0.2.17/32 is directly connected, eth6, weight 1, 01:30:44
+C>* 192.0.2.20/30 is directly connected, eth7, weight 1, 01:30:43
+L>* 192.0.2.21/32 is directly connected, eth7, weight 1, 01:30:43
+C>* 198.51.100.0/29 is directly connected, eth1, weight 1, 01:30:43
+L>* 198.51.100.1/32 is directly connected, eth1, weight 1, 01:30:43
+
+### 2026-11-01T12:50:30Z fw panos-cli
+Last login: Sun Nov  1 12:49:14 2026 from 172.21.40.1
+set cli pager off
+show routing route
+exit
+
+
+
+Number of failed attempts since last successful login: 0
+
+
+
+admin@fw> set 
+admin@fw> set cli 
+admin@fw> set cli pager 
+admin@fw> set cli pager off
+admin@fw> show 
+admin@fw> show routing 
+admin@fw> show routing route
+
+flags: A:active, ?:loose, C:connect, H:host, S:static, ~:internal, R:rip, O:ospf, B:bgp, 
+       Oi:ospf intra-area, Oo:ospf inter-area, O1:ospf ext-type-1, O2:ospf ext-type-2, E:ecmp, M:multicast
+
+  
+VIRTUAL ROUTER: core (id 2)
+  ==========
+destination                                 nexthop                                 metric flags      age   interface          next-AS    
+0.0.0.0/0                                   198.51.100.1                            10     A S              ethernet1/5                   
+10.0.0.0/8                                  discard                                 10     A S                                            
+10.20.1.0/24                                10.20.1.1                               0      A C              ae1.100                       
+10.20.1.1/32                                0.0.0.0                                 0      A H                                            
+10.20.2.0/24                                10.20.2.1                               0      A C              ae1.200                       
+10.20.2.1/32                                0.0.0.0                                 0      A H                                            
+10.20.3.0/24                                10.20.3.1                               0      A C              ae1.300                       
+10.20.3.1/32                                0.0.0.0                                 0      A H                                            
+10.20.9.0/24                                10.20.9.254                             0      A C              ethernet1/3                   
+10.20.9.254/32                              0.0.0.0                                 0      A H                                            
+10.20.11.0/24                               10.20.11.1                              0      A C              ae1.110                       
+10.20.11.1/32                               0.0.0.0                                 0      A H                                            
+10.20.13.0/24                               10.20.13.1                              0      A C              ae1.130                       
+10.20.13.1/32                               0.0.0.0                                 0      A H                                            
+10.20.14.0/24                               10.20.14.1                              0      A C              ae1.131                       
+10.20.14.1/32                               0.0.0.0                                 0      A H                                            
+10.24.10.8/30                               10.24.10.9                              0      A C              ethernet1/4                   
+10.24.10.9/32                               0.0.0.0                                 0      A H                                            
+10.24.10.52/30                              10.24.10.54                             0      A C              ethernet1/7                   
+10.24.10.54/32                              0.0.0.0                                 0      A H                                            
+172.16.0.0/12                               discard                                 10     A S                                            
+192.0.2.0/30                                0.0.0.0                                 10     A S              tunnel.1                      
+192.168.0.0/16                              discard                                 10     A S                                            
+198.51.100.0/29                             198.51.100.2                            0      A C              ethernet1/5                   
+198.51.100.2/32                             0.0.0.0                                 0      A H                                            
+total routes shown: 25
+
+admin@fw> exit
+
+### 2026-11-01T12:50:32Z k8s-cp1 kubectl
++ kubectl -n inference logs -l app.kubernetes.io/name=api-gateway -c apisix --prefix --tail=-1 --since=98s
+[pod/api-gateway-54cbc5d4c8-m9458/apisix] {"upstream_status":"200","route_id":"chat","host":"llm.ai.tarnwick.example","client":"10.22.4.13","route":"chat","consumer":"batch_key_152f9c75","time":"2026-11-01T12:49:58+00:00","request_time":0.783,"caller":"batch","status":200}
+[pod/api-gateway-54cbc5d4c8-m9458/apisix] 10.22.4.13 - - [01/Nov/2026:12:49:58 +0000] llm.ai.tarnwick.example "POST /models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions HTTP/1.1" 200 671 0.783 "-" "curl/8.14.1" 10.23.80.19:4000 200 0.772 "http://llm.ai.tarnwick.example/engines/chat/chat/completions"
+[pod/api-gateway-54cbc5d4c8-m9458/apisix] 2026/11/01 12:50:18 [warn] 30#30: *62316 [lua] plugin.lua:1160: run_plugin(): consumer-restriction exits with http status code 401, client: 10.22.4.13, server: _, request: "POST /models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions HTTP/1.1", host: "llm.ai.tarnwick.example"
+[pod/api-gateway-54cbc5d4c8-m9458/apisix] {"time":"2026-11-01T12:50:18+00:00","route_id":"staff","host":"llm.ai.tarnwick.example","client":"10.22.4.13","route":"staff","consumer":"batch_key_152f9c75","request_time":0,"caller":"batch","status":401}
+[pod/api-gateway-54cbc5d4c8-m9458/apisix] 10.22.4.13 - - [01/Nov/2026:12:50:18 +0000] llm.ai.tarnwick.example "POST /models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions HTTP/1.1" 401 46 0.000 "-" "curl/8.14.1" - - - "http://llm.ai.tarnwick.example/engines/staff/chat/completions"
+[pod/api-gateway-54cbc5d4c8-q9vl4/apisix] 2026/11/01 12:49:58 [warn] 30#30: *61867 [lua] plugin.lua:1160: run_plugin(): consumer-restriction exits with http status code 401, client: 10.22.4.108, server: _, request: "POST /models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions HTTP/1.1", host: "llm.ai.tarnwick.example"
+[pod/api-gateway-54cbc5d4c8-q9vl4/apisix] {"host":"llm.ai.tarnwick.example","client":"10.22.4.108","time":"2026-11-01T12:49:58+00:00","consumer":"helpdesk_key_cb9856d2","caller":"helpdesk","request_time":0,"route":"chat","route_id":"chat","status":401}
+[pod/api-gateway-54cbc5d4c8-q9vl4/apisix] 10.22.4.108 - - [01/Nov/2026:12:49:58 +0000] llm.ai.tarnwick.example "POST /models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions HTTP/1.1" 401 46 0.000 "-" "curl/8.14.1" - - - "http://llm.ai.tarnwick.example/engines/chat/chat/completions"
+[pod/api-gateway-54cbc5d4c8-q9vl4/apisix] {"host":"llm.ai.tarnwick.example","client":"10.22.4.108","time":"2026-11-01T12:50:18+00:00","consumer":"helpdesk_key_cb9856d2","caller":"helpdesk","request_time":18.904,"route":"staff","route_id":"staff","upstream_status":"200","status":200}
+[pod/api-gateway-54cbc5d4c8-q9vl4/apisix] 10.22.4.108 - - [01/Nov/2026:12:50:18 +0000] llm.ai.tarnwick.example "POST /models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions HTTP/1.1" 200 675 18.904 "-" "curl/8.14.1" 10.23.80.19:4000 200 18.898 "http://llm.ai.tarnwick.example/engines/staff/chat/completions"
+

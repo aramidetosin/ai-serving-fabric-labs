@@ -1,0 +1,1205 @@
+Script started on 2026-11-01 11:15:41+00:00 [COMMAND="make down" TERM="tmux-256color" TTY="/dev/pts/0" COLUMNS="-1" LINES="-1"]
+/root/sfab/clean/ai-serving-fabric-labs/common/stages/run.sh down
+== stage down 2026-11-01T11:15:41Z (log state/logs/down-20261101T111541Z.log)
+stop: restart policy off on 28 containers
+stop: GPU guests: powering off k8s-gpu1 k8s-gpu2
+stop: GPU guests: off
+stop: truenas1: docker stop -t 120
+stop: control plane: powering off k8s-cp1 k8s-cp2 k8s-cp3 k8s-ingress1 k8s-ingress2
+stop: control plane: off
+down: containerlab destroy sfab-ch02
+11:19:05 INFO Parsing & checking topology file=topo.clab.yml
+11:19:06 INFO Parsing & checking topology file=topo.clab.yml
+11:19:06 INFO Destroying lab name=sfab-ch02
+11:19:06 ERRO container "sfab-ch02-k8s-cp3" exited; container output:
+[vm-init] guest k8s-cp3 (sfab-ch02): 4 vCPU, 8192 MiB, 40G, NICs eth0 eth1 eth2 eth3
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge (tx off 1)
+[vm-init] root disk created: 40G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 21 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-gpu1" exited; container output:
+[vm-init] guest k8s-gpu1 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-cp1" exited; container output:
+[vm-init] guest k8s-cp1 (sfab-ch02): 4 vCPU, 8192 MiB, 40G, NICs eth0 eth1 eth2 eth3
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge (tx off 1)
+[vm-init] root disk created: 40G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 25 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-ingress2" exited; container output:
+[vm-init] guest k8s-ingress2 (sfab-ch02): 4 vCPU, 6144 MiB, 40G, NICs eth0 eth1 eth2 eth3
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge (tx off 1)
+[vm-init] root disk created: 40G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 20 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-gpu2" exited; container output:
+[vm-init] guest k8s-gpu2 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-cp2" exited; container output:
+[vm-init] guest k8s-cp2 (sfab-ch02): 4 vCPU, 8192 MiB, 40G, NICs eth0 eth1 eth2 eth3
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge (tx off 1)
+[vm-init] root disk created: 40G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 21 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-gpu1" exited; container output:
+[vm-init] guest k8s-gpu1 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-gpu1" exited; container output:
+[vm-init] guest k8s-gpu1 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-ingress1" exited; container output:
+[vm-init] guest k8s-ingress1 (sfab-ch02): 4 vCPU, 6144 MiB, 40G, NICs eth0 eth1 eth2 eth3
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge (tx off 1)
+[vm-init] root disk created: 40G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 20 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-truenas1" exited; container output:
+2026-11-01 08:42:51,854: vrnetlab       DEBUG Creating overlay disk image: /persist/truenas-overlay.qcow2
+2026-11-01 08:42:51,917: vrnetlab       DEBUG Starting vrnetlab TrueNAS
+2026-11-01 08:42:51,917: vrnetlab       DEBUG VMs: [<__main__.TrueNAS_vm object at 0x7541f0b80440>]
+2026-11-01 08:42:51,917: vrnetlab       DEBUG VM not started; starting!
+2026-11-01 08:42:51,917: vrnetlab       INFO ----------------START ENVIRONMENT VARIABLES-----------------
+2026-11-01 08:42:51,917: vrnetlab       INFO CLAB_INTFS: 6
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_GROUP:
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_KIND: generic_vm
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_LAB_DIR: /root/sfab/clean/ai-serving-fabric-labs/ch02/clab-sfab-ch02/truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_LONGNAME: sfab-ch02-truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_NAME: truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_TYPE:
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_OWNER: root
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_TOPO_FILE: /root/sfab/clean/ai-serving-fabric-labs/ch02/topo.clab.yml
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CONTAINERLAB: sfab-ch02
+2026-11-01 08:42:51,918: vrnetlab       INFO CONNECTION_MODE: tc
+2026-11-01 08:42:51,918: vrnetlab       INFO DOCKER_NET_V4_ADDR: 172.21.40.0/24
+2026-11-01 08:42:51,918: vrnetlab       INFO DOCKER_NET_V6_ADDR:
+2026-11-01 08:42:51,918: vrnetlab       INFO HOME: /root
+2026-11-01 08:42:51,918: vrnetlab       INFO HOSTNAME: truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO LC_CTYPE: C.UTF-8
+2026-11-01 08:42:51,918: vrnetlab       INFO NO_PROXY: localhost,127.0.0.1,::1,*.local,172.21.40.0/24,172.21.40.101,172.21.40.102,172.21.40.103,172.21.40.104,172.21.40.105,172.21.40.11,172.21.40.111,172.21.40.112,172.21.40.12,172.21.40.121,172.21.40.21,172.21.40.22,172.21.40.31,172.21.40.40,172.21.40.50,172.21.40.53,172.21.40.55,172.21.40.56,172.21.40.57,172.21.40.58,172.21.40.59,172.21.40.61,172.21.40.63,172.21.40.64,172.21.40.70,172.21.40.81,172.21.40.82,172.21.40.84,bastion,dns-auth1,dns-auth2,dns-res1,dns-res2,ent-client,ent-dns,fe-sw1,fe-sw2,fw,inet-ntp,inet-registry,k8s-cp1,k8s-cp2,k8s-cp3,k8s-gpu1,k8s-gpu2,k8s-ingress1,k8s-ingress2,oob-sw,ops-client,ops-dns,ops-gw,rail-sw1,rail-sw2,truenas1,uplink-rtr,web-client
+2026-11-01 08:42:51,918: vrnetlab       INFO PASSWORD: <redacted hmac:1bbc243e8333>
+2026-11-01 08:42:51,918: vrnetlab       INFO PATH: /.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+2026-11-01 08:42:51,918: vrnetlab       INFO TERM: xterm
+2026-11-01 08:42:51,918: vrnetlab       INFO TRUENAS_ARC_MAX_MB: 6144
+2026-11-01 08:42:51,918: vrnetlab       INFO TRUENAS_DATA_DISKS: 4
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_DATA_DISK_SIZE: 100G
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_POOL: tank
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_RAM: 16384
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_SMP: 8
+2026-11-01 08:42:51,919: vrnetlab       INFO USERNAME: truenas_admin
+2026-11-01 08:42:51,919: vrnetlab       INFO UV: /usr/bin/uv
+2026-11-01 08:42:51,919: vrnetlab       INFO UV_RUN_RECURSION_DEPTH: 1
+2026-11-01 08:42:51,919: vrnetlab       INFO VERSION: 27.0.0-RC.1
+2026-11-01 08:42:51,919: vrnetlab       INFO VIRTUAL_ENV: /.venv
+2026-11-01 08:42:51,919: vrnetlab       INFO no_proxy: localhost,127.0.0.1,::1,*.local,172.21.40.0/24,172.21.40.101,172.21.40.102,172.21.40.103,172.21.40.104,172.21.40.105,172.21.40.11,172.21.40.111,172.21.40.112,172.21.40.12,172.21.40.121,172.21.40.21,172.21.40.22,172.21.40.31,172.21.40.40,172.21.40.50,172.21.40.53,172.21.40.55,172.21.40.56,172.21.40.57,172.21.40.58,172.21.40.59,172.21.40.61,172.21.40.63,172.21.40.64,172.21.40.70,172.21.40.81,172.21.40.82,172.21.40.84,bastion,dns-auth1,dns-auth2,dns-res1,dns-res2,ent-client,ent-dns,fe-sw1,fe-sw2,fw,inet-ntp,inet-registry,k8s-cp1,k8s-cp2,k8s-cp3,k8s-gpu1,k8s-gpu2,k8s-ingress1,k8s-ingress2,oob-sw,ops-client,ops-dns,ops-gw,rail-sw1,rail-sw2,truenas1,uplink-rtr,web-client
+2026-11-01 08:42:51,919: vrnetlab       INFO -----------------END ENVIRONMENT VARIABLES------------------
+2026-11-01 08:42:51,919: vrnetlab       INFO Launching TrueNAS_vm arch x86_64 with 8 SMP/VCPU and 16384 M of RAM
+2026-11-01 08:42:51,919: vrnetlab       INFO Transparent mgmt interface: Disabled
+2026-11-01 08:42:51,920: vrnetlab       DEBUG number of provisioned data plane interfaces is 6
+2026-11-01 08:42:51,920: vrnetlab       DEBUG waiting for provisioned interfaces to appear...
+2026-11-01 08:42:56,921: vrnetlab       DEBUG highest allocated interface id determined to be: 6...
+2026-11-01 08:42:56,922: vrnetlab       DEBUG interfaces provisioned, continuing...
+2026-11-01 08:42:57,004: vrnetlab       DEBUG Found MAC address aa:c1:ab:3b:b1:25 for interface eth1
+2026-11-01 08:42:57,004: vrnetlab       INFO Using container interface MAC aa:c1:ab:3b:b1:25 for VM NIC eth1
+2026-11-01 08:42:57,124: vrnetlab       DEBUG Found MAC address aa:c1:ab:e8:97:91 for interface eth2
+2026-11-01 08:42:57,124: vrnetlab       INFO Using container interface MAC aa:c1:ab:e8:97:91 for VM NIC eth2
+2026-11-01 08:42:57,131: vrnetlab       DEBUG Found MAC address aa:c1:ab:67:70:b1 for interface eth3
+2026-11-01 08:42:57,132: vrnetlab       INFO Using container interface MAC aa:c1:ab:67:70:b1 for VM NIC eth3
+2026-11-01 08:42:57,145: vrnetlab       DEBUG Found MAC address aa:c1:ab:00:a8:4c for interface eth4
+2026-11-01 08:42:57,145: vrnetlab       INFO Using container interface MAC aa:c1:ab:00:a8:4c for VM NIC eth4
+2026-11-01 08:42:57,198: vrnetlab       DEBUG Found MAC address aa:c1:ab:87:84:42 for interface eth5
+2026-11-01 08:42:57,198: vrnetlab       INFO Using container interface MAC aa:c1:ab:87:84:42 for VM NIC eth5
+2026-11-01 08:42:57,253: vrnetlab       DEBUG Found MAC address aa:c1:ab:f1:d9:d0 for interface eth6
+2026-11-01 08:42:57,254: vrnetlab       INFO Using container interface MAC aa:c1:ab:f1:d9:d0 for VM NIC eth6
+2026-11-01 08:42:57,254: vrnetlab       DEBUG qemu cmd: qemu-system-x86_64 -enable-kvm -display none -machine pc -chardev socket,id=monitor0,host=::,port=4000,server=on,wait=off -monitor chardev:monitor0 -chardev socket,id=serial0,host=::,port=5000,server=on,wait=off,telnet=on -serial chardev:serial0 -m 16384 -cpu host -smp 8 -drive if=none,file=/persist/truenas-overlay.qcow2,id=boot,format=qcow2 -device virtio-blk-pci,drive=boot,serial=VRNBOOT01,bootindex=1 -global isa-fdc.fdtypeA=none -drive if=none,id=data1,file=/persist/data1.qcow2,format=qcow2 -device virtio-blk-pci,drive=data1,serial=VRNDATA01 -drive if=none,id=data2,file=/persist/data2.qcow2,format=qcow2 -device virtio-blk-pci,drive=data2,serial=VRNDATA02 -drive if=none,id=data3,file=/persist/data3.qcow2,format=qcow2 -device virtio-blk-pci,drive=data3,serial=VRNDATA03 -drive if=none,id=data4,file=/persist/data4.qcow2,format=qcow2 -device virtio-blk-pci,drive=data4,serial=VRNDATA04 -uuid a6d80849-d68b-4ffe-955d-98d792bc4228 -device pci-bridge,chassis_nr=1,id=pci.1 -device virtio-net-pci,speed=10000,duplex=full,netdev=p00,mac=0C:00:d5:7c:83:00,bus=pci.1,addr=0x1 -netdev user,id=p00,net=10.0.0.0/24,host=10.0.0.2,dns=10.0.0.3,dhcpstart=10.0.0.15,hostfwd=tcp:0.0.0.0:22-10.0.0.15:22,hostfwd=udp:0.0.0.0:161-10.0.0.15:161,hostfwd=tcp:0.0.0.0:80-10.0.0.15:80,hostfwd=tcp:0.0.0.0:443-10.0.0.15:443,hostfwd=tcp:0.0.0.0:830-10.0.0.15:830,hostfwd=tcp:0.0.0.0:6030-10.0.0.15:6030,hostfwd=tcp:0.0.0.0:8080-10.0.0.15:8080,hostfwd=tcp:0.0.0.0:9339-10.0.0.15:9339,hostfwd=tcp:0.0.0.0:32767-10.0.0.15:32767,hostfwd=tcp:0.0.0.0:50051-10.0.0.15:50051,hostfwd=tcp:0.0.0.0:57400-10.0.0.15:57400,tftp=/tftpboot -device virtio-net-pci,speed=10000,duplex=full,netdev=p01,mac=aa:c1:ab:3b:b1:25,bus=pci.1,addr=0x2 -netdev tap,id=p01,ifname=tap1,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p02,mac=aa:c1:ab:e8:97:91,bus=pci.1,addr=0x3 -netdev tap,id=p02,ifname=tap2,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p03,mac=aa:c1:ab:67:70:b1,bus=pci.1,addr=0x4 -netdev tap,id=p03,ifname=tap3,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p04,mac=aa:c1:ab:00:a8:4c,bus=pci.1,addr=0x5 -netdev tap,id=p04,ifname=tap4,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p05,mac=aa:c1:ab:87:84:42,bus=pci.1,addr=0x6 -netdev tap,id=p05,ifname=tap5,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p06,mac=aa:c1:ab:f1:d9:d0,bus=pci.1,addr=0x7 -netdev tap,id=p06,ifname=tap6,script=/etc/tc-tap-ifup,downscript=no
+2026-11-01 08:42:59,257: base_driver     INFO closing connection to '127.0.0.1' on port '4000'
+2026-11-01 08:42:59,257: base_driver     INFO connection to '127.0.0.1' on port '4000' closed successfully
+2026-11-01 08:42:59,257: base_driver     INFO opening connection to '127.0.0.1' on port '4000'
+2026-11-01 08:42:59,260: base_driver     INFO connection to '127.0.0.1' on port '4000' opened successfully
+2026-11-01 08:42:59,260: base_driver     INFO closing connection to '127.0.0.1' on port '5000'
+2026-11-01 08:42:59,260: base_driver     INFO connection to '127.0.0.1' on port '5000' closed successfully
+2026-11-01 08:42:59,260: base_driver     INFO opening connection to '127.0.0.1' on port '5000'
+2026-11-01 08:42:59,260: base_driver     INFO connection to '127.0.0.1' on port '5000' opened successfully
+2026-11-01 08:43:02,263: base_driver     INFO closing connection to '127.0.0.1' on port '5000'
+2026-11-01 08:43:02,263: base_driver     INFO connection to '127.0.0.1' on port '5000' closed successfully
+2026-11-01 08:43:12,274: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:43:24,283: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:43:36,295: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:43:48,308: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:00,320: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:12,330: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:24,342: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:26,345: launch     TRACE    API not reachable yet: [Errno 104] Connection reset by peer
+2026-11-01 08:44:39,205: launch         DEBUG API login: AUTH_ERR
+2026-11-01 08:44:40,104: launch         INFO TrueNAS middleware ready
+2026-11-01 08:44:40,105: launch         INFO setting hostname truenas1
+2026-11-01 08:44:41,827: launch         INFO setting the truenas_admin password
+2026-11-01 08:44:42,923: launch         INFO enabling SSH (password login)
+2026-11-01 08:44:45,524: launch         INFO capping the ZFS ARC at 6144 MiB
+2026-11-01 08:45:49,923: launch         INFO creating pool tank (RAIDZ1) on vdb, vdc, vdd, vde
+2026-11-01 08:45:59,964: launch     TRACE    Startup config file /config/startup-config.cfg not found
+2026-11-01 08:45:59,970: launch         INFO Startup complete in: 0:03:08.050847
+2026-11-01 11:17:23,039: launch         INFO container stopping: ACPI power-off of the guest (up to 90 s)
+2026-11-01 11:17:26,040: launch         INFO guest powered off
+11:19:06 ERRO container "sfab-ch02-k8s-cp1" exited; container output:
+[vm-init] guest k8s-cp1 (sfab-ch02): 4 vCPU, 8192 MiB, 40G, NICs eth0 eth1 eth2 eth3
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge (tx off 1)
+[vm-init] root disk created: 40G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 25 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-ingress2" exited; container output:
+[vm-init] guest k8s-ingress2 (sfab-ch02): 4 vCPU, 6144 MiB, 40G, NICs eth0 eth1 eth2 eth3
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge (tx off 1)
+[vm-init] root disk created: 40G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 20 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-cp3" exited; container output:
+[vm-init] guest k8s-cp3 (sfab-ch02): 4 vCPU, 8192 MiB, 40G, NICs eth0 eth1 eth2 eth3
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge (tx off 1)
+[vm-init] root disk created: 40G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 21 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-ingress1" exited; container output:
+[vm-init] guest k8s-ingress1 (sfab-ch02): 4 vCPU, 6144 MiB, 40G, NICs eth0 eth1 eth2 eth3
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge (tx off 1)
+[vm-init] root disk created: 40G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 20 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-cp2" exited; container output:
+[vm-init] guest k8s-cp2 (sfab-ch02): 4 vCPU, 8192 MiB, 40G, NICs eth0 eth1 eth2 eth3
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge (tx off 1)
+[vm-init] root disk created: 40G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 21 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-cp1" exited; container output:
+[vm-init] guest k8s-cp1 (sfab-ch02): 4 vCPU, 8192 MiB, 40G, NICs eth0 eth1 eth2 eth3
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge (tx off 1)
+[vm-init] root disk created: 40G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 25 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-truenas1" exited; container output:
+2026-11-01 08:42:51,854: vrnetlab       DEBUG Creating overlay disk image: /persist/truenas-overlay.qcow2
+2026-11-01 08:42:51,917: vrnetlab       DEBUG Starting vrnetlab TrueNAS
+2026-11-01 08:42:51,917: vrnetlab       DEBUG VMs: [<__main__.TrueNAS_vm object at 0x7541f0b80440>]
+2026-11-01 08:42:51,917: vrnetlab       DEBUG VM not started; starting!
+2026-11-01 08:42:51,917: vrnetlab       INFO ----------------START ENVIRONMENT VARIABLES-----------------
+2026-11-01 08:42:51,917: vrnetlab       INFO CLAB_INTFS: 6
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_GROUP:
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_KIND: generic_vm
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_LAB_DIR: /root/sfab/clean/ai-serving-fabric-labs/ch02/clab-sfab-ch02/truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_LONGNAME: sfab-ch02-truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_NAME: truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_TYPE:
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_OWNER: root
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_TOPO_FILE: /root/sfab/clean/ai-serving-fabric-labs/ch02/topo.clab.yml
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CONTAINERLAB: sfab-ch02
+2026-11-01 08:42:51,918: vrnetlab       INFO CONNECTION_MODE: tc
+2026-11-01 08:42:51,918: vrnetlab       INFO DOCKER_NET_V4_ADDR: 172.21.40.0/24
+2026-11-01 08:42:51,918: vrnetlab       INFO DOCKER_NET_V6_ADDR:
+2026-11-01 08:42:51,918: vrnetlab       INFO HOME: /root
+2026-11-01 08:42:51,918: vrnetlab       INFO HOSTNAME: truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO LC_CTYPE: C.UTF-8
+2026-11-01 08:42:51,918: vrnetlab       INFO NO_PROXY: localhost,127.0.0.1,::1,*.local,172.21.40.0/24,172.21.40.101,172.21.40.102,172.21.40.103,172.21.40.104,172.21.40.105,172.21.40.11,172.21.40.111,172.21.40.112,172.21.40.12,172.21.40.121,172.21.40.21,172.21.40.22,172.21.40.31,172.21.40.40,172.21.40.50,172.21.40.53,172.21.40.55,172.21.40.56,172.21.40.57,172.21.40.58,172.21.40.59,172.21.40.61,172.21.40.63,172.21.40.64,172.21.40.70,172.21.40.81,172.21.40.82,172.21.40.84,bastion,dns-auth1,dns-auth2,dns-res1,dns-res2,ent-client,ent-dns,fe-sw1,fe-sw2,fw,inet-ntp,inet-registry,k8s-cp1,k8s-cp2,k8s-cp3,k8s-gpu1,k8s-gpu2,k8s-ingress1,k8s-ingress2,oob-sw,ops-client,ops-dns,ops-gw,rail-sw1,rail-sw2,truenas1,uplink-rtr,web-client
+2026-11-01 08:42:51,918: vrnetlab       INFO PASSWORD: <redacted hmac:1bbc243e8333>
+2026-11-01 08:42:51,918: vrnetlab       INFO PATH: /.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+2026-11-01 08:42:51,918: vrnetlab       INFO TERM: xterm
+2026-11-01 08:42:51,918: vrnetlab       INFO TRUENAS_ARC_MAX_MB: 6144
+2026-11-01 08:42:51,918: vrnetlab       INFO TRUENAS_DATA_DISKS: 4
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_DATA_DISK_SIZE: 100G
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_POOL: tank
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_RAM: 16384
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_SMP: 8
+2026-11-01 08:42:51,919: vrnetlab       INFO USERNAME: truenas_admin
+2026-11-01 08:42:51,919: vrnetlab       INFO UV: /usr/bin/uv
+2026-11-01 08:42:51,919: vrnetlab       INFO UV_RUN_RECURSION_DEPTH: 1
+2026-11-01 08:42:51,919: vrnetlab       INFO VERSION: 27.0.0-RC.1
+2026-11-01 08:42:51,919: vrnetlab       INFO VIRTUAL_ENV: /.venv
+2026-11-01 08:42:51,919: vrnetlab       INFO no_proxy: localhost,127.0.0.1,::1,*.local,172.21.40.0/24,172.21.40.101,172.21.40.102,172.21.40.103,172.21.40.104,172.21.40.105,172.21.40.11,172.21.40.111,172.21.40.112,172.21.40.12,172.21.40.121,172.21.40.21,172.21.40.22,172.21.40.31,172.21.40.40,172.21.40.50,172.21.40.53,172.21.40.55,172.21.40.56,172.21.40.57,172.21.40.58,172.21.40.59,172.21.40.61,172.21.40.63,172.21.40.64,172.21.40.70,172.21.40.81,172.21.40.82,172.21.40.84,bastion,dns-auth1,dns-auth2,dns-res1,dns-res2,ent-client,ent-dns,fe-sw1,fe-sw2,fw,inet-ntp,inet-registry,k8s-cp1,k8s-cp2,k8s-cp3,k8s-gpu1,k8s-gpu2,k8s-ingress1,k8s-ingress2,oob-sw,ops-client,ops-dns,ops-gw,rail-sw1,rail-sw2,truenas1,uplink-rtr,web-client
+2026-11-01 08:42:51,919: vrnetlab       INFO -----------------END ENVIRONMENT VARIABLES------------------
+2026-11-01 08:42:51,919: vrnetlab       INFO Launching TrueNAS_vm arch x86_64 with 8 SMP/VCPU and 16384 M of RAM
+2026-11-01 08:42:51,919: vrnetlab       INFO Transparent mgmt interface: Disabled
+2026-11-01 08:42:51,920: vrnetlab       DEBUG number of provisioned data plane interfaces is 6
+2026-11-01 08:42:51,920: vrnetlab       DEBUG waiting for provisioned interfaces to appear...
+2026-11-01 08:42:56,921: vrnetlab       DEBUG highest allocated interface id determined to be: 6...
+2026-11-01 08:42:56,922: vrnetlab       DEBUG interfaces provisioned, continuing...
+2026-11-01 08:42:57,004: vrnetlab       DEBUG Found MAC address aa:c1:ab:3b:b1:25 for interface eth1
+2026-11-01 08:42:57,004: vrnetlab       INFO Using container interface MAC aa:c1:ab:3b:b1:25 for VM NIC eth1
+2026-11-01 08:42:57,124: vrnetlab       DEBUG Found MAC address aa:c1:ab:e8:97:91 for interface eth2
+2026-11-01 08:42:57,124: vrnetlab       INFO Using container interface MAC aa:c1:ab:e8:97:91 for VM NIC eth2
+2026-11-01 08:42:57,131: vrnetlab       DEBUG Found MAC address aa:c1:ab:67:70:b1 for interface eth3
+2026-11-01 08:42:57,132: vrnetlab       INFO Using container interface MAC aa:c1:ab:67:70:b1 for VM NIC eth3
+2026-11-01 08:42:57,145: vrnetlab       DEBUG Found MAC address aa:c1:ab:00:a8:4c for interface eth4
+2026-11-01 08:42:57,145: vrnetlab       INFO Using container interface MAC aa:c1:ab:00:a8:4c for VM NIC eth4
+2026-11-01 08:42:57,198: vrnetlab       DEBUG Found MAC address aa:c1:ab:87:84:42 for interface eth5
+2026-11-01 08:42:57,198: vrnetlab       INFO Using container interface MAC aa:c1:ab:87:84:42 for VM NIC eth5
+2026-11-01 08:42:57,253: vrnetlab       DEBUG Found MAC address aa:c1:ab:f1:d9:d0 for interface eth6
+2026-11-01 08:42:57,254: vrnetlab       INFO Using container interface MAC aa:c1:ab:f1:d9:d0 for VM NIC eth6
+2026-11-01 08:42:57,254: vrnetlab       DEBUG qemu cmd: qemu-system-x86_64 -enable-kvm -display none -machine pc -chardev socket,id=monitor0,host=::,port=4000,server=on,wait=off -monitor chardev:monitor0 -chardev socket,id=serial0,host=::,port=5000,server=on,wait=off,telnet=on -serial chardev:serial0 -m 16384 -cpu host -smp 8 -drive if=none,file=/persist/truenas-overlay.qcow2,id=boot,format=qcow2 -device virtio-blk-pci,drive=boot,serial=VRNBOOT01,bootindex=1 -global isa-fdc.fdtypeA=none -drive if=none,id=data1,file=/persist/data1.qcow2,format=qcow2 -device virtio-blk-pci,drive=data1,serial=VRNDATA01 -drive if=none,id=data2,file=/persist/data2.qcow2,format=qcow2 -device virtio-blk-pci,drive=data2,serial=VRNDATA02 -drive if=none,id=data3,file=/persist/data3.qcow2,format=qcow2 -device virtio-blk-pci,drive=data3,serial=VRNDATA03 -drive if=none,id=data4,file=/persist/data4.qcow2,format=qcow2 -device virtio-blk-pci,drive=data4,serial=VRNDATA04 -uuid a6d80849-d68b-4ffe-955d-98d792bc4228 -device pci-bridge,chassis_nr=1,id=pci.1 -device virtio-net-pci,speed=10000,duplex=full,netdev=p00,mac=0C:00:d5:7c:83:00,bus=pci.1,addr=0x1 -netdev user,id=p00,net=10.0.0.0/24,host=10.0.0.2,dns=10.0.0.3,dhcpstart=10.0.0.15,hostfwd=tcp:0.0.0.0:22-10.0.0.15:22,hostfwd=udp:0.0.0.0:161-10.0.0.15:161,hostfwd=tcp:0.0.0.0:80-10.0.0.15:80,hostfwd=tcp:0.0.0.0:443-10.0.0.15:443,hostfwd=tcp:0.0.0.0:830-10.0.0.15:830,hostfwd=tcp:0.0.0.0:6030-10.0.0.15:6030,hostfwd=tcp:0.0.0.0:8080-10.0.0.15:8080,hostfwd=tcp:0.0.0.0:9339-10.0.0.15:9339,hostfwd=tcp:0.0.0.0:32767-10.0.0.15:32767,hostfwd=tcp:0.0.0.0:50051-10.0.0.15:50051,hostfwd=tcp:0.0.0.0:57400-10.0.0.15:57400,tftp=/tftpboot -device virtio-net-pci,speed=10000,duplex=full,netdev=p01,mac=aa:c1:ab:3b:b1:25,bus=pci.1,addr=0x2 -netdev tap,id=p01,ifname=tap1,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p02,mac=aa:c1:ab:e8:97:91,bus=pci.1,addr=0x3 -netdev tap,id=p02,ifname=tap2,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p03,mac=aa:c1:ab:67:70:b1,bus=pci.1,addr=0x4 -netdev tap,id=p03,ifname=tap3,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p04,mac=aa:c1:ab:00:a8:4c,bus=pci.1,addr=0x5 -netdev tap,id=p04,ifname=tap4,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p05,mac=aa:c1:ab:87:84:42,bus=pci.1,addr=0x6 -netdev tap,id=p05,ifname=tap5,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p06,mac=aa:c1:ab:f1:d9:d0,bus=pci.1,addr=0x7 -netdev tap,id=p06,ifname=tap6,script=/etc/tc-tap-ifup,downscript=no
+2026-11-01 08:42:59,257: base_driver     INFO closing connection to '127.0.0.1' on port '4000'
+2026-11-01 08:42:59,257: base_driver     INFO connection to '127.0.0.1' on port '4000' closed successfully
+2026-11-01 08:42:59,257: base_driver     INFO opening connection to '127.0.0.1' on port '4000'
+2026-11-01 08:42:59,260: base_driver     INFO connection to '127.0.0.1' on port '4000' opened successfully
+2026-11-01 08:42:59,260: base_driver     INFO closing connection to '127.0.0.1' on port '5000'
+2026-11-01 08:42:59,260: base_driver     INFO connection to '127.0.0.1' on port '5000' closed successfully
+2026-11-01 08:42:59,260: base_driver     INFO opening connection to '127.0.0.1' on port '5000'
+2026-11-01 08:42:59,260: base_driver     INFO connection to '127.0.0.1' on port '5000' opened successfully
+2026-11-01 08:43:02,263: base_driver     INFO closing connection to '127.0.0.1' on port '5000'
+2026-11-01 08:43:02,263: base_driver     INFO connection to '127.0.0.1' on port '5000' closed successfully
+2026-11-01 08:43:12,274: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:43:24,283: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:43:36,295: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:43:48,308: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:00,320: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:12,330: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:24,342: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:26,345: launch     TRACE    API not reachable yet: [Errno 104] Connection reset by peer
+2026-11-01 08:44:39,205: launch         DEBUG API login: AUTH_ERR
+2026-11-01 08:44:40,104: launch         INFO TrueNAS middleware ready
+2026-11-01 08:44:40,105: launch         INFO setting hostname truenas1
+2026-11-01 08:44:41,827: launch         INFO setting the truenas_admin password
+2026-11-01 08:44:42,923: launch         INFO enabling SSH (password login)
+2026-11-01 08:44:45,524: launch         INFO capping the ZFS ARC at 6144 MiB
+2026-11-01 08:45:49,923: launch         INFO creating pool tank (RAIDZ1) on vdb, vdc, vdd, vde
+2026-11-01 08:45:59,964: launch     TRACE    Startup config file /config/startup-config.cfg not found
+2026-11-01 08:45:59,970: launch         INFO Startup complete in: 0:03:08.050847
+2026-11-01 11:17:23,039: launch         INFO container stopping: ACPI power-off of the guest (up to 90 s)
+2026-11-01 11:17:26,040: launch         INFO guest powered off
+11:19:06 ERRO container "sfab-ch02-k8s-gpu1" exited; container output:
+[vm-init] guest k8s-gpu1 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-gpu1" exited; container output:
+[vm-init] guest k8s-gpu1 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-gpu2" exited; container output:
+[vm-init] guest k8s-gpu2 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-ingress2" exited; container output:
+[vm-init] guest k8s-ingress2 (sfab-ch02): 4 vCPU, 6144 MiB, 40G, NICs eth0 eth1 eth2 eth3
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge (tx off 1)
+[vm-init] root disk created: 40G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 20 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-cp3" exited; container output:
+[vm-init] guest k8s-cp3 (sfab-ch02): 4 vCPU, 8192 MiB, 40G, NICs eth0 eth1 eth2 eth3
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge (tx off 1)
+[vm-init] root disk created: 40G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 21 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-ingress1" exited; container output:
+[vm-init] guest k8s-ingress1 (sfab-ch02): 4 vCPU, 6144 MiB, 40G, NICs eth0 eth1 eth2 eth3
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge (tx off 1)
+[vm-init] root disk created: 40G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 20 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-cp2" exited; container output:
+[vm-init] guest k8s-cp2 (sfab-ch02): 4 vCPU, 8192 MiB, 40G, NICs eth0 eth1 eth2 eth3
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge (tx off 1)
+[vm-init] root disk created: 40G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 21 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-truenas1" exited; container output:
+2026-11-01 08:42:51,854: vrnetlab       DEBUG Creating overlay disk image: /persist/truenas-overlay.qcow2
+2026-11-01 08:42:51,917: vrnetlab       DEBUG Starting vrnetlab TrueNAS
+2026-11-01 08:42:51,917: vrnetlab       DEBUG VMs: [<__main__.TrueNAS_vm object at 0x7541f0b80440>]
+2026-11-01 08:42:51,917: vrnetlab       DEBUG VM not started; starting!
+2026-11-01 08:42:51,917: vrnetlab       INFO ----------------START ENVIRONMENT VARIABLES-----------------
+2026-11-01 08:42:51,917: vrnetlab       INFO CLAB_INTFS: 6
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_GROUP:
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_KIND: generic_vm
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_LAB_DIR: /root/sfab/clean/ai-serving-fabric-labs/ch02/clab-sfab-ch02/truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_LONGNAME: sfab-ch02-truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_NAME: truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_TYPE:
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_OWNER: root
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_TOPO_FILE: /root/sfab/clean/ai-serving-fabric-labs/ch02/topo.clab.yml
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CONTAINERLAB: sfab-ch02
+2026-11-01 08:42:51,918: vrnetlab       INFO CONNECTION_MODE: tc
+2026-11-01 08:42:51,918: vrnetlab       INFO DOCKER_NET_V4_ADDR: 172.21.40.0/24
+2026-11-01 08:42:51,918: vrnetlab       INFO DOCKER_NET_V6_ADDR:
+2026-11-01 08:42:51,918: vrnetlab       INFO HOME: /root
+2026-11-01 08:42:51,918: vrnetlab       INFO HOSTNAME: truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO LC_CTYPE: C.UTF-8
+2026-11-01 08:42:51,918: vrnetlab       INFO NO_PROXY: localhost,127.0.0.1,::1,*.local,172.21.40.0/24,172.21.40.101,172.21.40.102,172.21.40.103,172.21.40.104,172.21.40.105,172.21.40.11,172.21.40.111,172.21.40.112,172.21.40.12,172.21.40.121,172.21.40.21,172.21.40.22,172.21.40.31,172.21.40.40,172.21.40.50,172.21.40.53,172.21.40.55,172.21.40.56,172.21.40.57,172.21.40.58,172.21.40.59,172.21.40.61,172.21.40.63,172.21.40.64,172.21.40.70,172.21.40.81,172.21.40.82,172.21.40.84,bastion,dns-auth1,dns-auth2,dns-res1,dns-res2,ent-client,ent-dns,fe-sw1,fe-sw2,fw,inet-ntp,inet-registry,k8s-cp1,k8s-cp2,k8s-cp3,k8s-gpu1,k8s-gpu2,k8s-ingress1,k8s-ingress2,oob-sw,ops-client,ops-dns,ops-gw,rail-sw1,rail-sw2,truenas1,uplink-rtr,web-client
+2026-11-01 08:42:51,918: vrnetlab       INFO PASSWORD: <redacted hmac:1bbc243e8333>
+2026-11-01 08:42:51,918: vrnetlab       INFO PATH: /.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+2026-11-01 08:42:51,918: vrnetlab       INFO TERM: xterm
+2026-11-01 08:42:51,918: vrnetlab       INFO TRUENAS_ARC_MAX_MB: 6144
+2026-11-01 08:42:51,918: vrnetlab       INFO TRUENAS_DATA_DISKS: 4
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_DATA_DISK_SIZE: 100G
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_POOL: tank
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_RAM: 16384
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_SMP: 8
+2026-11-01 08:42:51,919: vrnetlab       INFO USERNAME: truenas_admin
+2026-11-01 08:42:51,919: vrnetlab       INFO UV: /usr/bin/uv
+2026-11-01 08:42:51,919: vrnetlab       INFO UV_RUN_RECURSION_DEPTH: 1
+2026-11-01 08:42:51,919: vrnetlab       INFO VERSION: 27.0.0-RC.1
+2026-11-01 08:42:51,919: vrnetlab       INFO VIRTUAL_ENV: /.venv
+2026-11-01 08:42:51,919: vrnetlab       INFO no_proxy: localhost,127.0.0.1,::1,*.local,172.21.40.0/24,172.21.40.101,172.21.40.102,172.21.40.103,172.21.40.104,172.21.40.105,172.21.40.11,172.21.40.111,172.21.40.112,172.21.40.12,172.21.40.121,172.21.40.21,172.21.40.22,172.21.40.31,172.21.40.40,172.21.40.50,172.21.40.53,172.21.40.55,172.21.40.56,172.21.40.57,172.21.40.58,172.21.40.59,172.21.40.61,172.21.40.63,172.21.40.64,172.21.40.70,172.21.40.81,172.21.40.82,172.21.40.84,bastion,dns-auth1,dns-auth2,dns-res1,dns-res2,ent-client,ent-dns,fe-sw1,fe-sw2,fw,inet-ntp,inet-registry,k8s-cp1,k8s-cp2,k8s-cp3,k8s-gpu1,k8s-gpu2,k8s-ingress1,k8s-ingress2,oob-sw,ops-client,ops-dns,ops-gw,rail-sw1,rail-sw2,truenas1,uplink-rtr,web-client
+2026-11-01 08:42:51,919: vrnetlab       INFO -----------------END ENVIRONMENT VARIABLES------------------
+2026-11-01 08:42:51,919: vrnetlab       INFO Launching TrueNAS_vm arch x86_64 with 8 SMP/VCPU and 16384 M of RAM
+2026-11-01 08:42:51,919: vrnetlab       INFO Transparent mgmt interface: Disabled
+2026-11-01 08:42:51,920: vrnetlab       DEBUG number of provisioned data plane interfaces is 6
+2026-11-01 08:42:51,920: vrnetlab       DEBUG waiting for provisioned interfaces to appear...
+2026-11-01 08:42:56,921: vrnetlab       DEBUG highest allocated interface id determined to be: 6...
+2026-11-01 08:42:56,922: vrnetlab       DEBUG interfaces provisioned, continuing...
+2026-11-01 08:42:57,004: vrnetlab       DEBUG Found MAC address aa:c1:ab:3b:b1:25 for interface eth1
+2026-11-01 08:42:57,004: vrnetlab       INFO Using container interface MAC aa:c1:ab:3b:b1:25 for VM NIC eth1
+2026-11-01 08:42:57,124: vrnetlab       DEBUG Found MAC address aa:c1:ab:e8:97:91 for interface eth2
+2026-11-01 08:42:57,124: vrnetlab       INFO Using container interface MAC aa:c1:ab:e8:97:91 for VM NIC eth2
+2026-11-01 08:42:57,131: vrnetlab       DEBUG Found MAC address aa:c1:ab:67:70:b1 for interface eth3
+2026-11-01 08:42:57,132: vrnetlab       INFO Using container interface MAC aa:c1:ab:67:70:b1 for VM NIC eth3
+2026-11-01 08:42:57,145: vrnetlab       DEBUG Found MAC address aa:c1:ab:00:a8:4c for interface eth4
+2026-11-01 08:42:57,145: vrnetlab       INFO Using container interface MAC aa:c1:ab:00:a8:4c for VM NIC eth4
+2026-11-01 08:42:57,198: vrnetlab       DEBUG Found MAC address aa:c1:ab:87:84:42 for interface eth5
+2026-11-01 08:42:57,198: vrnetlab       INFO Using container interface MAC aa:c1:ab:87:84:42 for VM NIC eth5
+2026-11-01 08:42:57,253: vrnetlab       DEBUG Found MAC address aa:c1:ab:f1:d9:d0 for interface eth6
+2026-11-01 08:42:57,254: vrnetlab       INFO Using container interface MAC aa:c1:ab:f1:d9:d0 for VM NIC eth6
+2026-11-01 08:42:57,254: vrnetlab       DEBUG qemu cmd: qemu-system-x86_64 -enable-kvm -display none -machine pc -chardev socket,id=monitor0,host=::,port=4000,server=on,wait=off -monitor chardev:monitor0 -chardev socket,id=serial0,host=::,port=5000,server=on,wait=off,telnet=on -serial chardev:serial0 -m 16384 -cpu host -smp 8 -drive if=none,file=/persist/truenas-overlay.qcow2,id=boot,format=qcow2 -device virtio-blk-pci,drive=boot,serial=VRNBOOT01,bootindex=1 -global isa-fdc.fdtypeA=none -drive if=none,id=data1,file=/persist/data1.qcow2,format=qcow2 -device virtio-blk-pci,drive=data1,serial=VRNDATA01 -drive if=none,id=data2,file=/persist/data2.qcow2,format=qcow2 -device virtio-blk-pci,drive=data2,serial=VRNDATA02 -drive if=none,id=data3,file=/persist/data3.qcow2,format=qcow2 -device virtio-blk-pci,drive=data3,serial=VRNDATA03 -drive if=none,id=data4,file=/persist/data4.qcow2,format=qcow2 -device virtio-blk-pci,drive=data4,serial=VRNDATA04 -uuid a6d80849-d68b-4ffe-955d-98d792bc4228 -device pci-bridge,chassis_nr=1,id=pci.1 -device virtio-net-pci,speed=10000,duplex=full,netdev=p00,mac=0C:00:d5:7c:83:00,bus=pci.1,addr=0x1 -netdev user,id=p00,net=10.0.0.0/24,host=10.0.0.2,dns=10.0.0.3,dhcpstart=10.0.0.15,hostfwd=tcp:0.0.0.0:22-10.0.0.15:22,hostfwd=udp:0.0.0.0:161-10.0.0.15:161,hostfwd=tcp:0.0.0.0:80-10.0.0.15:80,hostfwd=tcp:0.0.0.0:443-10.0.0.15:443,hostfwd=tcp:0.0.0.0:830-10.0.0.15:830,hostfwd=tcp:0.0.0.0:6030-10.0.0.15:6030,hostfwd=tcp:0.0.0.0:8080-10.0.0.15:8080,hostfwd=tcp:0.0.0.0:9339-10.0.0.15:9339,hostfwd=tcp:0.0.0.0:32767-10.0.0.15:32767,hostfwd=tcp:0.0.0.0:50051-10.0.0.15:50051,hostfwd=tcp:0.0.0.0:57400-10.0.0.15:57400,tftp=/tftpboot -device virtio-net-pci,speed=10000,duplex=full,netdev=p01,mac=aa:c1:ab:3b:b1:25,bus=pci.1,addr=0x2 -netdev tap,id=p01,ifname=tap1,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p02,mac=aa:c1:ab:e8:97:91,bus=pci.1,addr=0x3 -netdev tap,id=p02,ifname=tap2,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p03,mac=aa:c1:ab:67:70:b1,bus=pci.1,addr=0x4 -netdev tap,id=p03,ifname=tap3,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p04,mac=aa:c1:ab:00:a8:4c,bus=pci.1,addr=0x5 -netdev tap,id=p04,ifname=tap4,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p05,mac=aa:c1:ab:87:84:42,bus=pci.1,addr=0x6 -netdev tap,id=p05,ifname=tap5,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p06,mac=aa:c1:ab:f1:d9:d0,bus=pci.1,addr=0x7 -netdev tap,id=p06,ifname=tap6,script=/etc/tc-tap-ifup,downscript=no
+2026-11-01 08:42:59,257: base_driver     INFO closing connection to '127.0.0.1' on port '4000'
+2026-11-01 08:42:59,257: base_driver     INFO connection to '127.0.0.1' on port '4000' closed successfully
+2026-11-01 08:42:59,257: base_driver     INFO opening connection to '127.0.0.1' on port '4000'
+2026-11-01 08:42:59,260: base_driver     INFO connection to '127.0.0.1' on port '4000' opened successfully
+2026-11-01 08:42:59,260: base_driver     INFO closing connection to '127.0.0.1' on port '5000'
+2026-11-01 08:42:59,260: base_driver     INFO connection to '127.0.0.1' on port '5000' closed successfully
+2026-11-01 08:42:59,260: base_driver     INFO opening connection to '127.0.0.1' on port '5000'
+2026-11-01 08:42:59,260: base_driver     INFO connection to '127.0.0.1' on port '5000' opened successfully
+2026-11-01 08:43:02,263: base_driver     INFO closing connection to '127.0.0.1' on port '5000'
+2026-11-01 08:43:02,263: base_driver     INFO connection to '127.0.0.1' on port '5000' closed successfully
+2026-11-01 08:43:12,274: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:43:24,283: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:43:36,295: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:43:48,308: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:00,320: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:12,330: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:24,342: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:26,345: launch     TRACE    API not reachable yet: [Errno 104] Connection reset by peer
+2026-11-01 08:44:39,205: launch         DEBUG API login: AUTH_ERR
+2026-11-01 08:44:40,104: launch         INFO TrueNAS middleware ready
+2026-11-01 08:44:40,105: launch         INFO setting hostname truenas1
+2026-11-01 08:44:41,827: launch         INFO setting the truenas_admin password
+2026-11-01 08:44:42,923: launch         INFO enabling SSH (password login)
+2026-11-01 08:44:45,524: launch         INFO capping the ZFS ARC at 6144 MiB
+2026-11-01 08:45:49,923: launch         INFO creating pool tank (RAIDZ1) on vdb, vdc, vdd, vde
+2026-11-01 08:45:59,964: launch     TRACE    Startup config file /config/startup-config.cfg not found
+2026-11-01 08:45:59,970: launch         INFO Startup complete in: 0:03:08.050847
+2026-11-01 11:17:23,039: launch         INFO container stopping: ACPI power-off of the guest (up to 90 s)
+2026-11-01 11:17:26,040: launch         INFO guest powered off
+11:19:06 INFO Removed container name=sfab-ch02-k8s-cp1
+11:19:06 ERRO container "sfab-ch02-k8s-gpu1" exited; container output:
+[vm-init] guest k8s-gpu1 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-gpu1" exited; container output:
+[vm-init] guest k8s-gpu1 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-truenas1" exited; container output:
+2026-11-01 08:42:51,854: vrnetlab       DEBUG Creating overlay disk image: /persist/truenas-overlay.qcow2
+2026-11-01 08:42:51,917: vrnetlab       DEBUG Starting vrnetlab TrueNAS
+2026-11-01 08:42:51,917: vrnetlab       DEBUG VMs: [<__main__.TrueNAS_vm object at 0x7541f0b80440>]
+2026-11-01 08:42:51,917: vrnetlab       DEBUG VM not started; starting!
+2026-11-01 08:42:51,917: vrnetlab       INFO ----------------START ENVIRONMENT VARIABLES-----------------
+2026-11-01 08:42:51,917: vrnetlab       INFO CLAB_INTFS: 6
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_GROUP:
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_KIND: generic_vm
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_LAB_DIR: /root/sfab/clean/ai-serving-fabric-labs/ch02/clab-sfab-ch02/truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_LONGNAME: sfab-ch02-truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_NAME: truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_TYPE:
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_OWNER: root
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_TOPO_FILE: /root/sfab/clean/ai-serving-fabric-labs/ch02/topo.clab.yml
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CONTAINERLAB: sfab-ch02
+2026-11-01 08:42:51,918: vrnetlab       INFO CONNECTION_MODE: tc
+2026-11-01 08:42:51,918: vrnetlab       INFO DOCKER_NET_V4_ADDR: 172.21.40.0/24
+2026-11-01 08:42:51,918: vrnetlab       INFO DOCKER_NET_V6_ADDR:
+2026-11-01 08:42:51,918: vrnetlab       INFO HOME: /root
+2026-11-01 08:42:51,918: vrnetlab       INFO HOSTNAME: truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO LC_CTYPE: C.UTF-8
+2026-11-01 08:42:51,918: vrnetlab       INFO NO_PROXY: localhost,127.0.0.1,::1,*.local,172.21.40.0/24,172.21.40.101,172.21.40.102,172.21.40.103,172.21.40.104,172.21.40.105,172.21.40.11,172.21.40.111,172.21.40.112,172.21.40.12,172.21.40.121,172.21.40.21,172.21.40.22,172.21.40.31,172.21.40.40,172.21.40.50,172.21.40.53,172.21.40.55,172.21.40.56,172.21.40.57,172.21.40.58,172.21.40.59,172.21.40.61,172.21.40.63,172.21.40.64,172.21.40.70,172.21.40.81,172.21.40.82,172.21.40.84,bastion,dns-auth1,dns-auth2,dns-res1,dns-res2,ent-client,ent-dns,fe-sw1,fe-sw2,fw,inet-ntp,inet-registry,k8s-cp1,k8s-cp2,k8s-cp3,k8s-gpu1,k8s-gpu2,k8s-ingress1,k8s-ingress2,oob-sw,ops-client,ops-dns,ops-gw,rail-sw1,rail-sw2,truenas1,uplink-rtr,web-client
+2026-11-01 08:42:51,918: vrnetlab       INFO PASSWORD: <redacted hmac:1bbc243e8333>
+2026-11-01 08:42:51,918: vrnetlab       INFO PATH: /.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+2026-11-01 08:42:51,918: vrnetlab       INFO TERM: xterm
+2026-11-01 08:42:51,918: vrnetlab       INFO TRUENAS_ARC_MAX_MB: 6144
+2026-11-01 08:42:51,918: vrnetlab       INFO TRUENAS_DATA_DISKS: 4
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_DATA_DISK_SIZE: 100G
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_POOL: tank
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_RAM: 16384
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_SMP: 8
+2026-11-01 08:42:51,919: vrnetlab       INFO USERNAME: truenas_admin
+2026-11-01 08:42:51,919: vrnetlab       INFO UV: /usr/bin/uv
+2026-11-01 08:42:51,919: vrnetlab       INFO UV_RUN_RECURSION_DEPTH: 1
+2026-11-01 08:42:51,919: vrnetlab       INFO VERSION: 27.0.0-RC.1
+2026-11-01 08:42:51,919: vrnetlab       INFO VIRTUAL_ENV: /.venv
+2026-11-01 08:42:51,919: vrnetlab       INFO no_proxy: localhost,127.0.0.1,::1,*.local,172.21.40.0/24,172.21.40.101,172.21.40.102,172.21.40.103,172.21.40.104,172.21.40.105,172.21.40.11,172.21.40.111,172.21.40.112,172.21.40.12,172.21.40.121,172.21.40.21,172.21.40.22,172.21.40.31,172.21.40.40,172.21.40.50,172.21.40.53,172.21.40.55,172.21.40.56,172.21.40.57,172.21.40.58,172.21.40.59,172.21.40.61,172.21.40.63,172.21.40.64,172.21.40.70,172.21.40.81,172.21.40.82,172.21.40.84,bastion,dns-auth1,dns-auth2,dns-res1,dns-res2,ent-client,ent-dns,fe-sw1,fe-sw2,fw,inet-ntp,inet-registry,k8s-cp1,k8s-cp2,k8s-cp3,k8s-gpu1,k8s-gpu2,k8s-ingress1,k8s-ingress2,oob-sw,ops-client,ops-dns,ops-gw,rail-sw1,rail-sw2,truenas1,uplink-rtr,web-client
+2026-11-01 08:42:51,919: vrnetlab       INFO -----------------END ENVIRONMENT VARIABLES------------------
+2026-11-01 08:42:51,919: vrnetlab       INFO Launching TrueNAS_vm arch x86_64 with 8 SMP/VCPU and 16384 M of RAM
+2026-11-01 08:42:51,919: vrnetlab       INFO Transparent mgmt interface: Disabled
+2026-11-01 08:42:51,920: vrnetlab       DEBUG number of provisioned data plane interfaces is 6
+2026-11-01 08:42:51,920: vrnetlab       DEBUG waiting for provisioned interfaces to appear...
+2026-11-01 08:42:56,921: vrnetlab       DEBUG highest allocated interface id determined to be: 6...
+2026-11-01 08:42:56,922: vrnetlab       DEBUG interfaces provisioned, continuing...
+2026-11-01 08:42:57,004: vrnetlab       DEBUG Found MAC address aa:c1:ab:3b:b1:25 for interface eth1
+2026-11-01 08:42:57,004: vrnetlab       INFO Using container interface MAC aa:c1:ab:3b:b1:25 for VM NIC eth1
+2026-11-01 08:42:57,124: vrnetlab       DEBUG Found MAC address aa:c1:ab:e8:97:91 for interface eth2
+2026-11-01 08:42:57,124: vrnetlab       INFO Using container interface MAC aa:c1:ab:e8:97:91 for VM NIC eth2
+2026-11-01 08:42:57,131: vrnetlab       DEBUG Found MAC address aa:c1:ab:67:70:b1 for interface eth3
+2026-11-01 08:42:57,132: vrnetlab       INFO Using container interface MAC aa:c1:ab:67:70:b1 for VM NIC eth3
+2026-11-01 08:42:57,145: vrnetlab       DEBUG Found MAC address aa:c1:ab:00:a8:4c for interface eth4
+2026-11-01 08:42:57,145: vrnetlab       INFO Using container interface MAC aa:c1:ab:00:a8:4c for VM NIC eth4
+2026-11-01 08:42:57,198: vrnetlab       DEBUG Found MAC address aa:c1:ab:87:84:42 for interface eth5
+2026-11-01 08:42:57,198: vrnetlab       INFO Using container interface MAC aa:c1:ab:87:84:42 for VM NIC eth5
+2026-11-01 08:42:57,253: vrnetlab       DEBUG Found MAC address aa:c1:ab:f1:d9:d0 for interface eth6
+2026-11-01 08:42:57,254: vrnetlab       INFO Using container interface MAC aa:c1:ab:f1:d9:d0 for VM NIC eth6
+2026-11-01 08:42:57,254: vrnetlab       DEBUG qemu cmd: qemu-system-x86_64 -enable-kvm -display none -machine pc -chardev socket,id=monitor0,host=::,port=4000,server=on,wait=off -monitor chardev:monitor0 -chardev socket,id=serial0,host=::,port=5000,server=on,wait=off,telnet=on -serial chardev:serial0 -m 16384 -cpu host -smp 8 -drive if=none,file=/persist/truenas-overlay.qcow2,id=boot,format=qcow2 -device virtio-blk-pci,drive=boot,serial=VRNBOOT01,bootindex=1 -global isa-fdc.fdtypeA=none -drive if=none,id=data1,file=/persist/data1.qcow2,format=qcow2 -device virtio-blk-pci,drive=data1,serial=VRNDATA01 -drive if=none,id=data2,file=/persist/data2.qcow2,format=qcow2 -device virtio-blk-pci,drive=data2,serial=VRNDATA02 -drive if=none,id=data3,file=/persist/data3.qcow2,format=qcow2 -device virtio-blk-pci,drive=data3,serial=VRNDATA03 -drive if=none,id=data4,file=/persist/data4.qcow2,format=qcow2 -device virtio-blk-pci,drive=data4,serial=VRNDATA04 -uuid a6d80849-d68b-4ffe-955d-98d792bc4228 -device pci-bridge,chassis_nr=1,id=pci.1 -device virtio-net-pci,speed=10000,duplex=full,netdev=p00,mac=0C:00:d5:7c:83:00,bus=pci.1,addr=0x1 -netdev user,id=p00,net=10.0.0.0/24,host=10.0.0.2,dns=10.0.0.3,dhcpstart=10.0.0.15,hostfwd=tcp:0.0.0.0:22-10.0.0.15:22,hostfwd=udp:0.0.0.0:161-10.0.0.15:161,hostfwd=tcp:0.0.0.0:80-10.0.0.15:80,hostfwd=tcp:0.0.0.0:443-10.0.0.15:443,hostfwd=tcp:0.0.0.0:830-10.0.0.15:830,hostfwd=tcp:0.0.0.0:6030-10.0.0.15:6030,hostfwd=tcp:0.0.0.0:8080-10.0.0.15:8080,hostfwd=tcp:0.0.0.0:9339-10.0.0.15:9339,hostfwd=tcp:0.0.0.0:32767-10.0.0.15:32767,hostfwd=tcp:0.0.0.0:50051-10.0.0.15:50051,hostfwd=tcp:0.0.0.0:57400-10.0.0.15:57400,tftp=/tftpboot -device virtio-net-pci,speed=10000,duplex=full,netdev=p01,mac=aa:c1:ab:3b:b1:25,bus=pci.1,addr=0x2 -netdev tap,id=p01,ifname=tap1,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p02,mac=aa:c1:ab:e8:97:91,bus=pci.1,addr=0x3 -netdev tap,id=p02,ifname=tap2,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p03,mac=aa:c1:ab:67:70:b1,bus=pci.1,addr=0x4 -netdev tap,id=p03,ifname=tap3,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p04,mac=aa:c1:ab:00:a8:4c,bus=pci.1,addr=0x5 -netdev tap,id=p04,ifname=tap4,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p05,mac=aa:c1:ab:87:84:42,bus=pci.1,addr=0x6 -netdev tap,id=p05,ifname=tap5,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p06,mac=aa:c1:ab:f1:d9:d0,bus=pci.1,addr=0x7 -netdev tap,id=p06,ifname=tap6,script=/etc/tc-tap-ifup,downscript=no
+2026-11-01 08:42:59,257: base_driver     INFO closing connection to '127.0.0.1' on port '4000'
+2026-11-01 08:42:59,257: base_driver     INFO connection to '127.0.0.1' on port '4000' closed successfully
+2026-11-01 08:42:59,257: base_driver     INFO opening connection to '127.0.0.1' on port '4000'
+2026-11-01 08:42:59,260: base_driver     INFO connection to '127.0.0.1' on port '4000' opened successfully
+2026-11-01 08:42:59,260: base_driver     INFO closing connection to '127.0.0.1' on port '5000'
+2026-11-01 08:42:59,260: base_driver     INFO connection to '127.0.0.1' on port '5000' closed successfully
+2026-11-01 08:42:59,260: base_driver     INFO opening connection to '127.0.0.1' on port '5000'
+2026-11-01 08:42:59,260: base_driver     INFO connection to '127.0.0.1' on port '5000' opened successfully
+2026-11-01 08:43:02,263: base_driver     INFO closing connection to '127.0.0.1' on port '5000'
+2026-11-01 08:43:02,263: base_driver     INFO connection to '127.0.0.1' on port '5000' closed successfully
+2026-11-01 08:43:12,274: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:43:24,283: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:43:36,295: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:43:48,308: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:00,320: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:12,330: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:24,342: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:26,345: launch     TRACE    API not reachable yet: [Errno 104] Connection reset by peer
+2026-11-01 08:44:39,205: launch         DEBUG API login: AUTH_ERR
+2026-11-01 08:44:40,104: launch         INFO TrueNAS middleware ready
+2026-11-01 08:44:40,105: launch         INFO setting hostname truenas1
+2026-11-01 08:44:41,827: launch         INFO setting the truenas_admin password
+2026-11-01 08:44:42,923: launch         INFO enabling SSH (password login)
+2026-11-01 08:44:45,524: launch         INFO capping the ZFS ARC at 6144 MiB
+2026-11-01 08:45:49,923: launch         INFO creating pool tank (RAIDZ1) on vdb, vdc, vdd, vde
+2026-11-01 08:45:59,964: launch     TRACE    Startup config file /config/startup-config.cfg not found
+2026-11-01 08:45:59,970: launch         INFO Startup complete in: 0:03:08.050847
+2026-11-01 11:17:23,039: launch         INFO container stopping: ACPI power-off of the guest (up to 90 s)
+2026-11-01 11:17:26,040: launch         INFO guest powered off
+11:19:06 INFO Removed container name=sfab-ch02-k8s-cp3
+11:19:06 INFO Removed container name=sfab-ch02-k8s-ingress2
+11:19:06 INFO Removed container name=sfab-ch02-k8s-cp2
+11:19:06 INFO Removed container name=sfab-ch02-k8s-ingress1
+11:19:06 ERRO container "sfab-ch02-truenas1" exited; container output:
+2026-11-01 08:42:51,854: vrnetlab       DEBUG Creating overlay disk image: /persist/truenas-overlay.qcow2
+2026-11-01 08:42:51,917: vrnetlab       DEBUG Starting vrnetlab TrueNAS
+2026-11-01 08:42:51,917: vrnetlab       DEBUG VMs: [<__main__.TrueNAS_vm object at 0x7541f0b80440>]
+2026-11-01 08:42:51,917: vrnetlab       DEBUG VM not started; starting!
+2026-11-01 08:42:51,917: vrnetlab       INFO ----------------START ENVIRONMENT VARIABLES-----------------
+2026-11-01 08:42:51,917: vrnetlab       INFO CLAB_INTFS: 6
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_GROUP:
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_KIND: generic_vm
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_LAB_DIR: /root/sfab/clean/ai-serving-fabric-labs/ch02/clab-sfab-ch02/truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_LONGNAME: sfab-ch02-truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_NAME: truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_TYPE:
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_OWNER: root
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_TOPO_FILE: /root/sfab/clean/ai-serving-fabric-labs/ch02/topo.clab.yml
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CONTAINERLAB: sfab-ch02
+2026-11-01 08:42:51,918: vrnetlab       INFO CONNECTION_MODE: tc
+2026-11-01 08:42:51,918: vrnetlab       INFO DOCKER_NET_V4_ADDR: 172.21.40.0/24
+2026-11-01 08:42:51,918: vrnetlab       INFO DOCKER_NET_V6_ADDR:
+2026-11-01 08:42:51,918: vrnetlab       INFO HOME: /root
+2026-11-01 08:42:51,918: vrnetlab       INFO HOSTNAME: truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO LC_CTYPE: C.UTF-8
+2026-11-01 08:42:51,918: vrnetlab       INFO NO_PROXY: localhost,127.0.0.1,::1,*.local,172.21.40.0/24,172.21.40.101,172.21.40.102,172.21.40.103,172.21.40.104,172.21.40.105,172.21.40.11,172.21.40.111,172.21.40.112,172.21.40.12,172.21.40.121,172.21.40.21,172.21.40.22,172.21.40.31,172.21.40.40,172.21.40.50,172.21.40.53,172.21.40.55,172.21.40.56,172.21.40.57,172.21.40.58,172.21.40.59,172.21.40.61,172.21.40.63,172.21.40.64,172.21.40.70,172.21.40.81,172.21.40.82,172.21.40.84,bastion,dns-auth1,dns-auth2,dns-res1,dns-res2,ent-client,ent-dns,fe-sw1,fe-sw2,fw,inet-ntp,inet-registry,k8s-cp1,k8s-cp2,k8s-cp3,k8s-gpu1,k8s-gpu2,k8s-ingress1,k8s-ingress2,oob-sw,ops-client,ops-dns,ops-gw,rail-sw1,rail-sw2,truenas1,uplink-rtr,web-client
+2026-11-01 08:42:51,918: vrnetlab       INFO PASSWORD: <redacted hmac:1bbc243e8333>
+2026-11-01 08:42:51,918: vrnetlab       INFO PATH: /.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+2026-11-01 08:42:51,918: vrnetlab       INFO TERM: xterm
+2026-11-01 08:42:51,918: vrnetlab       INFO TRUENAS_ARC_MAX_MB: 6144
+2026-11-01 08:42:51,918: vrnetlab       INFO TRUENAS_DATA_DISKS: 4
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_DATA_DISK_SIZE: 100G
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_POOL: tank
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_RAM: 16384
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_SMP: 8
+2026-11-01 08:42:51,919: vrnetlab       INFO USERNAME: truenas_admin
+2026-11-01 08:42:51,919: vrnetlab       INFO UV: /usr/bin/uv
+2026-11-01 08:42:51,919: vrnetlab       INFO UV_RUN_RECURSION_DEPTH: 1
+2026-11-01 08:42:51,919: vrnetlab       INFO VERSION: 27.0.0-RC.1
+2026-11-01 08:42:51,919: vrnetlab       INFO VIRTUAL_ENV: /.venv
+2026-11-01 08:42:51,919: vrnetlab       INFO no_proxy: localhost,127.0.0.1,::1,*.local,172.21.40.0/24,172.21.40.101,172.21.40.102,172.21.40.103,172.21.40.104,172.21.40.105,172.21.40.11,172.21.40.111,172.21.40.112,172.21.40.12,172.21.40.121,172.21.40.21,172.21.40.22,172.21.40.31,172.21.40.40,172.21.40.50,172.21.40.53,172.21.40.55,172.21.40.56,172.21.40.57,172.21.40.58,172.21.40.59,172.21.40.61,172.21.40.63,172.21.40.64,172.21.40.70,172.21.40.81,172.21.40.82,172.21.40.84,bastion,dns-auth1,dns-auth2,dns-res1,dns-res2,ent-client,ent-dns,fe-sw1,fe-sw2,fw,inet-ntp,inet-registry,k8s-cp1,k8s-cp2,k8s-cp3,k8s-gpu1,k8s-gpu2,k8s-ingress1,k8s-ingress2,oob-sw,ops-client,ops-dns,ops-gw,rail-sw1,rail-sw2,truenas1,uplink-rtr,web-client
+2026-11-01 08:42:51,919: vrnetlab       INFO -----------------END ENVIRONMENT VARIABLES------------------
+2026-11-01 08:42:51,919: vrnetlab       INFO Launching TrueNAS_vm arch x86_64 with 8 SMP/VCPU and 16384 M of RAM
+2026-11-01 08:42:51,919: vrnetlab       INFO Transparent mgmt interface: Disabled
+2026-11-01 08:42:51,920: vrnetlab       DEBUG number of provisioned data plane interfaces is 6
+2026-11-01 08:42:51,920: vrnetlab       DEBUG waiting for provisioned interfaces to appear...
+2026-11-01 08:42:56,921: vrnetlab       DEBUG highest allocated interface id determined to be: 6...
+2026-11-01 08:42:56,922: vrnetlab       DEBUG interfaces provisioned, continuing...
+2026-11-01 08:42:57,004: vrnetlab       DEBUG Found MAC address aa:c1:ab:3b:b1:25 for interface eth1
+2026-11-01 08:42:57,004: vrnetlab       INFO Using container interface MAC aa:c1:ab:3b:b1:25 for VM NIC eth1
+2026-11-01 08:42:57,124: vrnetlab       DEBUG Found MAC address aa:c1:ab:e8:97:91 for interface eth2
+2026-11-01 08:42:57,124: vrnetlab       INFO Using container interface MAC aa:c1:ab:e8:97:91 for VM NIC eth2
+2026-11-01 08:42:57,131: vrnetlab       DEBUG Found MAC address aa:c1:ab:67:70:b1 for interface eth3
+2026-11-01 08:42:57,132: vrnetlab       INFO Using container interface MAC aa:c1:ab:67:70:b1 for VM NIC eth3
+2026-11-01 08:42:57,145: vrnetlab       DEBUG Found MAC address aa:c1:ab:00:a8:4c for interface eth4
+2026-11-01 08:42:57,145: vrnetlab       INFO Using container interface MAC aa:c1:ab:00:a8:4c for VM NIC eth4
+2026-11-01 08:42:57,198: vrnetlab       DEBUG Found MAC address aa:c1:ab:87:84:42 for interface eth5
+2026-11-01 08:42:57,198: vrnetlab       INFO Using container interface MAC aa:c1:ab:87:84:42 for VM NIC eth5
+2026-11-01 08:42:57,253: vrnetlab       DEBUG Found MAC address aa:c1:ab:f1:d9:d0 for interface eth6
+2026-11-01 08:42:57,254: vrnetlab       INFO Using container interface MAC aa:c1:ab:f1:d9:d0 for VM NIC eth6
+2026-11-01 08:42:57,254: vrnetlab       DEBUG qemu cmd: qemu-system-x86_64 -enable-kvm -display none -machine pc -chardev socket,id=monitor0,host=::,port=4000,server=on,wait=off -monitor chardev:monitor0 -chardev socket,id=serial0,host=::,port=5000,server=on,wait=off,telnet=on -serial chardev:serial0 -m 16384 -cpu host -smp 8 -drive if=none,file=/persist/truenas-overlay.qcow2,id=boot,format=qcow2 -device virtio-blk-pci,drive=boot,serial=VRNBOOT01,bootindex=1 -global isa-fdc.fdtypeA=none -drive if=none,id=data1,file=/persist/data1.qcow2,format=qcow2 -device virtio-blk-pci,drive=data1,serial=VRNDATA01 -drive if=none,id=data2,file=/persist/data2.qcow2,format=qcow2 -device virtio-blk-pci,drive=data2,serial=VRNDATA02 -drive if=none,id=data3,file=/persist/data3.qcow2,format=qcow2 -device virtio-blk-pci,drive=data3,serial=VRNDATA03 -drive if=none,id=data4,file=/persist/data4.qcow2,format=qcow2 -device virtio-blk-pci,drive=data4,serial=VRNDATA04 -uuid a6d80849-d68b-4ffe-955d-98d792bc4228 -device pci-bridge,chassis_nr=1,id=pci.1 -device virtio-net-pci,speed=10000,duplex=full,netdev=p00,mac=0C:00:d5:7c:83:00,bus=pci.1,addr=0x1 -netdev user,id=p00,net=10.0.0.0/24,host=10.0.0.2,dns=10.0.0.3,dhcpstart=10.0.0.15,hostfwd=tcp:0.0.0.0:22-10.0.0.15:22,hostfwd=udp:0.0.0.0:161-10.0.0.15:161,hostfwd=tcp:0.0.0.0:80-10.0.0.15:80,hostfwd=tcp:0.0.0.0:443-10.0.0.15:443,hostfwd=tcp:0.0.0.0:830-10.0.0.15:830,hostfwd=tcp:0.0.0.0:6030-10.0.0.15:6030,hostfwd=tcp:0.0.0.0:8080-10.0.0.15:8080,hostfwd=tcp:0.0.0.0:9339-10.0.0.15:9339,hostfwd=tcp:0.0.0.0:32767-10.0.0.15:32767,hostfwd=tcp:0.0.0.0:50051-10.0.0.15:50051,hostfwd=tcp:0.0.0.0:57400-10.0.0.15:57400,tftp=/tftpboot -device virtio-net-pci,speed=10000,duplex=full,netdev=p01,mac=aa:c1:ab:3b:b1:25,bus=pci.1,addr=0x2 -netdev tap,id=p01,ifname=tap1,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p02,mac=aa:c1:ab:e8:97:91,bus=pci.1,addr=0x3 -netdev tap,id=p02,ifname=tap2,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p03,mac=aa:c1:ab:67:70:b1,bus=pci.1,addr=0x4 -netdev tap,id=p03,ifname=tap3,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p04,mac=aa:c1:ab:00:a8:4c,bus=pci.1,addr=0x5 -netdev tap,id=p04,ifname=tap4,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p05,mac=aa:c1:ab:87:84:42,bus=pci.1,addr=0x6 -netdev tap,id=p05,ifname=tap5,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p06,mac=aa:c1:ab:f1:d9:d0,bus=pci.1,addr=0x7 -netdev tap,id=p06,ifname=tap6,script=/etc/tc-tap-ifup,downscript=no
+2026-11-01 08:42:59,257: base_driver     INFO closing connection to '127.0.0.1' on port '4000'
+2026-11-01 08:42:59,257: base_driver     INFO connection to '127.0.0.1' on port '4000' closed successfully
+2026-11-01 08:42:59,257: base_driver     INFO opening connection to '127.0.0.1' on port '4000'
+2026-11-01 08:42:59,260: base_driver     INFO connection to '127.0.0.1' on port '4000' opened successfully
+2026-11-01 08:42:59,260: base_driver     INFO closing connection to '127.0.0.1' on port '5000'
+2026-11-01 08:42:59,260: base_driver     INFO connection to '127.0.0.1' on port '5000' closed successfully
+2026-11-01 08:42:59,260: base_driver     INFO opening connection to '127.0.0.1' on port '5000'
+2026-11-01 08:42:59,260: base_driver     INFO connection to '127.0.0.1' on port '5000' opened successfully
+2026-11-01 08:43:02,263: base_driver     INFO closing connection to '127.0.0.1' on port '5000'
+2026-11-01 08:43:02,263: base_driver     INFO connection to '127.0.0.1' on port '5000' closed successfully
+2026-11-01 08:43:12,274: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:43:24,283: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:43:36,295: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:43:48,308: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:00,320: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:12,330: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:24,342: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:26,345: launch     TRACE    API not reachable yet: [Errno 104] Connection reset by peer
+2026-11-01 08:44:39,205: launch         DEBUG API login: AUTH_ERR
+2026-11-01 08:44:40,104: launch         INFO TrueNAS middleware ready
+2026-11-01 08:44:40,105: launch         INFO setting hostname truenas1
+2026-11-01 08:44:41,827: launch         INFO setting the truenas_admin password
+2026-11-01 08:44:42,923: launch         INFO enabling SSH (password login)
+2026-11-01 08:44:45,524: launch         INFO capping the ZFS ARC at 6144 MiB
+2026-11-01 08:45:49,923: launch         INFO creating pool tank (RAIDZ1) on vdb, vdc, vdd, vde
+2026-11-01 08:45:59,964: launch     TRACE    Startup config file /config/startup-config.cfg not found
+2026-11-01 08:45:59,970: launch         INFO Startup complete in: 0:03:08.050847
+2026-11-01 11:17:23,039: launch         INFO container stopping: ACPI power-off of the guest (up to 90 s)
+2026-11-01 11:17:26,040: launch         INFO guest powered off
+11:19:06 INFO Removed container name=sfab-ch02-web-client
+11:19:06 ERRO container "sfab-ch02-k8s-gpu2" exited; container output:
+[vm-init] guest k8s-gpu2 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-gpu1" exited; container output:
+[vm-init] guest k8s-gpu1 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-k8s-gpu1" exited; container output:
+[vm-init] guest k8s-gpu1 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:06 ERRO container "sfab-ch02-truenas1" exited; container output:
+2026-11-01 08:42:51,854: vrnetlab       DEBUG Creating overlay disk image: /persist/truenas-overlay.qcow2
+2026-11-01 08:42:51,917: vrnetlab       DEBUG Starting vrnetlab TrueNAS
+2026-11-01 08:42:51,917: vrnetlab       DEBUG VMs: [<__main__.TrueNAS_vm object at 0x7541f0b80440>]
+2026-11-01 08:42:51,917: vrnetlab       DEBUG VM not started; starting!
+2026-11-01 08:42:51,917: vrnetlab       INFO ----------------START ENVIRONMENT VARIABLES-----------------
+2026-11-01 08:42:51,917: vrnetlab       INFO CLAB_INTFS: 6
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_GROUP:
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_KIND: generic_vm
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_LAB_DIR: /root/sfab/clean/ai-serving-fabric-labs/ch02/clab-sfab-ch02/truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_LONGNAME: sfab-ch02-truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_NAME: truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_NODE_TYPE:
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_OWNER: root
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CLAB_TOPO_FILE: /root/sfab/clean/ai-serving-fabric-labs/ch02/topo.clab.yml
+2026-11-01 08:42:51,918: vrnetlab       INFO CLAB_LABEL_CONTAINERLAB: sfab-ch02
+2026-11-01 08:42:51,918: vrnetlab       INFO CONNECTION_MODE: tc
+2026-11-01 08:42:51,918: vrnetlab       INFO DOCKER_NET_V4_ADDR: 172.21.40.0/24
+2026-11-01 08:42:51,918: vrnetlab       INFO DOCKER_NET_V6_ADDR:
+2026-11-01 08:42:51,918: vrnetlab       INFO HOME: /root
+2026-11-01 08:42:51,918: vrnetlab       INFO HOSTNAME: truenas1
+2026-11-01 08:42:51,918: vrnetlab       INFO LC_CTYPE: C.UTF-8
+2026-11-01 08:42:51,918: vrnetlab       INFO NO_PROXY: localhost,127.0.0.1,::1,*.local,172.21.40.0/24,172.21.40.101,172.21.40.102,172.21.40.103,172.21.40.104,172.21.40.105,172.21.40.11,172.21.40.111,172.21.40.112,172.21.40.12,172.21.40.121,172.21.40.21,172.21.40.22,172.21.40.31,172.21.40.40,172.21.40.50,172.21.40.53,172.21.40.55,172.21.40.56,172.21.40.57,172.21.40.58,172.21.40.59,172.21.40.61,172.21.40.63,172.21.40.64,172.21.40.70,172.21.40.81,172.21.40.82,172.21.40.84,bastion,dns-auth1,dns-auth2,dns-res1,dns-res2,ent-client,ent-dns,fe-sw1,fe-sw2,fw,inet-ntp,inet-registry,k8s-cp1,k8s-cp2,k8s-cp3,k8s-gpu1,k8s-gpu2,k8s-ingress1,k8s-ingress2,oob-sw,ops-client,ops-dns,ops-gw,rail-sw1,rail-sw2,truenas1,uplink-rtr,web-client
+2026-11-01 08:42:51,918: vrnetlab       INFO PASSWORD: <redacted hmac:1bbc243e8333>
+2026-11-01 08:42:51,918: vrnetlab       INFO PATH: /.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+2026-11-01 08:42:51,918: vrnetlab       INFO TERM: xterm
+2026-11-01 08:42:51,918: vrnetlab       INFO TRUENAS_ARC_MAX_MB: 6144
+2026-11-01 08:42:51,918: vrnetlab       INFO TRUENAS_DATA_DISKS: 4
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_DATA_DISK_SIZE: 100G
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_POOL: tank
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_RAM: 16384
+2026-11-01 08:42:51,919: vrnetlab       INFO TRUENAS_SMP: 8
+2026-11-01 08:42:51,919: vrnetlab       INFO USERNAME: truenas_admin
+2026-11-01 08:42:51,919: vrnetlab       INFO UV: /usr/bin/uv
+2026-11-01 08:42:51,919: vrnetlab       INFO UV_RUN_RECURSION_DEPTH: 1
+2026-11-01 08:42:51,919: vrnetlab       INFO VERSION: 27.0.0-RC.1
+2026-11-01 08:42:51,919: vrnetlab       INFO VIRTUAL_ENV: /.venv
+2026-11-01 08:42:51,919: vrnetlab       INFO no_proxy: localhost,127.0.0.1,::1,*.local,172.21.40.0/24,172.21.40.101,172.21.40.102,172.21.40.103,172.21.40.104,172.21.40.105,172.21.40.11,172.21.40.111,172.21.40.112,172.21.40.12,172.21.40.121,172.21.40.21,172.21.40.22,172.21.40.31,172.21.40.40,172.21.40.50,172.21.40.53,172.21.40.55,172.21.40.56,172.21.40.57,172.21.40.58,172.21.40.59,172.21.40.61,172.21.40.63,172.21.40.64,172.21.40.70,172.21.40.81,172.21.40.82,172.21.40.84,bastion,dns-auth1,dns-auth2,dns-res1,dns-res2,ent-client,ent-dns,fe-sw1,fe-sw2,fw,inet-ntp,inet-registry,k8s-cp1,k8s-cp2,k8s-cp3,k8s-gpu1,k8s-gpu2,k8s-ingress1,k8s-ingress2,oob-sw,ops-client,ops-dns,ops-gw,rail-sw1,rail-sw2,truenas1,uplink-rtr,web-client
+2026-11-01 08:42:51,919: vrnetlab       INFO -----------------END ENVIRONMENT VARIABLES------------------
+2026-11-01 08:42:51,919: vrnetlab       INFO Launching TrueNAS_vm arch x86_64 with 8 SMP/VCPU and 16384 M of RAM
+2026-11-01 08:42:51,919: vrnetlab       INFO Transparent mgmt interface: Disabled
+2026-11-01 08:42:51,920: vrnetlab       DEBUG number of provisioned data plane interfaces is 6
+2026-11-01 08:42:51,920: vrnetlab       DEBUG waiting for provisioned interfaces to appear...
+2026-11-01 08:42:56,921: vrnetlab       DEBUG highest allocated interface id determined to be: 6...
+2026-11-01 08:42:56,922: vrnetlab       DEBUG interfaces provisioned, continuing...
+2026-11-01 08:42:57,004: vrnetlab       DEBUG Found MAC address aa:c1:ab:3b:b1:25 for interface eth1
+2026-11-01 08:42:57,004: vrnetlab       INFO Using container interface MAC aa:c1:ab:3b:b1:25 for VM NIC eth1
+2026-11-01 08:42:57,124: vrnetlab       DEBUG Found MAC address aa:c1:ab:e8:97:91 for interface eth2
+2026-11-01 08:42:57,124: vrnetlab       INFO Using container interface MAC aa:c1:ab:e8:97:91 for VM NIC eth2
+2026-11-01 08:42:57,131: vrnetlab       DEBUG Found MAC address aa:c1:ab:67:70:b1 for interface eth3
+2026-11-01 08:42:57,132: vrnetlab       INFO Using container interface MAC aa:c1:ab:67:70:b1 for VM NIC eth3
+2026-11-01 08:42:57,145: vrnetlab       DEBUG Found MAC address aa:c1:ab:00:a8:4c for interface eth4
+2026-11-01 08:42:57,145: vrnetlab       INFO Using container interface MAC aa:c1:ab:00:a8:4c for VM NIC eth4
+2026-11-01 08:42:57,198: vrnetlab       DEBUG Found MAC address aa:c1:ab:87:84:42 for interface eth5
+2026-11-01 08:42:57,198: vrnetlab       INFO Using container interface MAC aa:c1:ab:87:84:42 for VM NIC eth5
+2026-11-01 08:42:57,253: vrnetlab       DEBUG Found MAC address aa:c1:ab:f1:d9:d0 for interface eth6
+2026-11-01 08:42:57,254: vrnetlab       INFO Using container interface MAC aa:c1:ab:f1:d9:d0 for VM NIC eth6
+2026-11-01 08:42:57,254: vrnetlab       DEBUG qemu cmd: qemu-system-x86_64 -enable-kvm -display none -machine pc -chardev socket,id=monitor0,host=::,port=4000,server=on,wait=off -monitor chardev:monitor0 -chardev socket,id=serial0,host=::,port=5000,server=on,wait=off,telnet=on -serial chardev:serial0 -m 16384 -cpu host -smp 8 -drive if=none,file=/persist/truenas-overlay.qcow2,id=boot,format=qcow2 -device virtio-blk-pci,drive=boot,serial=VRNBOOT01,bootindex=1 -global isa-fdc.fdtypeA=none -drive if=none,id=data1,file=/persist/data1.qcow2,format=qcow2 -device virtio-blk-pci,drive=data1,serial=VRNDATA01 -drive if=none,id=data2,file=/persist/data2.qcow2,format=qcow2 -device virtio-blk-pci,drive=data2,serial=VRNDATA02 -drive if=none,id=data3,file=/persist/data3.qcow2,format=qcow2 -device virtio-blk-pci,drive=data3,serial=VRNDATA03 -drive if=none,id=data4,file=/persist/data4.qcow2,format=qcow2 -device virtio-blk-pci,drive=data4,serial=VRNDATA04 -uuid a6d80849-d68b-4ffe-955d-98d792bc4228 -device pci-bridge,chassis_nr=1,id=pci.1 -device virtio-net-pci,speed=10000,duplex=full,netdev=p00,mac=0C:00:d5:7c:83:00,bus=pci.1,addr=0x1 -netdev user,id=p00,net=10.0.0.0/24,host=10.0.0.2,dns=10.0.0.3,dhcpstart=10.0.0.15,hostfwd=tcp:0.0.0.0:22-10.0.0.15:22,hostfwd=udp:0.0.0.0:161-10.0.0.15:161,hostfwd=tcp:0.0.0.0:80-10.0.0.15:80,hostfwd=tcp:0.0.0.0:443-10.0.0.15:443,hostfwd=tcp:0.0.0.0:830-10.0.0.15:830,hostfwd=tcp:0.0.0.0:6030-10.0.0.15:6030,hostfwd=tcp:0.0.0.0:8080-10.0.0.15:8080,hostfwd=tcp:0.0.0.0:9339-10.0.0.15:9339,hostfwd=tcp:0.0.0.0:32767-10.0.0.15:32767,hostfwd=tcp:0.0.0.0:50051-10.0.0.15:50051,hostfwd=tcp:0.0.0.0:57400-10.0.0.15:57400,tftp=/tftpboot -device virtio-net-pci,speed=10000,duplex=full,netdev=p01,mac=aa:c1:ab:3b:b1:25,bus=pci.1,addr=0x2 -netdev tap,id=p01,ifname=tap1,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p02,mac=aa:c1:ab:e8:97:91,bus=pci.1,addr=0x3 -netdev tap,id=p02,ifname=tap2,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p03,mac=aa:c1:ab:67:70:b1,bus=pci.1,addr=0x4 -netdev tap,id=p03,ifname=tap3,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p04,mac=aa:c1:ab:00:a8:4c,bus=pci.1,addr=0x5 -netdev tap,id=p04,ifname=tap4,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p05,mac=aa:c1:ab:87:84:42,bus=pci.1,addr=0x6 -netdev tap,id=p05,ifname=tap5,script=/etc/tc-tap-ifup,downscript=no -device virtio-net-pci,speed=10000,duplex=full,netdev=p06,mac=aa:c1:ab:f1:d9:d0,bus=pci.1,addr=0x7 -netdev tap,id=p06,ifname=tap6,script=/etc/tc-tap-ifup,downscript=no
+2026-11-01 08:42:59,257: base_driver     INFO closing connection to '127.0.0.1' on port '4000'
+2026-11-01 08:42:59,257: base_driver     INFO connection to '127.0.0.1' on port '4000' closed successfully
+2026-11-01 08:42:59,257: base_driver     INFO opening connection to '127.0.0.1' on port '4000'
+2026-11-01 08:42:59,260: base_driver     INFO connection to '127.0.0.1' on port '4000' opened successfully
+2026-11-01 08:42:59,260: base_driver     INFO closing connection to '127.0.0.1' on port '5000'
+2026-11-01 08:42:59,260: base_driver     INFO connection to '127.0.0.1' on port '5000' closed successfully
+2026-11-01 08:42:59,260: base_driver     INFO opening connection to '127.0.0.1' on port '5000'
+2026-11-01 08:42:59,260: base_driver     INFO connection to '127.0.0.1' on port '5000' opened successfully
+2026-11-01 08:43:02,263: base_driver     INFO closing connection to '127.0.0.1' on port '5000'
+2026-11-01 08:43:02,263: base_driver     INFO connection to '127.0.0.1' on port '5000' closed successfully
+2026-11-01 08:43:12,274: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:43:24,283: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:43:36,295: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:43:48,308: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:00,320: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:12,330: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:24,342: launch     TRACE    API not reachable yet: timed out
+2026-11-01 08:44:26,345: launch     TRACE    API not reachable yet: [Errno 104] Connection reset by peer
+2026-11-01 08:44:39,205: launch         DEBUG API login: AUTH_ERR
+2026-11-01 08:44:40,104: launch         INFO TrueNAS middleware ready
+2026-11-01 08:44:40,105: launch         INFO setting hostname truenas1
+2026-11-01 08:44:41,827: launch         INFO setting the truenas_admin password
+2026-11-01 08:44:42,923: launch         INFO enabling SSH (password login)
+2026-11-01 08:44:45,524: launch         INFO capping the ZFS ARC at 6144 MiB
+2026-11-01 08:45:49,923: launch         INFO creating pool tank (RAIDZ1) on vdb, vdc, vdd, vde
+2026-11-01 08:45:59,964: launch     TRACE    Startup config file /config/startup-config.cfg not found
+2026-11-01 08:45:59,970: launch         INFO Startup complete in: 0:03:08.050847
+2026-11-01 11:17:23,039: launch         INFO container stopping: ACPI power-off of the guest (up to 90 s)
+2026-11-01 11:17:26,040: launch         INFO guest powered off
+11:19:07 INFO Removed container name=sfab-ch02-inet-registry
+11:19:07 INFO Removed container name=sfab-ch02-truenas1
+11:19:07 ERRO container "sfab-ch02-k8s-gpu2" exited; container output:
+[vm-init] guest k8s-gpu2 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:07 ERRO container "sfab-ch02-k8s-gpu1" exited; container output:
+[vm-init] guest k8s-gpu1 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:07 ERRO container "sfab-ch02-k8s-gpu1" exited; container output:
+[vm-init] guest k8s-gpu1 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:07 INFO Removed container name=sfab-ch02-inet-ntp
+11:19:07 ERRO container "sfab-ch02-k8s-gpu2" exited; container output:
+[vm-init] guest k8s-gpu2 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:08 ERRO container "sfab-ch02-k8s-gpu2" exited; container output:
+[vm-init] guest k8s-gpu2 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:08 ERRO container "sfab-ch02-k8s-gpu2" exited; container output:
+[vm-init] guest k8s-gpu2 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:08 INFO Removed container name=sfab-ch02-k8s-gpu1
+11:19:08 INFO Removed container name=sfab-ch02-bastion
+11:19:08 ERRO container "sfab-ch02-k8s-gpu2" exited; container output:
+[vm-init] guest k8s-gpu2 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:08 ERRO container "sfab-ch02-k8s-gpu2" exited; container output:
+[vm-init] guest k8s-gpu2 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:08 INFO Removed container name=sfab-ch02-ent-client
+11:19:08 ERRO container "sfab-ch02-k8s-gpu2" exited; container output:
+[vm-init] guest k8s-gpu2 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:08 ERRO container "sfab-ch02-k8s-gpu2" exited; container output:
+[vm-init] guest k8s-gpu2 (sfab-ch02): 12 vCPU, 43008 MiB, 80G, NICs eth0 eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11
+[vm-init] held by /shared/hold-guests for 0s
+[vm-init] held by /shared/hold-guests for 120s
+[vm-init] held by /shared/hold-guests for 240s
+[vm-init] held by /shared/hold-guests for 360s
+[vm-init] held by /shared/hold-guests for 480s
+[vm-init] held by /shared/hold-guests for 600s
+[vm-init] held by /shared/hold-guests for 720s
+[vm-init] held by /shared/hold-guests for 840s
+[vm-init] held by /shared/hold-guests for 960s
+[vm-init] waiting for links (at most 240s)
+[vm-init] wired eth0 (bridge) and the data NICs: eth1:bridge eth2:bridge eth3:bridge eth4:bridge eth5:bridge eth6:bridge eth7:bridge eth8:bridge eth9:bridge eth10:bridge eth11:bridge (tx off 1)
+[vm-init] root disk created: 80G overlay of node.qcow2 (b08dca8fb063e789d46fb78b086559f34fd3c30cf23cff20ded896ad08e7d705)
+[vm-init] seed: 30 node files, 3 key(s)
+[vm-init] booting the guest (console in /vm/console.log)
+[vm-init] guest exited (0)
+11:19:08 INFO Removed container name=sfab-ch02-ops-dns
+11:19:08 INFO Removed container name=sfab-ch02-k8s-gpu2
+11:19:08 INFO Removed container name=sfab-ch02-ops-client
+11:19:08 INFO Removed container name=sfab-ch02-ent-dns
+11:19:08 INFO Removed container name=sfab-ch02-uplink-rtr
+11:19:09 INFO Removed container name=sfab-ch02-dns-auth1
+11:19:09 INFO Removed container name=sfab-ch02-ops-gw
+11:19:09 INFO Removed container name=sfab-ch02-dns-res1
+11:19:09 INFO Removed container name=sfab-ch02-dns-res2
+11:19:09 INFO Removed container name=sfab-ch02-dns-auth2
+11:19:09 INFO Removed container name=sfab-ch02-oob-sw
+11:19:09 INFO Removed container name=sfab-ch02-fw
+11:19:09 INFO Removed container name=sfab-ch02-rail-sw2
+11:19:10 INFO Removed container name=sfab-ch02-rail-sw1
+11:19:10 INFO Removed container name=sfab-ch02-fe-sw1
+11:19:10 INFO Removed container name=sfab-ch02-fe-sw2
+11:19:10 INFO Removing host entries path=/etc/hosts
+11:19:10 INFO Removing SSH config path=/etc/ssh/ssh_config.d/clab-sfab-ch02.conf
+down: removed clab-sfab-ch02/
+down: stopped sfab-ch02-memwatch
+== teardown sfab-ch02 (default)
+  PASS  no sfab-ch02-* container remains
+  PASS  no clab-sfab-ch02/ remains
+  PASS  the memory watchdog unit sfab-ch02-memwatch is not running
+  PASS  state/ disks kept until wipe (32G)
+== RESULT: 4 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+== stage down done in 211s
+
+Script done on 2026-11-01 11:19:12+00:00 [COMMAND_EXIT_CODE="0"]

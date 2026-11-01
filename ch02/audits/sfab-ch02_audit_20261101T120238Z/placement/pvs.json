@@ -1,0 +1,137 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "kind": "PersistentVolume",
+            "metadata": {
+                "annotations": {
+                    "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"PersistentVolume\",\"metadata\":{\"annotations\":{},\"labels\":{\"app.kubernetes.io/name\":\"serving\",\"tarnwick.example/namespace\":\"serving\",\"tarnwick.example/node\":\"k8s-gpu1\"},\"name\":\"serving-models-k8s-gpu1\"},\"spec\":{\"accessModes\":[\"ReadOnlyMany\"],\"capacity\":{\"storage\":\"29Gi\"},\"claimRef\":{\"name\":\"models-k8s-gpu1\",\"namespace\":\"serving\"},\"local\":{\"path\":\"/srv/models\"},\"nodeAffinity\":{\"required\":{\"nodeSelectorTerms\":[{\"matchExpressions\":[{\"key\":\"kubernetes.io/hostname\",\"operator\":\"In\",\"values\":[\"k8s-gpu1\"]}]}]}},\"persistentVolumeReclaimPolicy\":\"Retain\",\"storageClassName\":\"serving-models\",\"volumeMode\":\"Filesystem\"}}\n"
+                },
+                "creationTimestamp": "2026-11-01T11:48:30Z",
+                "finalizers": [
+                    "kubernetes.io/pv-protection"
+                ],
+                "labels": {
+                    "app.kubernetes.io/name": "serving",
+                    "tarnwick.example/namespace": "serving",
+                    "tarnwick.example/node": "k8s-gpu1"
+                },
+                "name": "serving-models-k8s-gpu1",
+                "resourceVersion": "4817",
+                "uid": "4583e958-64d5-4eaf-af3d-3a631bcdf67e"
+            },
+            "spec": {
+                "accessModes": [
+                    "ReadOnlyMany"
+                ],
+                "capacity": {
+                    "storage": "29Gi"
+                },
+                "claimRef": {
+                    "apiVersion": "v1",
+                    "kind": "PersistentVolumeClaim",
+                    "name": "models-k8s-gpu1",
+                    "namespace": "serving",
+                    "resourceVersion": "4814",
+                    "uid": "ffd1cbd0-b7f2-44e2-b94b-de76e95d6371"
+                },
+                "local": {
+                    "path": "/srv/models"
+                },
+                "nodeAffinity": {
+                    "required": {
+                        "nodeSelectorTerms": [
+                            {
+                                "matchExpressions": [
+                                    {
+                                        "key": "kubernetes.io/hostname",
+                                        "operator": "In",
+                                        "values": [
+                                            "k8s-gpu1"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "persistentVolumeReclaimPolicy": "Retain",
+                "storageClassName": "serving-models",
+                "volumeMode": "Filesystem"
+            },
+            "status": {
+                "lastPhaseTransitionTime": "2026-11-01T11:48:30Z",
+                "phase": "Bound"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "PersistentVolume",
+            "metadata": {
+                "annotations": {
+                    "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"PersistentVolume\",\"metadata\":{\"annotations\":{},\"labels\":{\"app.kubernetes.io/name\":\"serving\",\"tarnwick.example/namespace\":\"serving\",\"tarnwick.example/node\":\"k8s-gpu2\"},\"name\":\"serving-models-k8s-gpu2\"},\"spec\":{\"accessModes\":[\"ReadOnlyMany\"],\"capacity\":{\"storage\":\"29Gi\"},\"claimRef\":{\"name\":\"models-k8s-gpu2\",\"namespace\":\"serving\"},\"local\":{\"path\":\"/srv/models\"},\"nodeAffinity\":{\"required\":{\"nodeSelectorTerms\":[{\"matchExpressions\":[{\"key\":\"kubernetes.io/hostname\",\"operator\":\"In\",\"values\":[\"k8s-gpu2\"]}]}]}},\"persistentVolumeReclaimPolicy\":\"Retain\",\"storageClassName\":\"serving-models\",\"volumeMode\":\"Filesystem\"}}\n"
+                },
+                "creationTimestamp": "2026-11-01T11:48:30Z",
+                "finalizers": [
+                    "kubernetes.io/pv-protection"
+                ],
+                "labels": {
+                    "app.kubernetes.io/name": "serving",
+                    "tarnwick.example/namespace": "serving",
+                    "tarnwick.example/node": "k8s-gpu2"
+                },
+                "name": "serving-models-k8s-gpu2",
+                "resourceVersion": "4823",
+                "uid": "5e3625fe-20bf-453d-8783-520904ecdd75"
+            },
+            "spec": {
+                "accessModes": [
+                    "ReadOnlyMany"
+                ],
+                "capacity": {
+                    "storage": "29Gi"
+                },
+                "claimRef": {
+                    "apiVersion": "v1",
+                    "kind": "PersistentVolumeClaim",
+                    "name": "models-k8s-gpu2",
+                    "namespace": "serving",
+                    "resourceVersion": "4821",
+                    "uid": "9dfa8726-fd72-4943-b53a-a7434698f09a"
+                },
+                "local": {
+                    "path": "/srv/models"
+                },
+                "nodeAffinity": {
+                    "required": {
+                        "nodeSelectorTerms": [
+                            {
+                                "matchExpressions": [
+                                    {
+                                        "key": "kubernetes.io/hostname",
+                                        "operator": "In",
+                                        "values": [
+                                            "k8s-gpu2"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "persistentVolumeReclaimPolicy": "Retain",
+                "storageClassName": "serving-models",
+                "volumeMode": "Filesystem"
+            },
+            "status": {
+                "lastPhaseTransitionTime": "2026-11-01T11:48:30Z",
+                "phase": "Bound"
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
