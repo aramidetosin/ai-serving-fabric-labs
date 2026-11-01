@@ -1,0 +1,74 @@
+### 2026-10-31T16:18:52Z ent-dns container
++ sh -c rm -rf /tmp/sfab-break-dns && mkdir -p /tmp/sfab-break-dns && cp -R /sfab/bootstrap/. /tmp/sfab-break-dns/
+
+
+### 2026-10-31T16:18:52Z ent-dns container
++ cat >/tmp/sfab-break-dns/dnsmasq.conf (record/break-ent-dns-dnsmasq.conf.txt)
+
+### 2026-10-31T16:18:54Z ent-dns container
++ sfab-dns reload /tmp/sfab-break-dns
+[sfab-dns] checked: dnsmasq.conf
+[sfab-dns] reloaded from /etc/sfab/dns
+
+### 2026-10-31T16:18:59Z ent-client container
++ cat /etc/resolv.conf
+search tarnwick.example
+nameserver 10.24.10.53
+options timeout:10 attempts:4
+
+### 2026-10-31T16:18:59Z ent-client container
++ sh -c s=$(date +%s.%N); dig +tries=1 +time=5 llm.ai.tarnwick.example A; echo "exit $? start $s end $(date +%s.%N)"
+
+; <<>> DiG 9.18.49 <<>> +tries=1 +time=5 llm.ai.tarnwick.example A
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 2831
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+;; QUESTION SECTION:
+;llm.ai.tarnwick.example.	IN	A
+
+;; ANSWER SECTION:
+llm.ai.tarnwick.example. 0	IN	A	10.20.11.210
+
+;; Query time: 0 msec
+;; SERVER: 10.24.10.53#53(10.24.10.53) (UDP)
+;; WHEN: Sat Oct 31 16:18:59 UTC 2026
+;; MSG SIZE  rcvd: 68
+
+exit 0 start 1793463539. end 1793463539.
+
+### 2026-10-31T16:18:59Z ent-client container
++ sh -c s=$(date +%s.%N); dig +tries=1 +time=5 llm.ai.tarnwick.example AAAA; echo "exit $? start $s end $(date +%s.%N)"
+
+; <<>> DiG 9.18.49 <<>> +tries=1 +time=5 llm.ai.tarnwick.example AAAA
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: REFUSED, id: 39763
+;; flags: qr rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; EDE: 14 (Not Ready)
+;; QUESTION SECTION:
+;llm.ai.tarnwick.example.	IN	AAAA
+
+;; Query time: 0 msec
+;; SERVER: 10.24.10.53#53(10.24.10.53) (UDP)
+;; WHEN: Sat Oct 31 16:18:59 UTC 2026
+;; MSG SIZE  rcvd: 58
+
+exit 0 start 1793463539. end 1793463539.
+
+### 2026-10-31T16:19:09Z ent-client container
++ sh -c s=$(date +%s.%N); timeout 90 python3 /tmp/sfab-gai.py llm.ai.tarnwick.example; echo "exit $? start $s end $(date +%s.%N)"
+gaierror -3 [Errno -3] Try again
+exit 2 start 1793463539. end 1793463549.
+
+### 2026-10-31T16:19:09Z ent-client container
++ sh -c s=$(date +%s.%N); timeout 90 curl -sS -o /dev/null -w 'http %{http_code} remote %{remote_ip}\n' --max-time 90 'https://llm.ai.tarnwick.example/echo?msg=sfab-break-9a'; echo "exit $? start $s end $(date +%s.%N)"
+http 200 remote 10.20.11.210
+exit 0 start 1793463549. end 1793463549.
+

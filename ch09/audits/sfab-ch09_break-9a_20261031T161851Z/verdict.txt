@@ -1,0 +1,10 @@
+== break-9a: the corporate resolver pins llm and id with address= and stops forwarding the platform's zone
+  PASS  ent-dns: the platform's zone no longer forwarded; llm.ai.tarnwick.example id.ai.tarnwick.example pinned to 10.20.11.210 with address=; dnsmasq restarted on the copy ([sfab-dns] reloaded from /etc/sfab/dns)
+== break-9a: recorded
+  PASS  staff, break: ent-client looked up llm.ai.tarnwick.example with dig-a dig-aaaa getaddrinfo curl (dig-a NOERROR with 1 answer(s); dig-aaaa REFUSED with 0 answer(s); getaddrinfo failed in 10.0 s; curl resolved in 0.0 s)
+== break-9a: broken as designed
+  PASS  staff: A: NOERROR with 1 answer(s)
+  PASS  staff: AAAA: REFUSED with 0 answer(s), not NOERROR with 0 answer(s)
+  PASS  staff: getaddrinfo failed in 10.0 s, exit 2 (gaierror -3 [Errno -3] Try again)
+  PASS  staff: curl resolved in 0.0 s, exit 0
+== RESULT: 6 passed, 0 failed, 0 known platform limitation(s), 0 skipped

@@ -1,0 +1,15 @@
+Script started on 2026-10-31 16:18:51+00:00 [COMMAND="make break-9a" TERM="tmux-256color" TTY="/dev/pts/6" COLUMNS="-1" LINES="-1"]
+PYTHONDONTWRITEBYTECODE=1 python3 /root/sfab/labs/ai-serving-fabric-labs/common/breakheal.py break 9a
+== break-9a: the corporate resolver pins llm and id with address= and stops forwarding the platform's zone
+  PASS  ent-dns: the platform's zone no longer forwarded; llm.ai.tarnwick.example id.ai.tarnwick.example pinned to 10.20.11.210 with address=; dnsmasq restarted on the copy ([sfab-dns] reloaded from /etc/sfab/dns)
+== break-9a: recorded
+  PASS  staff, break: ent-client looked up llm.ai.tarnwick.example with dig-a dig-aaaa getaddrinfo curl (dig-a NOERROR with 1 answer(s); dig-aaaa REFUSED with 0 answer(s); getaddrinfo failed in 10.0 s; curl resolved in 0.0 s)
+== break-9a: broken as designed
+  PASS  staff: A: NOERROR with 1 answer(s)
+  PASS  staff: AAAA: REFUSED with 0 answer(s), not NOERROR with 0 answer(s)
+  PASS  staff: getaddrinfo failed in 10.0 s, exit 2 (gaierror -3 [Errno -3] Try again)
+  PASS  staff: curl resolved in 0.0 s, exit 0
+== RESULT: 6 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+== result set: ch09/audits/sfab-ch09_break-9a_20261031T161851Z
+
+Script done on 2026-10-31 16:19:10+00:00 [COMMAND_EXIT_CODE="0"]

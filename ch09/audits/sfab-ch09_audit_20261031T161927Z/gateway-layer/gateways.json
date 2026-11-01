@@ -1,0 +1,396 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "gateway.networking.k8s.io/v1",
+            "kind": "Gateway",
+            "metadata": {
+                "creationTimestamp": "2026-10-31T15:46:10Z",
+                "generation": 1,
+                "labels": {
+                    "decision.tarnwick.example/id": "dec-routeset-internet",
+                    "tarnwick.example/audience": "internet"
+                },
+                "name": "gw-inet",
+                "namespace": "gateways",
+                "resourceVersion": "4825",
+                "uid": "535d5502-d001-4621-ae6c-efbb2f51a65e"
+            },
+            "spec": {
+                "addresses": [
+                    {
+                        "type": "IPAddress",
+                        "value": "10.20.11.220"
+                    }
+                ],
+                "gatewayClassName": "cilium",
+                "infrastructure": {
+                    "labels": {
+                        "tarnwick.example/audience": "internet",
+                        "tarnwick.example/lb-pool": "gw-inet"
+                    }
+                },
+                "listeners": [
+                    {
+                        "allowedRoutes": {
+                            "kinds": [
+                                {
+                                    "group": "gateway.networking.k8s.io",
+                                    "kind": "HTTPRoute"
+                                }
+                            ],
+                            "namespaces": {
+                                "from": "Selector",
+                                "selector": {
+                                    "matchLabels": {
+                                        "routes.tarnwick.example/gw-inet": "true"
+                                    }
+                                }
+                            }
+                        },
+                        "hostname": "*.ai.tarnwick.example",
+                        "name": "https",
+                        "port": 443,
+                        "protocol": "HTTPS",
+                        "tls": {
+                            "certificateRefs": [
+                                {
+                                    "group": "",
+                                    "kind": "Secret",
+                                    "name": "gw-inet-tls"
+                                }
+                            ],
+                            "mode": "Terminate"
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "addresses": [
+                    {
+                        "type": "IPAddress",
+                        "value": "10.20.11.220"
+                    }
+                ],
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-31T15:46:35Z",
+                        "message": "Gateway successfully scheduled",
+                        "observedGeneration": 1,
+                        "reason": "Accepted",
+                        "status": "True",
+                        "type": "Accepted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-31T15:48:25Z",
+                        "message": "Gateway Programmed",
+                        "observedGeneration": 1,
+                        "reason": "Programmed",
+                        "status": "True",
+                        "type": "Programmed"
+                    }
+                ],
+                "listeners": [
+                    {
+                        "attachedRoutes": 2,
+                        "conditions": [
+                            {
+                                "lastTransitionTime": "2026-10-31T15:48:25Z",
+                                "message": "Resolved Refs",
+                                "observedGeneration": 1,
+                                "reason": "ResolvedRefs",
+                                "status": "True",
+                                "type": "ResolvedRefs"
+                            },
+                            {
+                                "lastTransitionTime": "2026-10-31T15:48:25Z",
+                                "message": "Listener Accepted",
+                                "observedGeneration": 1,
+                                "reason": "Accepted",
+                                "status": "True",
+                                "type": "Accepted"
+                            },
+                            {
+                                "lastTransitionTime": "2026-10-31T15:48:25Z",
+                                "message": "Listener Programmed",
+                                "observedGeneration": 1,
+                                "reason": "Programmed",
+                                "status": "True",
+                                "type": "Programmed"
+                            }
+                        ],
+                        "name": "https",
+                        "supportedKinds": [
+                            {
+                                "group": "gateway.networking.k8s.io",
+                                "kind": "HTTPRoute"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "gateway.networking.k8s.io/v1",
+            "kind": "Gateway",
+            "metadata": {
+                "creationTimestamp": "2026-10-31T15:46:10Z",
+                "generation": 1,
+                "labels": {
+                    "decision.tarnwick.example/id": "dec-routeset-internal",
+                    "tarnwick.example/audience": "internal"
+                },
+                "name": "gw-internal",
+                "namespace": "gateways",
+                "resourceVersion": "4819",
+                "uid": "0bef2e6b-c819-4673-99df-781f74bdb957"
+            },
+            "spec": {
+                "addresses": [
+                    {
+                        "type": "IPAddress",
+                        "value": "10.20.11.200"
+                    }
+                ],
+                "gatewayClassName": "cilium",
+                "infrastructure": {
+                    "labels": {
+                        "tarnwick.example/audience": "internal",
+                        "tarnwick.example/lb-pool": "gw-internal"
+                    }
+                },
+                "listeners": [
+                    {
+                        "allowedRoutes": {
+                            "kinds": [
+                                {
+                                    "group": "gateway.networking.k8s.io",
+                                    "kind": "HTTPRoute"
+                                }
+                            ],
+                            "namespaces": {
+                                "from": "Selector",
+                                "selector": {
+                                    "matchLabels": {
+                                        "routes.tarnwick.example/gw-internal": "true"
+                                    }
+                                }
+                            }
+                        },
+                        "hostname": "*.ai.tarnwick.example",
+                        "name": "https",
+                        "port": 443,
+                        "protocol": "HTTPS",
+                        "tls": {
+                            "certificateRefs": [
+                                {
+                                    "group": "",
+                                    "kind": "Secret",
+                                    "name": "gw-internal-tls"
+                                }
+                            ],
+                            "mode": "Terminate"
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "addresses": [
+                    {
+                        "type": "IPAddress",
+                        "value": "10.20.11.200"
+                    }
+                ],
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-31T15:46:35Z",
+                        "message": "Gateway successfully scheduled",
+                        "observedGeneration": 1,
+                        "reason": "Accepted",
+                        "status": "True",
+                        "type": "Accepted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-31T15:48:25Z",
+                        "message": "Gateway Programmed",
+                        "observedGeneration": 1,
+                        "reason": "Programmed",
+                        "status": "True",
+                        "type": "Programmed"
+                    }
+                ],
+                "listeners": [
+                    {
+                        "attachedRoutes": 4,
+                        "conditions": [
+                            {
+                                "lastTransitionTime": "2026-10-31T15:48:25Z",
+                                "message": "Resolved Refs",
+                                "observedGeneration": 1,
+                                "reason": "ResolvedRefs",
+                                "status": "True",
+                                "type": "ResolvedRefs"
+                            },
+                            {
+                                "lastTransitionTime": "2026-10-31T15:48:25Z",
+                                "message": "Listener Accepted",
+                                "observedGeneration": 1,
+                                "reason": "Accepted",
+                                "status": "True",
+                                "type": "Accepted"
+                            },
+                            {
+                                "lastTransitionTime": "2026-10-31T15:48:25Z",
+                                "message": "Listener Programmed",
+                                "observedGeneration": 1,
+                                "reason": "Programmed",
+                                "status": "True",
+                                "type": "Programmed"
+                            }
+                        ],
+                        "name": "https",
+                        "supportedKinds": [
+                            {
+                                "group": "gateway.networking.k8s.io",
+                                "kind": "HTTPRoute"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "gateway.networking.k8s.io/v1",
+            "kind": "Gateway",
+            "metadata": {
+                "creationTimestamp": "2026-10-31T15:46:10Z",
+                "generation": 1,
+                "labels": {
+                    "decision.tarnwick.example/id": "dec-routeset-enterprise",
+                    "tarnwick.example/audience": "enterprise"
+                },
+                "name": "gw-users",
+                "namespace": "gateways",
+                "resourceVersion": "4822",
+                "uid": "38c8386e-f169-4a16-8434-7460d96ffc75"
+            },
+            "spec": {
+                "addresses": [
+                    {
+                        "type": "IPAddress",
+                        "value": "10.20.11.210"
+                    }
+                ],
+                "gatewayClassName": "cilium",
+                "infrastructure": {
+                    "labels": {
+                        "tarnwick.example/audience": "enterprise",
+                        "tarnwick.example/lb-pool": "gw-users"
+                    }
+                },
+                "listeners": [
+                    {
+                        "allowedRoutes": {
+                            "kinds": [
+                                {
+                                    "group": "gateway.networking.k8s.io",
+                                    "kind": "HTTPRoute"
+                                }
+                            ],
+                            "namespaces": {
+                                "from": "Selector",
+                                "selector": {
+                                    "matchLabels": {
+                                        "routes.tarnwick.example/gw-users": "true"
+                                    }
+                                }
+                            }
+                        },
+                        "hostname": "*.ai.tarnwick.example",
+                        "name": "https",
+                        "port": 443,
+                        "protocol": "HTTPS",
+                        "tls": {
+                            "certificateRefs": [
+                                {
+                                    "group": "",
+                                    "kind": "Secret",
+                                    "name": "gw-users-tls"
+                                }
+                            ],
+                            "mode": "Terminate"
+                        }
+                    }
+                ]
+            },
+            "status": {
+                "addresses": [
+                    {
+                        "type": "IPAddress",
+                        "value": "10.20.11.210"
+                    }
+                ],
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-10-31T15:46:35Z",
+                        "message": "Gateway successfully scheduled",
+                        "observedGeneration": 1,
+                        "reason": "Accepted",
+                        "status": "True",
+                        "type": "Accepted"
+                    },
+                    {
+                        "lastTransitionTime": "2026-10-31T15:48:25Z",
+                        "message": "Gateway Programmed",
+                        "observedGeneration": 1,
+                        "reason": "Programmed",
+                        "status": "True",
+                        "type": "Programmed"
+                    }
+                ],
+                "listeners": [
+                    {
+                        "attachedRoutes": 3,
+                        "conditions": [
+                            {
+                                "lastTransitionTime": "2026-10-31T15:48:25Z",
+                                "message": "Resolved Refs",
+                                "observedGeneration": 1,
+                                "reason": "ResolvedRefs",
+                                "status": "True",
+                                "type": "ResolvedRefs"
+                            },
+                            {
+                                "lastTransitionTime": "2026-10-31T15:48:25Z",
+                                "message": "Listener Accepted",
+                                "observedGeneration": 1,
+                                "reason": "Accepted",
+                                "status": "True",
+                                "type": "Accepted"
+                            },
+                            {
+                                "lastTransitionTime": "2026-10-31T15:48:25Z",
+                                "message": "Listener Programmed",
+                                "observedGeneration": 1,
+                                "reason": "Programmed",
+                                "status": "True",
+                                "type": "Programmed"
+                            }
+                        ],
+                        "name": "https",
+                        "supportedKinds": [
+                            {
+                                "group": "gateway.networking.k8s.io",
+                                "kind": "HTTPRoute"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
