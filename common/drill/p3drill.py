@@ -18,10 +18,14 @@ analyze-lease (chapter 8) reads the drill's timeline, the leases read every 0.5 
 the firewall's ARP tables and the EndpointSlices, and prints:
 
   the move      each lease the cut node held taken by the other ingress node, and when (the first
-                read after the cut naming it, against the cut's own stamp, both on the lab host)
+                read after the cut naming it, against the moment both pair ports were shut and
+                against the cut's start, all on the lab host)
   the gap       for each echo probe and connect loop through a Gateway the cut node held: the
-                requests lost, and the gap from the last answered request before the cut to the
-                first after it; recovered before the ports came back, so the lease moved, not the
+                requests lost, and the gap from the last request answered before both ports were
+                shut (the timeline's SHUT) to the first sent after it that was answered, by the
+                requests' sent times, so a gap is a multiple of the probe's interval; the slowest
+                answer and connect sent while the node was cut, a stall the counts do not show;
+                recovered before the ports came back, so the lease moved, not the
                 restore; the prediction (2 to 4 s at the tuned timers, plus the firewall acting on
                 the new holder's gratuitous ARP) said beside the measured gap, which it never fails
   the ARP       the firewall's entry for each moved VIP naming the new holder's bond MAC while the
@@ -200,7 +204,7 @@ def tcp_records(text: str) -> list:
         x = line.split()
         if len(x) >= 5:
             try:
-                out.append({"t": float(x[0]), "ok": x[2] == "1"})
+                out.append({"t": float(x[0]), "ok": x[2] == "1", "ms": float(x[4])})
             except ValueError:
                 pass
     return out
@@ -224,6 +228,11 @@ def analyze_lease(v, dr: dict, d: Path, pas: str) -> dict:
         v.bad(f"{lab}: the cut", "the drill never cut a node (see timeline.txt)")
         return out
     tc = tl["CUT"][0]
+    # the node is cut once both of its pair ports are shut: the KLISH sessions run one switch after
+    # the other between CUT and SHUT, and the bond keeps a leg until the second. The probes' gaps and
+    # the leases' moves are timed from SHUT, the first moment the node is surely cut (from CUT where
+    # a timeline has no SHUT)
+    ts = (tl.get("SHUT") or (tc,))[0]
     tr = (tl.get("RESTORE") or (None,))[0]
     other = [n for n in dr["ingress"] if n != cut]
     reads = jsonl(d / "leases.jsonl")
@@ -239,18 +248,27 @@ def analyze_lease(v, dr: dict, d: Path, pas: str) -> dict:
         held_by_cut.append(g)
         moved = next((r for r in reads if r["t0"] >= tc and r.get("doc") and lease_holders(r["doc"]).get(name) in other), None)
         took = round(moved["t1"] - tc, 3) if moved else None
+        took_s = round(moved["t1"] - ts, 3) if moved else None
         new = lease_holders(moved["doc"]).get(name) if moved else None
-        out["gateways"][g] = {"holder": h0, "moved": bool(moved), "new": new, "took_s": took}
+        out["gateways"][g] = {"holder": h0, "moved": bool(moved), "new": new, "took_s": took, "after_shut_s": took_s}
         v.check(f"{lab}: {g}'s lease, held by {cut} at the cut, taken by {new or 'nobody'}"
-                + (f" within {took} s of the cut (the first lease read naming it)" if took is not None else ""),
+                + (f" within {took_s} s of both ports shut, {took} s of the cut's start (the first lease read naming it)"
+                   if took is not None else ""),
                 bool(moved) and (tr is None or moved["t0"] <= tr), "the lease never moved before the restore" if not moved else "moved after the restore")
     pr = dr.get("prediction") or {}
     lo, hi = (pr.get("min_ms") or 0) / 1000, (pr.get("max_ms") or 0) / 1000
     for i, e in enumerate(dr["echo"]):
         c = e["client"]
         recs = jsonl(d / "probes" / f"echo-{c}.jsonl")
-        gp = gap(recs, tc, lambda r: r.get("outcome") == "answered", "sent")
-        tcp = gap(tcp_records(read(d / "probes" / f"tcp-{c}.log")), tc, lambda r: r["ok"], "t")
+        gp = gap(recs, ts, lambda r: r.get("outcome") == "answered", "sent")
+        trecs = tcp_records(read(d / "probes" / f"tcp-{c}.log"))
+        tcp = gap(trecs, ts, lambda r: r["ok"], "t")
+        # the slowest answer and connect sent while the node was cut (from the cut's start to the
+        # restore): an answer that waited out a retransmission is a stall the counts do not show
+        win = [r for r in recs if r.get("outcome") == "answered" and r["sent"] >= tc and (tr is None or r["sent"] <= tr)]
+        gp["slowest_s"] = round(max(r["done"] - r["sent"] for r in win), 3) if win else None
+        twin = [r for r in trecs if r["ok"] and r["t"] >= tc and (tr is None or r["t"] <= tr)]
+        tcp["slowest_ms"] = max(r["ms"] for r in twin) if twin else None
         out["probes"][c], out["connects"][c] = gp, tcp
         mine = e["gateway"] in held_by_cut
         if not recs:
@@ -259,10 +277,13 @@ def analyze_lease(v, dr: dict, d: Path, pas: str) -> dict:
         if mine:
             rec_ok = gp["first_ok"] is not None and (tr is None or gp["first_ok"] < tr)
             v.check(f"{lab}: {c} through {e['gateway']}: {gp['lost']} of {gp['sent']} echo requests lost, the gap {gp['gap_s']} s from the "
-                    f"last answer before the cut to the first after it, answered again before the ports came back", rec_ok,
+                    f"last request answered before both ports were shut to the first sent after it that was answered (sent times, "
+                    f"every {dr['interval_s']} s), the slowest answer while cut {gp['slowest_s']} s; answered again before the ports came back",
+                    rec_ok,
                     "no answer after the cut" if gp["first_ok"] is None else "answered only after the restore")
-            v.check(f"{lab}: {c}'s connects to {e['address']}:443: {tcp['lost']} of {tcp['sent']} failed, the gap {tcp['gap_s']} s, connecting "
-                    "again before the ports came back", tcp["first_ok"] is not None and (tr is None or tcp["first_ok"] < tr),
+            v.check(f"{lab}: {c}'s connects to {e['address']}:443: {tcp['lost']} of {tcp['sent']} failed, the gap {tcp['gap_s']} s "
+                    f"(every {dr['connect_interval_s']} s), the slowest connect while cut {tcp['slowest_ms']} ms; connecting again before "
+                    "the ports came back", tcp["first_ok"] is not None and (tr is None or tcp["first_ok"] < tr),
                     "no connect after the cut" if tcp["first_ok"] is None else "only after the restore")
             if gp["gap_s"] is not None:
                 inside = lo <= gp["gap_s"] <= hi + float(dr["interval_s"])

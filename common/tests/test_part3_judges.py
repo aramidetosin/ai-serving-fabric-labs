@@ -191,6 +191,39 @@ class LeaseGapTest(unittest.TestCase):
         self.assertRegex(buf.getvalue(), r"  FAIL  pass 1 lease-holder-loss: gw-inet's lease, held by k8s-ingress2 at the cut, taken by nobody")
 
 
+    def test_gap_from_both_ports_shut(self):
+        # as chapter 8's first recordings showed: the pair ports are shut one switch after the other
+        # between CUT and SHUT, so a request sent between them is still answered, and the request lost
+        # comes after SHUT; timed from CUT the loss fell outside the gap and read 0 lost
+        d = Path(tempfile.mkdtemp(prefix="sfab-test-lease-"))
+        self.addCleanup(shutil.rmtree, d, True)
+        (d / "probes").mkdir()
+        (d / "timeline.txt").write_text("100.0 CUT k8s-ingress2\n102.6 SHUT k8s-ingress2\n137.0 RESTORE k8s-ingress2\n")
+        (d / "cut-node.txt").write_text("k8s-ingress2\n")
+        held = {"items": [{"metadata": {"name": "l-users"}, "spec": {"holderIdentity": "k8s-ingress2"}}]}
+        moved = {"items": [{"metadata": {"name": "l-users"}, "spec": {"holderIdentity": "k8s-ingress1"}}]}
+        (d / "leases.jsonl").write_text("\n".join(json.dumps({"t0": t, "t1": t + 0.1, "doc": held if t < 106 else moved})
+                                                  for t in (99, 101, 104, 106)) + "\n")
+        recs = [{"sent": 98.7, "done": 98.75, "outcome": "answered"}, {"sent": 100.7, "done": 100.75, "outcome": "answered"},
+                {"sent": 102.7, "done": 105.7, "outcome": "failed"}, {"sent": 104.7, "done": 105.77, "outcome": "answered"},
+                {"sent": 106.7, "done": 106.75, "outcome": "answered"}]
+        (d / "probes" / "echo-ent-client.jsonl").write_text("".join(json.dumps(r) + "\n" for r in recs))
+        tcp = [(100.1 + 0.5 * i, "1" if not 102.5 < 100.1 + 0.5 * i < 104.5 else "0", 1.0 if i != 10 else 2.5) for i in range(20)]
+        (d / "probes" / "tcp-ent-client.log").write_text("".join(f"{t:.6f} {i} {ok} 40000 {ms:.1f}\n" for i, (t, ok, ms) in enumerate(tcp)))
+        dr = {"id": "lease-holder-loss", "ingress": ["k8s-ingress1", "k8s-ingress2"], "leases": {"gw-users": "kube-system/l-users"},
+              "echo": [{"client": "ent-client", "gateway": "gw-users", "address": "10.20.11.210"}], "vips": {"gw-users": "10.20.11.210"},
+              "candidates": {}, "prediction": {"min_ms": 2000, "max_ms": 4000}, "interval_s": 2, "connect_interval_s": 0.5}
+        v, buf = vio()
+        an = p3drill.analyze_lease(v, dr, d, "1")
+        out = buf.getvalue()
+        self.assertIn("taken by k8s-ingress1 within 3.5 s of both ports shut, 6.1 s of the cut's start", out)
+        self.assertIn("ent-client through gw-users: 1 of 5 echo requests lost, the gap 4.0 s from the last request answered before both "
+                      "ports were shut", out)
+        self.assertIn("the slowest answer while cut 1.07 s", out)
+        self.assertEqual(an["probes"]["ent-client"]["lost"], 1)
+        self.assertEqual(an["connects"]["ent-client"]["lost"], 4)
+
+
 class IsolationCountsTest(unittest.TestCase):
     def test_a_forbidden_try_through_fails(self):
         self.assertTrue(p3drill.through({"kind": "connect", "outcome": "CONNECTED"}))
