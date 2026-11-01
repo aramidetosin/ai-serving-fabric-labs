@@ -1,0 +1,361 @@
+### 2026-11-01T14:46:56Z fe-sw1 shell
++ docker ps --format '{{.Names}}' | sort
+bgp
+database
+dhcp_relay
+eventd
+iccpd
+l2mcd
+lldp
+macsec
+mgmt-framework
+nat
+pmon
+radv
+sflow
+snmp
+stp
+swss
+syncd
+tam
+teamd
+telemetry
+timesync
+udld
+vrrp
+
+### 2026-11-01T14:46:57Z fe-sw1 shell
++ docker exec swss ps -eo comm= | sort -u
+acllogd
+aclsvcd
+arsmgrd
+bash
+buffermgrd
+coppmgrd
+evpnmhmgrd
+fdbsyncd
+intfmgrd
+iphelpermgrd
+loopbackmgrd
+nbrmgrd
+neighsyncd
+orchagent
+portmgrd
+portsyncd
+ps
+rsyslogd
+sh
+srv6mgrd
+supervisord
+switchmgrd
+tunnelmgrd
+vlanmgrd
+vrfmgrd
+vxlanmgrd
+
+### 2026-11-01T14:46:57Z fe-sw1 shell
++ docker exec teamd ps -eo comm= | sort -u
+portchannelstat
+ps
+rsyslogd
+sh
+supervisord
+teamd
+teammgrd
+teamsyncd
+tlm_teamd
+
+### 2026-11-01T14:47:01Z fe-sw1 klish
+terminal length 0
+show running-configuration interface PortChannel21
+show running-configuration interface Ethernet6
+exit
+terminal length 0
+show running-configuration interface PortChannel21
+show running-configuration interface Ethernet6
+exit
+fe-sw1# terminal length 0
+fe-sw1# show running-configuration interface PortChannel21
+!
+interface PortChannel21
+ description k8s-gpu1-bond
+ switchport access Vlan 100
+ switchport trunk allowed Vlan 120
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+ spanning-tree bpduguard port-shutdown
+ spanning-tree portfast
+fe-sw1# show running-configuration interface Ethernet6
+!
+interface Ethernet6
+ description k8s-gpu1-eth1
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ channel-group 21
+ no shutdown
+ storm-control broadcast 10000
+ storm-control unknown-unicast 10000
+ storm-control unknown-multicast 10000
+fe-sw1# exit
+
+### 2026-11-01T14:47:02Z fe-sw1 shell
++ sonic-db-cli CONFIG_DB keys '*PortChannel21*' | sort
+MCLAG_INTERFACE|1|PortChannel21
+PORTCHANNEL_MEMBER|PortChannel21|Ethernet6
+PORTCHANNEL|PortChannel21
+STP_PORT|PortChannel21
+VLAN_MEMBER|Vlan100|PortChannel21
+VLAN_MEMBER|Vlan120|PortChannel21
+
+### 2026-11-01T14:47:03Z fe-sw1 shell
++ sonic-db-cli CONFIG_DB hgetall 'PORTCHANNEL|PortChannel21'
+admin_status
+up
+description
+k8s-gpu1-bond
+mtu
+9216
+fast_rate
+true
+access_vlan
+100
+tagged_vlans@
+120
+
+### 2026-11-01T14:47:03Z fe-sw1 shell
++ sonic-db-cli CONFIG_DB hgetall 'VLAN_MEMBER|Vlan100|PortChannel21'
+tagging_mode
+untagged
+
+### 2026-11-01T14:47:04Z fe-sw1 shell
++ sonic-db-cli APPL_DB keys '*PortChannel21*' | sort
+DHCP_SNOOPING_STATISTICS:PortChannel21
+IF_REASON_EVENT:PortChannel21:all-links-down
+IF_REASON_EVENT:PortChannel21:lacp-fail
+IF_REASON_EVENT:PortChannel21:portchannel-up
+LAG_MEMBER_TABLE:PortChannel21:Ethernet6
+LAG_TABLE:PortChannel21
+STP_PORT_STATE_TABLE:PortChannel21:0
+STP_PORT_STATE_TABLE:PortChannel21:2
+_STP_PORT_TABLE:PortChannel21
+_STP_VLAN_PORT_TABLE:Vlan100:PortChannel21
+_STP_VLAN_PORT_TABLE:Vlan120:PortChannel21
+VLAN_MEMBER_TABLE:Vlan100:PortChannel21
+VLAN_MEMBER_TABLE:Vlan120:PortChannel21
+
+### 2026-11-01T14:47:05Z fe-sw1 shell
++ sonic-db-cli APPL_DB hgetall 'LAG_TABLE:PortChannel21'
+oper_status
+up
+mtu
+9216
+active
+true
+name
+lacp
+fallback_operational
+true
+speed
+25000
+admin_status
+up
+reason
+OPER_UP
+port_load_interval
+10
+description
+k8s-gpu1-bond
+isolate_peer
+true
+traffic_disable
+false
+
+
+last_change
+1793542949
+traffic_disable_evpnmh
+false
+
+### 2026-11-01T14:47:05Z fe-sw1 shell
++ sonic-db-cli APPL_DB hgetall 'LAG_MEMBER_TABLE:PortChannel21:Ethernet6'
+status
+enabled
+
+### 2026-11-01T14:47:06Z fe-sw1 shell
++ sonic-db-cli STATE_DB keys '*PortChannel21*' | sort
+L3_INTF_TABLE|PortChannel21
+LAG_MEMBER_TABLE|PortChannel21|Ethernet6
+LAG_TABLE|PortChannel21
+MCLAG_LACP_FLBK_ALW_TABLE|PortChannel21
+MCLAG_LOCAL_INTF_TABLE|PortChannel21
+MCLAG_REMOTE_INTF_TABLE|1|PortChannel21
+STP_COMMON_INFO_TABLE|Vlan100|PortChannel21|5
+STP_COMMON_INFO_TABLE|Vlan100|PortChannel21|6
+STP_COMMON_INFO_TABLE|Vlan100|PortChannel21|8
+STP_COMMON_INFO_TABLE|Vlan120|PortChannel21|5
+STP_COMMON_INFO_TABLE|Vlan120|PortChannel21|6
+STP_COMMON_INFO_TABLE|Vlan120|PortChannel21|8
+STP_ICCP_COMMON_INFO_TABLE|Vlan100|PortChannel21|5
+STP_ICCP_COMMON_INFO_TABLE|Vlan100|PortChannel21|6
+STP_ICCP_COMMON_INFO_TABLE|Vlan120|PortChannel21|5
+STP_ICCP_COMMON_INFO_TABLE|Vlan120|PortChannel21|6
+VLAN_MEMBER_TABLE|Vlan100|PortChannel21
+VLAN_MEMBER_TABLE|Vlan120|PortChannel21
+
+### 2026-11-01T14:47:07Z fe-sw1 shell
++ sonic-db-cli STATE_DB hgetall 'LAG_TABLE|PortChannel21'
+state
+ok
+admin_status
+up
+oper_status
+up
+mtu
+9216
+fallback_configured
+false
+number_of_member_ports_linkup
+1
+lacp_fallback_exit
+true
+runner.active_partner_sys_mac
+02:5a:6f:00:00:01
+setup.kernel_team_mode_name
+loadbalance
+setup.pid
+430
+runner.fast_rate
+true
+runner.active
+true
+runner.graceful_shutdown_mode
+false
+runner.active_partner_key
+15
+setup.runner_name
+lacp
+runner.sys_prio
+65535
+team_device.ifinfo.dev_addr
+02:5a:00:00:00:01
+team_device.ifinfo.ifindex
+167
+runner.active_actor_key
+21
+runner.fallback
+false
+runner.active_actor_sys_mac
+02:5a:00:00:00:01
+
+### 2026-11-01T14:47:08Z fe-sw1 shell
++ sonic-db-cli STATE_DB hgetall 'PORT_TABLE|Ethernet6'
+state
+ok
+netdev_oper_status
+up
+admin_status
+up
+mtu
+9216
+supported_speeds
+
+supported_fecs
+fc,none,rs
+supported_fecs_ext
+
+supported_features
+autoneg,linktrn
+autoneg_status
+off
+oper_speed
+25000
+
+### 2026-11-01T14:47:08Z fe-sw1 shell
++ sonic-db-cli COUNTERS_DB keys '*NAME_MAP*' | sort
+COUNTERS_LAG_NAME_MAP
+COUNTERS_PG_NAME_MAP
+COUNTERS_PORT_NAME_MAP
+COUNTERS_QUEUE_NAME_MAP
+COUNTERS_RIF_NAME_MAP
+
+### 2026-11-01T14:47:09Z fe-sw1 shell
++ sonic-db-cli COUNTERS_DB hget COUNTERS_PORT_NAME_MAP Ethernet6
+oid:0x1000000000008
+
+### 2026-11-01T14:47:10Z fe-sw1 shell
++ sonic-db-cli COUNTERS_DB hgetall 'COUNTERS:oid:0x1000000000008' | paste - - | grep -E '^(SAI_PORT_STAT_IF_IN_UCAST_PKTS|SAI_PORT_STAT_IF_OUT_UCAST_PKTS|SAI_PORT_STAT_IF_IN_ERRORS)\b'
+SAI_PORT_STAT_IF_IN_ERRORS	0
+SAI_PORT_STAT_IF_IN_UCAST_PKTS	97132
+SAI_PORT_STAT_IF_OUT_UCAST_PKTS	250239
+
+### 2026-11-01T14:47:10Z fe-sw1 shell
++ sonic-db-cli ASIC_DB hgetall 'ASIC_STATE:SAI_OBJECT_TYPE_PORT:oid:0x1000000000008'
+NULL
+NULL
+SAI_PORT_ATTR_ADMIN_STATE
+true
+SAI_PORT_ATTR_SPEED
+25000
+SAI_PORT_ATTR_MTU
+9238
+SAI_PORT_ATTR_BROADCAST_STORM_CONTROL_POLICER_ID
+oid:0x12000000000ad3
+SAI_PORT_ATTR_FLOOD_STORM_CONTROL_POLICER_ID
+oid:0x12000000000ad4
+SAI_PORT_ATTR_MULTICAST_STORM_CONTROL_POLICER_ID
+oid:0x12000000000ad5
+SAI_PORT_ATTR_PORT_VLAN_ID
+100
+
+### 2026-11-01T14:47:15Z fe-sw1 shell
++ for k in $(sonic-db-cli ASIC_DB keys 'ASIC_STATE:SAI_OBJECT_TYPE_LAG_MEMBER:*'); do [ "$(sonic-db-cli ASIC_DB hget "$k" SAI_LAG_MEMBER_ATTR_PORT_ID)" = 'oid:0x1000000000008' ] && echo "$k" && sonic-db-cli ASIC_DB hgetall "$k"; done
+ASIC_STATE:SAI_OBJECT_TYPE_LAG_MEMBER:oid:0x1b000000000b2e
+SAI_LAG_MEMBER_ATTR_LAG_ID
+oid:0x2000000000acd
+SAI_LAG_MEMBER_ATTR_PORT_ID
+oid:0x1000000000008
+
+### 2026-11-01T14:47:15Z fe-sw1 shell
++ sonic-db-cli ASIC_DB hgetall 'ASIC_STATE:SAI_OBJECT_TYPE_LAG:oid:0x2000000000acd'
+NULL
+NULL
+SAI_LAG_ATTR_PORT_VLAN_ID
+100
+
+### 2026-11-01T14:47:20Z fe-sw1 shell
++ for k in $(sonic-db-cli ASIC_DB keys 'ASIC_STATE:SAI_OBJECT_TYPE_LAG_MEMBER:*'); do sonic-db-cli ASIC_DB hget "$k" SAI_LAG_MEMBER_ATTR_LAG_ID; done | grep -c 'oid:0x2000000000acd'
+1
+
+### 2026-11-01T14:47:24Z fe-sw1 shell
++ for k in $(sonic-db-cli ASIC_DB keys 'ASIC_STATE:SAI_OBJECT_TYPE_BRIDGE_PORT:*'); do [ "$(sonic-db-cli ASIC_DB hget "$k" SAI_BRIDGE_PORT_ATTR_PORT_ID)" = 'oid:0x2000000000acd' ] && echo "$k" && sonic-db-cli ASIC_DB hgetall "$k"; done
+ASIC_STATE:SAI_OBJECT_TYPE_BRIDGE_PORT:oid:0x3a000000000ad0
+SAI_BRIDGE_PORT_ATTR_TYPE
+SAI_BRIDGE_PORT_TYPE_PORT
+SAI_BRIDGE_PORT_ATTR_PORT_ID
+oid:0x2000000000acd
+SAI_BRIDGE_PORT_ATTR_ADMIN_STATE
+true
+SAI_BRIDGE_PORT_ATTR_FDB_LEARNING_MODE
+SAI_BRIDGE_PORT_FDB_LEARNING_MODE_HW
+
+### 2026-11-01T14:47:26Z fe-sw1 shell
++ for k in $(sonic-db-cli ASIC_DB keys 'ASIC_STATE:SAI_OBJECT_TYPE_VLAN:*'); do [ "$(sonic-db-cli ASIC_DB hget "$k" SAI_VLAN_ATTR_VLAN_ID)" = '100' ] && echo "$k" && sonic-db-cli ASIC_DB hgetall "$k"; done
+ASIC_STATE:SAI_OBJECT_TYPE_VLAN:oid:0x26000000000a6e
+SAI_VLAN_ATTR_VLAN_ID
+100
+SAI_VLAN_ATTR_STP_INSTANCE
+oid:0x10000000000a70
+
+### 2026-11-01T14:47:34Z fe-sw1 shell
++ for k in $(sonic-db-cli ASIC_DB keys 'ASIC_STATE:SAI_OBJECT_TYPE_VLAN_MEMBER:*'); do [ "$(sonic-db-cli ASIC_DB hget "$k" SAI_VLAN_MEMBER_ATTR_BRIDGE_PORT_ID)" = 'oid:0x3a000000000ad0' ] && [ "$(sonic-db-cli ASIC_DB hget "$k" SAI_VLAN_MEMBER_ATTR_VLAN_ID)" = 'oid:0x26000000000a6e' ] && echo "$k" && sonic-db-cli ASIC_DB hgetall "$k"; done
+ASIC_STATE:SAI_OBJECT_TYPE_VLAN_MEMBER:oid:0x27000000000ad1
+SAI_VLAN_MEMBER_ATTR_VLAN_ID
+oid:0x26000000000a6e
+SAI_VLAN_MEMBER_ATTR_BRIDGE_PORT_ID
+oid:0x3a000000000ad0
+SAI_VLAN_MEMBER_ATTR_VLAN_TAGGING_MODE
+SAI_VLAN_TAGGING_MODE_UNTAGGED
+

@@ -1,0 +1,88 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "cilium.io/v2",
+            "kind": "CiliumNetworkPolicy",
+            "metadata": {
+                "creationTimestamp": "2026-11-01T14:29:19Z",
+                "generation": 1,
+                "name": "allow-gateways-to-backend",
+                "namespace": "echo",
+                "resourceVersion": "2727",
+                "uid": "9acfa559-08bd-48da-8e48-a9442d413d80"
+            },
+            "spec": {
+                "description": "the Gateways' Envoy to the test backend",
+                "endpointSelector": {
+                    "matchLabels": {
+                        "k8s:app.kubernetes.io/name": "echo"
+                    }
+                },
+                "ingress": [
+                    {
+                        "fromEntities": [
+                            "ingress"
+                        ],
+                        "toPorts": [
+                            {
+                                "ports": [
+                                    {
+                                        "port": "8080",
+                                        "protocol": "TCP"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T14:29:19Z",
+                        "message": "Policy validation succeeded",
+                        "status": "True",
+                        "type": "Valid"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "cilium.io/v2",
+            "kind": "CiliumNetworkPolicy",
+            "metadata": {
+                "creationTimestamp": "2026-11-01T14:29:19Z",
+                "generation": 1,
+                "name": "default-deny",
+                "namespace": "echo",
+                "resourceVersion": "2726",
+                "uid": "434fd522-b722-4049-8638-bf4d45ef8b16"
+            },
+            "spec": {
+                "description": "every pod in echo: no ingress and no egress but what an allow names",
+                "egress": [
+                    {}
+                ],
+                "endpointSelector": {},
+                "ingress": [
+                    {}
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2026-11-01T14:29:19Z",
+                        "message": "Policy validation succeeded",
+                        "status": "True",
+                        "type": "Valid"
+                    }
+                ]
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

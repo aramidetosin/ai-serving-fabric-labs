@@ -1,0 +1,31 @@
+== trace enterprise-users-vip: ent-client (10.24.10.10) to llm.ai.tarnwick.example on 10.20.11.210:443
+  PASS  ent-client resolves llm.ai.tarnwick.example through 10.24.10.53 to the users' VIP 10.20.11.210
+  PASS  the gw-users Service's L2 announcement lease holder is an ingress node (k8s-ingress2)
+  PASS  warm-up attempt from source port 41442 made first (HTTP 200; not judged)
+  PASS  the recorded SYN from ent-client's pinned source port 41443 found at 1-fw-ae1-leg2 (seq 1696879817)
+  PASS  7 capture points decoded (7 with a decode)
+== the SYN at each point
+  PASS  4-k8s-ingress2-bond0: the recorded SYN seen (seq 1696879817)
+  PASS  exactly one of the ae1 points carries the SYN (1-fw-ae1-leg1, 1-fw-ae1-leg2)
+  PASS  exactly one of the trunk points carries the SYN (2-fe-sw1-Ethernet2, 2-fe-sw2-Ethernet2)
+  PASS  exactly one of the server points carries the SYN (3-fe-sw1-Ethernet14, 3-fe-sw2-Ethernet14)
+  PASS  the SYN's trunk port is the pair port its ae1 leg lands on (1-fw-ae1-leg2 to fe-sw2:eth3)
+  PASS  the SYN leaves the pair on the switch that received it (fe-sw2)
+== tags, TTL and addresses
+  PASS  1-fw-ae1-leg2: tagged 802.1Q 110
+  PASS  2-fe-sw2-Ethernet2: tagged 802.1Q 110
+  PASS  3-fe-sw2-Ethernet14: tagged 802.1Q 110
+  PASS  4-k8s-ingress2-bond0: tagged 802.1Q 110
+  PASS  source 10.24.10.10 and destination 10.20.11.210:443 unchanged at every point (no translation)
+== one frame at every point
+  PASS  source MAC ba:db:ee:fb:ad:f0 the same at all 4 points that saw the SYN
+  PASS  destination MAC 02:5a:69:00:00:01 the same at all 4 points that saw the SYN
+  PASS  source address 10.24.10.10 the same at all 4 points that saw the SYN
+  PASS  destination address 10.20.11.210 the same at all 4 points that saw the SYN
+  PASS  IP id 54104 the same at all 4 points that saw the SYN
+  PASS  TTL 63 the same at all 4 points that saw the SYN
+  PASS  destination MAC is k8s-ingress2's bond0 MAC 02:5a:69:00:00:01 (the frame is addressed to the node, not to a router)
+== the reply and the firewall's witness
+  PASS  https://llm.ai.tarnwick.example/echo?msg=sfab-ch03-trace answers 200 with the echoed message sfab-ch03-trace
+  PASS  the firewall's traffic log has the session allowed by staff-to-users-gateway (shown as staff-to-users-gate), zone enterprise to zone ingress
+== RESULT: 25 passed, 0 failed, 0 known platform limitation(s), 0 skipped

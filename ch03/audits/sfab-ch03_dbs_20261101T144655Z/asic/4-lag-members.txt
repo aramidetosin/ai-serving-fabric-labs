@@ -1,0 +1,2 @@
+admin@fe-sw1:~$ for k in $(sonic-db-cli ASIC_DB keys 'ASIC_STATE:SAI_OBJECT_TYPE_LAG_MEMBER:*'); do sonic-db-cli ASIC_DB hget "$k" SAI_LAG_MEMBER_ATTR_LAG_ID; done | grep -c 'oid:0x2000000000acd'
+1

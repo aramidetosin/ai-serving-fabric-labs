@@ -1,0 +1,42 @@
+== fe-sw1: PortChannel21 (Ethernet6, access Vlan100, toward k8s-gpu1) through the databases
+== containers and processes
+  PASS  fe-sw1: container database running
+  PASS  fe-sw1: container swss running
+  PASS  fe-sw1: container syncd running
+  PASS  fe-sw1: container teamd running
+  PASS  fe-sw1: orchagent runs in swss
+  PASS  fe-sw1: portmgrd runs in swss
+  PASS  fe-sw1: vlanmgrd runs in swss
+  PASS  fe-sw1: portsyncd runs in swss
+  PASS  fe-sw1: teamd runs in teamd
+  PASS  fe-sw1: teammgrd runs in teamd
+  PASS  fe-sw1: teamsyncd runs in teamd
+== the KLISH configuration
+  PASS  fe-sw1: KLISH shows PortChannel21 in the MCLAG domain
+== CONFIG_DB
+  PASS  CONFIG_DB: PORTCHANNEL|PortChannel21
+  PASS  CONFIG_DB: PORTCHANNEL_MEMBER|PortChannel21|Ethernet6
+  PASS  CONFIG_DB: VLAN_MEMBER|Vlan100|PortChannel21
+  PASS  CONFIG_DB: PortChannel21 is an untagged member of Vlan100
+== APPL_DB
+  PASS  APPL_DB: LAG_TABLE:PortChannel21
+  PASS  APPL_DB: LAG_MEMBER_TABLE:PortChannel21:Ethernet6
+  PASS  APPL_DB: VLAN_MEMBER_TABLE:Vlan100:PortChannel21
+  PASS  APPL_DB: PortChannel21 oper_status up
+  PASS  APPL_DB: Ethernet6 enabled in PortChannel21
+== STATE_DB
+  PASS  STATE_DB: LAG_TABLE|PortChannel21
+  PASS  STATE_DB: LAG_MEMBER_TABLE|PortChannel21|Ethernet6
+  PASS  STATE_DB: Ethernet6 netdev_oper_status up
+== COUNTERS_DB and ASIC_DB: port, LAG member, LAG, bridge port, VLAN member, VLAN
+  PASS  COUNTERS_DB: Ethernet6 is oid:0x1000000000008
+  PASS  ASIC_DB: the port object oid:0x1000000000008 exists
+  PASS  ASIC_DB: LAG member oid:0x1b000000000b2e holds Ethernet6's port
+  PASS  ASIC_DB: its LAG oid:0x2000000000acd exists
+  PASS  ASIC_DB: oid:0x2000000000acd has one member on fe-sw1, as PortChannel21 has in CONFIG_DB
+  PASS  ASIC_DB: bridge port oid:0x3a000000000ad0 stands for the LAG
+  PASS  ASIC_DB: VLAN 100 is oid:0x26000000000a6e
+  PASS  ASIC_DB: VLAN member oid:0x27000000000ad1 holds the bridge port in VLAN 100
+  PASS  ASIC_DB: that member is in VLAN 100 (oid:0x26000000000a6e)
+  PASS  ASIC_DB: untagged, as CONFIG_DB says
+== RESULT: 34 passed, 0 failed, 0 known platform limitation(s), 0 skipped

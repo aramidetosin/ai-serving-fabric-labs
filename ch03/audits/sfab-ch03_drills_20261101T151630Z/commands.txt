@@ -1,0 +1,1858 @@
+### 2026-11-01T15:17:02Z fe-sw1 klish
+terminal length 0
+show mclag brief
+exit
+terminal length 0
+show mclag brief
+exit
+fe-sw1# terminal length 0
+fe-sw1# show mclag brief
+ 
+Domain ID            : 1
+Role                 : active
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.0
+Peer Address         : 10.20.255.1
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.4
+Peer Address         : 10.20.255.5
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw1# exit
+
+### 2026-11-01T15:17:05Z fe-sw2 klish
+terminal length 0
+show mclag brief
+exit
+terminal length 0
+show mclag brief
+exit
+fe-sw2# terminal length 0
+fe-sw2# show mclag brief
+ 
+Domain ID            : 1
+Role                 : standby
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.1
+Peer Address         : 10.20.255.0
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.5
+Peer Address         : 10.20.255.4
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw2# exit
+
+### 2026-11-01T15:17:06Z k8s-gpu1 capture
++ nsenter -t 3659249 -n timeout 1290 tcpdump -i eth1 -nn -s 128 -U -w captures/ping-k8s-gpu1-eth1.pcap '(icmp and host 10.20.1.21 and host 10.20.1.22) or (vlan and (icmp and host 10.20.1.21 and host 10.20.1.22))'
+
+### 2026-11-01T15:17:06Z k8s-gpu1 capture
++ nsenter -t 3659249 -n timeout 1290 tcpdump -i eth2 -nn -s 128 -U -w captures/ping-k8s-gpu1-eth2.pcap '(icmp and host 10.20.1.21 and host 10.20.1.22) or (vlan and (icmp and host 10.20.1.21 and host 10.20.1.22))'
+
+### 2026-11-01T15:17:06Z k8s-gpu2 capture
++ nsenter -t 3659379 -n timeout 1290 tcpdump -i eth1 -nn -s 128 -U -w captures/ping-k8s-gpu2-eth1.pcap '(icmp and host 10.20.1.21 and host 10.20.1.22) or (vlan and (icmp and host 10.20.1.21 and host 10.20.1.22))'
+
+### 2026-11-01T15:17:06Z k8s-gpu2 capture
++ nsenter -t 3659379 -n timeout 1290 tcpdump -i eth2 -nn -s 128 -U -w captures/ping-k8s-gpu2-eth2.pcap '(icmp and host 10.20.1.21 and host 10.20.1.22) or (vlan and (icmp and host 10.20.1.21 and host 10.20.1.22))'
+
+### 2026-11-01T15:17:07Z fw capture
++ nsenter -t 3659396 -n timeout 1290 tcpdump -i eth1 -nn -s 128 -U -w captures/tcp-fw-eth1.pcap '(tcp port 443 and host 10.24.10.10 and host 10.20.11.210) or (vlan and (tcp port 443 and host 10.24.10.10 and host 10.20.11.210))'
+
+### 2026-11-01T15:17:07Z fw capture
++ nsenter -t 3659396 -n timeout 1290 tcpdump -i eth2 -nn -s 128 -U -w captures/tcp-fw-eth2.pcap '(tcp port 443 and host 10.24.10.10 and host 10.20.11.210) or (vlan and (tcp port 443 and host 10.24.10.10 and host 10.20.11.210))'
+
+### 2026-11-01T15:17:14Z fe-sw1 klish
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+fe-sw1# terminal length 0
+fe-sw1# show mclag brief
+ 
+Domain ID            : 1
+Role                 : active
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.0
+Peer Address         : 10.20.255.1
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.4
+Peer Address         : 10.20.255.5
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw1# show PortChannel summary
+Flags(oper-status):  D - Down U - Up (portchannel) P - Up in portchannel (members) I - LACP individual
+----------------------------------------------------------------------------------------------------------------------------
+Group               PortChannel                   Type                Protocol          Member Ports
+----------------------------------------------------------------------------------------------------------------------------
+1                   PortChannel1   (U)            Eth                 LACP              Ethernet0(P)
+                                                                                        Ethernet1(P)
+10                  PortChannel10  (U)            Eth                 LACP              Ethernet2(P)
+11                  PortChannel11  (U)            Eth                 LACP              Ethernet3(P)
+12                  PortChannel12  (U)            Eth                 LACP              Ethernet4(P)
+13                  PortChannel13  (U)            Eth                 LACP              Ethernet5(P)
+14                  PortChannel14  (U)            Eth                 LACP             Ethernet13(P)
+15                  PortChannel15  (U)            Eth                 LACP             Ethernet14(P)
+21                  PortChannel21  (U)            Eth                 LACP              Ethernet6(P)
+22                  PortChannel22  (U)            Eth                 LACP              Ethernet7(P)
+30                  PortChannel30  (U)            Eth                 LACP              Ethernet8(P)
+31                  PortChannel31  (U)            Eth                 LACP              Ethernet9(P)
+                                                                                       Ethernet10(P)
+32                  PortChannel32  (U)            Eth                 LACP             Ethernet11(P)
+41                  PortChannel41  (U)            Eth                 LACP             Ethernet15(P)
+42                  PortChannel42  (U)            Eth                 LACP             Ethernet16(P)
+43                  PortChannel43  (U)            Eth                 LACP             Ethernet17(P)
+44                  PortChannel44  (U)            Eth                 LACP             Ethernet18(P)
+fe-sw1# exit
+
+### 2026-11-01T15:17:18Z fe-sw2 klish
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+fe-sw2# terminal length 0
+fe-sw2# show mclag brief
+ 
+Domain ID            : 1
+Role                 : standby
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.1
+Peer Address         : 10.20.255.0
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.5
+Peer Address         : 10.20.255.4
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw2# show PortChannel summary
+Flags(oper-status):  D - Down U - Up (portchannel) P - Up in portchannel (members) I - LACP individual
+----------------------------------------------------------------------------------------------------------------------------
+Group               PortChannel                   Type                Protocol          Member Ports
+----------------------------------------------------------------------------------------------------------------------------
+1                   PortChannel1   (U)            Eth                 LACP              Ethernet0(P)
+                                                                                        Ethernet1(P)
+10                  PortChannel10  (U)            Eth                 LACP              Ethernet2(P)
+11                  PortChannel11  (U)            Eth                 LACP              Ethernet3(P)
+12                  PortChannel12  (U)            Eth                 LACP              Ethernet4(P)
+13                  PortChannel13  (U)            Eth                 LACP              Ethernet5(P)
+14                  PortChannel14  (U)            Eth                 LACP             Ethernet13(P)
+15                  PortChannel15  (U)            Eth                 LACP             Ethernet14(P)
+21                  PortChannel21  (U)            Eth                 LACP              Ethernet6(P)
+22                  PortChannel22  (U)            Eth                 LACP              Ethernet7(P)
+30                  PortChannel30  (U)            Eth                 LACP              Ethernet8(P)
+31                  PortChannel31  (U)            Eth                 LACP              Ethernet9(P)
+                                                                                       Ethernet10(P)
+32                  PortChannel32  (U)            Eth                 LACP             Ethernet11(P)
+41                  PortChannel41  (U)            Eth                 LACP             Ethernet15(P)
+42                  PortChannel42  (U)            Eth                 LACP             Ethernet16(P)
+43                  PortChannel43  (U)            Eth                 LACP             Ethernet17(P)
+44                  PortChannel44  (U)            Eth                 LACP             Ethernet18(P)
+fe-sw2# exit
+
+### 2026-11-01T15:17:20Z k8s-gpu1 guest
++ mkdir -p /tmp/sfab-drill; for id in 3100 3101 3102 3103 3104 3105 3106 3107; do rm -f /tmp/sfab-drill/ping-$id.log; setsid ping -D -O -i 0.3 -W 1 -e $id -w 820 10.20.1.22 >/tmp/sfab-drill/ping-$id.log 2>&1 </dev/null & done; sleep 0.2; pgrep -fc '[p]ing -D -O -i'
+9
+
+### 2026-11-01T15:17:21Z ent-client container
++ python3 /tmp/sfab-probe-tcp.py 10.20.11.210 443 820 0.3 1 /tmp/sfab-drill-tcp.log &
+
+### 2026-11-01T15:17:41Z fe-sw1 klish
+terminal length 0
+configure terminal
+interface Ethernet12
+shutdown
+end
+exit
+fe-sw1# terminal length 0
+fe-sw1# configure terminal
+fe-sw1(config)# interface Ethernet12
+fe-sw1(config-if-Ethernet12)# shutdown
+fe-sw1(config-if-Ethernet12)# end
+fe-sw1# exit
+
+### 2026-11-01T15:18:16Z fe-sw1 klish
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+fe-sw1# terminal length 0
+fe-sw1# show mclag brief
+ 
+Domain ID            : 1
+Role                 : active
+Session Status       : down
+Peer Link Status     : up
+Source Address       : 10.20.255.0
+Peer Address         : 10.20.255.1
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : down
+Source Address       : 10.20.255.4
+Peer Address         : 10.20.255.5
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/unknown
+PortChannel11            up/unknown
+PortChannel12            up/unknown
+PortChannel13            up/unknown
+PortChannel14            up/unknown
+PortChannel15            up/unknown
+PortChannel21            up/unknown
+PortChannel22            up/unknown
+PortChannel30            up/unknown
+PortChannel31            up/unknown
+PortChannel32            up/unknown
+PortChannel41            up/unknown
+PortChannel42            up/unknown
+PortChannel43            up/unknown
+PortChannel44            up/unknown
+fe-sw1# show PortChannel summary
+Flags(oper-status):  D - Down U - Up (portchannel) P - Up in portchannel (members) I - LACP individual
+----------------------------------------------------------------------------------------------------------------------------
+Group               PortChannel                   Type                Protocol          Member Ports
+----------------------------------------------------------------------------------------------------------------------------
+1                   PortChannel1   (U)            Eth                 LACP              Ethernet0(P)
+                                                                                        Ethernet1(P)
+10                  PortChannel10  (U)            Eth                 LACP              Ethernet2(P)
+11                  PortChannel11  (U)            Eth                 LACP              Ethernet3(P)
+12                  PortChannel12  (U)            Eth                 LACP              Ethernet4(P)
+13                  PortChannel13  (U)            Eth                 LACP              Ethernet5(P)
+14                  PortChannel14  (U)            Eth                 LACP             Ethernet13(P)
+15                  PortChannel15  (U)            Eth                 LACP             Ethernet14(P)
+21                  PortChannel21  (U)            Eth                 LACP              Ethernet6(P)
+22                  PortChannel22  (U)            Eth                 LACP              Ethernet7(P)
+30                  PortChannel30  (U)            Eth                 LACP              Ethernet8(P)
+31                  PortChannel31  (U)            Eth                 LACP              Ethernet9(P)
+                                                                                       Ethernet10(P)
+32                  PortChannel32  (U)            Eth                 LACP             Ethernet11(P)
+41                  PortChannel41  (U)            Eth                 LACP             Ethernet15(P)
+42                  PortChannel42  (U)            Eth                 LACP             Ethernet16(P)
+43                  PortChannel43  (U)            Eth                 LACP             Ethernet17(P)
+44                  PortChannel44  (U)            Eth                 LACP             Ethernet18(P)
+fe-sw1# exit
+
+### 2026-11-01T15:18:25Z fe-sw2 klish
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+fe-sw2# terminal length 0
+fe-sw2# show mclag brief
+ 
+Domain ID            : 1
+Role                 : standby
+Session Status       : down
+Peer Link Status     : up
+Source Address       : 10.20.255.1
+Peer Address         : 10.20.255.0
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:d6:ce:21:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : down
+Source Address       : 10.20.255.5
+Peer Address         : 10.20.255.4
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/unknown
+PortChannel11            up/unknown
+PortChannel12            up/unknown
+PortChannel13            up/unknown
+PortChannel14            up/unknown
+PortChannel15            up/unknown
+PortChannel21            up/unknown
+PortChannel22            up/unknown
+PortChannel30            up/unknown
+PortChannel31            up/unknown
+PortChannel32            up/unknown
+PortChannel41            up/unknown
+PortChannel42            up/unknown
+PortChannel43            up/unknown
+PortChannel44            up/unknown
+fe-sw2# show PortChannel summary
+Flags(oper-status):  D - Down U - Up (portchannel) P - Up in portchannel (members) I - LACP individual
+----------------------------------------------------------------------------------------------------------------------------
+Group               PortChannel                   Type                Protocol          Member Ports
+----------------------------------------------------------------------------------------------------------------------------
+1                   PortChannel1   (U)            Eth                 LACP              Ethernet0(P)
+                                                                                        Ethernet1(P)
+10                  PortChannel10  (U)            Eth                 LACP              Ethernet2(P)
+11                  PortChannel11  (U)            Eth                 LACP              Ethernet3(P)
+12                  PortChannel12  (U)            Eth                 LACP              Ethernet4(P)
+13                  PortChannel13  (U)            Eth                 LACP              Ethernet5(P)
+14                  PortChannel14  (U)            Eth                 LACP             Ethernet13(P)
+15                  PortChannel15  (U)            Eth                 LACP             Ethernet14(P)
+21                  PortChannel21  (U)            Eth                 LACP              Ethernet6(P)
+22                  PortChannel22  (U)            Eth                 LACP              Ethernet7(P)
+30                  PortChannel30  (U)            Eth                 LACP              Ethernet8(P)
+31                  PortChannel31  (U)            Eth                 LACP              Ethernet9(P)
+                                                                                       Ethernet10(P)
+32                  PortChannel32  (U)            Eth                 LACP             Ethernet11(P)
+41                  PortChannel41  (U)            Eth                 LACP             Ethernet15(P)
+42                  PortChannel42  (U)            Eth                 LACP             Ethernet16(P)
+43                  PortChannel43  (U)            Eth                 LACP             Ethernet17(P)
+44                  PortChannel44  (U)            Eth                 LACP             Ethernet18(P)
+fe-sw2# exit
+
+### 2026-11-01T15:18:51Z fe-sw1 klish
+terminal length 0
+configure terminal
+interface Ethernet12
+no shutdown
+end
+exit
+fe-sw1# terminal length 0
+fe-sw1# configure terminal
+fe-sw1(config)# interface Ethernet12
+fe-sw1(config-if-Ethernet12)# no shutdown
+fe-sw1(config-if-Ethernet12)# end
+fe-sw1# exit
+
+### 2026-11-01T15:25:15Z fe-sw1 klish
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+fe-sw1# terminal length 0
+fe-sw1# show mclag brief
+ 
+Domain ID            : 1
+Role                 : active
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.0
+Peer Address         : 10.20.255.1
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.4
+Peer Address         : 10.20.255.5
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw1# show PortChannel summary
+Flags(oper-status):  D - Down U - Up (portchannel) P - Up in portchannel (members) I - LACP individual
+----------------------------------------------------------------------------------------------------------------------------
+Group               PortChannel                   Type                Protocol          Member Ports
+----------------------------------------------------------------------------------------------------------------------------
+1                   PortChannel1   (U)            Eth                 LACP              Ethernet0(P)
+                                                                                        Ethernet1(P)
+10                  PortChannel10  (U)            Eth                 LACP              Ethernet2(P)
+11                  PortChannel11  (U)            Eth                 LACP              Ethernet3(P)
+12                  PortChannel12  (U)            Eth                 LACP              Ethernet4(P)
+13                  PortChannel13  (U)            Eth                 LACP              Ethernet5(P)
+14                  PortChannel14  (U)            Eth                 LACP             Ethernet13(P)
+15                  PortChannel15  (U)            Eth                 LACP             Ethernet14(P)
+21                  PortChannel21  (U)            Eth                 LACP              Ethernet6(P)
+22                  PortChannel22  (U)            Eth                 LACP              Ethernet7(P)
+30                  PortChannel30  (U)            Eth                 LACP              Ethernet8(P)
+31                  PortChannel31  (U)            Eth                 LACP              Ethernet9(P)
+                                                                                       Ethernet10(P)
+32                  PortChannel32  (U)            Eth                 LACP             Ethernet11(P)
+41                  PortChannel41  (U)            Eth                 LACP             Ethernet15(P)
+42                  PortChannel42  (U)            Eth                 LACP             Ethernet16(P)
+43                  PortChannel43  (U)            Eth                 LACP             Ethernet17(P)
+44                  PortChannel44  (U)            Eth                 LACP             Ethernet18(P)
+
+### 2026-11-01T15:25:19Z fe-sw2 klish
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+fe-sw2# terminal length 0
+fe-sw2# show mclag brief
+ 
+Domain ID            : 1
+Role                 : standby
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.1
+Peer Address         : 10.20.255.0
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.5
+Peer Address         : 10.20.255.4
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw2# show PortChannel summary
+Flags(oper-status):  D - Down U - Up (portchannel) P - Up in portchannel (members) I - LACP individual
+----------------------------------------------------------------------------------------------------------------------------
+Group               PortChannel                   Type                Protocol          Member Ports
+----------------------------------------------------------------------------------------------------------------------------
+1                   PortChannel1   (U)            Eth                 LACP              Ethernet0(P)
+                                                                                        Ethernet1(P)
+10                  PortChannel10  (U)            Eth                 LACP              Ethernet2(P)
+11                  PortChannel11  (U)            Eth                 LACP              Ethernet3(P)
+12                  PortChannel12  (U)            Eth                 LACP              Ethernet4(P)
+13                  PortChannel13  (U)            Eth                 LACP              Ethernet5(P)
+14                  PortChannel14  (U)            Eth                 LACP             Ethernet13(P)
+15                  PortChannel15  (U)            Eth                 LACP             Ethernet14(P)
+21                  PortChannel21  (U)            Eth                 LACP              Ethernet6(P)
+22                  PortChannel22  (U)            Eth                 LACP              Ethernet7(P)
+30                  PortChannel30  (U)            Eth                 LACP              Ethernet8(P)
+31                  PortChannel31  (U)            Eth                 LACP              Ethernet9(P)
+                                                                                       Ethernet10(P)
+32                  PortChannel32  (U)            Eth                 LACP             Ethernet11(P)
+41                  PortChannel41  (U)            Eth                 LACP             Ethernet15(P)
+42                  PortChannel42  (U)            Eth                 LACP             Ethernet16(P)
+43                  PortChannel43  (U)            Eth                 LACP             Ethernet17(P)
+44                  PortChannel44  (U)            Eth                 LACP             Ethernet18(P)
+fe-sw2# exit
+
+### 2026-11-01T15:26:55Z fe-sw1 klish
+terminal length 0
+show mclag brief
+exit
+terminal length 0
+show mclag brief
+exit
+fe-sw1# terminal length 0
+fe-sw1# show mclag brief
+ 
+Domain ID            : 1
+Role                 : active
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.0
+Peer Address         : 10.20.255.1
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.4
+Peer Address         : 10.20.255.5
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw1# exit
+
+### 2026-11-01T15:26:58Z fe-sw2 klish
+terminal length 0
+show mclag brief
+exit
+terminal length 0
+show mclag brief
+exit
+fe-sw2# terminal length 0
+fe-sw2# show mclag brief
+ 
+Domain ID            : 1
+Role                 : standby
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.1
+Peer Address         : 10.20.255.0
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.5
+Peer Address         : 10.20.255.4
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw2# exit
+
+### 2026-11-01T15:26:59Z k8s-gpu1 capture
++ nsenter -t 3659249 -n timeout 1290 tcpdump -i eth1 -nn -s 128 -U -w captures/ping-k8s-gpu1-eth1.pcap '(icmp and host 10.20.1.21 and host 10.20.1.22) or (vlan and (icmp and host 10.20.1.21 and host 10.20.1.22))'
+
+### 2026-11-01T15:26:59Z k8s-gpu1 capture
++ nsenter -t 3659249 -n timeout 1290 tcpdump -i eth2 -nn -s 128 -U -w captures/ping-k8s-gpu1-eth2.pcap '(icmp and host 10.20.1.21 and host 10.20.1.22) or (vlan and (icmp and host 10.20.1.21 and host 10.20.1.22))'
+
+### 2026-11-01T15:26:59Z k8s-gpu2 capture
++ nsenter -t 3659379 -n timeout 1290 tcpdump -i eth1 -nn -s 128 -U -w captures/ping-k8s-gpu2-eth1.pcap '(icmp and host 10.20.1.21 and host 10.20.1.22) or (vlan and (icmp and host 10.20.1.21 and host 10.20.1.22))'
+
+### 2026-11-01T15:26:59Z k8s-gpu2 capture
++ nsenter -t 3659379 -n timeout 1290 tcpdump -i eth2 -nn -s 128 -U -w captures/ping-k8s-gpu2-eth2.pcap '(icmp and host 10.20.1.21 and host 10.20.1.22) or (vlan and (icmp and host 10.20.1.21 and host 10.20.1.22))'
+
+### 2026-11-01T15:27:00Z fw capture
++ nsenter -t 3659396 -n timeout 1290 tcpdump -i eth1 -nn -s 128 -U -w captures/tcp-fw-eth1.pcap '(tcp port 443 and host 10.24.10.10 and host 10.20.11.210) or (vlan and (tcp port 443 and host 10.24.10.10 and host 10.20.11.210))'
+
+### 2026-11-01T15:27:00Z fw capture
++ nsenter -t 3659396 -n timeout 1290 tcpdump -i eth2 -nn -s 128 -U -w captures/tcp-fw-eth2.pcap '(tcp port 443 and host 10.24.10.10 and host 10.20.11.210) or (vlan and (tcp port 443 and host 10.24.10.10 and host 10.20.11.210))'
+
+### 2026-11-01T15:27:07Z fe-sw1 klish
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+fe-sw1# terminal length 0
+fe-sw1# show mclag brief
+ 
+Domain ID            : 1
+Role                 : active
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.0
+Peer Address         : 10.20.255.1
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.4
+Peer Address         : 10.20.255.5
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw1# show PortChannel summary
+Flags(oper-status):  D - Down U - Up (portchannel) P - Up in portchannel (members) I - LACP individual
+----------------------------------------------------------------------------------------------------------------------------
+Group               PortChannel                   Type                Protocol          Member Ports
+----------------------------------------------------------------------------------------------------------------------------
+1                   PortChannel1   (U)            Eth                 LACP              Ethernet0(P)
+                                                                                        Ethernet1(P)
+10                  PortChannel10  (U)            Eth                 LACP              Ethernet2(P)
+11                  PortChannel11  (U)            Eth                 LACP              Ethernet3(P)
+12                  PortChannel12  (U)            Eth                 LACP              Ethernet4(P)
+13                  PortChannel13  (U)            Eth                 LACP              Ethernet5(P)
+14                  PortChannel14  (U)            Eth                 LACP             Ethernet13(P)
+15                  PortChannel15  (U)            Eth                 LACP             Ethernet14(P)
+21                  PortChannel21  (U)            Eth                 LACP              Ethernet6(P)
+22                  PortChannel22  (U)            Eth                 LACP              Ethernet7(P)
+30                  PortChannel30  (U)            Eth                 LACP              Ethernet8(P)
+31                  PortChannel31  (U)            Eth                 LACP              Ethernet9(P)
+                                                                                       Ethernet10(P)
+32                  PortChannel32  (U)            Eth                 LACP             Ethernet11(P)
+41                  PortChannel41  (U)            Eth                 LACP             Ethernet15(P)
+42                  PortChannel42  (U)            Eth                 LACP             Ethernet16(P)
+43                  PortChannel43  (U)            Eth                 LACP             Ethernet17(P)
+44                  PortChannel44  (U)            Eth                 LACP             Ethernet18(P)
+fe-sw1# exit
+
+### 2026-11-01T15:27:11Z fe-sw2 klish
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+fe-sw2# terminal length 0
+fe-sw2# show mclag brief
+ 
+Domain ID            : 1
+Role                 : standby
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.1
+Peer Address         : 10.20.255.0
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.5
+Peer Address         : 10.20.255.4
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw2# show PortChannel summary
+Flags(oper-status):  D - Down U - Up (portchannel) P - Up in portchannel (members) I - LACP individual
+----------------------------------------------------------------------------------------------------------------------------
+Group               PortChannel                   Type                Protocol          Member Ports
+----------------------------------------------------------------------------------------------------------------------------
+1                   PortChannel1   (U)            Eth                 LACP              Ethernet0(P)
+                                                                                        Ethernet1(P)
+10                  PortChannel10  (U)            Eth                 LACP              Ethernet2(P)
+11                  PortChannel11  (U)            Eth                 LACP              Ethernet3(P)
+12                  PortChannel12  (U)            Eth                 LACP              Ethernet4(P)
+13                  PortChannel13  (U)            Eth                 LACP              Ethernet5(P)
+14                  PortChannel14  (U)            Eth                 LACP             Ethernet13(P)
+15                  PortChannel15  (U)            Eth                 LACP             Ethernet14(P)
+21                  PortChannel21  (U)            Eth                 LACP              Ethernet6(P)
+22                  PortChannel22  (U)            Eth                 LACP              Ethernet7(P)
+30                  PortChannel30  (U)            Eth                 LACP              Ethernet8(P)
+31                  PortChannel31  (U)            Eth                 LACP              Ethernet9(P)
+                                                                                       Ethernet10(P)
+32                  PortChannel32  (U)            Eth                 LACP             Ethernet11(P)
+41                  PortChannel41  (U)            Eth                 LACP             Ethernet15(P)
+42                  PortChannel42  (U)            Eth                 LACP             Ethernet16(P)
+43                  PortChannel43  (U)            Eth                 LACP             Ethernet17(P)
+44                  PortChannel44  (U)            Eth                 LACP             Ethernet18(P)
+fe-sw2# exit
+
+### 2026-11-01T15:27:12Z k8s-gpu1 guest
++ mkdir -p /tmp/sfab-drill; for id in 3100 3101 3102 3103 3104 3105 3106 3107; do rm -f /tmp/sfab-drill/ping-$id.log; setsid ping -D -O -i 0.3 -W 1 -e $id -w 820 10.20.1.22 >/tmp/sfab-drill/ping-$id.log 2>&1 </dev/null & done; sleep 0.2; pgrep -fc '[p]ing -D -O -i'
+9
+
+### 2026-11-01T15:27:13Z ent-client container
++ python3 /tmp/sfab-probe-tcp.py 10.20.11.210 443 820 0.3 1 /tmp/sfab-drill-tcp.log &
+
+### 2026-11-01T15:27:33Z fe-sw1 klish
+terminal length 0
+configure terminal
+interface Ethernet12
+shutdown
+end
+exit
+fe-sw1# terminal length 0
+fe-sw1# configure terminal
+fe-sw1(config)# interface Ethernet12
+fe-sw1(config-if-Ethernet12)# shutdown
+fe-sw1(config-if-Ethernet12)# end
+fe-sw1# exit
+
+### 2026-11-01T15:28:08Z fe-sw1 klish
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+fe-sw1# terminal length 0
+fe-sw1# show mclag brief
+ 
+Domain ID            : 1
+Role                 : active
+Session Status       : down
+Peer Link Status     : up
+Source Address       : 10.20.255.0
+Peer Address         : 10.20.255.1
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : down
+Source Address       : 10.20.255.4
+Peer Address         : 10.20.255.5
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/unknown
+PortChannel11            up/unknown
+PortChannel12            up/unknown
+PortChannel13            up/unknown
+PortChannel14            up/unknown
+PortChannel15            up/unknown
+PortChannel21            up/unknown
+PortChannel22            up/unknown
+PortChannel30            up/unknown
+PortChannel31            up/unknown
+PortChannel32            up/unknown
+PortChannel41            up/unknown
+PortChannel42            up/unknown
+PortChannel43            up/unknown
+PortChannel44            up/unknown
+
+### 2026-11-01T15:28:16Z fe-sw2 klish
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+fe-sw2# terminal length 0
+fe-sw2# show mclag brief
+ 
+Domain ID            : 1
+Role                 : standby
+Session Status       : down
+Peer Link Status     : up
+Source Address       : 10.20.255.1
+Peer Address         : 10.20.255.0
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:d6:ce:21:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : down
+Source Address       : 10.20.255.5
+Peer Address         : 10.20.255.4
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/unknown
+PortChannel11            up/unknown
+PortChannel12            up/unknown
+PortChannel13            up/unknown
+PortChannel14            up/unknown
+PortChannel15            up/unknown
+PortChannel21            up/unknown
+PortChannel22            up/unknown
+PortChannel30            up/unknown
+PortChannel31            up/unknown
+PortChannel32            up/unknown
+PortChannel41            up/unknown
+PortChannel42            up/unknown
+PortChannel43            up/unknown
+PortChannel44            up/unknown
+fe-sw2# show PortChannel summary
+Flags(oper-status):  D - Down U - Up (portchannel) P - Up in portchannel (members) I - LACP individual
+----------------------------------------------------------------------------------------------------------------------------
+Group               PortChannel                   Type                Protocol          Member Ports
+----------------------------------------------------------------------------------------------------------------------------
+1                   PortChannel1   (U)            Eth                 LACP              Ethernet0(P)
+                                                                                        Ethernet1(P)
+10                  PortChannel10  (U)            Eth                 LACP              Ethernet2(P)
+11                  PortChannel11  (U)            Eth                 LACP              Ethernet3(P)
+12                  PortChannel12  (U)            Eth                 LACP              Ethernet4(P)
+13                  PortChannel13  (U)            Eth                 LACP              Ethernet5(P)
+14                  PortChannel14  (U)            Eth                 LACP             Ethernet13(P)
+15                  PortChannel15  (U)            Eth                 LACP             Ethernet14(P)
+21                  PortChannel21  (U)            Eth                 LACP              Ethernet6(P)
+22                  PortChannel22  (U)            Eth                 LACP              Ethernet7(P)
+30                  PortChannel30  (U)            Eth                 LACP              Ethernet8(P)
+31                  PortChannel31  (U)            Eth                 LACP              Ethernet9(P)
+                                                                                       Ethernet10(P)
+32                  PortChannel32  (U)            Eth                 LACP             Ethernet11(P)
+41                  PortChannel41  (U)            Eth                 LACP             Ethernet15(P)
+42                  PortChannel42  (U)            Eth                 LACP             Ethernet16(P)
+43                  PortChannel43  (U)            Eth                 LACP             Ethernet17(P)
+44                  PortChannel44  (U)            Eth                 LACP             Ethernet18(P)
+fe-sw2# exit
+
+### 2026-11-01T15:28:43Z fe-sw1 klish
+terminal length 0
+configure terminal
+interface Ethernet12
+no shutdown
+end
+exit
+fe-sw1# terminal length 0
+fe-sw1# configure terminal
+fe-sw1(config)# interface Ethernet12
+fe-sw1(config-if-Ethernet12)# no shutdown
+fe-sw1(config-if-Ethernet12)# end
+fe-sw1# exit
+
+### 2026-11-01T15:35:04Z fe-sw1 klish
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+fe-sw1# terminal length 0
+fe-sw1# show mclag brief
+ 
+Domain ID            : 1
+Role                 : active
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.0
+Peer Address         : 10.20.255.1
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.4
+Peer Address         : 10.20.255.5
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw1# show PortChannel summary
+
+### 2026-11-01T15:35:08Z fe-sw2 klish
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+fe-sw2# terminal length 0
+fe-sw2# show mclag brief
+ 
+Domain ID            : 1
+Role                 : standby
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.1
+Peer Address         : 10.20.255.0
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.5
+Peer Address         : 10.20.255.4
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw2# show PortChannel summary
+Flags(oper-status):  D - Down U - Up (portchannel) P - Up in portchannel (members) I - LACP individual
+----------------------------------------------------------------------------------------------------------------------------
+Group               PortChannel                   Type                Protocol          Member Ports
+----------------------------------------------------------------------------------------------------------------------------
+1                   PortChannel1   (U)            Eth                 LACP              Ethernet0(P)
+                                                                                        Ethernet1(P)
+10                  PortChannel10  (U)            Eth                 LACP              Ethernet2(P)
+11                  PortChannel11  (U)            Eth                 LACP              Ethernet3(P)
+12                  PortChannel12  (U)            Eth                 LACP              Ethernet4(P)
+13                  PortChannel13  (U)            Eth                 LACP              Ethernet5(P)
+14                  PortChannel14  (U)            Eth                 LACP             Ethernet13(P)
+15                  PortChannel15  (U)            Eth                 LACP             Ethernet14(P)
+21                  PortChannel21  (U)            Eth                 LACP              Ethernet6(P)
+22                  PortChannel22  (U)            Eth                 LACP              Ethernet7(P)
+30                  PortChannel30  (U)            Eth                 LACP              Ethernet8(P)
+31                  PortChannel31  (U)            Eth                 LACP              Ethernet9(P)
+                                                                                       Ethernet10(P)
+32                  PortChannel32  (U)            Eth                 LACP             Ethernet11(P)
+41                  PortChannel41  (U)            Eth                 LACP             Ethernet15(P)
+42                  PortChannel42  (U)            Eth                 LACP             Ethernet16(P)
+43                  PortChannel43  (U)            Eth                 LACP             Ethernet17(P)
+44                  PortChannel44  (U)            Eth                 LACP             Ethernet18(P)
+fe-sw2# exit
+
+### 2026-11-01T15:36:43Z fe-sw1 klish
+terminal length 0
+show mclag brief
+exit
+terminal length 0
+show mclag brief
+exit
+fe-sw1# terminal length 0
+fe-sw1# show mclag brief
+ 
+Domain ID            : 1
+Role                 : active
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.0
+Peer Address         : 10.20.255.1
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.4
+Peer Address         : 10.20.255.5
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw1# exit
+
+### 2026-11-01T15:36:46Z fe-sw2 klish
+terminal length 0
+show mclag brief
+exit
+terminal length 0
+show mclag brief
+exit
+fe-sw2# terminal length 0
+fe-sw2# show mclag brief
+ 
+Domain ID            : 1
+Role                 : standby
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.1
+Peer Address         : 10.20.255.0
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.5
+Peer Address         : 10.20.255.4
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw2# exit
+
+### 2026-11-01T15:36:47Z k8s-gpu1 capture
++ nsenter -t 3659249 -n timeout 1290 tcpdump -i eth1 -nn -s 128 -U -w captures/ping-k8s-gpu1-eth1.pcap '(icmp and host 10.20.1.21 and host 10.20.1.22) or (vlan and (icmp and host 10.20.1.21 and host 10.20.1.22))'
+
+### 2026-11-01T15:36:47Z k8s-gpu1 capture
++ nsenter -t 3659249 -n timeout 1290 tcpdump -i eth2 -nn -s 128 -U -w captures/ping-k8s-gpu1-eth2.pcap '(icmp and host 10.20.1.21 and host 10.20.1.22) or (vlan and (icmp and host 10.20.1.21 and host 10.20.1.22))'
+
+### 2026-11-01T15:36:47Z k8s-gpu2 capture
++ nsenter -t 3659379 -n timeout 1290 tcpdump -i eth1 -nn -s 128 -U -w captures/ping-k8s-gpu2-eth1.pcap '(icmp and host 10.20.1.21 and host 10.20.1.22) or (vlan and (icmp and host 10.20.1.21 and host 10.20.1.22))'
+
+### 2026-11-01T15:36:48Z k8s-gpu2 capture
++ nsenter -t 3659379 -n timeout 1290 tcpdump -i eth2 -nn -s 128 -U -w captures/ping-k8s-gpu2-eth2.pcap '(icmp and host 10.20.1.21 and host 10.20.1.22) or (vlan and (icmp and host 10.20.1.21 and host 10.20.1.22))'
+
+### 2026-11-01T15:36:48Z fw capture
++ nsenter -t 3659396 -n timeout 1290 tcpdump -i eth1 -nn -s 128 -U -w captures/tcp-fw-eth1.pcap '(tcp port 443 and host 10.24.10.10 and host 10.20.11.210) or (vlan and (tcp port 443 and host 10.24.10.10 and host 10.20.11.210))'
+
+### 2026-11-01T15:36:48Z fw capture
++ nsenter -t 3659396 -n timeout 1290 tcpdump -i eth2 -nn -s 128 -U -w captures/tcp-fw-eth2.pcap '(tcp port 443 and host 10.24.10.10 and host 10.20.11.210) or (vlan and (tcp port 443 and host 10.24.10.10 and host 10.20.11.210))'
+
+### 2026-11-01T15:36:54Z fe-sw1 klish
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+fe-sw1# terminal length 0
+fe-sw1# show mclag brief
+ 
+Domain ID            : 1
+Role                 : active
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.0
+Peer Address         : 10.20.255.1
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.4
+Peer Address         : 10.20.255.5
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw1# show PortChannel summary
+Flags(oper-status):  D - Down U - Up (portchannel) P - Up in portchannel (members) I - LACP individual
+----------------------------------------------------------------------------------------------------------------------------
+Group               PortChannel                   Type                Protocol          Member Ports
+----------------------------------------------------------------------------------------------------------------------------
+1                   PortChannel1   (U)            Eth                 LACP              Ethernet0(P)
+                                                                                        Ethernet1(P)
+10                  PortChannel10  (U)            Eth                 LACP              Ethernet2(P)
+11                  PortChannel11  (U)            Eth                 LACP              Ethernet3(P)
+12                  PortChannel12  (U)            Eth                 LACP              Ethernet4(P)
+13                  PortChannel13  (U)            Eth                 LACP              Ethernet5(P)
+14                  PortChannel14  (U)            Eth                 LACP             Ethernet13(P)
+15                  PortChannel15  (U)            Eth                 LACP             Ethernet14(P)
+21                  PortChannel21  (U)            Eth                 LACP              Ethernet6(P)
+22                  PortChannel22  (U)            Eth                 LACP              Ethernet7(P)
+30                  PortChannel30  (U)            Eth                 LACP              Ethernet8(P)
+31                  PortChannel31  (U)            Eth                 LACP              Ethernet9(P)
+                                                                                       Ethernet10(P)
+32                  PortChannel32  (U)            Eth                 LACP             Ethernet11(P)
+41                  PortChannel41  (U)            Eth                 LACP             Ethernet15(P)
+42                  PortChannel42  (U)            Eth                 LACP             Ethernet16(P)
+43                  PortChannel43  (U)            Eth                 LACP             Ethernet17(P)
+44                  PortChannel44  (U)            Eth                 LACP             Ethernet18(P)
+fe-sw1# exit
+
+### 2026-11-01T15:36:58Z fe-sw2 klish
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+fe-sw2# terminal length 0
+fe-sw2# show mclag brief
+ 
+Domain ID            : 1
+Role                 : standby
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.1
+Peer Address         : 10.20.255.0
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.5
+Peer Address         : 10.20.255.4
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw2# show PortChannel summary
+Flags(oper-status):  D - Down U - Up (portchannel) P - Up in portchannel (members) I - LACP individual
+----------------------------------------------------------------------------------------------------------------------------
+Group               PortChannel                   Type                Protocol          Member Ports
+----------------------------------------------------------------------------------------------------------------------------
+1                   PortChannel1   (U)            Eth                 LACP              Ethernet0(P)
+                                                                                        Ethernet1(P)
+10                  PortChannel10  (U)            Eth                 LACP              Ethernet2(P)
+11                  PortChannel11  (U)            Eth                 LACP              Ethernet3(P)
+12                  PortChannel12  (U)            Eth                 LACP              Ethernet4(P)
+13                  PortChannel13  (U)            Eth                 LACP              Ethernet5(P)
+14                  PortChannel14  (U)            Eth                 LACP             Ethernet13(P)
+15                  PortChannel15  (U)            Eth                 LACP             Ethernet14(P)
+21                  PortChannel21  (U)            Eth                 LACP              Ethernet6(P)
+22                  PortChannel22  (U)            Eth                 LACP              Ethernet7(P)
+30                  PortChannel30  (U)            Eth                 LACP              Ethernet8(P)
+31                  PortChannel31  (U)            Eth                 LACP              Ethernet9(P)
+                                                                                       Ethernet10(P)
+32                  PortChannel32  (U)            Eth                 LACP             Ethernet11(P)
+41                  PortChannel41  (U)            Eth                 LACP             Ethernet15(P)
+42                  PortChannel42  (U)            Eth                 LACP             Ethernet16(P)
+43                  PortChannel43  (U)            Eth                 LACP             Ethernet17(P)
+44                  PortChannel44  (U)            Eth                 LACP             Ethernet18(P)
+fe-sw2# exit
+
+### 2026-11-01T15:37:00Z k8s-gpu1 guest
++ mkdir -p /tmp/sfab-drill; for id in 3100 3101 3102 3103 3104 3105 3106 3107; do rm -f /tmp/sfab-drill/ping-$id.log; setsid ping -D -O -i 0.3 -W 1 -e $id -w 820 10.20.1.22 >/tmp/sfab-drill/ping-$id.log 2>&1 </dev/null & done; sleep 0.2; pgrep -fc '[p]ing -D -O -i'
+9
+
+### 2026-11-01T15:37:01Z ent-client container
++ python3 /tmp/sfab-probe-tcp.py 10.20.11.210 443 820 0.3 1 /tmp/sfab-drill-tcp.log &
+
+### 2026-11-01T15:37:21Z fe-sw1 klish
+terminal length 0
+configure terminal
+interface Ethernet12
+shutdown
+end
+exit
+fe-sw1# terminal length 0
+fe-sw1# configure terminal
+fe-sw1(config)# interface Ethernet12
+fe-sw1(config-if-Ethernet12)# shutdown
+fe-sw1(config-if-Ethernet12)# end
+fe-sw1# exit
+
+### 2026-11-01T15:37:56Z fe-sw1 klish
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+fe-sw1# terminal length 0
+fe-sw1# show mclag brief
+ 
+Domain ID            : 1
+Role                 : active
+Session Status       : down
+Peer Link Status     : up
+Source Address       : 10.20.255.0
+Peer Address         : 10.20.255.1
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : down
+Source Address       : 10.20.255.4
+Peer Address         : 10.20.255.5
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/unknown
+PortChannel11            up/unknown
+PortChannel12            up/unknown
+PortChannel13            up/unknown
+PortChannel14            up/unknown
+PortChannel15            up/unknown
+PortChannel21            up/unknown
+PortChannel22            up/unknown
+PortChannel30            up/unknown
+PortChannel31            up/unknown
+PortChannel32            up/unknown
+PortChannel41            up/unknown
+PortChannel42            up/unknown
+PortChannel43            up/unknown
+PortChannel44            up/unknown
+fe-sw1# show PortChannel summary
+Flags(oper-status):  D - Down U - Up (portchannel) P - Up in portchannel (members) I - LACP individual
+----------------------------------------------------------------------------------------------------------------------------
+Group               PortChannel                   Type                Protocol          Member Ports
+----------------------------------------------------------------------------------------------------------------------------
+1                   PortChannel1   (U)            Eth                 LACP              Ethernet0(P)
+                                                                                        Ethernet1(P)
+10                  PortChannel10  (U)            Eth                 LACP              Ethernet2(P)
+11                  PortChannel11  (U)            Eth                 LACP              Ethernet3(P)
+12                  PortChannel12  (U)            Eth                 LACP              Ethernet4(P)
+13                  PortChannel13  (U)            Eth                 LACP              Ethernet5(P)
+14                  PortChannel14  (U)            Eth                 LACP             Ethernet13(P)
+15                  PortChannel15  (U)            Eth                 LACP             Ethernet14(P)
+21                  PortChannel21  (U)            Eth                 LACP              Ethernet6(P)
+22                  PortChannel22  (U)            Eth                 LACP              Ethernet7(P)
+30                  PortChannel30  (U)            Eth                 LACP              Ethernet8(P)
+31                  PortChannel31  (U)            Eth                 LACP              Ethernet9(P)
+                                                                                       Ethernet10(P)
+32                  PortChannel32  (U)            Eth                 LACP             Ethernet11(P)
+41                  PortChannel41  (U)            Eth                 LACP             Ethernet15(P)
+42                  PortChannel42  (U)            Eth                 LACP             Ethernet16(P)
+43                  PortChannel43  (U)            Eth                 LACP             Ethernet17(P)
+44                  PortChannel44  (U)            Eth                 LACP             Ethernet18(P)
+fe-sw1# exit
+
+### 2026-11-01T15:38:04Z fe-sw2 klish
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+fe-sw2# terminal length 0
+fe-sw2# show mclag brief
+ 
+Domain ID            : 1
+Role                 : standby
+Session Status       : down
+Peer Link Status     : up
+Source Address       : 10.20.255.1
+Peer Address         : 10.20.255.0
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:d6:ce:21:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : down
+Source Address       : 10.20.255.5
+Peer Address         : 10.20.255.4
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/unknown
+PortChannel11            up/unknown
+PortChannel12            up/unknown
+PortChannel13            up/unknown
+PortChannel14            up/unknown
+PortChannel15            up/unknown
+PortChannel21            up/unknown
+PortChannel22            up/unknown
+PortChannel30            up/unknown
+PortChannel31            up/unknown
+PortChannel32            up/unknown
+PortChannel41            up/unknown
+PortChannel42            up/unknown
+PortChannel43            up/unknown
+PortChannel44            up/unknown
+fe-sw2# show PortChannel summary
+Flags(oper-status):  D - Down U - Up (portchannel) P - Up in portchannel (members) I - LACP individual
+----------------------------------------------------------------------------------------------------------------------------
+Group               PortChannel                   Type                Protocol          Member Ports
+----------------------------------------------------------------------------------------------------------------------------
+1                   PortChannel1   (U)            Eth                 LACP              Ethernet0(P)
+                                                                                        Ethernet1(P)
+10                  PortChannel10  (U)            Eth                 LACP              Ethernet2(P)
+11                  PortChannel11  (U)            Eth                 LACP              Ethernet3(P)
+12                  PortChannel12  (U)            Eth                 LACP              Ethernet4(P)
+13                  PortChannel13  (U)            Eth                 LACP              Ethernet5(P)
+14                  PortChannel14  (U)            Eth                 LACP             Ethernet13(P)
+15                  PortChannel15  (U)            Eth                 LACP             Ethernet14(P)
+21                  PortChannel21  (U)            Eth                 LACP              Ethernet6(P)
+22                  PortChannel22  (U)            Eth                 LACP              Ethernet7(P)
+30                  PortChannel30  (U)            Eth                 LACP              Ethernet8(P)
+31                  PortChannel31  (U)            Eth                 LACP              Ethernet9(P)
+                                                                                       Ethernet10(P)
+32                  PortChannel32  (U)            Eth                 LACP             Ethernet11(P)
+41                  PortChannel41  (U)            Eth                 LACP             Ethernet15(P)
+42                  PortChannel42  (U)            Eth                 LACP             Ethernet16(P)
+43                  PortChannel43  (U)            Eth                 LACP             Ethernet17(P)
+44                  PortChannel44  (U)            Eth                 LACP             Ethernet18(P)
+fe-sw2# exit
+
+### 2026-11-01T15:38:31Z fe-sw1 klish
+terminal length 0
+configure terminal
+interface Ethernet12
+no shutdown
+end
+exit
+fe-sw1# terminal length 0
+fe-sw1# configure terminal
+fe-sw1(config)# interface Ethernet12
+fe-sw1(config-if-Ethernet12)# no shutdown
+fe-sw1(config-if-Ethernet12)# end
+fe-sw1# exit
+
+### 2026-11-01T15:45:09Z fe-sw1 klish
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+fe-sw1# terminal length 0
+fe-sw1# show mclag brief
+ 
+Domain ID            : 1
+Role                 : active
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.0
+Peer Address         : 10.20.255.1
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.4
+Peer Address         : 10.20.255.5
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw1# show PortChannel summary
+
+### 2026-11-01T15:45:13Z fe-sw2 klish
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+fe-sw2# terminal length 0
+fe-sw2# show mclag brief
+ 
+Domain ID            : 1
+Role                 : standby
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.1
+Peer Address         : 10.20.255.0
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.5
+Peer Address         : 10.20.255.4
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw2# show PortChannel summary
+Flags(oper-status):  D - Down U - Up (portchannel) P - Up in portchannel (members) I - LACP individual
+----------------------------------------------------------------------------------------------------------------------------
+Group               PortChannel                   Type                Protocol          Member Ports
+----------------------------------------------------------------------------------------------------------------------------
+1                   PortChannel1   (U)            Eth                 LACP              Ethernet0(P)
+                                                                                        Ethernet1(P)
+10                  PortChannel10  (U)            Eth                 LACP              Ethernet2(P)
+11                  PortChannel11  (U)            Eth                 LACP              Ethernet3(P)
+12                  PortChannel12  (U)            Eth                 LACP              Ethernet4(P)
+13                  PortChannel13  (U)            Eth                 LACP              Ethernet5(P)
+14                  PortChannel14  (U)            Eth                 LACP             Ethernet13(P)
+15                  PortChannel15  (U)            Eth                 LACP             Ethernet14(P)
+21                  PortChannel21  (U)            Eth                 LACP              Ethernet6(P)
+22                  PortChannel22  (U)            Eth                 LACP              Ethernet7(P)
+30                  PortChannel30  (U)            Eth                 LACP              Ethernet8(P)
+31                  PortChannel31  (U)            Eth                 LACP              Ethernet9(P)
+                                                                                       Ethernet10(P)
+32                  PortChannel32  (U)            Eth                 LACP             Ethernet11(P)
+41                  PortChannel41  (U)            Eth                 LACP             Ethernet15(P)
+42                  PortChannel42  (U)            Eth                 LACP             Ethernet16(P)
+43                  PortChannel43  (U)            Eth                 LACP             Ethernet17(P)
+44                  PortChannel44  (U)            Eth                 LACP             Ethernet18(P)
+fe-sw2# exit
+

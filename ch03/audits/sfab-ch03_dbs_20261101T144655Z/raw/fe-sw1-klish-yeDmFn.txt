@@ -1,0 +1,34 @@
+terminal length 0
+show running-configuration interface PortChannel21
+show running-configuration interface Ethernet6
+exit
+terminal length 0
+show running-configuration interface PortChannel21
+show running-configuration interface Ethernet6
+exit
+fe-sw1# terminal length 0
+fe-sw1# show running-configuration interface PortChannel21
+!
+interface PortChannel21
+ description k8s-gpu1-bond
+ switchport access Vlan 100
+ switchport trunk allowed Vlan 120
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+ spanning-tree bpduguard port-shutdown
+ spanning-tree portfast
+fe-sw1# show running-configuration interface Ethernet6
+!
+interface Ethernet6
+ description k8s-gpu1-eth1
+ mtu 9216
+ speed 25000
+ unreliable-los auto
+ channel-group 21
+ no shutdown
+ storm-control broadcast 10000
+ storm-control unknown-unicast 10000
+ storm-control unknown-multicast 10000
+fe-sw1# exit

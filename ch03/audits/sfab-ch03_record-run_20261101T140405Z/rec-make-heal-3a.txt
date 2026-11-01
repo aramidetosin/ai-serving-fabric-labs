@@ -1,0 +1,18 @@
+Script started on 2026-11-01 16:27:58+00:00 [COMMAND="make heal-3a" TERM="tmux-256color" TTY="/dev/pts/0" COLUMNS="-1" LINES="-1"]
+PYTHONDONTWRITEBYTECODE=1 python3 /root/sfab/clean/ai-serving-fabric-labs/common/breakheal.py heal 3a
+== heal-3a: VLAN 200 allowed on the firewall PortChannel on fe-sw1 only
+  PASS  fe-sw2: the render replayed where the running configuration missed it (replay fe-sw2: typed 1 block(s), skipped 0)
+  PASS  fe-sw2: parity, 0 missing lines
+== heal-3a: recorded
+  PASS  bastion-stor-mgmt, heal, pass 1: 0 of 60 connects from bastion to 10.20.2.31:443 failed (recorded; the exercise names no share)
+== heal-3a: healed
+  PASS  fe-sw2: show vlan has PortChannel10 in Vlan200 (T): Vlan200: PortChannel1(T),PortChannel10(T),PortChannel32(A)
+  PASS  fe-sw1: show vlan has PortChannel10 in Vlan200 (T): Vlan200: PortChannel1(T),PortChannel10(T),PortChannel32(A)
+  PASS  fe-sw2: parity, 0 missing lines
+  PASS  bastion-stor-mgmt: every connect succeeds (60 of 60)
+== the chapter audit after the heal
+  PASS  audit.sh after the heal: RESULT: 799 passed, 0 failed, 0 known platform limitation(s), 2 skipped (ch03/audits/sfab-ch03_audit_20261101T162917Z)
+== RESULT: 8 passed, 0 failed, 0 known platform limitation(s), 0 skipped
+== result set: ch03/audits/sfab-ch03_heal-3a_20261101T162759Z
+
+Script done on 2026-11-01 16:32:57+00:00 [COMMAND_EXIT_CODE="0"]

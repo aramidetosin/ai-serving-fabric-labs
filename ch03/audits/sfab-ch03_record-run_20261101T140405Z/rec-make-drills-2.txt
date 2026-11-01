@@ -1,0 +1,269 @@
+Script started on 2026-11-01 15:16:30+00:00 [COMMAND="make drills DRILLS=keepalive-link PASSES=3" TERM="tmux-256color" TTY="/dev/pts/0" COLUMNS="-1" LINES="-1"]
+/root/sfab/clean/ai-serving-fabric-labs/ch03/drills.sh --drills "keepalive-link" --passes 3
+== pass 1, drill keepalive-link: the dedicated keepalive link shut on fe-sw1 with the peer link and the backup keepalive up
+drill: pass 1 keepalive-link (the dedicated keepalive link shut on fe-sw1 with the peer link and the backup keepalive up)
+  PASS  pass 1 keepalive-link: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 1 keepalive-link: probes located before the fault as the drill needs them (try 1): ping: requests leave fe-sw1, fe-sw2
+  PASS  pass 1 keepalive-link: KLISH shutdown of Ethernet12 (the keepalive link Ethernet12) on fe-sw1 accepted
+  PASS  pass 1 keepalive-link: no shutdown accepted on fe-sw1 after 70 s
+  PASS  pass 1 keepalive-link: the pair whole and every bond back on its legs 327 s after the restore (polls 5 s apart; an event, drill.py analyze times it from the monitor)
+  PASS  pass 1 keepalive-link: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+drills: 3 Warning event(s) archived in pass1/keepalive-link/events and cleared
+  PASS  pass 1 keepalive-link: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+drill keepalive-link, pass 1: the dedicated keepalive link shut on fe-sw1 with the peer link and the backup keepalive up
+  target switch fe-sw1; every time on the lab host's clock, relative to the cut (T0)
+  the fault's session took 3.58 s (T0 is when it started)
+  placement: ping: requests leave fe-sw1, fe-sw2
+  the standby (fe-sw2) as the monitor saw it (reads every few seconds; each is an event, not a measured gap):
+    T0   +40.2 s  the active's iccpd no longer reports the keepalive OK
+    T0   +76.3 s  the standby's own MCLAG PortChannels read down or traffic-disabled, the standby still answering
+    T0   +76.3 s  every bond toward the pair on one leg
+    T0   +76.3 s  the keepalive OK on both switches
+    T0  +379.7 s  every MCLAG PortChannel up on the standby
+    T0  +379.7 s  the firewall's ae1 on both legs
+    T0  +379.7 s  every bond toward the pair back on two legs: the return
+    T0  +423.5 s  the drill's own polls: the pair whole and every bond on its legs again
+    not seen: the peer link up on the active
+  ping 3102, 3103, 3106, 3107 cross fe-sw1; 3100, 3101, 3104, 3105 do not
+  ping id 3100 (via fe-sw2): sent 1596, answered 1576, round trips lost 20
+    20 lost elsewhere
+    first lost sent at +32.62 s, last at +66.68 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 3.94 s, from +32.33 s to +36.27 s
+    the guest's ping: 1596 transmitted, 1576 received; the two witnesses agree on every round trip both saw
+  ping id 3101 (via fe-sw2): sent 1596, answered 1576, round trips lost 20
+    20 lost elsewhere
+    first lost sent at +32.62 s, last at +66.68 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 3.94 s, from +32.33 s to +36.27 s
+    1 duplicate replies
+    the guest's ping: 1596 transmitted, 1576 received; the two witnesses agree on every round trip both saw
+  ping id 3102 (via fe-sw1): sent 1596, answered 1596, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +284.24 s to +284.58 s
+    the guest's ping: 1596 transmitted, 1596 received; the two witnesses agree on every round trip both saw
+  ping id 3103 (via fe-sw1): sent 1596, answered 1596, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.35 s, from +284.23 s to +284.58 s
+    the guest's ping: 1596 transmitted, 1596 received; the two witnesses agree on every round trip both saw
+  ping id 3104 (via fe-sw2): sent 1596, answered 1576, round trips lost 20
+    20 lost elsewhere
+    first lost sent at +32.64 s, last at +66.69 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 3.94 s, from +32.35 s to +36.28 s
+    1 duplicate replies
+    the guest's ping: 1596 transmitted, 1576 received; the two witnesses agree on every round trip both saw
+  ping id 3105 (via fe-sw2): sent 1596, answered 1576, round trips lost 20
+    20 lost elsewhere
+    first lost sent at +32.62 s, last at +66.68 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 3.94 s, from +32.33 s to +36.27 s
+    the guest's ping: 1596 transmitted, 1576 received; the two witnesses agree on every round trip both saw
+  ping id 3106 (via fe-sw1): sent 1596, answered 1596, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.35 s, from +284.23 s to +284.58 s
+    the guest's ping: 1596 transmitted, 1596 received; the two witnesses agree on every round trip both saw
+  ping id 3107 (via fe-sw1): sent 1596, answered 1596, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +439.52 s to +439.87 s
+    the guest's ping: 1596 transmitted, 1596 received; the two witnesses agree on every round trip both saw
+  tcp connects to the users' VIP: 1527 attempts, 31 failed (0 at the cut, 0 at the restore, 31 elsewhere)
+    attempts in the cut window by the firewall leg their SYN took: {'fe-sw1': 25, 'fe-sw2': 26}
+    failed run: last ok 32.183, first failed +32.48 s, first ok after 36.488, 4 failed, SYN legs {'fe-sw1': 2, 'fe-sw2': 2}
+    failed run: last ok 36.488, first failed +36.79 s, first ok after 37.788, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 37.788, first failed +38.09 s, first ok after 39.09, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 39.09, first failed +39.39 s, first ok after 40.391, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 40.391, first failed +40.69 s, first ok after 52.703, 12 failed, SYN legs {'fe-sw2': 7, 'fe-sw1': 5}
+    failed run: last ok 52.703, first failed +53.00 s, first ok after 59.011, 6 failed, SYN legs {'fe-sw2': 4, 'fe-sw1': 2}
+    failed run: last ok 59.011, first failed +59.31 s, first ok after 62.315, 3 failed, SYN legs {'fe-sw2': 1, 'fe-sw1': 2}
+    failed run: last ok 64.415, first failed +64.72 s, first ok after 67.718, 3 failed, SYN legs {'fe-sw2': 2, 'fe-sw1': 1}
+  KNOWN pass 1 keepalive-link: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+  KNOWN pass 1 keepalive-link: 2 duplicate ping replies (peer-link isolation is not enforced): L1
+== pass 2, drill keepalive-link: the dedicated keepalive link shut on fe-sw1 with the peer link and the backup keepalive up
+drill: pass 2 keepalive-link (the dedicated keepalive link shut on fe-sw1 with the peer link and the backup keepalive up)
+  PASS  pass 2 keepalive-link: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 2 keepalive-link: probes located before the fault as the drill needs them (try 1): ping: requests leave fe-sw1, fe-sw2
+  PASS  pass 2 keepalive-link: KLISH shutdown of Ethernet12 (the keepalive link Ethernet12) on fe-sw1 accepted
+  PASS  pass 2 keepalive-link: no shutdown accepted on fe-sw1 after 70 s
+  PASS  pass 2 keepalive-link: the pair whole and every bond back on its legs 326 s after the restore (polls 5 s apart; an event, drill.py analyze times it from the monitor)
+  PASS  pass 2 keepalive-link: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+drills: 6 Warning event(s) archived in pass2/keepalive-link/events and cleared
+  PASS  pass 2 keepalive-link: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+drill keepalive-link, pass 2: the dedicated keepalive link shut on fe-sw1 with the peer link and the backup keepalive up
+  target switch fe-sw1; every time on the lab host's clock, relative to the cut (T0)
+  the fault's session took 3.47 s (T0 is when it started)
+  placement: ping: requests leave fe-sw1, fe-sw2
+  the standby (fe-sw2) as the monitor saw it (reads every few seconds; each is an event, not a measured gap):
+    T0   +39.4 s  the active's iccpd no longer reports the keepalive OK
+    T0   +56.4 s  the standby's own MCLAG PortChannels read down or traffic-disabled, the standby still answering
+    T0   +74.6 s  every bond toward the pair on one leg
+    T0   +74.6 s  the keepalive OK on both switches
+    T0  +376.9 s  every MCLAG PortChannel up on the standby
+    T0  +376.9 s  every bond toward the pair back on two legs: the return
+    T0  +386.5 s  the firewall's ae1 on both legs
+    T0  +420.5 s  the drill's own polls: the pair whole and every bond on its legs again
+    not seen: the peer link up on the active
+  ping 3102, 3103, 3106, 3107 cross fe-sw1; 3100, 3101, 3104, 3105 do not
+  ping id 3100 (via fe-sw2): sent 1584, answered 1563, round trips lost 21
+    8 lost in the standby window
+    13 lost elsewhere
+    first lost sent at +31.71 s, last at +65.18 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 4.25 s, from +31.41 s to +35.66 s
+    the guest's ping: 1584 transmitted, 1563 received; the two witnesses agree on every round trip both saw
+  ping id 3101 (via fe-sw2): sent 1584, answered 1563, round trips lost 21
+    8 lost in the standby window
+    13 lost elsewhere
+    first lost sent at +31.71 s, last at +65.17 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 4.25 s, from +31.41 s to +35.66 s
+    the guest's ping: 1584 transmitted, 1563 received; the two witnesses agree on every round trip both saw
+  ping id 3102 (via fe-sw1): sent 1585, answered 1585, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +420.84 s to +421.19 s
+    the guest's ping: 1585 transmitted, 1585 received; the two witnesses agree on every round trip both saw
+  ping id 3103 (via fe-sw1): sent 1585, answered 1585, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +49.17 s to +49.52 s
+    the guest's ping: 1585 transmitted, 1585 received; the two witnesses agree on every round trip both saw
+  ping id 3104 (via fe-sw2): sent 1584, answered 1563, round trips lost 21
+    8 lost in the standby window
+    13 lost elsewhere
+    first lost sent at +31.71 s, last at +65.17 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 4.25 s, from +31.41 s to +35.66 s
+    the guest's ping: 1584 transmitted, 1563 received; the two witnesses agree on every round trip both saw
+  ping id 3105 (via fe-sw2): sent 1584, answered 1563, round trips lost 21
+    8 lost in the standby window
+    13 lost elsewhere
+    first lost sent at +31.71 s, last at +65.18 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 4.25 s, from +31.41 s to +35.66 s
+    the guest's ping: 1584 transmitted, 1563 received; the two witnesses agree on every round trip both saw
+  ping id 3106 (via fe-sw1): sent 1585, answered 1585, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +259.52 s to +259.85 s
+    the guest's ping: 1585 transmitted, 1585 received; the two witnesses agree on every round trip both saw
+  ping id 3107 (via fe-sw1): sent 1585, answered 1585, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +49.17 s to +49.52 s
+    the guest's ping: 1585 transmitted, 1585 received; the two witnesses agree on every round trip both saw
+  tcp connects to the users' VIP: 1522 attempts, 28 failed (0 at the cut, 0 at the restore, 10 in the standby window, 18 elsewhere)
+    attempts in the cut window by the firewall leg their SYN took: {'fe-sw1': 26, 'fe-sw2': 25}
+    failed run: last ok 31.591, first failed +31.89 s, first ok after 34.894, 3 failed, SYN legs {'fe-sw2': 2, 'fe-sw1': 1}
+    failed run: last ok 34.894, first failed +35.19 s, first ok after 38.198, 3 failed, SYN legs {'fe-sw2': 2, 'fe-sw1': 1}
+    failed run: last ok 38.198, first failed +38.50 s, first ok after 39.499, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 39.499, first failed +39.80 s, first ok after 40.8, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 40.8, first failed +41.10 s, first ok after 48.107, 7 failed, SYN legs {'fe-sw2': 4, 'fe-sw1': 3}
+    failed run: last ok 48.107, first failed +48.41 s, first ok after 49.409, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 49.409, first failed +49.71 s, first ok after 51.711, 2 failed, SYN legs {'fe-sw2': 2}
+    failed run: last ok 51.711, first failed +52.01 s, first ok after 53.012, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 53.012, first failed +53.31 s, first ok after 54.314, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 54.314, first failed +54.61 s, first ok after 55.614, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 55.614, first failed +55.91 s, first ok after 56.915, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 56.915, first failed +57.22 s, first ok after 58.216, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 58.216, first failed +58.52 s, first ok after 59.517, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 59.517, first failed +59.82 s, first ok after 60.818, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 60.818, first failed +61.12 s, first ok after 62.12, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 62.72, first failed +63.02 s, first ok after 64.02, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 64.02, first failed +64.32 s, first ok after 65.322, 1 failed, SYN legs {'fe-sw2': 1}
+  KNOWN pass 2 keepalive-link: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+== pass 3, drill keepalive-link: the dedicated keepalive link shut on fe-sw1 with the peer link and the backup keepalive up
+drill: pass 3 keepalive-link (the dedicated keepalive link shut on fe-sw1 with the peer link and the backup keepalive up)
+  PASS  pass 3 keepalive-link: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 3 keepalive-link: probes located before the fault as the drill needs them (try 1): ping: requests leave fe-sw1, fe-sw2
+  PASS  pass 3 keepalive-link: KLISH shutdown of Ethernet12 (the keepalive link Ethernet12) on fe-sw1 accepted
+  PASS  pass 3 keepalive-link: no shutdown accepted on fe-sw1 after 70 s
+  PASS  pass 3 keepalive-link: the pair whole and every bond back on its legs 343 s after the restore (polls 5 s apart; an event, drill.py analyze times it from the monitor)
+  PASS  pass 3 keepalive-link: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+drills: 11 Warning event(s) archived in pass3/keepalive-link/events and cleared
+  PASS  pass 3 keepalive-link: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+drill keepalive-link, pass 3: the dedicated keepalive link shut on fe-sw1 with the peer link and the backup keepalive up
+  target switch fe-sw1; every time on the lab host's clock, relative to the cut (T0)
+  the fault's session took 3.49 s (T0 is when it started)
+  placement: ping: requests leave fe-sw1, fe-sw2
+  the standby (fe-sw2) as the monitor saw it (reads every few seconds; each is an event, not a measured gap):
+    T0   +40.5 s  the active's iccpd no longer reports the keepalive OK
+    T0   +57.7 s  the standby's own MCLAG PortChannels read down or traffic-disabled, the standby still answering
+    T0   +75.3 s  every bond toward the pair on one leg
+    T0   +75.3 s  the keepalive OK on both switches
+    T0  +377.7 s  every MCLAG PortChannel up on the standby
+    T0  +377.7 s  the firewall's ae1 on both legs
+    T0  +377.7 s  every bond toward the pair back on two legs: the return
+    T0  +438.6 s  the drill's own polls: the pair whole and every bond on its legs again
+    not seen: the peer link up on the active
+  ping 3102, 3103, 3106, 3107 cross fe-sw1; 3100, 3101, 3104, 3105 do not
+  ping id 3100 (via fe-sw2): sent 1644, answered 1623, round trips lost 21
+    8 lost in the standby window
+    13 lost elsewhere
+    first lost sent at +32.62 s, last at +65.79 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 4.25 s, from +32.32 s to +36.58 s
+    the guest's ping: 1644 transmitted, 1623 received; the two witnesses agree on every round trip both saw
+  ping id 3101 (via fe-sw2): sent 1644, answered 1623, round trips lost 21
+    8 lost in the standby window
+    13 lost elsewhere
+    first lost sent at +32.62 s, last at +65.80 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 4.25 s, from +32.32 s to +36.58 s
+    the guest's ping: 1644 transmitted, 1623 received; the two witnesses agree on every round trip both saw
+  ping id 3102 (via fe-sw1): sent 1644, answered 1644, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +148.50 s to +148.84 s
+    the guest's ping: 1644 transmitted, 1644 received; the two witnesses agree on every round trip both saw
+  ping id 3103 (via fe-sw1): sent 1644, answered 1644, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +60.62 s to +60.97 s
+    the guest's ping: 1644 transmitted, 1644 received; the two witnesses agree on every round trip both saw
+  ping id 3104 (via fe-sw2): sent 1644, answered 1623, round trips lost 21
+    8 lost in the standby window
+    13 lost elsewhere
+    first lost sent at +32.64 s, last at +65.81 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 4.26 s, from +32.33 s to +36.59 s
+    the guest's ping: 1644 transmitted, 1623 received; the two witnesses agree on every round trip both saw
+  ping id 3105 (via fe-sw2): sent 1644, answered 1623, round trips lost 21
+    8 lost in the standby window
+    13 lost elsewhere
+    first lost sent at +32.64 s, last at +65.80 s (host clock, relative to the cut)
+    longest stretch with no reply arriving: 4.26 s, from +32.33 s to +36.59 s
+    the guest's ping: 1644 transmitted, 1622 received; the two witnesses agree on every round trip both saw
+  ping id 3106 (via fe-sw1): sent 1644, answered 1644, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.34 s, from +350.71 s to +351.05 s
+    the guest's ping: 1644 transmitted, 1644 received; the two witnesses agree on every round trip both saw
+  ping id 3107 (via fe-sw1): sent 1644, answered 1644, round trips lost 0
+    no round trip lost
+    longest stretch with no reply arriving: 0.35 s, from +60.62 s to +60.97 s
+    the guest's ping: 1644 transmitted, 1644 received; the two witnesses agree on every round trip both saw
+  tcp connects to the users' VIP: 1575 attempts, 31 failed (0 at the cut, 0 at the restore, 12 in the standby window, 19 elsewhere)
+    attempts in the cut window by the firewall leg their SYN took: {'fe-sw1': 26, 'fe-sw2': 25}
+    failed run: last ok 32.19, first failed +32.49 s, first ok after 33.491, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 33.491, first failed +33.79 s, first ok after 34.792, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 34.792, first failed +35.09 s, first ok after 36.093, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 36.093, first failed +36.39 s, first ok after 41.398, 5 failed, SYN legs {'fe-sw2': 3, 'fe-sw1': 2}
+    failed run: last ok 41.398, first failed +41.70 s, first ok after 46.705, 5 failed, SYN legs {'fe-sw2': 3, 'fe-sw1': 2}
+    failed run: last ok 46.705, first failed +47.01 s, first ok after 48.006, 1 failed, SYN legs {'fe-sw2': 1}
+    failed run: last ok 48.006, first failed +48.31 s, first ok after 51.311, 3 failed, SYN legs {'fe-sw2': 2, 'fe-sw1': 1}
+    failed run: last ok 51.311, first failed +51.61 s, first ok after 58.619, 7 failed, SYN legs {'fe-sw2': 4, 'fe-sw1': 3}
+    failed run: last ok 58.619, first failed +58.92 s, first ok after 62.924, 4 failed, SYN legs {'fe-sw2': 2, 'fe-sw1': 2}
+    failed run: last ok 63.224, first failed +63.52 s, first ok after 66.528, 3 failed, SYN legs {'fe-sw2': 2, 'fe-sw1': 1}
+  KNOWN pass 3 keepalive-link: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+drills: 0 Warning event(s) archived in events-after and cleared
+== the passes compared
+Passes compared: pass1, pass2, pass3 in sfab-ch03_drills_20261101T151630Z
+
+## keepalive-link
+
+| measure | across every pass and probe | agrees? |
+|---|---|---|
+| placed before the fault | pass 1 yes, pass 2 yes, pass 3 yes | yes |
+| ping round trips lost, ids crossing fe-sw1 | 0 | yes |
+|   of them at the cut | 0 | yes |
+|   of them at the restore | 0 | yes |
+| ping round trips lost, ids not crossing fe-sw1 | 20 to 21 | yes |
+| longest stretch with no reply at the cut, ids crossing fe-sw1 (s) | 0.30 to 0.34 | - |
+| ping ids crossing the target, per pass | pass 1 4 of 8, pass 2 4 of 8, pass 3 4 of 8 | - |
+| TCP connects failed at the cut | 0 | yes |
+| TCP connects failed at the restore | 0 | yes |
+| TCP connects failed elsewhere | 18 to 31 | yes |
+| every bond on one leg, seconds after the fault began (the reboot or the shut) | 74.6 to 76.3 | - |
+| the standby returned (every bond back on two legs) | pass 1 yes, pass 2 yes, pass 3 yes | yes |
+
+Ranges span every probe instance of every pass. A ping lost is a round trip lost, on either leg.
+
+no disagreement between the passes
+  PASS  compare_passes.py: no disagreement between the passes
+== RESULT: 22 passed, 0 failed, 4 known platform limitation(s), 0 skipped
+== result set: ch03/audits/sfab-ch03_drills_20261101T151630Z
+
+Script done on 2026-11-01 15:46:24+00:00 [COMMAND_EXIT_CODE="0"]

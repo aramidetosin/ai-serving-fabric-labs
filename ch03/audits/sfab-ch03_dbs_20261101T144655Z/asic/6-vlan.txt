@@ -1,0 +1,6 @@
+admin@fe-sw1:~$ for k in $(sonic-db-cli ASIC_DB keys 'ASIC_STATE:SAI_OBJECT_TYPE_VLAN:*'); do [ "$(sonic-db-cli ASIC_DB hget "$k" SAI_VLAN_ATTR_VLAN_ID)" = '100' ] && echo "$k" && sonic-db-cli ASIC_DB hgetall "$k"; done
+ASIC_STATE:SAI_OBJECT_TYPE_VLAN:oid:0x26000000000a6e
+SAI_VLAN_ATTR_VLAN_ID
+100
+SAI_VLAN_ATTR_STP_INSTANCE
+oid:0x10000000000a70

@@ -1,0 +1,78 @@
+== pass 1, drill fw-leg: the firewall bundle's leg on fe-sw1 shut from the switch side
+  PASS  pass 1 fw-leg: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 1 fw-leg: probes located before the fault as the drill needs them (try 1): tcp: 5 connects leave the firewall toward fe-sw1, 6 toward the other switch
+  PASS  pass 1 fw-leg: KLISH shutdown of Ethernet2 (PortChannel10) on fe-sw1 accepted
+  PASS  pass 1 fw-leg: no shutdown accepted on fe-sw1 after 30 s
+  PASS  pass 1 fw-leg: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 1 fw-leg: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+  KNOWN pass 1 fw-leg: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+== pass 1, drill server-member: k8s-gpu1's member on fe-sw1 shut from the switch side
+  PASS  pass 1 server-member: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 1 server-member: probes located before the fault as the drill needs them (try 1): ping: 4 of 8 ids cross fe-sw1, 4 do not
+  PASS  pass 1 server-member: KLISH shutdown of Ethernet6 (PortChannel21) on fe-sw1 accepted
+  PASS  pass 1 server-member: no shutdown accepted on fe-sw1 after 30 s
+  PASS  pass 1 server-member: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 1 server-member: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+  KNOWN pass 1 server-member: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+  KNOWN pass 1 server-member: 9 duplicate ping replies (peer-link isolation is not enforced): L1
+== pass 1, drill peer-link: the peer link shut on fe-sw1 with the keepalive link up
+  PASS  pass 1 peer-link: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 1 peer-link: probes located before the fault as the drill needs them (try 1): ping: requests leave fe-sw1, fe-sw2
+  PASS  pass 1 peer-link: KLISH shutdown of Ethernet0,Ethernet1 (PortChannel1) on fe-sw1 accepted
+  PASS  pass 1 peer-link: no shutdown accepted on fe-sw1 after 30 s
+  PASS  pass 1 peer-link: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 1 peer-link: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+  KNOWN pass 1 peer-link: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+== pass 2, drill fw-leg: the firewall bundle's leg on fe-sw1 shut from the switch side
+  PASS  pass 2 fw-leg: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 2 fw-leg: probes located before the fault as the drill needs them (try 1): tcp: 6 connects leave the firewall toward fe-sw1, 6 toward the other switch
+  PASS  pass 2 fw-leg: KLISH shutdown of Ethernet2 (PortChannel10) on fe-sw1 accepted
+  PASS  pass 2 fw-leg: no shutdown accepted on fe-sw1 after 30 s
+  PASS  pass 2 fw-leg: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 2 fw-leg: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+  KNOWN pass 2 fw-leg: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+== pass 2, drill server-member: k8s-gpu1's member on fe-sw1 shut from the switch side
+  PASS  pass 2 server-member: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 2 server-member: probes located before the fault as the drill needs them (try 1): ping: 4 of 8 ids cross fe-sw1, 4 do not
+  PASS  pass 2 server-member: KLISH shutdown of Ethernet6 (PortChannel21) on fe-sw1 accepted
+  PASS  pass 2 server-member: no shutdown accepted on fe-sw1 after 30 s
+  PASS  pass 2 server-member: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 2 server-member: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+  KNOWN pass 2 server-member: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+  KNOWN pass 2 server-member: 25 duplicate ping replies (peer-link isolation is not enforced): L1
+== pass 2, drill peer-link: the peer link shut on fe-sw1 with the keepalive link up
+  PASS  pass 2 peer-link: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 2 peer-link: probes located before the fault as the drill needs them (try 1): ping: requests leave fe-sw1, fe-sw2
+  PASS  pass 2 peer-link: KLISH shutdown of Ethernet0,Ethernet1 (PortChannel1) on fe-sw1 accepted
+  PASS  pass 2 peer-link: no shutdown accepted on fe-sw1 after 30 s
+  PASS  pass 2 peer-link: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 2 peer-link: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+  KNOWN pass 2 peer-link: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+== pass 3, drill fw-leg: the firewall bundle's leg on fe-sw1 shut from the switch side
+  PASS  pass 3 fw-leg: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 3 fw-leg: probes located before the fault as the drill needs them (try 1): tcp: 5 connects leave the firewall toward fe-sw1, 6 toward the other switch
+  PASS  pass 3 fw-leg: KLISH shutdown of Ethernet2 (PortChannel10) on fe-sw1 accepted
+  PASS  pass 3 fw-leg: no shutdown accepted on fe-sw1 after 30 s
+  PASS  pass 3 fw-leg: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 3 fw-leg: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+  KNOWN pass 3 fw-leg: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+== pass 3, drill server-member: k8s-gpu1's member on fe-sw1 shut from the switch side
+  PASS  pass 3 server-member: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 3 server-member: probes located before the fault as the drill needs them (try 1): ping: 4 of 8 ids cross fe-sw1, 4 do not
+  PASS  pass 3 server-member: KLISH shutdown of Ethernet6 (PortChannel21) on fe-sw1 accepted
+  PASS  pass 3 server-member: no shutdown accepted on fe-sw1 after 30 s
+  PASS  pass 3 server-member: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 3 server-member: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+  KNOWN pass 3 server-member: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+  KNOWN pass 3 server-member: 17 duplicate ping replies (peer-link isolation is not enforced): L1
+== pass 3, drill peer-link: the peer link shut on fe-sw1 with the keepalive link up
+  PASS  pass 3 peer-link: the lab whole before the fault: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 3 peer-link: probes located before the fault as the drill needs them (try 1): ping: requests leave fe-sw1, fe-sw2
+  PASS  pass 3 peer-link: KLISH shutdown of Ethernet0,Ethernet1 (PortChannel1) on fe-sw1 accepted
+  PASS  pass 3 peer-link: no shutdown accepted on fe-sw1 after 30 s
+  PASS  pass 3 peer-link: the lab whole again after the drill: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll 2)
+  PASS  pass 3 peer-link: audit.sh --quick after the drill: RESULT: 239 passed, 0 failed, 0 known platform limitation(s), 1 skipped
+  KNOWN pass 3 peer-link: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure: L9
+== the passes compared
+  PASS  compare_passes.py: no disagreement between the passes
+== RESULT: 55 passed, 0 failed, 12 known platform limitation(s), 0 skipped

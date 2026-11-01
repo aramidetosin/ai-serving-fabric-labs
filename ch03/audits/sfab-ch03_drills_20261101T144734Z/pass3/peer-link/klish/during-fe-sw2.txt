@@ -1,0 +1,79 @@
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+terminal length 0
+show mclag brief
+show PortChannel summary
+exit
+fe-sw2# terminal length 0
+fe-sw2# show mclag brief
+ 
+Domain ID            : 1
+Role                 : standby
+Session Status       : up
+Peer Link Status     : down
+Source Address       : 10.20.255.1
+Peer Address         : 10.20.255.0
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : down
+Source Address       : 10.20.255.5
+Peer Address         : 10.20.255.4
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw2# show PortChannel summary
+Flags(oper-status):  D - Down U - Up (portchannel) P - Up in portchannel (members) I - LACP individual
+----------------------------------------------------------------------------------------------------------------------------
+Group               PortChannel                   Type                Protocol          Member Ports
+----------------------------------------------------------------------------------------------------------------------------
+1                   PortChannel1   (D)            Eth                 LACP              Ethernet0(D)
+                                                                                        Ethernet1(D)
+10                  PortChannel10  (U)            Eth                 LACP              Ethernet2(P)
+11                  PortChannel11  (U)            Eth                 LACP              Ethernet3(P)
+12                  PortChannel12  (U)            Eth                 LACP              Ethernet4(P)
+13                  PortChannel13  (U)            Eth                 LACP              Ethernet5(P)
+14                  PortChannel14  (U)            Eth                 LACP             Ethernet13(P)
+15                  PortChannel15  (U)            Eth                 LACP             Ethernet14(P)
+21                  PortChannel21  (U)            Eth                 LACP              Ethernet6(P)
+22                  PortChannel22  (U)            Eth                 LACP              Ethernet7(P)
+30                  PortChannel30  (U)            Eth                 LACP              Ethernet8(P)
+31                  PortChannel31  (U)            Eth                 LACP              Ethernet9(P)
+                                                                                       Ethernet10(P)
+32                  PortChannel32  (U)            Eth                 LACP             Ethernet11(P)
+41                  PortChannel41  (U)            Eth                 LACP             Ethernet15(P)
+42                  PortChannel42  (U)            Eth                 LACP             Ethernet16(P)
+43                  PortChannel43  (U)            Eth                 LACP             Ethernet17(P)
+44                  PortChannel44  (U)            Eth                 LACP             Ethernet18(P)
+fe-sw2# exit

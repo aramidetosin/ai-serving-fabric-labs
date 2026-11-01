@@ -1,0 +1,615 @@
+### 2026-11-01T16:33:01Z fe-sw1 klish
+terminal length 0
+configure terminal
+interface Ethernet11
+shutdown
+end
+exit
+terminal length 0
+configure terminal
+interface Ethernet11
+shutdown
+end
+exit
+fe-sw1# terminal length 0
+fe-sw1# configure terminal
+fe-sw1(config)# interface Ethernet11
+fe-sw1(config-if-Ethernet11)# shutdown
+fe-sw1(config-if-Ethernet11)# end
+fe-sw1# exit
+
+### 2026-11-01T16:33:13Z fe-sw1 klish
+terminal length 0
+show mclag brief
+show interface status
+show running-configuration interface PortChannel 32
+exit
+terminal length 0
+show mclag brief
+show interface status
+show running-configuration interface PortChannel 32
+exit
+fe-sw1# terminal length 0
+fe-sw1# show mclag brief
+ 
+Domain ID            : 1
+Role                 : active
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.0
+Peer Address         : 10.20.255.1
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.4
+Peer Address         : 10.20.255.5
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            down/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw1# show interface status
+--------------------------------------------------------------------------------------------------------------------------------------
+Name                Description                   Oper        Reason         AutoNeg   Speed          MTU            Alternate Name      
+--------------------------------------------------------------------------------------------------------------------------------------
+Ethernet0           peer-link-1                   up          oper-up          off       25000          9216           Eth1/1              
+Ethernet1           peer-link-2                   up          oper-up          off       25000          9216           Eth1/2              
+Ethernet2           fw-eth1                       up          oper-up          off       25000          9216           Eth1/3              
+Ethernet3           k8s-cp1-eth1                  up          oper-up          off       25000          9216           Eth1/4              
+Ethernet4           k8s-cp2-eth1                  up          oper-up          off       25000          9216           Eth1/5              
+Ethernet5           k8s-cp3-eth1                  up          oper-up          off       25000          9216           Eth1/6              
+Ethernet6           k8s-gpu1-eth1                 up          oper-up          off       25000          9216           Eth1/7              
+Ethernet7           k8s-gpu2-eth1                 up          oper-up          off       25000          9216           Eth1/8              
+Ethernet8           bastion-eth1                  up          oper-up          off       25000          9216           Eth1/9              
+Ethernet9           truenas1-eth1                 up          oper-up          off       25000          9216           Eth1/10             
+Ethernet10          truenas1-eth2                 up          oper-up          off       25000          9216           Eth1/11             
+Ethernet11          truenas1-eth5                 down        admin-down       off       25000          9216           Eth1/12             
+Ethernet12          mclag-keepalive               up          oper-up          off       25000          9216           Eth1/13             
+Ethernet13          k8s-ingress1-eth1             up          oper-up          off       25000          9216           Eth1/14             
+Ethernet14          k8s-ingress2-eth1             up          oper-up          off       25000          9216           Eth1/15             
+Ethernet15          dns-auth1-eth1                up          oper-up          off       25000          9216           Eth1/16             
+Ethernet16          dns-res1-eth1                 up          oper-up          off       25000          9216           Eth1/17             
+Ethernet17          dns-auth2-eth1                up          oper-up          off       25000          9216           Eth1/18             
+Ethernet18          dns-res2-eth1                 up          oper-up          off       25000          9216           Eth1/19             
+Ethernet19          -                             down        admin-down       off       25000          9100           Eth1/20             
+Ethernet20          -                             down        admin-down       off       25000          9100           Eth1/21             
+Ethernet21          -                             down        admin-down       off       25000          9100           Eth1/22             
+Ethernet22          -                             down        admin-down       off       25000          9100           Eth1/23             
+Ethernet23          -                             down        admin-down       off       25000          9100           Eth1/24             
+Ethernet24          -                             down        admin-down       off       25000          9100           Eth1/25             
+Ethernet25          -                             down        admin-down       off       25000          9100           Eth1/26             
+Ethernet26          -                             down        admin-down       off       25000          9100           Eth1/27             
+Ethernet27          -                             down        admin-down       off       25000          9100           Eth1/28             
+Ethernet28          -                             down        admin-down       off       25000          9100           Eth1/29             
+Ethernet29          -                             down        admin-down       off       25000          9100           Eth1/30             
+Ethernet30          -                             down        admin-down       off       25000          9100           Eth1/31             
+Ethernet31          -                             down        admin-down       off       25000          9100           Eth1/32             
+Ethernet32          -                             down        admin-down       off       25000          9100           Eth1/33             
+Ethernet33          -                             down        admin-down       off       25000          9100           Eth1/34             
+Ethernet34          -                             down        admin-down       off       25000          9100           Eth1/35             
+Ethernet35          -                             down        admin-down       off       25000          9100           Eth1/36             
+Ethernet36          -                             down        admin-down       off       25000          9100           Eth1/37             
+Ethernet37          -                             down        admin-down       off       25000          9100           Eth1/38             
+Ethernet38          -                             down        admin-down       off       25000          9100           Eth1/39             
+Ethernet39          -                             down        admin-down       off       25000          9100           Eth1/40             
+Ethernet40          -                             down        admin-down       off       25000          9100           Eth1/41             
+Ethernet41          -                             down        admin-down       off       25000          9100           Eth1/42             
+Ethernet42          -                             down        admin-down       off       25000          9100           Eth1/43             
+Ethernet43          -                             down        admin-down       off       25000          9100           Eth1/44             
+Ethernet44          -                             down        admin-down       off       25000          9100           Eth1/45             
+Ethernet45          -                             down        admin-down       off       25000          9100           Eth1/46             
+Ethernet46          -                             down        admin-down       off       25000          9100           Eth1/47             
+Ethernet47          -                             down        admin-down       off       25000          9100           Eth1/48             
+Ethernet48          -                             down        admin-down       off       100000         9100           Eth1/49             
+Ethernet52          -                             down        admin-down       off       100000         9100           Eth1/50             
+Ethernet56          -                             down        admin-down       off       100000         9100           Eth1/51             
+Ethernet60          -                             down        admin-down       off       100000         9100           Eth1/52             
+Ethernet64          -                             down        admin-down       off       100000         9100           Eth1/53             
+Ethernet68          -                             down        admin-down       off       100000         9100           Eth1/54             
+Ethernet72          -                             down        admin-down       off       100000         9100           Eth1/55             
+Ethernet76          -                             down        admin-down       off       100000         9100           Eth1/56             
+PortChannel1        peer-link                     up          oper-up          -         50000          9216           -                   
+PortChannel10       fw-ae1                        up          oper-up          -         25000          9216           -                   
+PortChannel11       k8s-cp1-bond                  up          oper-up          -         25000          9216           -                   
+PortChannel12       k8s-cp2-bond                  up          oper-up          -         25000          9216           -                   
+PortChannel13       k8s-cp3-bond                  up          oper-up          -         25000          9216           -                   
+PortChannel14       k8s-ingress1-bond             up          oper-up          -         25000          9216           -                   
+PortChannel15       k8s-ingress2-bond             up          oper-up          -         25000          9216           -                   
+PortChannel21       k8s-gpu1-bond                 up          oper-up          -         25000          9216           -                   
+PortChannel22       k8s-gpu2-bond                 up          oper-up          -         25000          9216           -                   
+PortChannel30       bastion-bond                  up          oper-up          -         25000          9216           -                   
+PortChannel31       truenas1-data                 up          oper-up          -         50000          9216           -                   
+PortChannel32       truenas1-mgmt                 down        all-links-down   -         0              9216           -                   
+PortChannel41       dns-auth1-bond                up          oper-up          -         25000          9216           -                   
+PortChannel42       dns-res1-bond                 up          oper-up          -         25000          9216           -                   
+PortChannel43       dns-auth2-bond                up          oper-up          -         25000          9216           -                   
+PortChannel44       dns-res2-bond                 up          oper-up          -         25000          9216           -                   
+fe-sw1# show running-configuration interface PortChannel 32
+!
+interface PortChannel32
+ description truenas1-mgmt
+ switchport access Vlan 200
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+ spanning-tree bpduguard port-shutdown
+ spanning-tree portfast
+fe-sw1# exit
+
+### 2026-11-01T16:33:20Z fe-sw2 klish
+terminal length 0
+show mclag brief
+show interface status
+show running-configuration interface PortChannel 32
+exit
+terminal length 0
+show mclag brief
+show interface status
+show running-configuration interface PortChannel 32
+exit
+fe-sw2# terminal length 0
+fe-sw2# show mclag brief
+ 
+Domain ID            : 1
+Role                 : standby
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.1
+Peer Address         : 10.20.255.0
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.5
+Peer Address         : 10.20.255.4
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/down
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw2# show interface status
+--------------------------------------------------------------------------------------------------------------------------------------
+Name                Description                   Oper        Reason         AutoNeg   Speed          MTU            Alternate Name      
+--------------------------------------------------------------------------------------------------------------------------------------
+Ethernet0           peer-link-1                   up          oper-up          off       25000          9216           Eth1/1              
+Ethernet1           peer-link-2                   up          oper-up          off       25000          9216           Eth1/2              
+Ethernet2           fw-eth2                       up          oper-up          off       25000          9216           Eth1/3              
+Ethernet3           k8s-cp1-eth2                  up          oper-up          off       25000          9216           Eth1/4              
+Ethernet4           k8s-cp2-eth2                  up          oper-up          off       25000          9216           Eth1/5              
+Ethernet5           k8s-cp3-eth2                  up          oper-up          off       25000          9216           Eth1/6              
+Ethernet6           k8s-gpu1-eth2                 up          oper-up          off       25000          9216           Eth1/7              
+Ethernet7           k8s-gpu2-eth2                 up          oper-up          off       25000          9216           Eth1/8              
+Ethernet8           bastion-eth2                  up          oper-up          off       25000          9216           Eth1/9              
+Ethernet9           truenas1-eth3                 up          oper-up          off       25000          9216           Eth1/10             
+Ethernet10          truenas1-eth4                 up          oper-up          off       25000          9216           Eth1/11             
+Ethernet11          truenas1-eth6                 up          oper-up          off       25000          9216           Eth1/12             
+Ethernet12          mclag-keepalive               up          oper-up          off       25000          9216           Eth1/13             
+Ethernet13          k8s-ingress1-eth2             up          oper-up          off       25000          9216           Eth1/14             
+Ethernet14          k8s-ingress2-eth2             up          oper-up          off       25000          9216           Eth1/15             
+Ethernet15          dns-auth1-eth2                up          oper-up          off       25000          9216           Eth1/16             
+Ethernet16          dns-res1-eth2                 up          oper-up          off       25000          9216           Eth1/17             
+Ethernet17          dns-auth2-eth2                up          oper-up          off       25000          9216           Eth1/18             
+Ethernet18          dns-res2-eth2                 up          oper-up          off       25000          9216           Eth1/19             
+Ethernet19          -                             down        admin-down       off       25000          9100           Eth1/20             
+Ethernet20          -                             down        admin-down       off       25000          9100           Eth1/21             
+Ethernet21          -                             down        admin-down       off       25000          9100           Eth1/22             
+Ethernet22          -                             down        admin-down       off       25000          9100           Eth1/23             
+Ethernet23          -                             down        admin-down       off       25000          9100           Eth1/24             
+Ethernet24          -                             down        admin-down       off       25000          9100           Eth1/25             
+Ethernet25          -                             down        admin-down       off       25000          9100           Eth1/26             
+Ethernet26          -                             down        admin-down       off       25000          9100           Eth1/27             
+Ethernet27          -                             down        admin-down       off       25000          9100           Eth1/28             
+Ethernet28          -                             down        admin-down       off       25000          9100           Eth1/29             
+Ethernet29          -                             down        admin-down       off       25000          9100           Eth1/30             
+Ethernet30          -                             down        admin-down       off       25000          9100           Eth1/31             
+Ethernet31          -                             down        admin-down       off       25000          9100           Eth1/32             
+Ethernet32          -                             down        admin-down       off       25000          9100           Eth1/33             
+Ethernet33          -                             down        admin-down       off       25000          9100           Eth1/34             
+Ethernet34          -                             down        admin-down       off       25000          9100           Eth1/35             
+Ethernet35          -                             down        admin-down       off       25000          9100           Eth1/36             
+Ethernet36          -                             down        admin-down       off       25000          9100           Eth1/37             
+Ethernet37          -                             down        admin-down       off       25000          9100           Eth1/38             
+Ethernet38          -                             down        admin-down       off       25000          9100           Eth1/39             
+Ethernet39          -                             down        admin-down       off       25000          9100           Eth1/40             
+Ethernet40          -                             down        admin-down       off       25000          9100           Eth1/41             
+Ethernet41          -                             down        admin-down       off       25000          9100           Eth1/42             
+Ethernet42          -                             down        admin-down       off       25000          9100           Eth1/43             
+Ethernet43          -                             down        admin-down       off       25000          9100           Eth1/44             
+Ethernet44          -                             down        admin-down       off       25000          9100           Eth1/45             
+Ethernet45          -                             down        admin-down       off       25000          9100           Eth1/46             
+Ethernet46          -                             down        admin-down       off       25000          9100           Eth1/47             
+Ethernet47          -                             down        admin-down       off       25000          9100           Eth1/48             
+Ethernet48          -                             down        admin-down       off       100000         9100           Eth1/49             
+Ethernet52          -                             down        admin-down       off       100000         9100           Eth1/50             
+Ethernet56          -                             down        admin-down       off       100000         9100           Eth1/51             
+Ethernet60          -                             down        admin-down       off       100000         9100           Eth1/52             
+Ethernet64          -                             down        admin-down       off       100000         9100           Eth1/53             
+Ethernet68          -                             down        admin-down       off       100000         9100           Eth1/54             
+Ethernet72          -                             down        admin-down       off       100000         9100           Eth1/55             
+Ethernet76          -                             down        admin-down       off       100000         9100           Eth1/56             
+PortChannel1        peer-link                     up          oper-up          -         50000          9216           -                   
+PortChannel10       fw-ae1                        up          oper-up          -         25000          9216           -                   
+PortChannel11       k8s-cp1-bond                  up          oper-up          -         25000          9216           -                   
+PortChannel12       k8s-cp2-bond                  up          oper-up          -         25000          9216           -                   
+PortChannel13       k8s-cp3-bond                  up          oper-up          -         25000          9216           -                   
+PortChannel14       k8s-ingress1-bond             up          oper-up          -         25000          9216           -                   
+PortChannel15       k8s-ingress2-bond             up          oper-up          -         25000          9216           -                   
+PortChannel21       k8s-gpu1-bond                 up          oper-up          -         25000          9216           -                   
+PortChannel22       k8s-gpu2-bond                 up          oper-up          -         25000          9216           -                   
+PortChannel30       bastion-bond                  up          oper-up          -         25000          9216           -                   
+PortChannel31       truenas1-data                 up          oper-up          -         50000          9216           -                   
+PortChannel32       truenas1-mgmt                 up          oper-up          -         25000          9216           -                   
+PortChannel41       dns-auth1-bond                up          oper-up          -         25000          9216           -                   
+PortChannel42       dns-res1-bond                 up          oper-up          -         25000          9216           -                   
+PortChannel43       dns-auth2-bond                up          oper-up          -         25000          9216           -                   
+PortChannel44       dns-res2-bond                 up          oper-up          -         25000          9216           -                   
+fe-sw2# show running-configuration interface PortChannel 32
+!
+interface PortChannel32
+ description truenas1-mgmt
+ switchport access Vlan 200
+ fast_rate
+ mtu 9216
+ no shutdown
+ mclag 1
+ spanning-tree bpduguard port-shutdown
+ spanning-tree portfast
+fe-sw2# exit
+
+### 2026-11-01T16:33:51Z bastion container
++ bash -c for i in $(seq 0 59); do t=$(date +%s.%N); if timeout 2 bash -c 'exec 3<>/dev/tcp/10.20.2.31/443' 2>/dev/null; then ok=1; else ok=0; fi; echo "$t $i $ok"; sleep 0.5; done
+1793550801.153164380 0 1
+1793550801.665293368 1 1
+1793550802.174939025 2 1
+1793550802.687990670 3 1
+1793550803.200402011 4 1
+1793550803.714168624 5 1
+1793550804.225614077 6 1
+1793550804.737114917 7 1
+1793550805.250209216 8 1
+1793550805.761960868 9 1
+1793550806.272465172 10 1
+1793550806.785771355 11 1
+1793550807.297723179 12 1
+1793550807.810766289 13 1
+1793550808.322338807 14 1
+1793550808.834154506 15 1
+1793550809.346114122 16 1
+1793550809.859234791 17 1
+1793550810.371029305 18 1
+1793550810.884129124 19 1
+1793550811.396270794 20 1
+1793550811.908970800 21 1
+1793550812.420601137 22 1
+1793550812.934003171 23 1
+1793550813.444416832 24 1
+1793550813.957302443 25 1
+1793550814.468932411 26 1
+1793550814.981754188 27 1
+1793550815.494503636 28 1
+1793550816.007719259 29 1
+1793550816.520454323 30 1
+1793550817.033165839 31 1
+1793550817.545660823 32 1
+1793550818.057595505 33 1
+1793550818.570428285 34 1
+1793550819.081571451 35 1
+1793550819.592710567 36 1
+1793550820.104991193 37 1
+1793550820.617072408 38 1
+1793550821.128805107 39 1
+1793550821.640203867 40 1
+1793550822.151239316 41 1
+1793550822.662465647 42 1
+1793550823.174528430 43 1
+1793550823.687536342 44 1
+1793550824.199423423 45 1
+1793550824.711512325 46 1
+1793550825.223472550 47 1
+1793550825.735820514 48 1
+1793550826.248221310 49 1
+1793550826.760227131 50 1
+1793550827.273079036 51 1
+1793550827.785229400 52 1
+1793550828.298797199 53 1
+1793550828.810449270 54 1
+1793550829.322370997 55 1
+1793550829.834350758 56 1
+1793550830.346763877 57 1
+1793550830.858331970 58 1
+1793550831.370480598 59 1
+
+### 2026-11-01T16:34:22Z bastion container
++ bash -c for i in $(seq 0 59); do t=$(date +%s.%N); if timeout 2 bash -c 'exec 3<>/dev/tcp/10.20.2.31/443' 2>/dev/null; then ok=1; else ok=0; fi; echo "$t $i $ok"; sleep 0.5; done
+1793550832.181605623 0 1
+1793550832.693848756 1 1
+1793550833.205893345 2 1
+1793550833.718231250 3 1
+1793550834.230793158 4 1
+1793550834.745670245 5 1
+1793550835.258204247 6 1
+1793550835.769868971 7 1
+1793550836.282363968 8 1
+1793550836.794736524 9 1
+1793550837.307820100 10 1
+1793550837.824217353 11 1
+1793550838.336663532 12 1
+1793550838.848246908 13 1
+1793550839.361319131 14 1
+1793550839.873909039 15 1
+1793550840.386334866 16 1
+1793550840.898818227 17 1
+1793550841.410256721 18 1
+1793550841.922771570 19 1
+1793550842.434636194 20 1
+1793550842.947268372 21 1
+1793550843.459504650 22 1
+1793550843.977854706 23 1
+1793550844.490097066 24 1
+1793550845.002437423 25 1
+1793550845.514893233 26 1
+1793550846.029036130 27 1
+1793550846.540931006 28 1
+1793550847.053575088 29 1
+1793550847.566008520 30 1
+1793550848.079265839 31 1
+1793550848.591599715 32 1
+1793550849.103846998 33 1
+1793550849.615256318 34 1
+1793550850.128014997 35 1
+1793550850.641073933 36 1
+1793550851.154128891 37 1
+1793550851.666183231 38 1
+1793550852.178476418 39 1
+1793550852.691538288 40 1
+1793550853.202942801 41 1
+1793550853.716776560 42 1
+1793550854.234870043 43 1
+1793550854.746554783 44 1
+1793550855.258430871 45 1
+1793550855.771401889 46 1
+1793550856.284315179 47 1
+1793550856.797400484 48 1
+1793550857.311049142 49 1
+1793550857.822978916 50 1
+1793550858.335436300 51 1
+1793550858.848526412 52 1
+1793550859.361101967 53 1
+1793550859.872527472 54 1
+1793550860.385162419 55 1
+1793550860.897543413 56 1
+1793550861.410352769 57 1
+1793550861.923348024 58 1
+1793550862.435260606 59 1
+
+### 2026-11-01T16:34:54Z bastion container
++ bash -c for i in $(seq 0 59); do t=$(date +%s.%N); if timeout 2 bash -c 'exec 3<>/dev/tcp/10.20.2.31/443' 2>/dev/null; then ok=1; else ok=0; fi; echo "$t $i $ok"; sleep 0.5; done
+1793550863.260578216 0 1
+1793550863.772976900 1 1
+1793550864.284368704 2 1
+1793550864.797361979 3 1
+1793550865.309502182 4 1
+1793550865.821886057 5 1
+1793550866.334584881 6 1
+1793550866.847112191 7 1
+1793550867.359641617 8 1
+1793550867.871507598 9 1
+1793550868.384194067 10 1
+1793550868.896880344 11 1
+1793550869.409635751 12 1
+1793550869.922461975 13 1
+1793550870.435216703 14 1
+1793550870.947821500 15 1
+1793550871.460271238 16 1
+1793550871.972526345 17 1
+1793550872.485025977 18 1
+1793550872.997910831 19 1
+1793550873.510435356 20 1
+1793550874.022459900 21 1
+1793550874.534338339 22 1
+1793550875.046540308 23 1
+1793550875.559399038 24 1
+1793550876.072143593 25 1
+1793550876.584428193 26 1
+1793550877.097465123 27 1
+1793550877.611036428 28 1
+1793550878.136533210 29 1
+1793550878.648602001 30 1
+1793550879.160016097 31 1
+1793550879.671423301 32 1
+1793550880.184041997 33 1
+1793550880.696511912 34 1
+1793550881.207721560 35 1
+1793550881.719793364 36 1
+1793550882.242346504 37 1
+1793550882.755024162 38 1
+1793550883.269329743 39 1
+1793550883.781780648 40 1
+1793550884.321708433 41 1
+1793550884.833742579 42 1
+1793550885.345577461 43 1
+1793550885.858299900 44 1
+1793550886.370539972 45 1
+1793550886.882614451 46 1
+1793550887.395315184 47 1
+1793550887.908406934 48 1
+1793550888.421029759 49 1
+1793550888.934157706 50 1
+1793550889.446498677 51 1
+1793550889.959440338 52 1
+1793550890.471269409 53 1
+1793550890.983185836 54 1
+1793550891.496744405 55 1
+1793550892.008799595 56 1
+1793550892.532748006 57 1
+1793550893.094432147 58 1
+1793550893.606456529 59 1
+
+### 2026-11-01T16:34:58Z fe-sw1 klish
+terminal length 0
+show mclag brief
+exit
+terminal length 0
+show mclag brief
+exit
+fe-sw1# terminal length 0
+fe-sw1# show mclag brief
+ 
+Domain ID            : 1
+Role                 : active
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.0
+Peer Address         : 10.20.255.1
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.4
+Peer Address         : 10.20.255.5
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            down/up
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw1# exit
+
+### 2026-11-01T16:35:01Z fe-sw2 klish
+terminal length 0
+show mclag brief
+exit
+terminal length 0
+show mclag brief
+exit
+fe-sw2# terminal length 0
+fe-sw2# show mclag brief
+ 
+Domain ID            : 1
+Role                 : standby
+Session Status       : up
+Peer Link Status     : up
+Source Address       : 10.20.255.1
+Peer Address         : 10.20.255.0
+Session Vrf          : VrfMclagKa
+Peer Link            : PortChannel1
+Keepalive Interval   : 1 secs
+Session Timeout      : 30 secs
+Delay Restore        : 300 secs
+System Mac           : 0c:00:a4:62:c8:14
+Mclag System Mac     : 02:5a:00:00:00:01
+ 
+ 
+Backup Keepalive Session Information:
+-----------------------------------
+Session Vrf          : VrfMclagKa
+Session Status       : up
+Source Address       : 10.20.255.5
+Peer Address         : 10.20.255.4
+Keepalive Interval   : 1 secs
+-----------------------------------
+ 
+ 
+Number of MLAG Interfaces:15
+-----------------------------------------------------------
+MLAG Interface       Local/Remote Status 
+-----------------------------------------------------------
+PortChannel10            up/up
+PortChannel11            up/up
+PortChannel12            up/up
+PortChannel13            up/up
+PortChannel14            up/up
+PortChannel15            up/up
+PortChannel21            up/up
+PortChannel22            up/up
+PortChannel30            up/up
+PortChannel31            up/up
+PortChannel32            up/down
+PortChannel41            up/up
+PortChannel42            up/up
+PortChannel43            up/up
+PortChannel44            up/up
+fe-sw2# exit
+
