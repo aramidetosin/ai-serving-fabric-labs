@@ -20,16 +20,16 @@ Memory: a budget of 162.5 GiB, and preflight wants MemAvailable to cover it plus
 ```
 cd ch06
 make render          # topo.clab.yml, bootstrap/ and gen/ (serving.env, the inference files, trace.json, drills.json, breaks.json)
-make up              # preflight, up, boot, finish (the cluster, the serving recipe, the API gateway and router), audit (Example 6-1)
-make audit           # audits/sfab-ch06_audit_<UTC>/ (Example 6-2)
-make trace           # audits/sfab-ch06_trace_<UTC>/ with trace.md (Example 6-5)
-make drills          # audits/sfab-ch06_drills_<UTC>/ with drills.md, three passes (Examples 6-7, 6-8, 6-10 and 6-11)
-make record          # after the drills: audit, trace, then the gate on both sets (Example 6-9)
-make break-6a        # audits/sfab-ch06_break-6a_<UTC>/ (Exercise 4)
-make heal-6a         # audits/sfab-ch06_heal-6a_<UTC>/, then the chapter audit
-make attach          # audits/sfab-ch06_attach_<UTC>/: chat-c-server-0's two networks, read-only
-make break-6b        # audits/sfab-ch06_break-6b_<UTC>/: chat-c-server-0's rail attachment with a route to the pod network
-make heal-6b         # audits/sfab-ch06_heal-6b_<UTC>/, then the chapter audit
+make up              # preflight, up, boot, finish (the cluster, the serving recipe, the API gateway and router), audit
+make audit           # runs/sfab-ch06_audit_<UTC>/
+make trace           # runs/sfab-ch06_trace_<UTC>/ with trace.md
+make drills          # runs/sfab-ch06_drills_<UTC>/ with drills.md, three passes
+make verify          # after the drills: audit, trace, then the results check on both sets
+make break-6a        # runs/sfab-ch06_break-6a_<UTC>/
+make heal-6a         # runs/sfab-ch06_heal-6a_<UTC>/, then the chapter audit
+make attach          # runs/sfab-ch06_attach_<UTC>/: chat-c-server-0's two networks, read-only
+make break-6b        # runs/sfab-ch06_break-6b_<UTC>/: chat-c-server-0's rail attachment with a route to the pod network
+make heal-6b         # runs/sfab-ch06_heal-6b_<UTC>/, then the chapter audit
 make serve           # the serving recipe again with bootstrap/k8s/serving.env (it acts only on what changed)
 make load USERS=10 SECONDS=60   # concurrent streaming clients from the operator's client, through the IPsec tunnel to the internal Gateway
 make down            # keeps state/ disks; make wipe removes them
@@ -41,4 +41,4 @@ Once the lab is up, `ssh admin@sfab-ch06-<node>` from the lab host logs in to `b
 
 ## What the checks do
 
-`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `audits/` in this directory, which git ignores. `spec/known.yaml` lists the known limits of the virtual platforms.
+`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `runs/` in this directory, which git ignores. `spec/limitations.yaml` lists the known limits of the virtual platforms.

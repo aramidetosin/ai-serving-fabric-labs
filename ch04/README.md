@@ -20,13 +20,13 @@ Memory: a budget of 126.75 GiB, and preflight wants MemAvailable to cover it plu
 ```
 cd ch04
 make render          # topo.clab.yml, bootstrap/ and gen/ (gen/trace.json, gen/drills.json, gen/breaks.json among them)
-make up              # preflight, up, boot, finish, audit (book Example 4-1)
-make audit           # audits/sfab-ch04_audit_<UTC>/ (Example 4-2)
-make trace           # audits/sfab-ch04_trace_<UTC>/ with trace.md (Examples 4-6 and 4-7)
-make drills          # audits/sfab-ch04_drills_<UTC>/ with drills.md, three passes (Examples 4-8 to 4-10)
-make record          # after the drills: audit, trace, then the gate on both sets (Example 4-11)
-make break-4a        # audits/sfab-ch04_break-4a_<UTC>/ (Exercise 4)
-make heal-4a         # audits/sfab-ch04_heal-4a_<UTC>/, then the chapter audit
+make up              # preflight, up, boot, finish, audit
+make audit           # runs/sfab-ch04_audit_<UTC>/
+make trace           # runs/sfab-ch04_trace_<UTC>/ with trace.md
+make drills          # runs/sfab-ch04_drills_<UTC>/ with drills.md, three passes
+make verify          # after the drills: audit, trace, then the results check on both sets
+make break-4a        # runs/sfab-ch04_break-4a_<UTC>/
+make heal-4a         # runs/sfab-ch04_heal-4a_<UTC>/, then the chapter audit
 make down            # keeps state/ disks; make wipe removes them
 ```
 
@@ -36,4 +36,4 @@ Once the lab is up, `ssh admin@sfab-ch04-<node>` from the lab host logs in to `b
 
 ## What the checks do
 
-`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `audits/` in this directory, which git ignores. `spec/known.yaml` lists the known limits of the virtual platforms.
+`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `runs/` in this directory, which git ignores. `spec/limitations.yaml` lists the known limits of the virtual platforms.

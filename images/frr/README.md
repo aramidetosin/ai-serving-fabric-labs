@@ -17,7 +17,7 @@ make -C images frr        # sfab/frr:10.5.4-3; rebuilt when a file here is newer
 | `vtysh.conf` | `service integrated-vtysh-config` |
 | `init.env` | what `frr-init.sh` needs before FRR starts (below) |
 
-The keys the topology binds at `/sfab/authorized_keys` (the lab key and the deploying user's own) let the login user, `GUEST_USER` (`admin` by default), in over SSH. Without them sshd still runs, and `docker exec <container> vtysh` is the way in (the harness's `FR` runner uses it).
+The keys the topology binds at `/sfab/authorized_keys` (the lab key and the deploying user's own) let the login user, `GUEST_USER` (`admin` by default), in over SSH. Without them sshd still runs, and `docker exec <container> vtysh` is the way in (the lab tooling's `FR` runner uses it).
 
 ## How it starts
 

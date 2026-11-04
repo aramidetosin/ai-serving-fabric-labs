@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# ch01/trace.sh: the request walk (book Examples 1-3 to 1-9), recorded as
-# audits/sfab-ch01_trace_<UTC>/ with trace.md, verdict.txt, dns/, fw/, pair/, rail/, cluster/,
+# ch01/trace.sh: the request walk, saved as
+# runs/sfab-ch01_trace_<UTC>/ with trace.md, results.txt, dns/, fw/, pair/, rail/, cluster/,
 # sessions/, request/, refuse/ and captures/.
 #
 # One chat completion from the enterprise client to chat through the users' Gateway, with chat's key
@@ -16,7 +16,7 @@
 # workers on the rail the placement table names; the rail switches' counters, cleared before the
 # request and read after it, and their MAC tables (the copy the router picks: chat a or chat b keeps
 # its RPC inside its node and puts nothing on a rail switch, chat c, which spans both nodes, crosses
-# rail-sw1 on rail 7). Then three requests that must be refused, each recorded where it died: the
+# rail-sw1 on rail 7). Then three requests that must be refused, each saved where it died: the
 # admin hostname to the users' Gateway (404 at the Gateway, no API gateway pod sees it), staff's key
 # (the helpdesk caller's) on chat's route (401 at the API gateway, no router pod receives it), and
 # k8s-gpu1's SSH port (deny-all-log at the firewall, no SYN on either leg). The plan is

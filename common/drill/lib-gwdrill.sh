@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 # common/drill/lib-gwdrill.sh: chapter 7's gateway drills, sourced by a chapter's drills.sh after lib.sh's sfab_init drills, which opened
-# audits/<lab>_drills_<UTC>/. The plan is gen/drills.json (sfab.render.drills: key-lifecycle,
+# runs/<lab>_drills_<UTC>/. The plan is gen/drills.json (sfab.render.drills: key-lifecycle,
 # rejected-code and idle-timeout drills, and the gateway_layer block they share).
 #
 #   gwdrills_main               --drills "ID ..." --passes N: every pass runs every drill (a drill's
@@ -427,7 +427,7 @@ gd_silent() {
 gd_leases() { EVID_OFF=1 K -n kube-system get leases -o json >"$D/leases-$1.json" 2>/dev/null || true; }
 
 # gd_helm rendered|corrected: Cilium's values as the plan holds them, applied with helm on the init
-# node (the harness's kubectl and helm), then the operator, the agents and Envoy rolled (each reads its configuration at start);
+# node (the lab's kubectl and helm), then the operator, the agents and Envoy rolled (each reads its configuration at start);
 # the upgrade and each rollout stamped on the timeline, and the leases saved before and after
 gd_helm() {
   local which="$1" f rel ns ch ver flags="" r

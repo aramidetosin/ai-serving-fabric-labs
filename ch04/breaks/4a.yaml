@@ -7,14 +7,14 @@
 # keep working (the enterprise's path to the users' VIP crosses no source NAT), so nothing but the
 # nodes' own requests to the public address shows the fault, and only the global counters name it.
 #
-# The break deletes the rule through the XML API and commits. record: reads the drop counters'
+# The break deletes the rule through the XML API and commits. observe: reads the drop counters'
 # delta view (its baseline), pings the public address ten times from k8s-cp2, reads the delta view
 # again (the drop counters that moved during those pings) and the NAT rulebase, then pings it in
 # three passes with show counter global read before and after each, and runs ten requests from the
 # enterprise client to the users' hostname. Every show counter global read starts the firewall's
 # next delta sampling, so no full counter read sits between the two delta views.
 # The heal puts the rendered rule back where the render places it (before internet-snat) and
-# commits, and its record runs the same reads.
+# commits, and its observe step runs the same reads.
 # Every check that reads flow_policy_nat_land first looks for the name in this firewall's own
 # counter table: the name is relied on only once the firewall has printed it.
 title: the no-translation rule for the public address removed
@@ -22,7 +22,7 @@ exercise: 4
 since: 4
 break:
   - panos_api: {del: nat, rule: no-nat-public}
-record:
+observe:
   - fw_show: {lines: [show counter global filter delta yes severity drop]}
   - probe_ping: {id: node-delta, from: k8s-cp2, to: public, count: 10, interval_s: 0.5, timeout_s: 1, passes: 1}
   - fw_show: {lines: [show counter global filter delta yes severity drop, show running nat-policy]}

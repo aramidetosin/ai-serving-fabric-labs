@@ -10,7 +10,7 @@
     panos_parse.py policy    FILE                               the rule names of show running *-policy, in order
     panos_parse.py ntp       FILE                               JSON {servers, synched}
 
-Every reader is tolerant of what it does not know: it returns what it found, and the caller judges
+Every reader is tolerant of what it does not know: it returns what it found, and the caller checks
 what is missing. The formats are the ones PA-VM 12.1.2 prints. Standard library only.
 """
 
@@ -31,7 +31,7 @@ IP = r"\d{1,3}(?:\.\d{1,3}){3}"
 
 
 def read(p) -> str:
-    """The text of a recorded file, stored plain or compressed (evfile.py); "" when it is not there."""
+    """The text of a saved file, stored plain or compressed (evfile.py); "" when it is not there."""
     try:
         return evfile.read_text(p)
     except (OSError, TypeError, ValueError):

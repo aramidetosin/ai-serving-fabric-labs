@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # ch02/matrix.sh: every cell of the population and endpoint matrix, its mode asserted (book Examples
-# 2-9 and 2-10), recorded as audits/sfab-ch02_matrix_<UTC>/ with matrix.md,
-# verdict.txt, requests.tsv, lookups/, requests/, keys/, fw/, routers/ and api-gateway/.
+# 2-9 and 2-10), saved as runs/sfab-ch02_matrix_<UTC>/ with matrix.md,
+# results.txt, requests.tsv, lookups/, requests/, keys/, fw/, routers/ and api-gateway/.
 #
-# gen/matrix.json is the matrix (Table 2-2) as render/decisions.py computes it from the spec: four
+# gen/matrix.json is the matrix as render/decisions.py computes it from the spec: four
 # populations (the staff from the enterprise client, the operator from its client behind its site's
 # IPsec router, the nodes from k8s-cp2 in VLAN 100, and an internet host that is not the operator
 # from the web client) against eleven endpoints, each cell's mode with the layer that decides it.
@@ -17,7 +17,7 @@
 # evidence (a router's table without the route, the firewall's discard route, or zone protection's
 # strict IP check: the firewall's route back to the source through the tunnel and its drop counter
 # over the run); the 404 with no line in the API gateway's log; the 401 with the API gateway's own
-# message. The only files it leaves are its own result set's: the clients' copies are removed.
+# message. The only files it leaves are its own run directory's: the clients' copies are removed.
 set -euo pipefail
 # shellcheck source=common/lib.sh
 . "$(dirname "$0")/../common/lib.sh"

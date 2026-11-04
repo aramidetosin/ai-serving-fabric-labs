@@ -35,13 +35,13 @@ A break file, breaks/<id>.yaml:
     title: one line
     exercise: the chapter's exercise number (metadata)
     break:  [{klish: {node, context, lines, fallback}}]       typed in one session each
-    record: [{show: {node, lines}}, {probe_tcp: {from, to, address, port, count, interval_s, timeout_s, passes}}]
+    observe: [{show: {node, lines}}, {probe_tcp: {from, to, address, port, count, interval_s, timeout_s, passes}}]
     expect_broken: [{vlan_member: {node, vlan, port, present, mode}}, {probe_share: {probe, failing: some}}]
     heal:   [{restore: <switch>}]
     expect_healed: [{vlan_member: ...}, {parity: {node}}, {probe_share: {probe, failing: none}}]
 
 The klish action's fallback is one alternative line list, typed only when the switch answers the
-first with "% Error"; the line it took is saved in the result set.
+first with "% Error"; the line it took is saved in the run directory.
 
 Chapter 4 adds the firewall. Its drills change the firewall live through the XML API and put the
 render back after, each restore pushed before the change:
@@ -149,7 +149,7 @@ network-status annotation names).
 A serving break may also add a route to a pod's rail attachment: pod_route {pod, via} (the pod
 re-created at its table address and MAC, but on a copy of its rail attachment named <nad>-route
 whose static IPAM adds a route to the cluster's pod network, k8s.pod_cidr, via the on-link rail
-address via; its replies to the cluster network then leave on the rail). The record action pod_net
+address via; its replies to the cluster network then leave on the rail). The observe action pod_net
 {pod, from: router, capture_s} reads the pod's route table on its node (in the network namespace
 whose eth0 holds the pod's IP) and captures the node's rail NIC while a router pod opens a
 connection to the pod's HTTP port (the router is the one client the serving namespace's network
@@ -186,17 +186,17 @@ drills share: the API gateway's selector, port, sidecar and hold file, the key S
 tool's image and accounts, each model's route path.
 
 A break may now act on the API gateway's keys: key_hold {pod} and key_mint {model, id} in break:,
-key_probe {id, model, key, route, expect, wait_s} and key_show {} in record:, gateway_restart {pod:
+key_probe {id, model, key, route, expect, wait_s} and key_show {} in observe:, gateway_restart {pod:
 held} in heal:, the check key_pods {probe, refusing: held|none}, probe_gateway with key: (a named
 key, with one model), and a new part, cleanup: (key_revoke {model, id}, a key the break minted), run
-after expect_healed: is judged; a break without cleanup renders without the part, as before.
+after expect_healed: is checked; a break without cleanup renders without the part, as before.
 
 Chapter 1's break moves a security rule's destination and records where the request's SYN went:
 panos_api {edit: security, rule, destination: [addresses] | rendered} in break: and heal: (the XML
 API's edit of the rule's destination node, which replaces it, where a set would add members beside
 the rendered ones; one commit after the part, as for chapter 4's actions; the plan holds the element
 and the rendered members), probe_syn {id, from, to, port, count, sport, timeout_s, passes, capture}
-in record: (count connects from a client, each from its own pinned source port counting up from
+in observe: (count connects from a client, each from its own pinned source port counting up from
 sport, to an address, a node or vip:<gateway>, with the container ports capture names, node:eth,
 captured on the lab host around each pass; its connects' shares are probe_share's, as probe_tcp's
 are), and the checks syn_at {probe, seen, seen_any, unseen} (the probe's SYNs at every point of
@@ -745,7 +745,7 @@ def _serve_drill(inv: dict, model, d: dict, probes: dict, seen: set) -> dict:
         # a copy whose RPC crosses the dark switch (a worker on another node than its server) loses
         # it; a node-local copy on a dark rail keeps its RPC inside the node's macvlan bridge, since
         # a KLISH shutdown drops no carrier at the rail NICs (a limit of the virtual switch): it stays, and the
-        # analysis says so on a KNOWN line (on hardware it would leave too)
+        # analysis says so on a LIMITATION line (on hardware it would leave too)
         on_dark = [c for c in copies if c["rail"] in dead_rails]
         dead = [c["id"] for c in on_dark if any(w["node"] != c["server"]["node"] for w in c["workers"])]
         in_node = [c["id"] for c in on_dark if c["id"] not in dead]
@@ -1296,20 +1296,20 @@ def drills(inv: dict, raw: dict, model=None, ctx=None) -> dict:
     from . import tenancy  # noqa: PLC0415
 
     items = list(raw.get("list") or [])
-    if items and all(isinstance(d, dict) and any(k in d for k in tenancy.P3_DRILL_KEYS) for d in items):
+    if items and all(isinstance(d, dict) and any(k in d for k in tenancy.TENANT_DRILL_KEYS) for d in items):
         # Part III's drills (render/tenancy.py): the lease-holder loss and the isolation drill under
         # load, each carrying its own probes
         if raw.get("probes"):
             _err("chapter.yaml drills.probes", "Part III's drills carry their own probes")
-        timing = dict(tenancy.P3_TIMING_DEFAULTS)
+        timing = dict(tenancy.TT_TIMING_DEFAULTS)
         for k, v in (raw.get("timing") or {}).items():
             if k not in timing:
                 _err("chapter.yaml drills.timing", f"unknown key {k!r} (have {', '.join(sorted(timing))})")
             timing[k] = _num(v, f"chapter.yaml drills.timing.{k}")
         seen: set = set()
-        lst = [tenancy.p3_drill(model, inv, d, seen, ctx) for d in items]
+        lst = [tenancy.tt_drill(model, inv, d, seen, ctx) for d in items]
         return {"schema": SCHEMA, "lab": inv.get("lab"), "kind": "part3", "timing": timing, "list": lst}
-    if any(isinstance(d, dict) and any(k in d for k in tenancy.P3_DRILL_KEYS) for d in items):
+    if any(isinstance(d, dict) and any(k in d for k in tenancy.TENANT_DRILL_KEYS) for d in items):
         _err("chapter.yaml drills.list", "Part III's drills run on their own, without the earlier chapters' kinds")
     pair = _pair(inv)
     probes = _probes(inv, raw.get("probes") or {}, model)
@@ -1365,7 +1365,7 @@ def drills(inv: dict, raw: dict, model=None, ctx=None) -> dict:
 # --------------------------------------------------------------------------------------------
 # breaks
 
-BREAK_KEYS = {"title", "exercise", "since", "break", "record", "expect_broken", "heal", "expect_healed", "cleanup", "note"}
+BREAK_KEYS = {"title", "exercise", "since", "break", "observe", "expect_broken", "heal", "expect_healed", "cleanup", "note"}
 
 
 def _break_action(inv: dict, a, where: str, model=None) -> dict:
@@ -1928,7 +1928,7 @@ def _gw_break_action(inv: dict, model, kind: str, body, where: str) -> dict:
         return dict(base, kind="gateway_restart", pod="held", deployment=layer["api_gateway"]["name"])
     # key_pods
     if set(b) - {"probe", "refusing"} or b.get("refusing") not in ("held", "none"):
-        _err(f"{where}.key_pods", "probe: a key_probe of record:, refusing: held (only the held pod refuses the key) or none")
+        _err(f"{where}.key_pods", "probe: a key_probe of observe:, refusing: held (only the held pod refuses the key) or none")
     return {"kind": "key_pods", "probe": str(b.get("probe") or ""), "refusing": str(b["refusing"])}
 
 
@@ -2031,7 +2031,7 @@ def _serve_break_action(inv: dict, model, kind: str, body, where: str) -> dict:
                 "capture_s": int(_num(b.get("capture_s", 12), f"{where}.pod_net.capture_s"))}
     if kind == "reply_path":
         if set(b) - {"pod", "leaves"} or b.get("leaves") not in ("rail", "eth0"):
-            _err(f"{where}.reply_path", "pod: the pod a pod_net action of record: reads, leaves: rail (its replies to the "
+            _err(f"{where}.reply_path", "pod: the pod a pod_net action of observe: reads, leaves: rail (its replies to the "
                                         "cluster network leave on its rail) or eth0")
         return {"kind": "reply_path", "pod": str(b.get("pod") or ""), "leaves": str(b["leaves"]), "namespace": sv["namespace"]}
     if kind == "mac_gone":
@@ -2238,7 +2238,7 @@ def _break(inv: dict, bid: str, raw: dict, model=None) -> dict:
     if extra:
         _err(where, f"unknown keys {sorted(extra)}")
     out = {"id": bid, "title": str(raw.get("title") or bid), "exercise": raw.get("exercise"), "note": raw.get("note")}
-    for part in ("break", "record", "expect_broken", "heal", "expect_healed", "cleanup"):
+    for part in ("break", "observe", "expect_broken", "heal", "expect_healed", "cleanup"):
         out[part] = [_break_action(inv, a, f"{where} {part}[{i}]", model) for i, a in enumerate(raw.get(part) or [])]
     if not out["break"]:
         _err(where, "break: names no action")
@@ -2248,7 +2248,7 @@ def _break(inv: dict, bid: str, raw: dict, model=None) -> dict:
               "mac_gone", "key_pods", "syn_at", "tlog_rule", "cell_mode", "reply_path", "mclag_iface", "lookup_answer", "vip_arp", "route_set"}
     allowed = {"break": {"klish", "panos_api", "relay_route", "pod_rail", "pod_route", "key_hold", "key_mint", "dns_answer", "k8s_patch",
                          "dnsmasq_pin"},
-               "record": {"show", "probe_tcp", "fw_show", "probe_ping", "probe_http", "ns_show", "probe_rail", "k8s_show", "pod_net",
+               "observe": {"show", "probe_tcp", "fw_show", "probe_ping", "probe_http", "ns_show", "probe_rail", "k8s_show", "pod_net",
                           "probe_gateway", "key_probe", "key_show", "probe_syn", "matrix_cells", "k8s_read", "probe_lookup"},
                "heal": {"klish", "restore", "panos_api", "relay_route", "serve", "gateway_restart", "k8s_patch"}, "expect_broken": checks,
                "expect_healed": checks, "cleanup": {"key_revoke"}}
@@ -2256,14 +2256,14 @@ def _break(inv: dict, bid: str, raw: dict, model=None) -> dict:
         for a in out.get(part) or []:
             if a["kind"] not in kinds:
                 _err(where, f"{part}: a {a['kind']} action does not belong there (have {', '.join(sorted(kinds))})")
-    probes = {a["id"]: a for a in out["record"] if a["kind"] in ("probe_tcp", "probe_ping", "probe_http", "probe_rail", "probe_gateway",
+    probes = {a["id"]: a for a in out["observe"] if a["kind"] in ("probe_tcp", "probe_ping", "probe_http", "probe_rail", "probe_gateway",
                                                                  "key_probe", "probe_syn", "matrix_cells", "probe_lookup")}
     for part in ("expect_broken", "expect_healed"):
         for a in out[part]:
             if a["kind"] in ("syn_at", "tlog_rule"):
                 p = probes.get(a["probe"])
                 if p is None or p["kind"] != "probe_syn":
-                    _err(where, f"{part}: {a['kind']} names {a['probe']!r}, which is no probe_syn of record:")
+                    _err(where, f"{part}: {a['kind']} names {a['probe']!r}, which is no probe_syn of observe:")
                 ids = {f"{c['node']}:{c['eth']}": c["id"] for c in p["capture"]}
                 for k in ("seen", "seen_any", "unseen"):
                     for x in a.get(k) or []:
@@ -2274,11 +2274,11 @@ def _break(inv: dict, bid: str, raw: dict, model=None) -> dict:
             if a["kind"] == "cell_mode":
                 p = probes.get(a["probe"])
                 if p is None or p["kind"] != "matrix_cells" or a["cell"] not in p["cells"]:
-                    _err(where, f"{part}: cell_mode names {a['cell']!r} of {a['probe']!r}, which no matrix_cells of record: tries")
+                    _err(where, f"{part}: cell_mode names {a['cell']!r} of {a['probe']!r}, which no matrix_cells of observe: tries")
             if a["kind"] == "lookup_answer":
                 p = probes.get(a["probe"])
                 if p is None or p["kind"] != "probe_lookup":
-                    _err(where, f"{part}: lookup_answer names {a['probe']!r}, which is no probe_lookup of record:")
+                    _err(where, f"{part}: lookup_answer names {a['probe']!r}, which is no probe_lookup of observe:")
                 need = a.get("tool") or {"A": "dig-a", "AAAA": "dig-aaaa"}[a["type"]]
                 if need not in p["tools"]:
                     _err(where, f"{part}: lookup_answer wants {need}, which {a['probe']} does not run")
@@ -2287,13 +2287,13 @@ def _break(inv: dict, bid: str, raw: dict, model=None) -> dict:
             if a["kind"] == "probe_share" and probes.get(a["probe"], {}).get("kind") == "matrix_cells":
                 _err(where, f"{part}: probe_share names {a['probe']!r}, a matrix_cells: its check is cell_mode")
             if a["kind"] == "probe_share" and a["probe"] not in probes:
-                _err(where, f"{part}: probe_share names {a['probe']!r}, which record: does not run")
+                _err(where, f"{part}: probe_share names {a['probe']!r}, which observe: does not run")
             if a["kind"] == "probe_share" and probes[a["probe"]]["kind"] == "key_probe":
                 _err(where, f"{part}: probe_share names {a['probe']!r}, a key_probe: its check is key_pods")
             if a["kind"] == "key_pods":
                 p = probes.get(a["probe"])
                 if p is None or p["kind"] != "key_probe":
-                    _err(where, f"{part}: key_pods names {a['probe']!r}, which is no key_probe of record:")
+                    _err(where, f"{part}: key_pods names {a['probe']!r}, which is no key_probe of observe:")
                 if a["refusing"] == "held" and not any(x["kind"] == "key_hold" for x in out["break"]):
                     _err(where, f"{part}: key_pods refusing: held, but break: holds no API gateway pod")
             if a["kind"] == "far_capture":
@@ -2301,9 +2301,9 @@ def _break(inv: dict, bid: str, raw: dict, model=None) -> dict:
                 if p is None or p["kind"] != "probe_rail" or not p.get("capture"):
                     _err(where, f"{part}: far_capture names {a['probe']!r}, which is no probe_rail with capture: true")
             if a["kind"] == "reply_path":
-                pn = next((x for x in out["record"] if x["kind"] == "pod_net" and x["pod"] == a["pod"]), None)
+                pn = next((x for x in out["observe"] if x["kind"] == "pod_net" and x["pod"] == a["pod"]), None)
                 if pn is None:
-                    _err(where, f"{part}: reply_path names {a['pod']!r}, which no pod_net action of record: reads")
+                    _err(where, f"{part}: reply_path names {a['pod']!r}, which no pod_net action of observe: reads")
                 rt = next((x for x in out["break"] if x["kind"] == "pod_route" and x["pod"] == a["pod"]), None)
                 if rt is None:
                     _err(where, f"{part}: reply_path names {a['pod']!r}, which no pod_route action of break: reroutes")

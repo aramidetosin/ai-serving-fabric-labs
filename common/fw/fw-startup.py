@@ -40,7 +40,7 @@ steps with that race closed:
 
 Credentials. The PA-VM keeps containerlab's paloalto_panos default login: the kind gives the
 image's launcher (PID 1) its default --username and --password on the command line, and the
-launcher never reads USERNAME and PASSWORD from the environment. So the login is read from the launcher's arguments, as the harness reads
+launcher never reads USERNAME and PASSWORD from the environment. So the login is read from the launcher's arguments, as the lab tooling reads
 a switch's. In order:
 
   1. SFAB_FW_PASSWORD (and SFAB_FW_USER, default admin), only when the operator exports it: an
@@ -99,7 +99,7 @@ TRANSIENT = (OSError, http.client.HTTPException, ET.ParseError)
 
 
 class Timing:
-    """Tries and pauses (seconds). The tests shrink them."""
+    """Tries and pauses (seconds)."""
 
     keygen_tries = 60
     keygen_pause = 10.0

@@ -34,7 +34,7 @@
 #   4. the lab's join token, with no expiry; the shared keys published for the control nodes
 #   5. the API's chain checked: a kubeconfig with the API through the VIP and the lab root as its only
 #      trust, made in a 0600 file under the run directory and removed after (no kubeconfig leaves this
-#      node: the harness's kubectl runs here with admin.conf, and each operator's on the bastion carries
+#      node: the lab's kubectl runs here with admin.conf, and each operator's on the bastion carries
 #      a short-lived client certificate the finish stage issues here)
 #   6. the Gateway API CRDs, established before Cilium: its operator turns its Gateway controller
 #      on only when they exist as it starts
@@ -49,8 +49,7 @@
 #   2. (control) the chain on the API server's certificate, and kube-vip on admin.conf
 #
 # The token is never printed. SFAB_K8S_DIR, SFAB_SHARED_CLUSTER, SFAB_KUBE_DIR, SFAB_STATE_DIR,
-# SFAB_RUN_DIR and SFAB_BIN_DIR move the directories, and SFAB_WAIT_S and SFAB_POLL_S the waits
-# (the tests use them, with stand-ins for kubeadm, kubectl, crictl, ctr and curl).
+# SFAB_RUN_DIR and SFAB_BIN_DIR move the directories, and SFAB_WAIT_S and SFAB_POLL_S the waits.
 set -euo pipefail
 
 K8S_DIR=${SFAB_K8S_DIR:-/etc/sfab/k8s}
@@ -142,7 +141,7 @@ load() {
     *) die "$f: CLUSTER_ROLE $CLUSTER_ROLE is not init, join-control or join-worker" ;;
   esac
   SHARED=${SFAB_SHARED_CLUSTER:-$CLUSTER_SHARED}
-  # the EncryptionConfiguration under /etc/kubernetes follows SFAB_KUBE_DIR (the tests move it)
+  # the EncryptionConfiguration under /etc/kubernetes follows SFAB_KUBE_DIR
   if [ -n "${CLUSTER_ENCRYPTION_CONFIG:-}" ]; then CLUSTER_ENCRYPTION_CONFIG=${CLUSTER_ENCRYPTION_CONFIG/#\/etc\/kubernetes/$KDIR}; fi
   KUBEADM_CFG=$K8S_DIR/$CLUSTER_KUBEADM
   ADMIN=$KDIR/admin.conf

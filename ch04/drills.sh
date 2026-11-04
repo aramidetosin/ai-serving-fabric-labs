@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# ch04/drills.sh [--drills "ID ..."] [--passes N]: the chapter's firewall drills (book Examples 4-8
-# to 4-10), recorded as audits/sfab-ch04_drills_<UTC>/ with pass<N>/<drill>/ and
+# ch04/drills.sh [--drills "ID ..."] [--passes N]: the chapter's firewall drills, saved as runs/sfab-ch04_drills_<UTC>/ with pass<N>/<drill>/ and
 # drills.md. make drills runs it with PASSES=3.
 #
 # The drills are chapter.yaml's drills block, rendered to gen/drills.json, in this order:
@@ -24,7 +23,7 @@
 #               inside-to-ntp.
 #
 # Each change has its restore pushed first, run from the EXIT trap whatever happens. Every time is
-# the lab host's clock, and preflight's host tick of 10000 is checked when the result set opens.
+# the lab host's clock, and preflight's host tick of 10000 is checked when the run directory opens.
 set -euo pipefail
 # shellcheck source=common/lib.sh
 . "$(dirname "$0")/../common/lib.sh"

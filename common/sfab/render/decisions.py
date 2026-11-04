@@ -1,7 +1,7 @@
 """gen/decisions.yaml and gen/matrix.yaml (chapter 2), with their runtime forms gen/decisions.json and
 gen/matrix.json, in a lab whose chapter.yaml says decisions: true.
 
-The decision table (Table 2-1) is the spec's decisions.rows, one row per layer a request meets, each
+The decision table is the spec's decisions.rows, one row per layer a request meets, each
 with the objects of the lab that implement it, found in the model:
 
     view       the DNS views, each with its server, the segments it answers and its answer
@@ -22,7 +22,7 @@ holds no comment for in this render). Every switch is labeled forwarding only (d
 with the decision ids its own ports carry; the ids the spec gives objects of no row are listed with
 why (decisions.other). An explicit id under no row and not listed there is a render error.
 
-The matrix (Table 2-2) is the spec's matrix.rows (a population and the client it tries from) by
+The matrix is the spec's matrix.rows (a population and the client it tries from) by
 matrix.columns. Each cell's mode is computed here, as the request meets the layers: the client's
 resolver view answers its name; the client's gateway, or a router's static route, takes it to the
 firewall, which looks up the route on ingress, matches a NAT rule on the pre-NAT zones and the first
@@ -1047,11 +1047,11 @@ def render(model: Model, ctx) -> dict:
     plan = label_plan(model, t, mx)
     src = ctx.profile_file(model)
     th = [f"{model.lab} decisions: rendered from {src} by render/decisions.py; edit the spec and run make render",
-          "The decision table (Table 2-1): one row per layer, in the order a request meets them, each with the objects of",
+          "The decision table: one row per layer, in the order a request meets them, each with the objects of",
           "this lab that implement it and the decision id each carries. label.sh reads gen/decisions.json, the same data",
           "with its plan of reads, and prints the live object behind every row."]
     mh = [f"{model.lab} matrix: rendered from {src} by render/decisions.py; edit the spec and run make render",
-          "The population and endpoint matrix (Table 2-2): every cell's mode as the request meets the layers, with the",
+          "The population and endpoint matrix: every cell's mode as the request meets the layers, with the",
           "requests matrix.sh makes and the evidence each mode leaves. matrix.sh reads gen/matrix.json, the same data."]
     return {YAML_PATH: _yaml(th, t), JSON_PATH: dumps(dict(t, plan=plan)), MATRIX_YAML: _yaml(mh, mx), MATRIX_JSON: dumps(mx)}
 

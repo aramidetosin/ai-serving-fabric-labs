@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
-# collect.sh --set DIR [--quick] [--nodes a,b]: save every node's collection plan into a result set.
+# collect.sh --set DIR [--quick] [--nodes a,b]: save every node's collection plan into a run directory.
 #
-# Each node's plan comes from common/audit/cmds/ (judge.py plan). Nodes are collected in parallel,
+# Each node's plan comes from common/audit/cmds/ (checks.py plan). Nodes are collected in parallel,
 # at most SFAB_COLLECT_JOBS (16) at a time. On a switch every KLISH line of the plan runs in one
-# sonic-cli session that judge.py split cuts by prompt; on the firewall the CLI lines share one
+# sonic-cli session that checks.py split cuts by prompt; on the firewall the CLI lines share one
 # session the same way. Files land as DIR/<node>/NN_<slug>.txt (.json, .xml), each output once;
 # the transcript blocks go to DIR/commands.txt in node order. Each node prints one PASS or FAIL
-# line for its collection. Nothing is judged here.
+# line for its collection. Nothing is checked here.
 # Surfaces (cmds/README.md): klish, cli and cli-set (one session each), vtysh, shell, guest, xml,
 # host (a host_* function below), exec (docker exec), frr (vtysh in an FRR container),
-# kubectl (a shell on the init node, where the harness's kubectl runs with the admin kubeconfig) and
+# kubectl (a shell on the init node, where the lab's kubectl runs with the admin kubeconfig) and
 # node (a VM guest over SSH, else docker exec).
 # shellcheck disable=SC2317 # the host_* functions run through the plan's dispatch
 set -euo pipefail
@@ -18,7 +18,7 @@ set -euo pipefail
 sfab_init collect "$@"
 [ -n "$RS" ] || die "collect.sh needs --set DIR"
 
-JUDGE="$SFAB_COMMON/audit/judge.py"
+CHECKS="$SFAB_COMMON/audit/checks.py"
 PART="$RS/.part"
 mkdir -p "$PART"
 
@@ -160,13 +160,13 @@ _save() {
 collect_node() {
   local n="$1" dir="$RS/$1" plan="$PART/$1.plan" nn slug surface ext cmd out rc
   local got=0 want=0 failed=()
-  SFAB_VERDICT="$PART/$n.verdict"
+  SFAB_RESULTS="$PART/$n.results"
   [ -z "${EVID:-}" ] || EVID="$PART/$n.evid"
-  : >"$SFAB_VERDICT"
+  : >"$SFAB_RESULTS"
   mkdir -p "$dir"
   local qa=()
   [ "$SFAB_QUICK" = 1 ] && qa=(--quick)
-  if ! py "$JUDGE" plan --inv "$INV" --node "$n" "${qa[@]}" >"$plan"; then
+  if ! py "$CHECKS" plan --inv "$INV" --node "$n" "${qa[@]}" >"$plan"; then
     bad "collect $n" "no plan"
     return 0
   fi
@@ -182,7 +182,7 @@ collect_node() {
     if [ "$surface" = klish ]; then SW "$n" "${cmds[@]}" >"$sess" 2>&1 || rc=$?; else FW "${cmds[@]}" >"$sess" 2>&1 || rc=$?; fi
     local style=klish
     [ "$surface" = cli ] && style=panos
-    py "$JUDGE" split --style "$style" --plan "$sub" --session "$sess" --out "$dir" >"$PART/$n.missing" || true
+    py "$CHECKS" split --style "$style" --plan "$sub" --session "$sess" --out "$dir" >"$PART/$n.missing" || true
     while read -r slug; do [ -z "$slug" ] || failed+=("$slug"); done <"$PART/$n.missing"
     [ "$rc" -eq 0 ] || failed+=("$surface session exit $rc")
   done
@@ -190,7 +190,7 @@ collect_node() {
   if [ -s "$sub" ]; then
     rc=0
     FW "set cli config-output-format set" "configure" "show" "exit" >"$sess" 2>&1 || rc=$?
-    py "$JUDGE" split --style panos --plan "$sub" --session "$sess" --out "$dir" >"$PART/$n.missing" || true
+    py "$CHECKS" split --style panos --plan "$sub" --session "$sess" --out "$dir" >"$PART/$n.missing" || true
     while read -r slug; do [ -z "$slug" ] || failed+=("$slug"); done <"$PART/$n.missing"
   fi
 
@@ -223,7 +223,7 @@ collect_node() {
     # a guest probe that fails (a ping with no reply) is still evidence; only a dead transport
     # (ssh 255, timeout 124, no such function 127) means nothing was collected. A docker exec
     # into a missing container exits 1 with nothing on stdout, a kubectl read that fails leaves
-    # an empty JSON file: both are judged from what was saved.
+    # an empty JSON file: both are checked from what was saved.
     case "$rc" in 124|127|255) failed+=("$slug (exit $rc)"); rm -f "$out" ;; esac
   done 3<"$plan"
 
@@ -255,7 +255,7 @@ else
 fi
 [ "$SFAB_QUICK" = 1 ] && [ "${#SFAB_NODES[@]}" -eq 0 ] && targets=("${SWITCHES[@]}" ${FW_NODE:+"$FW_NODE"})
 
-main_verdict="$SFAB_VERDICT"
+main_results="$SFAB_RESULTS"
 main_evid="${EVID:-}"
 qlabel=""
 [ "$SFAB_QUICK" = 1 ] && qlabel=", quick"
@@ -268,15 +268,15 @@ for n in "${targets[@]}"; do
 done
 for p in "${pids[@]}"; do wait "$p" || true; done
 
-SFAB_VERDICT="$main_verdict"
+SFAB_RESULTS="$main_results"
 EVID="$main_evid"
 fails=0
 for n in "${targets[@]}"; do
-  if [ -f "$PART/$n.verdict" ]; then
+  if [ -f "$PART/$n.results" ]; then
     while IFS= read -r l; do
       _vline "$l"
       case "$l" in "  FAIL  "*) fails=1 ;; esac
-    done <"$PART/$n.verdict"
+    done <"$PART/$n.results"
   else
     bad "collect $n" "the collector died"
     fails=1

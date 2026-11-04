@@ -1,69 +1,58 @@
-# Known platform limitations. A KNOWN line in an audit, trace or drill must name one of these ids,
-# and KNOWN is never counted as a pass. Each entry says what the limit is (statement) and what every
-# lab does about it (lab).
+# Known platform limitations. A LIMITATION line in an audit, trace or drill states one of these
+# in its own words, and is never counted as a pass. Each entry says what the limit is (statement)
+# and what every lab does about it (lab).
 
-known:
-  - id: L1
-    title: peer-link isolation is not enforced
+limitations:
+  - title: peer-link isolation is not enforced
     statement: >-
       MCLAG peer-link isolation is configured and shown as enabled, but the virtual bridge does
       not isolate, so broadcast that crosses the peer link comes back out the MCLAG bonds.
-    lab: a duplicate reply in a pair transcript is this artifact; warm ARP and MAC tables before recording
-  - id: L2
-    title: delay-restore is not enforced
+    lab: a duplicate reply in a pair transcript is this artifact; warm ARP and MAC tables before saving
+  - title: delay-restore is not enforced
     statement: >-
       delay-restore 300 is written by default and displayed, and nothing is held down; a rejoin
       is boot plus LACP.
     lab: record the standby's return as an event, never the departure-to-return span
-  - id: L3
-    title: PFC and ECN are configuration only
+  - title: PFC and ECN are configuration only
     statement: >-
       Maps, PFC priorities, the watchdog and the RoCE defaults are accepted, and no buffer limits
       exist in the switch's state database.
     lab: no QoS configuration in any lab
-  - id: L4
-    title: custom WRED is rejected
+  - title: custom WRED is rejected
     statement: >-
       Only the RoCE force-defaults command installs the RoCE policy, and it restarts the switch.
     lab: none
-  - id: L5
-    title: no BMP
+  - title: no BMP
     statement: >-
       There is no KLISH command for BMP, and bgpd starts without the BMP module.
     lab: the route view is a REST or gNMI Get poll, or a gNMI SAMPLE subscription at 20 s or more
-  - id: L6
-    title: sFlow crash-loops swss on a switch missing NICs
+  - title: sFlow crash-loops swss on a switch missing NICs
     statement: >-
       Global sFlow samples all 56 ports; ports without a VM NIC make syncd throw and swss restart
       about every 2.5 minutes until sFlow is disabled.
     lab: a switch that exports sFlow runs NUM_NICS 56 with eth56 connected
-  - id: L7
-    title: LLDP stops after a swss restart
+  - title: LLDP stops after a swss restart
     statement: >-
       LLDP stays dead after a swss restart until the switch VM reboots, and during swss loops the
       hosts cache a 1500-byte path MTU.
     lab: reboot before reading LLDP after any swss restart; flush the hosts' route cache after an MTU event
-  - id: L8
-    title: ECMP hashes on IP addresses only
+  - title: ECMP hashes on IP addresses only
     statement: >-
       The virtual data plane hashes ECMP on source and destination addresses; the KLISH load-share
       hash lines do not reach it.
     lab: drills place flows by source or destination address and locate each flow before a cut
-  - id: L9
-    title: a shut port drops no carrier at the far end
+  - title: a shut port drops no carrier at the far end
     statement: >-
       A KLISH shutdown inside the switch VM does not drop carrier on the neighbor, and a
       container-side link down is invisible to the VM, so no cable pull can be emulated.
     lab: every failover figure is an LACP-timeout or BFD figure, labeled so
-  - id: L10
-    title: docker pause holds packets
+  - title: docker pause holds packets
     statement: >-
       A paused switch container holds packets and delivers them about 31 s later, and BGP
       neighbors reset their sessions on resume.
     lab: drills never use docker pause; late replies (RTT over 1 s) count as lost
-  - id: L11
-    title: the lab host's clock
+  - title: the lab host's clock
     statement: >-
       A host whose kernel tick is not 10000 us runs its monotonic clock away from real time and
       steps its wall clock, so durations measured on it are off.
-    lab: preflight reads the tick and every result set is stamped when it is not 10000; cross-switch timing still needs a measured offset
+    lab: preflight reads the tick and every run directory is stamped when it is not 10000; cross-switch timing still needs a measured offset

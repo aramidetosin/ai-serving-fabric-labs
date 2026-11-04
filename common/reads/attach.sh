@@ -79,7 +79,7 @@ attach_words() {
   printf '%s' "${out# }"
 }
 
-# attach_k DIR NAME ARGS...: the harness's kubectl (on the init node), saved at that node's root prompt
+# attach_k DIR NAME ARGS...: the lab's kubectl (on the init node), saved at that node's root prompt
 attach_k() {
   local dir="$1" name="$2"
   shift 2

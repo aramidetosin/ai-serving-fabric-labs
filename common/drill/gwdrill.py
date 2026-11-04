@@ -16,7 +16,7 @@
     gwdrill.py summarize --set DIR [--stamp TEXT]        drills.md
 
 analyze reads one pass of one drill from its directory, prints the result vocabulary (appending
-to $SFAB_VERDICT) and writes analysis.json and analysis.txt:
+to $SFAB_RESULTS) and writes analysis.json and analysis.txt:
 
   key-lifecycle  the mint and the revoke as the key Jobs logged them (each key by its fingerprint);
                  per API gateway pod, when it first accepted the new key (the per-pod probe's
@@ -209,7 +209,7 @@ def probe_counts(v, d: Path, plan: dict, label: str) -> list:
         rs = jlines(d / f"records-{m}.jsonl")
         failed = [r for r in rs if r.get("outcome") != "answered"]
         v.check(f"{label}: {m} through {plan['probes']['gateway']['gateway']}: {len(failed)} of {len(rs)} requests failed",
-                bool(rs) and not failed, ", ".join(f"#{r.get('n')} {r.get('why')}" for r in failed[:4]) or "no request recorded")
+                bool(rs) and not failed, ", ".join(f"#{r.get('n')} {r.get('why')}" for r in failed[:4]) or "no request saved")
         out.append({"model": m, "sent": len(rs), "failed": len(failed)})
     return out
 
@@ -540,9 +540,9 @@ def cmd_summarize(a) -> int:
                     continue
                 L.append(f"- {k}: `{json.dumps(x, sort_keys=True)}`")
             L.append("")
-    verdict = read(rs / "verdict.txt")
-    L += ["## Verdict", "", "```"] + [l for l in verdict.splitlines() if l.strip()] + ["```", "",
-                                                                                     vocab.result_line(vocab.counts_of(str(rs / "verdict.txt"))), ""]
+    results = read(rs / "results.txt")
+    L += ["## Results", "", "```"] + [l for l in results.splitlines() if l.strip()] + ["```", "",
+                                                                                     vocab.result_line(vocab.counts_of(str(rs / "results.txt"))), ""]
     (rs / "drills.md").write_text("\n".join(L), encoding="utf-8")
     return 0
 

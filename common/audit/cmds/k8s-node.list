@@ -1,5 +1,5 @@
 # A Kubernetes node (a VM guest with a k8s role, stages.cluster), after vm-node.list and its role's
-# list: SLUG SURFACE COMMAND. judge.py's "cluster-nodes" group judges these files.
+# list: SLUG SURFACE COMMAND. checks.py's "cluster-nodes" group checks these files.
 cluster_unit         guest       systemctl show -p ActiveState -p SubState -p ExecMainStatus -p ExecMainExitTimestampMonotonic -p NRestarts sfab-cluster.service
 kubelet_active       guest       systemctl is-active kubelet
 containerd_hosts     guest       for f in /etc/containerd/certs.d/*/hosts.toml; do echo "== $f"; cat "$f"; done

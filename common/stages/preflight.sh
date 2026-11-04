@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # preflight.sh: refuse to deploy unless the host can hold this lab.
 #
-# Every check prints PASS or FAIL (SKIP where it cannot judge), and any FAIL refuses. The lines
+# Every check prints PASS or FAIL (SKIP where it cannot check), and any FAIL refuses. The lines
 # are kept in state/preflight.last, which the audit replays. Preflight
 # changes nothing on the host beyond loading the kernel modules the lab needs (idempotent, not
 # persistent) and creating the lab's own state/secrets.env and SSH key.
@@ -65,9 +65,9 @@ pf_tick() {
   if [ "$rc" -eq 0 ]; then
     ok "host tick $t"
   else
-    # The tick is read and recorded, never refused: another workload on a shared host can move it
+    # The tick is read and saved, never refused: another workload on a shared host can move it
     # (any container holding CAP_SYS_TIME adjusts the one clock), and a lab must not stop on that.
-    skip "host tick ${t:-unreadable}" "reads ${t:-nothing}, not ${HOST_TICK_WANT:-10000}: recorded, not refused; common/bin/tick.py reads it, and run as root with --set it sets it to 10000 (adjtimex(2) ADJ_TICK)"
+    skip "host tick ${t:-unreadable}" "reads ${t:-nothing}, not ${HOST_TICK_WANT:-10000}: saved, not refused; common/bin/tick.py reads it, and run as root with --set it sets it to 10000 (adjtimex(2) ADJ_TICK)"
   fi
 }
 
@@ -328,7 +328,7 @@ pf_cpu() {
 #   the container layer where vrnetlab writes the switches' and the PA-VM's overlays.
 # Where the two share a filesystem, its free space must cover both at once.
 pf_disk() {
-  local n root out verdict label detail waiting=()
+  local n root out results label detail waiting=()
   mkdir -p "$STATEDIR"
   for n in "${NODES[@]}"; do running "$n" || waiting+=("$n"); done
   root="$(dk info --format '{{.DockerRootDir}}' 2>/dev/null || true)"
@@ -370,7 +370,7 @@ for n in nodes:
 layer_need = sum(b(n, "layer_gib") for n in waiting if n in nodes)
 st = "%.1f GiB under state/ (budget %.1f GiB, %.1f GiB of it already there)" % (state_need, plan, held)
 if not root or not os.path.isdir(root):
-    print("FAIL\tdisk\tdocker info gives no data root (DockerRootDir %r), so the container layers cannot be judged" % root)
+    print("FAIL\tdisk\tdocker info gives no data root (DockerRootDir %r), so the container layers cannot be checked" % root)
     raise SystemExit(0)
 ly = "%.1f GiB of container layers under %s for the nodes not yet running" % (layer_need, root)
 if os.stat(state).st_dev == os.stat(root).st_dev:
@@ -389,8 +389,8 @@ else:
 PY
 )" || true
   [ -n "$out" ] || { bad "disk" "the disk budget could not be read from the inventory"; return 0; }
-  while IFS=$'\t' read -r verdict label detail; do
-    case "$verdict" in
+  while IFS=$'\t' read -r results label detail; do
+    case "$results" in
       PASS) ok "$label" ;;
       *) bad "$label" "$detail" ;;
     esac
@@ -476,9 +476,9 @@ preflight_main() {
   summary || rc=$?
   {
     printf '# preflight %s\n' "$(utc)"
-    cat "$SFAB_VERDICT"
+    cat "$SFAB_RESULTS"
   } >"$STATEDIR/preflight.last"
-  rm -f "$SFAB_VERDICT"
+  rm -f "$SFAB_RESULTS"
   [ "$rc" -eq 0 ] || { printf 'preflight: refusing to deploy %s\n' "$LAB" >&2; return 1; }
 }
 

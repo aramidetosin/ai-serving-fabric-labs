@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 # operator-shell.sh: the bastion's login environment for the operator, installed as
 # /etc/profile.d/sfab-operator.sh (login shells) and sourced from /etc/bash.bashrc (interactive
-# shells). It sets nothing a script relies on: the harness runs kubectl through docker exec as
+# shells). It sets nothing a script relies on: the lab tooling runs kubectl through docker exec as
 # root, which reads /root/.kube/config, the kubeconfig bastion-init.sh picks up.
 #
 # Interactive shells get the k alias with kubectl's completion and start in /workspace; a shell

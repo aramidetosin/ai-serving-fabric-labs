@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# ch03/drills.sh [--drills "ID ..."] [--passes N]: the chapter's failure drills (book Examples 3-10
-# to 3-12, and the keepalive drills), recorded as
-# audits/sfab-ch03_drills_<UTC>/ with pass<N>/<drill>/, compare.txt and drills.md. make drills runs
+# ch03/drills.sh [--drills "ID ..."] [--passes N]: the chapter's failure drills, saved as
+# runs/sfab-ch03_drills_<UTC>/ with pass<N>/<drill>/, compare.txt and drills.md. make drills runs
 # it with PASSES=3.
 #
 # The drills are chapter.yaml's drills block, rendered to gen/drills.json, in this order:
@@ -30,13 +29,13 @@
 #   standby-reboot  sudo reboot, under a timeout, on the switch show mclag brief names standby when
 #                   the drill runs. A monitor reads every bond's legs, both switches' MCLAG and
 #                   PortChannel state and the firewall's LACP every few seconds; the departure is
-#                   timed from it, and the return (every bond back on two legs) is recorded as an
+#                   timed from it, and the return (every bond back on two legs) is saved as an
 #                   event with the probes lost around it, never as a span from the departure. GRO
 #                   and parity are checked on the switch after it returns.
 #
 # Every drill checks the lab whole first and again after, and runs audit.sh --quick after. Every
 # time is the lab host's clock: the captures run on the host, the connect loops in containers, and
-# preflight's host tick of 10000 is checked when the result set opens. A lost ping is a round trip.
+# preflight's host tick of 10000 is checked when the run directory opens. A lost ping is a round trip.
 set -euo pipefail
 # shellcheck source=common/lib.sh
 . "$(dirname "$0")/../common/lib.sh"

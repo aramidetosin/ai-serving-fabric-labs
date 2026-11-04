@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
-"""trace-md.py: a chapter trace's planning and judgment (common/trace/lib-trace.sh).
+"""trace-md.py: a chapter trace's planning and check (common/trace/lib-trace.sh).
 
     trace-md.py flow   --inv INV [--k8s gen/k8s.json] [--flow ID]   shell assignments for one flow
     trace-md.py holder --leases FILE --namespace NS --gateway GW [--lease NS/NAME]
     trace-md.py points --inv INV --holder NODE               the capture points, one per line
     trace-md.py syn    --decode FILE --sport N --vip ADDR    the first matching SYN's seq, or nothing
-    trace-md.py judge  --set DIR --inv INV --points FILE --env FILE [--stamp TEXT]
+    trace-md.py check  --set DIR --inv INV --points FILE --env FILE [--stamp TEXT]
 
 The client need not be a capture point, and a flow with
-same_frame: true is also judged as one frame at every point that carries it.
+same_frame: true is also checked as one frame at every point that carries it.
 
 flow resolves a flow of the chapter's trace block (inventory "trace") against the inventory: the
-client and its address, the Gateway, its VIP and namespace, the URL and the expected verdict. points
+client and its address, the Gateway, its VIP and namespace, the URL and the expected result. points
 expands the points, a point with "at: lease-holder" for the control node that holds the Gateway's
 L2 announcement lease: "side: pair" for the pair ports facing that node's bond, "iface:" for an
 interface inside it (captured and decoded in the guest). Each output line is tab-separated:
 
     id  where (container or guest)  node  interface  vlan (none or a tag)  group  depth
 
-judge reads the decodes (captures/<id>.txt, tcpdump -nn -e -tttt -v -S -r) and the other saved
-files, prints the result vocabulary (appending to $SFAB_VERDICT), and writes trace.md. The recorded
+check reads the decodes (captures/<id>.txt, tcpdump -nn -e -tttt -v -S -r) and the other saved
+files, prints the result vocabulary (appending to $SFAB_RESULTS), and writes trace.md. The saved
 SYN is the client's SYN from the pinned source port, found at the client's own point when the trace
 has one, else at the first point (in depth order) that saw it; at every other point the SYN with
 the same sequence number is that SYN, whatever its addresses, so a translation would show as a
@@ -265,7 +265,7 @@ def tlog_find(text: str, src, sport, dst, dport):
 
 
 # --------------------------------------------------------------------------------------------
-# judgment and trace.md
+# check and trace.md
 
 
 def read(p: Path) -> str | None:
@@ -275,7 +275,7 @@ def read(p: Path) -> str | None:
         return None
 
 
-def judge(a) -> int:
+def run_checks(a) -> int:
     rs = Path(a.set)
     inv = load(a.inv)
     env = {}
@@ -288,7 +288,7 @@ def judge(a) -> int:
         f = line.split("\t")
         if len(f) >= 7:
             pts.append({"id": f[0], "where": f[1], "node": f[2], "iface": f[3], "vlan": f[4], "group": f[5], "depth": int(f[6])})
-    v = vocab.Vocab(known=set(inv.get("known") or []) or None)
+    v = vocab.Vocab()
     nodes = inv.get("nodes") or {}
     client, caddr, vip = env["CLIENT"], env["CLIENT_ADDR"], env["VIP"]
     sport, port = int(env["SPORT"]), int(env["PORT"])
@@ -310,11 +310,11 @@ def judge(a) -> int:
             holder in announcers, f"holder {holder or 'unknown'}")
     warm = read(rs / "warmup.txt")
     wc, _ = http_reply(warm or "")
-    v.ok(f"warm-up attempt from source port {env['WARM_SPORT']} made first (HTTP {wc if wc else 'no reply'}; not judged)")
+    v.ok(f"warm-up attempt from source port {env['WARM_SPORT']} made first (HTTP {wc if wc else 'no reply'}; not checked)")
 
-    # the recorded SYN at the client, then the same sequence number everywhere
+    # the traced SYN at the client, then the same sequence number everywhere
     decodes = {p["id"]: packets(read(rs / "captures" / f"{p['id']}.txt") or "") for p in pts}
-    # the recorded SYN: at the client's own point when the trace has one, else at the first point
+    # the traced SYN: at the client's own point when the trace has one, else at the first point
     # (in depth order) that saw a SYN from the pinned source port to the VIP
     order = [p for p in pts if p["node"] == client] + sorted((p for p in pts if p["node"] != client), key=lambda p: p["depth"])
     first, syn0 = None, None
@@ -328,7 +328,7 @@ def judge(a) -> int:
             break
     seq = syn0.get("seq") if syn0 else None
     where0 = client if first is not None and first["node"] == client else (first["id"] if first else "any point")
-    v.check(f"the recorded SYN from {client}'s pinned source port {sport} found at {where0} (seq {seq})",
+    v.check(f"the traced SYN from {client}'s pinned source port {sport} found at {where0} (seq {seq})",
             syn0 is not None and seq is not None, f"no SYN from port {sport} at {first['id'] if first else 'any point'}")
     rows = []
     for p in pts:
@@ -344,7 +344,7 @@ def judge(a) -> int:
         if r["group"] != "-":
             groups.setdefault(r["group"], []).append(r)
             continue
-        v.check(f"{r['id']}: the recorded SYN seen (seq {seq})", r["syn"] is not None,
+        v.check(f"{r['id']}: the traced SYN seen (seq {seq})", r["syn"] is not None,
                 f"{r['frames']} frames, none with seq {seq}" if r["decoded"] else "no decode")
     for g, members in groups.items():
         seen = [r["id"] for r in members if r["syn"] is not None]
@@ -400,7 +400,7 @@ def judge(a) -> int:
         v.check(f"the firewall's traffic log has the session allowed by {rule} (shown as {want_rule}), zone {env.get('FROM_ZONE')} to zone {env.get('TO_ZONE')}",
                 ok_, "no entry for the connection" if not e else f"rule {e['rule']}, {e['action']}, {e['from']} to {e['to']}")
 
-    counts = vocab.counts_of(os.environ["SFAB_VERDICT"]) if os.environ.get("SFAB_VERDICT") else v.counts()
+    counts = vocab.counts_of(os.environ["SFAB_RESULTS"]) if os.environ.get("SFAB_RESULTS") else v.counts()
     write_md(rs, inv, env, rows, seq, code, counts, a.stamp)
     return 1 if v.counts()["fail"] else 0
 
@@ -438,7 +438,7 @@ def write_md(rs: Path, inv: dict, env: dict, rows: list, seq, code, counts: dict
     repo = run.get("labs_repo") or {}
     commit = repo.get("commit") or "none"
     uncommitted = " (with uncommitted changes)" if repo.get("dirty") is True else ""
-    verdict = read(rs / "verdict.txt") or ""
+    results = read(rs / "results.txt") or ""
     L = [f"# Trace {env['FLOW']}", "",
          f"- Lab: `{inv.get('lab')}`; labs repo commit `{commit}`{uncommitted}; UTC {run.get('utc_start') or 'unknown'}",
          f"- Flow: `{env['CLIENT']}` ({env['CLIENT_ADDR']}) to `https://{env['FQDN']}{env['URLPATH']}` on {env['VIP']}:{env['PORT']} "
@@ -449,7 +449,7 @@ def write_md(rs: Path, inv: dict, env: dict, rows: list, seq, code, counts: dict
     L += ["", "## Path", "", "| Depth | Point | Where | Node | Interface | Expected tag |", "|---|---|---|---|---|---|"]
     for r in rows:
         L.append(f"| {r['depth']} | `{r['id']}` | {r['where']} | {r['node']} | {r['iface']} | {r['vlan']} |")
-    L += ["", "## Verdict", "", "```"] + [l for l in verdict.splitlines() if l.strip()] + ["```", "",
+    L += ["", "## Results", "", "```"] + [l for l in results.splitlines() if l.strip()] + ["```", "",
           "## Frames per point", "", f"| Point | Frames | SYNs with seq {seq} | Source MAC | Destination MAC | IP id | TTL | Tag | Checksum |",
           "|---|---|---|---|---|---|---|---|---|"]
     for r in rows:
@@ -462,7 +462,7 @@ def write_md(rs: Path, inv: dict, env: dict, rows: list, seq, code, counts: dict
         L.append(f"- `{r['id']}` (`captures/{r['id']}.txt:{s['line']}`)" if s else f"- `{r['id']}`: not seen")
         if s:
             L += ["", "  ```", f"  {s['head']}", "  ```", ""]
-    L += ["## Files", "", "- `verdict.txt`, `commands.txt`, `dns.txt`, `warmup.txt`, `request.txt`, `fw-traffic-log.txt`, `points.tsv`",
+    L += ["## Files", "", "- `results.txt`, `commands.txt`, `dns.txt`, `warmup.txt`, `request.txt`, `fw-traffic-log.txt`, `points.tsv`",
           "- `captures/<point>.pcap` and `captures/<point>.txt` (decoded with `tcpdump -nn -e -tttt -v -S -r`; guest points decoded in the guest)",
           "", vocab.result_line(counts), ""]
     (rs / "trace.md").write_text("\n".join(L), encoding="utf-8")
@@ -487,14 +487,14 @@ def main(argv=None) -> int:
     s.add_argument("--decode", required=True)
     s.add_argument("--sport", required=True)
     s.add_argument("--vip")
-    s = sub.add_parser("judge")
+    s = sub.add_parser("check")
     s.add_argument("--set", required=True)
     s.add_argument("--inv", required=True)
     s.add_argument("--points", required=True)
     s.add_argument("--env", required=True)
     s.add_argument("--stamp")
     a = p.parse_args(argv)
-    return {"flow": cmd_flow, "holder": cmd_holder, "points": cmd_points, "syn": cmd_syn, "judge": judge}[a.cmd](a)
+    return {"flow": cmd_flow, "holder": cmd_holder, "points": cmd_points, "syn": cmd_syn, "check": run_checks}[a.cmd](a)
 
 
 if __name__ == "__main__":

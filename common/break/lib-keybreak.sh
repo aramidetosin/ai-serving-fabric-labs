@@ -5,7 +5,7 @@
 #   key_hold_action JSON TAG       the API gateway pod at the action's place among them by name held:
 #                                  a hold file in its sidecar's shared directory, while which its
 #                                  sidecar (sfab-keys compose) keeps the apisix.yaml it has; the pod
-#                                  is recorded as "held <pod>" in the break's mark
+#                                  is saved as "held <pod>" in the break's mark
 #   key_mint_action JSON TAG       one key minted into the model keys' Secret by a Job of the key tool
 #   key_revoke_action JSON TAG     that key revoked the same way (a cleanup: the Secret holds the
 #                                  lab's first key a model again)
@@ -45,7 +45,7 @@ key_hold_action() {
   mapfile -t pods < <(kb_pods "$js")
   pod="${pods[$i]:-}"
   [ -n "$pod" ] || { bad "the API gateway pod at place $i held" "only ${#pods[@]} Running API gateway pod(s)"; return 1; }
-  out="$RS/record/$tag-hold-$pod.txt"
+  out="$RS/observe/$tag-hold-$pod.txt"
   if K -n "$(kb_ns "$js")" exec "$pod" -c "$(jf "$js" api_gateway.sidecar)" -- touch "$(jf "$js" api_gateway.hold)" >"$out" 2>&1; then
     ok "$pod, the API gateway pod at place $i of ${#pods[@]} by name, held: its sidecar keeps the apisix.yaml it has (hold file $(jf "$js" api_gateway.hold))"
     printf 'held %s\n' "$pod" >>"$RS/taken.txt"
@@ -57,7 +57,7 @@ key_hold_action() {
 
 key_job_action() {  # key_job_action JSON TAG mint|revoke
   local js="$1" tag="$2" op="$3" out did
-  out="$RS/record/$tag-$op-$(jf "$js" field).log"
+  out="$RS/observe/$tag-$op-$(jf "$js" field).log"
   did=minted
   [ "$op" = mint ] || did=revoked
   if keyjob_run "$(k8s_get inference.probe.name)-$tag-$op" "$out" "$op" "$(jf "$js" model)" "$(jf "$js" id)"; then
@@ -84,17 +84,17 @@ key_probe_action() {
   py "$SFAB_COMMON/trace/keyprobe.py" summary --log "$RS/probes/$pid-$MODE.log" --label "$pid" --expect "$(jf "$js" expect)" \
     >"$RS/probes/$pid-$MODE.pods" 2>&1 || true
   printf '%s\n' "$(jf "$js" expect)" >"$RS/probes/$pid-$MODE.expect"
-  ok "$pid, $MODE: the per-pod probe of $field on $(jf "$js" route)'s route: $(awk -F'\t' '{printf "%s%s %s", (NR > 1 ? "; " : ""), $1, $5}' "$RS/probes/$pid-$MODE.pods") (recorded)"
+  ok "$pid, $MODE: the per-pod probe of $field on $(jf "$js" route)'s route: $(awk -F'\t' '{printf "%s%s %s", (NR > 1 ? "; " : ""), $1, $5}' "$RS/probes/$pid-$MODE.pods") (saved)"
 }
 
 key_show_action() {
   local js="$1" tag="$2" ns p
   ns="$(kb_ns "$js")"
   EVID_OFF=1 K -n "$ns" get secret "$(jf "$js" keys.secret)" -o json 2>/dev/null |
-    py "$SFAB_COMMON/trace/servekeys.py" list >"$RS/record/$tag-secret-fields.txt" 2>&1 || true
-  K -n "$ns" get pods -l "$(jf "$js" api_gateway.selector)" -o wide >"$RS/record/$tag-api-gateway-pods.txt" 2>&1 || true
+    py "$SFAB_COMMON/trace/servekeys.py" list >"$RS/observe/$tag-secret-fields.txt" 2>&1 || true
+  K -n "$ns" get pods -l "$(jf "$js" api_gateway.selector)" -o wide >"$RS/observe/$tag-api-gateway-pods.txt" 2>&1 || true
   for p in $(kb_pods "$js"); do
-    K -n "$ns" logs "$p" -c "$(jf "$js" api_gateway.sidecar)" --tail=20 >"$RS/record/$tag-sidecar-$p.txt" 2>&1 || true
+    K -n "$ns" logs "$p" -c "$(jf "$js" api_gateway.sidecar)" --tail=20 >"$RS/observe/$tag-sidecar-$p.txt" 2>&1 || true
   done
 }
 
@@ -102,7 +102,7 @@ gateway_restart_action() {
   local js="$1" tag="$2" pod ns out
   pod="$(kb_held)" ns="$(kb_ns "$js")"
   [ -n "$pod" ] || { bad "the held API gateway pod restarted" "the break's mark names no held pod"; return 1; }
-  out="$RS/record/$tag-restart-$pod.txt"
+  out="$RS/observe/$tag-restart-$pod.txt"
   if K -n "$ns" delete pod "$pod" --wait=true >"$out" 2>&1 &&
     K -n "$ns" rollout status "deployment/$(jf "$js" deployment)" --timeout=300s >>"$out" 2>&1; then
     ok "$pod deleted, and its Deployment $(jf "$js" deployment) rolled out with a new pod in its place ($(kb_pods "$js" | paste -sd ',' -))"

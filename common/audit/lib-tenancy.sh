@@ -2,7 +2,7 @@
 # common/audit/lib-tenancy.sh: Part III's audit groups (chapters 8 to 11) and the held connections
 # they, chapter 10's measurement and chapter 11's drill share. Sourced after lib.sh's sfab_init and
 # common/audit/lib-audit.sh. The plan is gen/tenancy.json (sfab.render.tenancy); each group reads
-# into its own directory of the result set and is judged by common/audit/tenancy.py:
+# into its own directory of the run directory and is checked by common/audit/tenancy.py:
 #
 #   audit_audiences       chapter 8: a Gateway per audience. Into audiences/: the Gateways, the
 #                         HTTPRoutes, the namespaces, the leases, the L2 announcement policies,
@@ -23,7 +23,7 @@
 #                         server for the platform's names; the ISP router's routing table; the
 #                         internet client's connect to the published address and its traffic log
 #                         line; Cilium's copies of the Gateway certificates and the certificates
-#                         each recorded node's Envoy has loaded (recorded, not judged)
+#                         each audited node's Envoy has loaded (saved, not checked)
 #   audit_zone_nat        chapter 10: the running NAT and security rulebases; each inside
 #                         population's connect to the published address and its traffic log line
 #                         (or, for a silent one, the routing tables in front of the firewall); and,
@@ -183,7 +183,7 @@ audit_audiences() {
       >/dev/null 2>&1 || phase=Failed
     printf '%s\n' "$phase" >"$d/refused-mint.phase"
     # the refused Job leaves a Warning event (BackoffLimitExceeded) that the next audit's cluster
-    # group would read as a fault (the lab's first ch10 deploy, its second audit): it is this
+    # group would read as a fault: it is this
     # check's own evidence, so it is saved here and deleted, as the drills archive theirs
     tn_refused_events "$d" "$(k8s_get inference.probe.name)-refused" "$(k8s_get inference.namespace)"
     EVID_OFF=1 K -n "$ns" get secret "$sec" -o json 2>/dev/null | py "$SFAB_COMMON/trace/servekeys.py" list >"$d/keys-after.txt" 2>&1 || true
@@ -210,7 +210,7 @@ audit_audiences() {
       done
     fi
   fi
-  _judge audiences
+  _run_check audiences
 }
 
 # ---------------------------------------------------------------------------------------------
@@ -270,9 +270,9 @@ audit_split_horizon() {
     fwt_tlog "$d/traffic-log.txt" "show log traffic direction equal backward receive_time in last-15-minutes dport equal 443" \
       --src "$(inv get nodes."$c".address | cut -d/ -f1)" --sport "$sp" >/dev/null 2>&1 || true
   fi
-  # Cilium's copies of the Gateway certificates, which every node's Envoy loads (recorded): Cilium
+  # Cilium's copies of the Gateway certificates, which every node's Envoy loads (saved): Cilium
   # 1.19 names each copy by a hash and labels it with the Secret it copies, so the listing carries
-  # that label as a column (no Secret data is read); and the certificates each recorded node's
+  # that label as a column (no Secret data is read); and the certificates each audited node's
   # Envoy has loaded, listed from its Cilium agent pod (serials, names and expiry, no key), beside
   # each Gateway's own certificate with its serial (gateway-certs.txt, as audiences/certs.txt)
   tn_gateway_certs "$d/gateway-certs.txt"
@@ -291,7 +291,7 @@ try:
         print(i["metadata"]["name"], (i.get("spec") or {}).get("nodeName", ""))
 except ValueError:
     pass')
-  _judge split-horizon
+  _run_check split-horizon
 }
 
 # ---------------------------------------------------------------------------------------------
@@ -335,14 +335,14 @@ audit_zone_nat() {
     hold_counts "$d" held
     for ((i = 0; i < rows; i++)); do hold_stop "$d" "$i"; done
   fi
-  _judge zone-nat
+  _run_check zone-nat
 }
 
 # chapter 11: the negative checks, from the three groups' files
 audit_isolation() {
   [ "$SFAB_QUICK" != 1 ] || return 0
   tn_has isolation || return 0
-  _judge isolation
+  _run_check isolation
 }
 
 # ---------------------------------------------------------------------------------------------

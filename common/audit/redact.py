@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""redact: scrub credentials from a result set in place.
+"""redact: scrub credentials from a run directory in place.
 
     redact.py [--secrets state/secrets.env] [--key state/secrets/redact.key] SET_DIR...
     redact.py [--secrets state/secrets.env] [--key state/secrets/redact.key] --stream

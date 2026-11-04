@@ -24,7 +24,7 @@
 #                              the gateway probe from a client (probe_gateway.py), count requests a
 #                              model through a Gateway's model route with each model's key (its
 #                              first, or the key the action names: chapter 7), PASSES times; each
-#                              pass's failing share recorded for probe_share
+#                              pass's failing share saved for probe_share
 #   serve_check JSON           the checks: endpoints (a Service's ready endpoints counted),
 #                              placement (the rail a pod's network-status annotation names) and
 #                              mac_gone (the rail switch no longer holds the MAC the moved pod had on
@@ -44,7 +44,7 @@ sb_recipe() { py "$SFAB_ROOT/serving-layer/serving.py" "$@"; }
 pod_rail_action() {
   local js="$1" tag="$2" pod rail addr master out
   pod="$(jf "$js" pod)" rail="$(jf "$js" moved.rail)" addr="$(jf "$js" moved.address)" master="$(jf "$js" moved.master)"
-  out="$RS/record/$tag-move-$pod.txt"
+  out="$RS/observe/$tag-move-$pod.txt"
   if sb_recipe move --env "$(sb_env)" --pod "$pod" --rail "$rail" --address "$addr" --master "$master" --mac "$(jf "$js" moved.mac)" >"$out" 2>&1; then
     ok "$pod deleted and made again on rail $rail at $addr ($(jf "$js" row.nad) $(jf "$js" row.address) in the table)$( [ "$(jf "$js" new_nad)" = True ] && echo ", with a rail$rail attachment the table does not use")"
     printf '%s\t%s\n' "$pod" "moved to rail $rail at $addr" >>"$RS/taken.txt"
@@ -57,7 +57,7 @@ pod_rail_action() {
 pod_route_action() {
   local js="$1" tag="$2" pod nad out
   pod="$(jf "$js" pod)" nad="$(jf "$js" nad)"
-  out="$RS/record/$tag-reroute-$pod.txt"
+  out="$RS/observe/$tag-reroute-$pod.txt"
   if sb_recipe reroute --env "$(sb_env)" --pod "$pod" --nad "$nad" --dst "$(jf "$js" dst)" --via "$(jf "$js" via)" >"$out" 2>&1; then
     ok "$pod deleted and made again at $(jf "$js" row.address) through $nad, a copy of $(jf "$js" row.nad) with a route to $(jf "$js" dst) via $(jf "$js" via) ($(grep -E '^  PASS  .*Ready' "$out" | tail -n 1 | sed 's/^  PASS  //'))"
     printf '%s\t%s\n' "$pod" "rerouted through $nad" >>"$RS/taken.txt"
@@ -76,7 +76,7 @@ pod_net_action() {
   local js="$1" tag="$2" ns pod peer pns node iface ip pip nsn cap t pfx port
   ns="$(jf "$js" namespace)" pod="$(jf "$js" pod)" node="$(jf "$js" node)" iface="$(jf "$js" iface)" t="$(jf "$js" capture_s)"
   pns="$(jf "$js" peer.namespace)" port="$(jf "$js" port)"
-  pfx="$RS/record/$tag-$pod"
+  pfx="$RS/observe/$tag-$pod"
   ip="$(EVID_OFF=1 K -n "$ns" get pod "$pod" -o 'jsonpath={.status.podIP}' 2>/dev/null || true)"
   peer="$(EVID_OFF=1 K -n "$pns" get pods -l "$(jf "$js" peer.selector)" --field-selector=status.phase=Running -o 'jsonpath={.items[0].metadata.name}' 2>/dev/null || true)"
   pip="$(EVID_OFF=1 K -n "$pns" get pod "$peer" -o 'jsonpath={.status.podIP}' 2>/dev/null || true)"
@@ -97,13 +97,13 @@ pod_net_action() {
     K -n "$pns" exec "$peer" -- python3 -c "$py_conn" "$ip" "$port" 2>&1 | tail -n 1 || echo "exit $?"; } >"$pfx-connect.txt"
   sleep "$t"
   { printf '%s@%s:~$ sudo tcpdump -nr %s\n' "$GUEST_USER" "$node" "$cap"; H "$node" "tcpdump -nr $cap 2>/dev/null; rm -f $cap" 2>&1 || true; } >"$pfx-$iface.txt"
-  ok "$pod ($ip, on $node): route table read, and $iface captured while the router pod $peer ($pip) connected to port $port: $(tail -n +2 "$pfx-connect.txt" | tail -n 1), $(tail -n +2 "$pfx-$iface.txt" | grep -c " IP $ip\." || true) packet(s) from $ip on $iface (recorded)"
+  ok "$pod ($ip, on $node): route table read, and $iface captured while the router pod $peer ($pip) connected to port $port: $(tail -n +2 "$pfx-connect.txt" | tail -n 1), $(tail -n +2 "$pfx-$iface.txt" | grep -c " IP $ip\." || true) packet(s) from $ip on $iface (saved)"
 }
 
 serve_action() {
   local js="$1" tag="$2" rep=() p out
   for p in $(jf "$js" replace); do rep+=(--replace "$p"); done
-  out="$RS/record/$tag-serve.txt"
+  out="$RS/observe/$tag-serve.txt"
   if sb_recipe serve --env "$(sb_env)" "${rep[@]+"${rep[@]}"}" >"$out" 2>&1; then
     ok "make serve: every pod where the table places it$( [ ${#rep[@]} -eq 0 ] || echo ", $(jf "$js" replace | paste -sd ',' -) removed first and made again") ($(grep -E '^== RESULT: ' "$out" | tail -n 1 | sed 's/^== //'))"
   else
@@ -115,12 +115,12 @@ serve_action() {
 k8s_show_action() {
   local js="$1" tag="$2" ns
   ns="$(jf "$js" namespace)"
-  K -n "$ns" get pods -o wide >"$RS/record/$tag-pods.txt" 2>&1 || true
-  EVID_OFF=1 K -n "$ns" get pods -o json >"$RS/record/$tag-pods.json" 2>/dev/null || true
-  K -n "$ns" get endpointslices -o wide >"$RS/record/$tag-endpointslices.txt" 2>&1 || true
-  EVID_OFF=1 K -n "$ns" get endpointslices -o json >"$RS/record/$tag-endpointslices.json" 2>/dev/null || true
-  py "$BH" netstatus --file "$RS/record/$tag-pods.json" >"$RS/record/$tag-network-status.txt" 2>&1 || true
-  K -n "$ns" get events --field-selector type=Warning --sort-by=.lastTimestamp >"$RS/record/$tag-events.txt" 2>&1 || true
+  K -n "$ns" get pods -o wide >"$RS/observe/$tag-pods.txt" 2>&1 || true
+  EVID_OFF=1 K -n "$ns" get pods -o json >"$RS/observe/$tag-pods.json" 2>/dev/null || true
+  K -n "$ns" get endpointslices -o wide >"$RS/observe/$tag-endpointslices.txt" 2>&1 || true
+  EVID_OFF=1 K -n "$ns" get endpointslices -o json >"$RS/observe/$tag-endpointslices.json" 2>/dev/null || true
+  py "$BH" netstatus --file "$RS/observe/$tag-pods.json" >"$RS/observe/$tag-network-status.txt" 2>&1 || true
+  K -n "$ns" get events --field-selector type=Warning --sort-by=.lastTimestamp >"$RS/observe/$tag-events.txt" 2>&1 || true
 }
 
 # gateway_probe_action JSON PASSES: count requests a model through the Gateway's model route
@@ -146,7 +146,7 @@ gateway_probe_action() {
       read -r a b <<<"$(py "$BH" gwshare --file "$RS/probes/$pid-$MODE-pass$p-$m.jsonl" 2>/dev/null || echo "0 0")"
       n=$((n + a)) f=$((f + b))
     done
-    ok "$pid, $MODE, pass $p: $f of $n requests through $(jf "$js" gateway) to $(py -c 'import json, sys; print(", ".join(m["model"] for m in json.loads(sys.argv[1])["models"]))' "$js") failed (recorded)"
+    ok "$pid, $MODE, pass $p: $f of $n requests through $(jf "$js" gateway) to $(py -c 'import json, sys; print(", ".join(m["model"] for m in json.loads(sys.argv[1])["models"]))' "$js") failed (saved)"
     printf '%s %s %s\n' "$p" "$n" "$f" >>"$RS/probes/$pid-$MODE.shares"
   done
   echo request >"$RS/probes/$pid-$MODE.kind"
@@ -160,7 +160,7 @@ serve_check() {
     endpoints)
       local svc want got ips
       ns="$(jf "$js" namespace)" svc="$(jf "$js" service)" want="$(jf "$js" ready)"
-      out="$RS/record/check-$MODE-endpoints-$svc.json"
+      out="$RS/observe/check-$MODE-endpoints-$svc.json"
       EVID_OFF=1 K -n "$ns" get endpointslices -l "kubernetes.io/service-name=$svc" -o json >"$out" 2>/dev/null || true
       ips="$(py "$BH" epready --file "$out")"
       got=0
@@ -173,7 +173,7 @@ serve_check() {
     placement)
       local pod rail got
       ns="$(jf "$js" namespace)" pod="$(jf "$js" pod)" rail="$(jf "$js" rail)"
-      out="$RS/record/check-$MODE-placement-$pod.json"
+      out="$RS/observe/check-$MODE-placement-$pod.json"
       EVID_OFF=1 K -n "$ns" get pod "$pod" -o json >"$out" 2>/dev/null || true
       got="$(py "$BH" netstatus --file "$out")"
       if py "$BH" netstatus --file "$out" --rail "$rail" >/dev/null; then
@@ -190,9 +190,9 @@ serve_check() {
       ns="$(jf "$js" namespace)" pod="$(jf "$js" pod)" iface="$(jf "$js" iface)" nad="$(jf "$js" nad)" dst="$(jf "$js" dst)" via="$(jf "$js" via)"
       local t=healed
       [ "$MODE" != break ] || t=broken
-      on="$(jf "$js" leaves)" ip="$(cat "$RS/record/$t-$pod-ip.txt" 2>/dev/null || true)"
-      r="$(tail -n +2 "$RS/record/$t-$pod-routes.txt" 2>/dev/null | grep -E "^$dst via $via dev $iface( |$)" || true)"
-      n="$(tail -n +2 "$RS/record/$t-$pod-$iface.txt" 2>/dev/null | grep -c " IP ${ip:-none}\." || true)"
+      on="$(jf "$js" leaves)" ip="$(cat "$RS/observe/$t-$pod-ip.txt" 2>/dev/null || true)"
+      r="$(tail -n +2 "$RS/observe/$t-$pod-routes.txt" 2>/dev/null | grep -E "^$dst via $via dev $iface( |$)" || true)"
+      n="$(tail -n +2 "$RS/observe/$t-$pod-$iface.txt" 2>/dev/null | grep -c " IP ${ip:-none}\." || true)"
       if [ "$on" = rail ]; then
         if [ -n "$r" ]; then ok "$pod's route table holds $(tr -s ' ' <<<"$r")"; else bad "$pod's route table holds $dst via $via dev $iface" "no such route"; fi
         if [ "${n:-0}" -gt 0 ]; then
@@ -201,12 +201,12 @@ serve_check() {
           bad "$pod's replies leave on the rail" "no packet from ${ip:-its eth0 address} on $iface"
         fi
       else
-        if [ -z "$r" ] && grep -q ' dev eth0' "$RS/record/$t-$pod-routes.txt" 2>/dev/null; then
+        if [ -z "$r" ] && grep -q ' dev eth0' "$RS/observe/$t-$pod-routes.txt" 2>/dev/null; then
           ok "$pod's route table holds no route to $dst via $via: the cluster network is on eth0 again"
         else
           bad "$pod's route table holds no route to $dst via $via" "${r:-route table unread}"
         fi
-        if [ -f "$RS/record/$t-$pod-$iface.txt" ] && [ "${n:-0}" = 0 ]; then
+        if [ -f "$RS/observe/$t-$pod-$iface.txt" ] && [ "${n:-0}" = 0 ]; then
           ok "no packet from $pod's eth0 address $ip on $iface while its peer connected"
         else
           bad "no packet from $pod's eth0 address on $iface" "${n:-capture unread}"
@@ -222,8 +222,8 @@ serve_check() {
       sw="$(jf "$js" switch)" mac="$(jf "$js" mac)" native="$(jf "$js" native)" vlan="$(jf "$js" vlan)"
       t0="$SECONDS"
       while :; do
-        SW "$sw" "show mac address-table" | klish_body "show mac address-table" >"$RS/record/check-$MODE-mac-$sw.txt" 2>/dev/null || true
-        seen="$(grep -ciE "^[[:space:]]*${vlan}[[:space:]]+${mac}[[:space:]]" "$RS/record/check-$MODE-mac-$sw.txt" || true)"
+        SW "$sw" "show mac address-table" | klish_body "show mac address-table" >"$RS/observe/check-$MODE-mac-$sw.txt" 2>/dev/null || true
+        seen="$(grep -ciE "^[[:space:]]*${vlan}[[:space:]]+${mac}[[:space:]]" "$RS/observe/check-$MODE-mac-$sw.txt" || true)"
         waited=$((SECONDS - t0))
         [ "$seen" != 0 ] || break
         [ "$waited" -lt "$(jf "$js" wait_s)" ] || break

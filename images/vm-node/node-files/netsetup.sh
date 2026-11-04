@@ -25,7 +25,7 @@
 #
 # TX checksum offload is turned off on every data NIC (VM_TX_OFF=1); vm-init.sh does the same on
 # the container side. SFAB_DRY_RUN=1 prints every change instead of making it, as if nothing
-# existed yet (the tests read that output); SFAB_NODE_ENV names another env file.
+# existed yet; SFAB_NODE_ENV names another env file.
 set -euo pipefail
 
 ENV_FILE=${SFAB_NODE_ENV:-/etc/sfab/node.env}
@@ -449,7 +449,7 @@ names() {
 }
 
 # Ubuntu 24.04 starts sshd through ssh.socket, which refuses connections during the handover to
-# the service, and can leave a listener outside the unit that holds port 22. Every harness reaches
+# the service, and can leave a listener outside the unit that holds port 22. All lab tooling reaches
 # the guests over SSH, so: the plain service, always listening, repaired when it is not.
 ssh_service() {
   if [ "$DRY" = 1 ]; then printf '+ sshd: ssh.service listening, ssh.socket off\n'; return 0; fi

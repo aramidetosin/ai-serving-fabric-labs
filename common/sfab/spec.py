@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 SPEC_DIR = "spec"
-CORE_FILES = ("common.yaml", "versions.yaml", "known.yaml", "klish-normalize.yaml")
+CORE_FILES = ("common.yaml", "versions.yaml", "limitations.yaml", "klish-normalize.yaml")
 FEATURES = ("k8s", "serving", "storage_setup")
 
 
@@ -267,7 +267,7 @@ class Spec:
     profiles: dict[str, dict]
     variants: dict[str, dict]
     versions: dict
-    known: dict
+    limitations: dict
     normalize: dict
     files: dict[str, str] = field(default_factory=dict)  # 'spec/x.yaml' -> sha256
 
@@ -324,7 +324,7 @@ def load(root: Path | str) -> Spec:
 
     common = rd(sd / "common.yaml")
     versions = rd(sd / "versions.yaml")
-    known = rd(sd / "known.yaml")
+    limitations = rd(sd / "limitations.yaml")
     normalize = rd(sd / "klish-normalize.yaml")
     profiles = {}
     for p in sorted(sd.glob("profile-*.yaml")):
@@ -347,7 +347,7 @@ def load(root: Path | str) -> Spec:
         if errs:
             raise SpecError(f"spec/profile-{name}.yaml:\n  " + "\n  ".join(errs))
     return Spec(root=root, common=common, profiles=profiles, variants=variants,
-                versions=versions, known=known, normalize=normalize, files=files)
+                versions=versions, limitations=limitations, normalize=normalize, files=files)
 
 
 # --------------------------------------------------------------------------------------------
@@ -533,7 +533,7 @@ def select(spec: Spec, chapter: Chapter | dict | str | Path, variant: str | None
         chapter=ch,
         features=feats,
         versions=spec.versions,
-        known=spec.known,
+        limitations=spec.limitations,
         normalize=spec.normalize,
         spec_files=spec.files_for(ch.profile, vfile),
         root=str(spec.root),

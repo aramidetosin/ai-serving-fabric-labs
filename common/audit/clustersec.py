@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The cluster-security and identity groups of judge.py (the cluster's protections and sign-in), and
+"""The cluster-security and identity groups of checks.py (the cluster's protections and sign-in), and
 the plans their collection in lib-audit.sh reads.
 
     clustersec.py targets K8S_JSON            the policed Services the probe pod connects to:
@@ -130,7 +130,7 @@ def people(k8s_json: str, inv_json: str) -> int:
 
 
 # --------------------------------------------------------------------------------------------
-# the judge groups
+# the checker groups
 
 
 def _k8s(self) -> dict:

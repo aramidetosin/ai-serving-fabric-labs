@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# ch06/drills.sh [--drills "ID ..."] [--passes N]: the chapter's placement drills (book Examples 6-6,
-# 6-7, 6-9 and 6-10), recorded as audits/sfab-ch06_drills_<UTC>/ with
+# ch06/drills.sh [--drills "ID ..."] [--passes N]: the chapter's placement drills, saved as runs/sfab-ch06_drills_<UTC>/ with
 # pass<N>/<drill>/ and drills.md. make drills runs it with PASSES=3.
 #
 #   dark-switch   every port rail-sw1 uses shut in one KLISH session (interface range
@@ -23,7 +22,7 @@
 # left and rejoined its Services against the readiness bound, counts the requests by when they were
 # sent and how they ended, and names the answers the router had to try again for. The restore is
 # pushed before the shut, run from the EXIT trap whatever happens. Every time is the lab host's
-# clock, and preflight's host tick of 10000 is checked when the result set opens. The plan is
+# clock, and preflight's host tick of 10000 is checked when the run directory opens. The plan is
 # chapter.yaml's drills block, rendered to gen/drills.json (common/drill/lib-servedrill.sh).
 set -euo pipefail
 # shellcheck source=common/lib.sh

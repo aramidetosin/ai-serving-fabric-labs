@@ -9,7 +9,7 @@
 # 200 or 401 by which API gateway pod the Gateway's proxy picks; the lab's first key for chat keeps
 # working everywhere.
 #
-# record: the per-pod probe (a pod of the key tool, in the cluster, sending one request with the
+# observe: the per-pod probe (a pod of the key tool, in the cluster, sending one request with the
 # new key to every API gateway pod by its address until each accepts it, 240 s at most), 20
 # requests through the users' VIP with the new key from the enterprise client, and the Secret's
 # fields with their fingerprints beside each API gateway pod's sidecar log. The exercise works from
@@ -26,7 +26,7 @@ since: 7
 break:
   - key_hold: {pod: 1}
   - key_mint: {model: chat, id: fa000001}
-record:
+observe:
   - key_probe: {id: pods, model: chat, key: fa000001, expect: 200, wait_s: 240}
   - probe_gateway: {id: users, from: ent-client, gateway: gw-users, models: [chat], key: fa000001, count: 20, interval_s: 1, timeout_s: 400, passes: 1}
   - key_show: {}

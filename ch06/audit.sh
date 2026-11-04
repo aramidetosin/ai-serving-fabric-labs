@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# ch06/audit.sh: the lab's audit (book Examples 6-2, 6-9 and 6-10), recorded as a
-# result set under audits/.
+# ch06/audit.sh: the lab's audit, saved as a
+# run directory under runs/.
 #
 #   ./audit.sh                  the full audit
 #   ./audit.sh --quick          switches, the firewall, the container links the MAC tables need, and
-#                               the placement group; not recorded (finish runs it, and drills.sh)
-#   ./audit.sh --table FILE     the placement group judged against another table than the rendered
+#                               the placement group; not saved (finish runs it, and drills.sh)
+#   ./audit.sh --table FILE     the placement group checked against another table than the rendered
 #                               bootstrap/k8s/serving.env (the rail-move drill's moved table)
 #
 # Chapter 4's audit comes first, as chapter 4's lab runs it (this lab extends it): the shared
@@ -14,7 +14,7 @@
 # security, the bastion, the platform's DNS and time servers, the uplink side, the clients, the
 # populations; this lab holds no storage) and the firewall edge. Then chapter 5's rail-backend group
 # on the rail switches and both GPU nodes. Chapter 6 adds the placement group
-# (common/audit/lib-audit.sh audit_placement, then judge.py placement), every pod read back
+# (common/audit/lib-audit.sh audit_placement, then checks.py placement), every pod read back
 # against the placement table:
 #
 #   the table       the recipe's rules (every pod of a copy on one rail, one server and at least one
@@ -52,12 +52,12 @@ if [ "$SFAB_QUICK" = 1 ]; then
 else
   audit_collect                                                  # every node's plan
 fi
-audit_judge                                                      # shared: switches, firewall, guests, rails, VLANs, MAC tables
+audit_check                                                      # shared: switches, firewall, guests, rails, VLANs, MAC tables
 audit_forwarding_only fe-sw1 fe-sw2 rail-sw1 rail-sw2 oob-sw     # chapter 2's forwarding-only reads
 audit_mclag_pair fe-sw1 fe-sw2                                   # the pair, every PortChannel
-_judge pair-roles fe-sw1 fe-sw2                                  # chapter 3: roles and the ICCP session
+_run_check pair-roles fe-sw1 fe-sw2                                  # chapter 3: roles and the ICCP session
 mapfile -t _bl < <(bonded_nodes)
-judge_present bond-legs "${_bl[@]}" ${FW_NODE:+"$FW_NODE"}       # chapter 3: every bond's legs
+check_present bond-legs "${_bl[@]}" ${FW_NODE:+"$FW_NODE"}       # chapter 3: every bond's legs
 audit_rail_backend rail-sw1 rail-sw2                             # chapter 5: the absences, the ports, the namespaces
 audit_placement                                                  # chapter 6: the pods against the placement table
 if [ "$SFAB_QUICK" = 1 ]; then summary; exit; fi

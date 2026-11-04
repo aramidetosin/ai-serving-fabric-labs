@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""holdrun.py: chapter 10's session measurement judged (common/trace/lib-hold.sh), and hold.md.
+"""holdrun.py: chapter 10's session measurement checked (common/trace/lib-hold.sh), and hold.md.
 
-    holdrun.py judge --set DIR --plan gen/tenancy.json [--factor F] [--stamp TEXT]
+    holdrun.py check --set DIR --plan gen/tenancy.json [--factor F] [--stamp TEXT]
 
 It reads the files the run saved in DIR and prints the result vocabulary, appending each line to
-$SFAB_VERDICT:
+$SFAB_RESULTS:
 
   held          every population's N connections opened, held and answered 200 on every request,
                 and its zone's session count on the firewall, read while they are held, within the
@@ -58,14 +58,14 @@ def little(events: list, stop_t: float | None) -> dict:
     return {"arrivals": len(opens), "window_s": round(w, 1), "mean_hold_s": round(t_mean, 1), "predicted": round(lam * t_mean, 1)}
 
 
-def judge(a) -> int:
+def run_checks(a) -> int:
     d = Path(a.set)
     plan = json.loads(Path(a.plan).read_text())
     hp = plan["hold"]
     factor = int(a.factor or 1)
     v = vocab.Vocab()
     v.sec(f"the held connections: {hp['n'] * factor} a population for {hp['hold_s']} s (chapter 10)")
-    res = T.judge_hold(v, d, hp, "held", factor)
+    res = T.check_hold(v, d, hp, "held", factor)
     v.sec("one chat completion a population, with its own caller's key")
     for r in hp["rows"]:
         if not r.get("chat"):
@@ -131,8 +131,8 @@ def write_md(d: Path, plan: dict, rows: list, factor: int, stamp, timeouts: dict
           + " applies to a session the firewall holds in the discard state. This run makes no denied attempt, and each "
           "population's filter names its zone and its own Gateway's address and port, so the counts above hold the "
           "population's own connections and its chat request alone.", ""]
-    verdict = read(d / "verdict.txt")
-    L += ["## Verdict", "", "```"] + [x for x in verdict.splitlines() if x.strip()] + ["```", ""]
+    results = read(d / "results.txt")
+    L += ["## Results", "", "```"] + [x for x in results.splitlines() if x.strip()] + ["```", ""]
     L += ["## Files", "", "- `hold-<population>.jsonl`: each client's events (open, reply, held, closed, done), on the client's clock",
           "- `counts-<when>-<population>.txt`: show session all with the population's filter and count yes, before, held, after the chat "
           "and after the stop", "- `sessions-after-<population>.txt`: the same filter's entries still listed after the stop, with their states "
@@ -146,13 +146,13 @@ def write_md(d: Path, plan: dict, rows: list, factor: int, stamp, timeouts: dict
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="holdrun")
     sub = ap.add_subparsers(dest="cmd", required=True)
-    s = sub.add_parser("judge")
+    s = sub.add_parser("check")
     s.add_argument("--set", required=True)
     s.add_argument("--plan", required=True)
     s.add_argument("--factor", default="1")
     s.add_argument("--stamp")
     a = ap.parse_args(argv)
-    return judge(a)
+    return run_checks(a)
 
 
 if __name__ == "__main__":

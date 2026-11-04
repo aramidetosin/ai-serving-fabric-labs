@@ -8,9 +8,9 @@
 # VIP, but no ingress node holds a device the policy names, so no agent answers ARP for 10.20.11.220;
 # the internal and the users' Gateways keep theirs.
 #
-# record: the policy, the internet Gateway's lease and the Gateway with its Service, each read whole,
+# observe: the policy, the internet Gateway's lease and the Gateway with its Service, each read whole,
 # the firewall's ARP table, and requests from the staff client through the users' Gateway. What the
-# lease shows while the policy matches no device (present, its holder, renewed or not) is recorded
+# lease shows while the policy matches no device (present, its holder, renewed or not) is saved
 # before the exercise text names it; the expectations here are only what the render knows. No
 # population reaches 10.20.11.220 through the firewall in chapter 8, so the symptom is checked where
 # it shows: the VIP asked for by ARP from the ingress node that does not hold its lease, on its VLAN
@@ -22,7 +22,7 @@ exercise: 5
 since: 8
 break:
   - l2_policy: {gateway: gw-inet, interfaces: ["^bond0\\.111$"]}
-record:
+observe:
   - k8s_read: {objects: ["l2_policy:gw-inet", "lease:gw-inet", "gateway:gw-inet", "l2_policy:gw-users", "lease:gw-users"]}
   - fw_show: {lines: [show arp all]}
   - probe_http: {id: staff, from: ent-client, hostname: llm, path: "/echo?msg=sfab-break-8a", count: 10, interval_s: 0.5, timeout_s: 5, passes: 1}

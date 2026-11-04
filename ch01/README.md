@@ -20,12 +20,12 @@ Memory: a budget of 179 GiB, and preflight wants MemAvailable to cover it plus t
 ```
 cd ch01
 make render          # topo.clab.yml, bootstrap/ and gen/ (trace.json, breaks.json)
-make up              # preflight, up, boot, finish (the cluster, storage, the Gateway layer, the serving recipe, the API gateway, router and identity provider), audit (Example 1-1)
-make audit           # audits/sfab-ch01_audit_<UTC>/ (Example 1-2)
-make trace           # audits/sfab-ch01_trace_<UTC>/ with trace.md (Examples 1-3 to 1-9)
-make record          # audit, trace, then the gate on both sets (Example 1-10)
-make break-1a        # audits/sfab-ch01_break-1a_<UTC>/ (Exercise 4)
-make heal-1a         # audits/sfab-ch01_heal-1a_<UTC>/, then the chapter audit
+make up              # preflight, up, boot, finish (the cluster, storage, the Gateway layer, the serving recipe, the API gateway, router and identity provider), audit
+make audit           # runs/sfab-ch01_audit_<UTC>/
+make trace           # runs/sfab-ch01_trace_<UTC>/ with trace.md
+make verify          # audit, trace, then the results check on both sets
+make break-1a        # runs/sfab-ch01_break-1a_<UTC>/
+make heal-1a         # runs/sfab-ch01_heal-1a_<UTC>/, then the chapter audit
 make down            # keeps state/ disks; make wipe removes them
 ```
 
@@ -35,4 +35,4 @@ Once the lab is up, `ssh admin@sfab-ch01-<node>` from the lab host logs in to `b
 
 ## What the checks do
 
-`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `audits/` in this directory, which git ignores. `spec/known.yaml` lists the known limits of the virtual platforms.
+`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `runs/` in this directory, which git ignores. `spec/limitations.yaml` lists the known limits of the virtual platforms.

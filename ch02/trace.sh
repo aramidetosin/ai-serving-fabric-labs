@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # ch02/trace.sh: chapter 1's request walk, each hop tagged with the row of the decision table that
-# decides there (book Example 2-11), recorded as audits/sfab-ch02_trace_<UTC>/
-# with trace.md, verdict.txt, dns/, fw/, pair/, rail/, cluster/, sessions/, request/, refuse/ and
+# decides there, saved as runs/sfab-ch02_trace_<UTC>/
+# with trace.md, results.txt, dns/, fw/, pair/, rail/, cluster/, sessions/, request/, refuse/ and
 # captures/.
 #
 # The walk is chapter 1's (ch01/trace.sh): one chat completion from the enterprise client to chat
 # through the users' Gateway, with chat's key handed to the client from its Secret as a 0600 header
 # file, never printed, and its source port pinned, after one warm-up request, walked inward with every
-# device's table, then three requests that must be refused, each recorded where it died. The plan,
+# device's table, then three requests that must be refused, each saved where it died. The plan,
 # gen/trace.json, adds chapter 2's rows (render/trace.py, from decisions: true): trace.md's table of
 # hops gains a Row column, the resolver view at the resolver, routing, NAT and security policy at the
 # firewall, forwarding only at the bundle, the pair and the rail switch, the route set at the

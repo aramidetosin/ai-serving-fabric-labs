@@ -21,7 +21,7 @@ host's, for a container):
     {"t": ..., "event": "closed", "conn": i}
     {"t": ..., "event": "done", "open": n, "replies": r, "errors": e}
 
-It stops after HOLD_S, or as soon as STOPFILE exists (the harness removes the held load early),
+It stops after HOLD_S, or as soon as STOPFILE exists (the lab tooling removes the held load early),
 closing every connection itself. No credential is involved: the test backend's path needs none.
 Exit status 0 when every connection lived to the end with every reply 200, 1 otherwise.
 """

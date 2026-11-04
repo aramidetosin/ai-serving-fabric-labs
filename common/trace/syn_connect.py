@@ -9,8 +9,8 @@ sends nothing over a connection it opens and closes it at once. One line an atte
     <epoch the attempt started> <attempt from 0> <1 connected, else 0> <source port> <outcome> <seconds>
 
 the outcome CONNECTED, TIMEOUT (no answer within TIMEOUT_S, as a silent drop leaves it), REFUSED (a
-reset), or ERROR:<reason> (an ICMP unreachable reads as one). The client's view is recorded, not
-assumed. Exit status 0 always: the caller judges the lines.
+reset), or ERROR:<reason> (an ICMP unreachable reads as one). The client's view is saved, not
+assumed. Exit status 0 always: the caller checks the lines.
 """
 
 import socket

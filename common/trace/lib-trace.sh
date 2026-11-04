@@ -1,6 +1,6 @@
 # shellcheck shell=bash
-# common/trace/lib-trace.sh: a chapter's hop-by-hop trace, recorded as
-# audits/<lab>_trace_<UTC>/ with trace.md, verdict.txt and captures/. A chapter's
+# common/trace/lib-trace.sh: a chapter's hop-by-hop trace, saved as
+# runs/<lab>_trace_<UTC>/ with trace.md, results.txt and captures/. A chapter's
 # trace.sh is
 #
 #   . "$(dirname "$0")/../common/lib.sh"; sfab_init trace "$@"
@@ -9,18 +9,18 @@
 # The flow and the capture points come from chapter.yaml's trace block (the inventory's "trace"). In
 # order:
 #   1. the lease holder: the control node holding the Gateway Service's Cilium L2 announcement
-#      lease, read with the harness's kubectl (the init node); the points at it are expanded (trace-md.py points)
+#      lease, read with the lab's kubectl (the init node); the points at it are expanded (trace-md.py points)
 #   2. captures start at every point: on a container port with nsenter and tcpdump on the lab host,
 #      in a VM guest with tcpdump over SSH (decoded in the guest, so the decode names the guest's
 #      own interfaces); the trace waits until every pcap exists, then 3 s more
 #   3. the client resolves the name through its own resolver, then makes a warm-up attempt, labelled
-#      as such (the first packets of a new flow are lost to ARP), then the recorded attempt with its
+#      as such (the first packets of a new flow are lost to ARP), then the traced attempt with its
 #      source port pinned (curl --local-port)
 #   4. captures stop with kill -INT, waiting on their PIDs (never a bare wait); each runs under
 #      timeout as well; host-side pcaps are decoded with tcpdump -nn -e -tttt -v -S
 #   5. the firewall's traffic log is read (a time filter and the destination port), until the
 #      connection's entry appears: PAN-OS writes an entry when the session ends
-#   6. trace-md.py judges the evidence and writes trace.md
+#   6. trace-md.py checks the evidence and writes trace.md
 #
 # Capture filter: the flow's TCP port, 802.1Q-aware ((f) or (vlan and (f))), snaplen 256. Every
 # process this starts it stops; it changes nothing on any device.
@@ -108,7 +108,7 @@ trace_fw_log() {
   [ -n "${FW_NODE:-}" ] && [ -n "${RULE:-}" ] || return 0
   for i in $(seq 1 "${SFAB_TRACE_TLOG_TRIES:-9}"); do
     FW "$cmd" >"$RS/fw-session.txt" 2>&1 || true
-    py "$SFAB_COMMON/audit/judge.py" body --style panos --command "$cmd" <"$RS/fw-session.txt" >"$RS/fw-traffic-log.txt" 2>/dev/null || true
+    py "$SFAB_COMMON/audit/checks.py" body --style panos --command "$cmd" <"$RS/fw-session.txt" >"$RS/fw-traffic-log.txt" 2>/dev/null || true
     # a command echo the CLI wrapped is not found by its prompt line: keep the whole session then
     [ -s "$RS/fw-traffic-log.txt" ] || cp "$RS/fw-session.txt" "$RS/fw-traffic-log.txt"
     if grep -q -- "$SPORT" "$RS/fw-traffic-log.txt" 2>/dev/null && grep -q -- "$CLIENT_ADDR" "$RS/fw-traffic-log.txt"; then
@@ -161,6 +161,6 @@ trace_run() {
   trap - EXIT
   trace_fw_log
   [ -z "${SFAB_TICK_STAMP:-}" ] || stamp_args=(--stamp "$SFAB_TICK_STAMP")
-  py "$TMD" judge --set "$RS" --inv "$INV" --points "$RS/points.tsv" --env "$RS/flow.env" "${stamp_args[@]+"${stamp_args[@]}"}" || true
+  py "$TMD" check --set "$RS" --inv "$INV" --points "$RS/points.tsv" --env "$RS/flow.env" "${stamp_args[@]+"${stamp_args[@]}"}" || true
   summary
 }

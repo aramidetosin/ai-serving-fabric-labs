@@ -12,7 +12,7 @@
 # rm -f of each inventory container, a sweep of the exact <lab>- prefix, and the lab's memory
 # watchdog unit stopped. Nothing outside the lab is touched. --verify records the teardown checks
 # (no <lab>- container, no clab-<lab>/, the <lab>-memwatch unit not running, state/ disks kept
-# unless wiped) as a result set.
+# unless wiped) as a run directory.
 set -euo pipefail
 # shellcheck source=common/lib.sh
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/lib.sh"

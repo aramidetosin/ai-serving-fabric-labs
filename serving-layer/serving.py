@@ -988,7 +988,7 @@ def reroute(kube: Kube, s: Settings, rep: Report, pod: str, nad: str, dst: str, 
     missing = _remake(kube, s, [routed_nad(s, p, nad, dst, via), routed_pod(s, p, nad)], pod, WAIT["servers"])
     rep.ok(f"{pod} made again by StatefulSet {controller(p)} through {nad} (route {dst} via {via}) at {p['address']}")
     # whether it turns Ready is what the break records, so either way is reported, never failed
-    rep.ok(f"{pod} Ready through {nad}" if not missing else f"{pod} not Ready within {WAIT['servers']}s (recorded)")
+    rep.ok(f"{pod} Ready through {nad}" if not missing else f"{pod} not Ready within {WAIT['servers']}s (saved)")
     return rep.summary()
 
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# ch10/hold.sh: the session measurement (book Examples 10-10 and 10-11), recorded as
-# audits/sfab-ch10_hold_<UTC>/ with hold.md and verdict.txt (common/trace/lib-hold.sh, judged by
+# ch10/hold.sh: the session measurement, saved as
+# runs/sfab-ch10_hold_<UTC>/ with hold.md and results.txt (common/trace/lib-hold.sh, checked by
 # common/trace/holdrun.py).
 #
 # Every population's held connections at once (chapter.yaml tenancy.hold: 8 keep-alive HTTPS

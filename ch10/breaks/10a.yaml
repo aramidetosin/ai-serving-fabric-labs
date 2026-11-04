@@ -8,7 +8,7 @@
 # no rule then matches the internet users' sessions, which meet deny-all-log. The staff (the first rule, the
 # users' VIP, untranslated) and the operator (through its tunnel, untranslated) are unaffected.
 #
-# record: requests from the internet client to llm.ai.tarnwick.example (its resolver answers the
+# observe: requests from the internet client to llm.ai.tarnwick.example (its resolver answers the
 # published address) and from the staff client to the same name (the users' VIP); connects from the
 # internet client to the published address from pinned ports, captured on the ISP router's link and
 # on both legs of the bundle; and the running security and NAT rulebases. The heal writes the
@@ -18,7 +18,7 @@ exercise: 5
 since: 10
 break:
   - panos_api: {edit: security, rule: isp-to-internet-gateway, destination: ["10.20.11.220"]}
-record:
+observe:
   - probe_http: {id: internet, from: inet-client, hostname: llm, path: "/echo?msg=sfab-break-10a", count: 10, interval_s: 0.5, timeout_s: 5, passes: 1}
   - probe_http: {id: staff, from: ent-client, hostname: llm, path: "/echo?msg=sfab-break-10a", count: 10, interval_s: 0.5, timeout_s: 5, passes: 1}
   - probe_syn: {id: syn, from: inet-client, to: "198.51.100.10", port: 443, count: 3, sport: 42310, timeout_s: 5, passes: 1, capture: ["isp-rtr:eth1", "fw:eth1", "fw:eth2"]}

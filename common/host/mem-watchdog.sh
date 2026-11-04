@@ -19,9 +19,9 @@
 # has appeared within SFAB_MEMWATCH_GRACE_S (900) of its start (up starts it before the deploy,
 # which may first wait for the host-wide lock).
 #
-#   --once     one poll, then exit (a manual check; the tests)
+#   --once     one poll, then exit (a manual check)
 #   --dry-run  say which guest it would stop, and stop nothing
-# SFAB_MEMINFO names another meminfo file (the tests).
+# SFAB_MEMINFO names another meminfo file.
 set -euo pipefail
 # shellcheck source=common/lib.sh
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/lib.sh"
@@ -72,7 +72,7 @@ poll() {
   local a v c
   a="$(avail_kb)"
   if [ "$a" -lt 0 ]; then
-    wlog "no MemAvailable in $MEMINFO: nothing judged"
+    wlog "no MemAvailable in $MEMINFO: nothing checked"
     return 0
   fi
   [ "$a" -lt "$FLOOR_KB" ] || return 0

@@ -16,7 +16,7 @@
 #             (k8s.cilium_devices); a different set is fixed with helm upgrade --reuse-values from
 #             the registry's chart, then the DaemonSet is rolled. Agents read cilium-config only at
 #             start, so an agent older than the ConfigMap's last change is drift too, fixed by a roll.
-#   apply     bootstrap/k8s/apply.list, each file applied with the harness's kubectl (on the init
+#   apply     bootstrap/k8s/apply.list, each file applied with the lab's kubectl (on the init
 #             node, the admin kubeconfig kubeadm wrote there; bootstrap/k8s copied in first) with
 #             kubectl apply --server-side. A file whose kinds are not served yet (their CRDs come
 #             with a chart) is set aside for apply-late.
@@ -83,7 +83,7 @@ sfab_init finish "$@"
 RUNDIR="$STATEDIR/run/finish"
 mkdir -p "$RUNDIR"
 K8S_DIR="$RENDERDIR/bootstrap/k8s"
-# where bootstrap/k8s is copied on the init node, which the harness's kubectl and helm read from
+# where bootstrap/k8s is copied on the init node, which the lab's kubectl and helm read from
 INKNODE=/tmp/sfab-k8s
 REGISTRY_CA=/shared/ca/root.crt
 SFAB_CA="$SFAB_COMMON/ca/sfab-ca"
@@ -266,7 +266,7 @@ cilium_drift() {
 # --- manifests and charts ------------------------------------------------------------------------------
 
 # copy_in: bootstrap/k8s onto the init node at /tmp/sfab-k8s (a tar stream over SSH), where the
-# harness's kubectl and helm read it. Nothing in it is a secret.
+# lab tooling's kubectl and helm read it. Nothing in it is a secret.
 copy_in() {
   [ -n "${KNODE:-}" ] || { warn "no Kubernetes init node in $LAB"; return 2; }
   tar -C "$K8S_DIR" -cf - . | EVID_OFF=1 _ssh_guest_in "$GUEST_USER@$(node_mgmt "$KNODE")" \
@@ -415,7 +415,7 @@ operators() {
     mkdir -p "$out"
     chmod 0755 "$STATEDIR/operators" "$out"
     # the kubeconfig holds the operator's private key: it goes from the init node to a 0600 file on
-    # the lab host and is never recorded or printed
+    # the lab host and is never saved or printed
     if (umask 077; EVID_OFF=1 H "$KNODE" "kubeadm kubeconfig user --config $cfg --client-name $u --org $group --validity-period ${hours}h0m0s" \
           >"$out/kubeconfig.new" 2>"$RUNDIR/operator-$u.err") && grep -q '^kind: Config' "$out/kubeconfig.new"; then
       chmod 0600 "$out/kubeconfig.new"
@@ -449,10 +449,10 @@ storage_bonds() {
         mkdir -p "$dir/$sw"
         EVID_OFF=1 SW "$sw" "show mclag brief" "show PortChannel summary" >"$dir/$sw.session" 2>/dev/null || true
         printf '01\tmclag_brief\tklish\t.txt\tshow mclag brief\n02\tportchannel_summary\tklish\t.txt\tshow PortChannel summary\n' >"$dir/$sw.plan"
-        py "$SFAB_COMMON/audit/judge.py" split --style klish --plan "$dir/$sw.plan" --session "$dir/$sw.session" --out "$dir/$sw" >/dev/null || true
+        py "$SFAB_COMMON/audit/checks.py" split --style klish --plan "$dir/$sw.plan" --session "$dir/$sw.session" --out "$dir/$sw" >/dev/null || true
       done
-      SFAB_VERDICT="$dir/verdict-$p.txt" py "$SFAB_COMMON/audit/judge.py" run --set "$dir" --inv "$INV" --render "$RENDERDIR" \
-        mclag-pair "$a" "$b" >"$dir/judge-$p.txt" 2>&1 || rc=1
+      SFAB_RESULTS="$dir/results-$p.txt" py "$SFAB_COMMON/audit/checks.py" run --set "$dir" --inv "$INV" --render "$RENDERDIR" \
+        mclag-pair "$a" "$b" >"$dir/checks-$p.txt" 2>&1 || rc=1
     done
     if [ "$rc" -eq 0 ]; then good=$((good + 1)); [ "$good" -ge "$need" ] && break; else good=0; fi
     sleep "$pause"
@@ -460,7 +460,7 @@ storage_bonds() {
   if [ "$good" -ge "$need" ]; then
     ok "pair: every PortChannel up with every member, the storage bonds included ($need consecutive polls, poll $i)"
   else
-    bad "pair: the storage bonds up" "$(grep -hE '^  FAIL  ' "$dir"/judge-*.txt 2>/dev/null | head -n 2 | sed 's/^  FAIL  //' | paste -sd ';' -)"
+    bad "pair: the storage bonds up" "$(grep -hE '^  FAIL  ' "$dir"/checks-*.txt 2>/dev/null | head -n 2 | sed 's/^  FAIL  //' | paste -sd ';' -)"
     return 1
   fi
 }

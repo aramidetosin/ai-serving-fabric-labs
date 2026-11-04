@@ -24,8 +24,7 @@
 # and MODELS_MOUNT, /models is exported to the guest read-only over virtio-9p under that tag, and
 # the seed carries a mount unit for MODELS_MOUNT with a kubelet drop-in that requires it, so the
 # guest mounts the weights read-only before kubelet starts any pod. SFAB_DRY_RUN=1
-# writes the seed tree under SFAB_VM_DIR and prints the QEMU command instead of touching devices
-# (the tests use it).
+# writes the seed tree under SFAB_VM_DIR and prints the QEMU command instead of touching devices.
 set -euo pipefail
 
 BOOT=${SFAB_BOOTSTRAP:-/sfab/bootstrap}
@@ -124,7 +123,7 @@ data_dev_prep() {  # data_dev_prep <dev> <tap> <mtu or empty>: no IPv6, MTU, TX 
 
 # A two-port bridge must never learn: it is a wire. The switch pair floods a guest's own
 # broadcasts back to it over its other bond leg (peer-link isolation is not enforced on the VM,
-# a known limit in spec/known.yaml), so a learning bridge moved the guest's own MAC to the container side and then
+# a limitation in spec/limitations.yaml), so a learning bridge moved the guest's own MAC to the container side and then
 # dropped every frame sent back to that MAC.
 no_learning() {  # no_learning <port>...: learning off on each bridge port; unknown frames flood
   local d

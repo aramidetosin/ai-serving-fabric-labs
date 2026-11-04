@@ -27,7 +27,7 @@ with its attestations lists twenty manifests. From those hosts the seed reads th
 once, checks its sha256 against the pin, and copies only the linux/amd64 manifest the index names
 (PLATFORM), so the whole image costs two manifest requests. The mirror then serves that manifest
 under the tag, and SEED.json records its digest beside the pinned one: a node pulls such an image
-by tag (or by the recorded platform digest), never by the index digest. A pin may say
+by tag (or by the pinned platform digest), never by the index digest. A pin may say
 `platforms: all` to copy every platform from any host, or `platforms: one` to copy one from any.
 
 How. `run` starts the registry image on seed.yml with the data directory bound read-write, on the
@@ -963,7 +963,7 @@ def check_data(data: Path, images, charts, record: dict | None = None, local=())
     """Problems with data: every pinned tag must point at the pinned digest (a one-platform image:
     at the platform digest SEED.json records for that pin), the manifest blob must be there, and
     for a chart the pinned .tgz must be its one layer. An image built here must be in SEED.json,
-    its tag on the manifest recorded there, with every blob that manifest names."""
+    its tag on the manifest saved there, with every blob that manifest names."""
     problems = []
     rec = record if record is not None else read_record(data)
     served = previous_served(rec)

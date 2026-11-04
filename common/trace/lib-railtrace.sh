@@ -1,5 +1,5 @@
 # shellcheck shell=bash
-# common/trace/lib-railtrace.sh: chapter 5's rail trace, recorded as audits/<lab>_trace_<UTC>/ with trace.md, verdict.txt, health/, flows/, df/,
+# common/trace/lib-railtrace.sh: chapter 5's rail trace, saved as runs/<lab>_trace_<UTC>/ with trace.md, results.txt, health/, flows/, df/,
 # captures/ and captures-df/. A chapter's trace.sh is
 #
 #   . "$(dirname "$0")/../common/lib.sh"; sfab_init trace "$@"
@@ -18,7 +18,7 @@
 #   5. traceroute for each flow from the same namespace (traceroute -n, three probes a hop)
 #   6. the DF matrix with its own captures (captures-df/): each row's ping, three requests with the
 #      don't-fragment bit set (ping -M do) at the row's payload, under the row's own ICMP id
-#   7. railtrace.py judges the evidence and writes trace.md
+#   7. railtrace.py checks the evidence and writes trace.md
 #
 # Changes nothing on any device; every process it starts it stops.
 
@@ -98,6 +98,6 @@ railtrace_run() {
   railcap_stop
   trap - EXIT
   [ -z "${SFAB_TICK_STAMP:-}" ] || stamp_args=(--stamp "$SFAB_TICK_STAMP")
-  py "$RTP" judge --set "$RS" --plan "$RT_PLAN" --inv "$INV" "${stamp_args[@]+"${stamp_args[@]}"}" || true
+  py "$RTP" check --set "$RS" --plan "$RT_PLAN" --inv "$INV" "${stamp_args[@]+"${stamp_args[@]}"}" || true
   summary
 }

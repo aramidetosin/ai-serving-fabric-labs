@@ -18,8 +18,8 @@
 #                                values (chapter 5), a server pod's two networks (chapter 6)
 #   hold                         the lab's hold.sh: the held connections and the firewall's sessions
 #                                per zone under them (chapter 10)
-#   record                       audit, trace, label and matrix (each the lab has), then
-#                                common/audit/gate.sh on the new sets
+#   verify                       audit, trace, label and matrix (each the lab has), then
+#                                common/audit/check-results.sh on the new run directories
 #   break-<id> heal-<id> heal-all  common/breakheal.py
 #   load serve client            serving-layer, with this lab's bootstrap/k8s/serving.env
 #   status stop down wipe        down keeps state/ disks; wipe removes them
@@ -50,7 +50,7 @@ else
 RUNUP = $(RUN)
 endif
 
-.PHONY: render check lint show ca ca-status up deploy boot finish recover audit trace label matrix dbs rpf attach hold drills accept record \
+.PHONY: render check lint show ca ca-status up deploy boot finish recover audit trace label matrix dbs rpf attach hold drills accept verify \
         heal-all load serve client status stop down wipe help
 
 help:
@@ -109,15 +109,15 @@ drills:
 accept: audit trace
 	@if [ -x $(LABDIR)/drills.sh ]; then $(MAKE) --no-print-directory drills; else echo "$(LAB) has no drills.sh"; fi
 
-# record: audit, then trace, label and matrix (each when the lab has one), then the gate on the result
-# sets this target made.
-record:
+# verify: audit, then trace, label and matrix (each when the lab has one), then the results check on
+# the run directories this target made.
+verify:
 	@mark=$$(mktemp); trap 'rm -f $$mark' EXIT; \
 	$(RUN) audit && { [ ! -x $(LABDIR)/trace.sh ] || $(RUN) trace; } && { [ ! -x $(LABDIR)/label.sh ] || $(RUN) label; } && \
 	  { [ ! -x $(LABDIR)/matrix.sh ] || $(RUN) matrix; }; rc=$$?; \
-	sets=$$(find $(RENDERDIR)/audits -mindepth 1 -maxdepth 1 -type d -newer $$mark -name '$(LAB)_*' 2>/dev/null | sort); \
-	[ -n "$$sets" ] || { echo "record: no new result set"; exit 1; }; \
-	$(COMMON)/audit/gate.sh $$sets && exit $$rc
+	sets=$$(find $(RENDERDIR)/runs -mindepth 1 -maxdepth 1 -type d -newer $$mark -name '$(LAB)_*' 2>/dev/null | sort); \
+	[ -n "$$sets" ] || { echo "verify: no new run directory"; exit 1; }; \
+	$(COMMON)/audit/check-results.sh $$sets && exit $$rc
 
 break-%:
 	$(PY) $(COMMON)/breakheal.py break $*

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""label.py: chapter 2's label.sh judge. It reads gen/decisions.json (the decision table, Table 2-1,
+"""label.py: chapter 2's label.sh check. It reads gen/decisions.json (the decision table,
 with label.sh's plan of reads) and what label.sh saved from the running build, and names the live
 object behind every row of the table with the decision label it carries.
 
     label.py get --plan P PATH              one value of the plan (gen/decisions.json), by dotted path
-    label.py judge --plan P --dir D [--stamp S]
-                                            verdict lines (PASS/FAIL) and D/labels.md
+    label.py check --plan P --dir D [--stamp S]
+                                            result lines (PASS/FAIL) and D/labels.md
 
-What label.sh saves under D (the result set), one directory a row:
+What label.sh saves under D (the run directory), one directory a row:
 
     view/<population>-lookup.txt    the population's client looking up the users' hostname through its
                                     own resolver (dig in a container, getent ahostsv4 in a VM guest)
@@ -29,7 +29,7 @@ What label.sh saves under D (the result set), one directory a row:
     forwarding/<switch>-startup.txt the first lines of the KLISH startup file delivered to the switch,
                                     and <switch>-ip-route.txt its show ip route
 
-Standard library only, plus the harness's evfile and vocab.
+Standard library only, plus the lab tooling's evfile and vocab.
 """
 
 from __future__ import annotations
@@ -178,7 +178,7 @@ def fw_route_rows(text: str) -> list:
     return out
 
 
-def judge(a) -> int:
+def run_checks(a) -> int:
     d = Path(a.dir)
     t = load(a.plan)
     plan = t["plan"]
@@ -254,7 +254,7 @@ def judge(a) -> int:
         r = rows[rid]
         v.sec(f"{r['layer']} ({r['owner']}): {r['decision'].lower()}")
         # PAN-OS prints its two predefined rules after the rulebase; deny-all-log above them takes
-        # every session first, so they are set aside as the audit's judge sets them aside
+        # every session first, so they are set aside as the audit's check sets them aside
         # (listed by name, or as <vsys>+<name> once overridden, as build A does to log them)
         order = [(n, i) for n, i in rule_order(read(d / "fw" / f)) if n.split("+", 1)[-1] not in PREDEFINED]
         names = [n for n, _ in order]
@@ -363,8 +363,8 @@ def write_md(d: Path, t: dict, out: list, stamp=None):
     L += ["", "| Row | Live object | Decision | Evidence |", "|---|---|---|---|"]
     for rid, what, dec, ev in out:
         L.append(f"| {layers.get(rid, rid)} | {what} | `{dec}` | {ev} |")
-    verdict = read(d / "verdict.txt")
-    L += ["", "## Verdict", "", "```"] + [l for l in verdict.splitlines() if l.strip()] + ["```", ""]
+    results = read(d / "results.txt")
+    L += ["", "## Results", "", "```"] + [l for l in results.splitlines() if l.strip()] + ["```", ""]
     (d / "labels.md").write_text("\n".join(L), encoding="utf-8")
 
 
@@ -374,12 +374,12 @@ def main(argv=None) -> int:
     s = sub.add_parser("get")
     s.add_argument("--plan", required=True)
     s.add_argument("path")
-    s = sub.add_parser("judge")
+    s = sub.add_parser("check")
     s.add_argument("--plan", required=True)
     s.add_argument("--dir", required=True)
     s.add_argument("--stamp")
     a = p.parse_args(argv)
-    return {"get": cmd_get, "judge": judge}[a.cmd](a)
+    return {"get": cmd_get, "check": run_checks}[a.cmd](a)
 
 
 if __name__ == "__main__":

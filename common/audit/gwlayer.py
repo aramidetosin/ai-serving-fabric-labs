@@ -1,7 +1,7 @@
-"""The gateway-layer and keys groups of judge.py (chapter 7): the chain from the firewall to the model.
+"""The gateway-layer and keys groups of checks.py (chapter 7): the chain from the firewall to the model.
 
-audit_gateway_layer in lib-audit.sh saves the reads, then `judge.py run ... keys` and (in a full
-audit) `judge.py run ... gateway-layer` judge them, from the saved files only.
+audit_gateway_layer in lib-audit.sh saves the reads, then `checks.py run ... keys` and (in a full
+audit) `checks.py run ... gateway-layer` check them, from the saved files only.
 
 keys (keys/, a quick audit too), for each model route a client of the lab reaches. A model's key is
 the first key of the first application caller (inference.callers) that may call the model
@@ -23,19 +23,19 @@ gateway-layer (gateway-layer/, a full audit only):
                 (from: Selector), and exactly the namespaces the render attaches routes from carry
                 the label; its attached routes are the render's
   hostnames     each Gateway's accepted routes carry the hostname and path pairs the render gives
-                it (Table 7-1): the internal Gateway the bare model prefix and the admin hostnames,
+                it: the internal Gateway the bare model prefix and the admin hostnames,
                 the users' Gateway one rule a model; no route on a Gateway without admin hostnames
                 names one
   leases        each Gateway's VIP announced by a node the L2 announcement policy selects, its
-                lease's holder (Table 7-3): an ingress node in build A
+                lease's holder: an ingress node in build A
   the VIPs      from a GPU node, each VIP resolves by ARP and opens TCP 443, and answers no ICMP
                 echo (every VIP check is a TCP connect)
   certificates  each VIP's chain, for the users' hostname, verifies against the lab root: the
                 wildcard leaf from the platform intermediate, which the root signs
   the CA proof  sfab-ca proof on the lab host, where the CA lives: every inside leaf verifies, and every leaf the
                 intermediates sign outside their name constraints is refused on a name constraint,
-                the verification failure recorded with openssl's own error line
-  timeouts      the chain as the cluster runs it (Table 7-2): the router's attempts inside the API
+                the verification failure saved with openssl's own error line
+  timeouts      the chain as the cluster runs it: the router's attempts inside the API
                 gateway's upstream read, inside the model routes' backendRequest, inside their
                 request; and the stream idle timeout Cilium's operator wrote into each Gateway's
                 listener

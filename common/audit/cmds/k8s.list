@@ -1,6 +1,6 @@
-# The cluster, read with the harness's kubectl on the init node (stages.kubectl, the admin kubeconfig
-# kubeadm wrote there; stages.cluster): SLUG SURFACE COMMAND. judge.py adds this file to that node's
-# plan, and its "cluster" group judges these files. The wildcard
+# The cluster, read with the lab's kubectl on the init node (stages.kubectl, the admin kubeconfig
+# kubeadm wrote there; stages.cluster): SLUG SURFACE COMMAND. checks.py adds this file to that node's
+# plan, and its "cluster" group checks these files. The wildcard
 # certificate line decodes the certificate only; the secret's key is never read.
 kube_version         kubectl-json  kubectl version -o json
 kube_server          kubectl       kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'; echo

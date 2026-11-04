@@ -49,12 +49,12 @@ trace:
 # each Gateway every 2 s on a new connection each time (from the staff client to the users' Gateway,
 # from the operator's client to the internal Gateway) and a TCP connect to each of those VIPs every
 # 0.5 s; the leases are read every 0.5 s on the lab host for the new holder; the firewall's ARP
-# table before, during and after. A chat completion every 2 s through the users' Gateway is recorded
+# table before, during and after. A chat completion every 2 s through the users' Gateway is saved
 # beside them and reported apart: the API gateway, the router and the identity provider run on the
 # ingress nodes too, so the cut node takes its share of them with it until their endpoints leave
-# the Services (the pods' places and the EndpointSlices are recorded through each pass). The virtual
+# the Services (the pods' places and the EndpointSlices are saved through each pass). The virtual
 # switch gives the cut node no loss of carrier, so the node loses its lease because it cannot renew
-# it; the KNOWN line names that limitation on every pass.
+# it; the LIMITATION line names it on every pass.
 drills:
   timing: {lead_s: 20, hold_s: 30, tail_s: 30, settle_max_s: 300, whole_polls: 3}
   list:

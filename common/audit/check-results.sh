@@ -1,26 +1,26 @@
 #!/usr/bin/env bash
-# gate.sh SET...: the closing checks on result sets (make record).
+# check-results.sh DIR...: the closing checks on run directories (make verify).
 #
 # For each set:
 #   - the secret scan is clean: no value from the lab's state/secrets.env in any file (text or
 #     binary, captures included, a compressed file read decompressed), no PEM private key, no
 #     unredacted Authorization, X-PAN-KEY or key= value, no API key in the sk-<org>-<slug>-<hex> form,
 #     and not the lab host's kernel release ($SFAB_HOST_KERNEL, else uname -r on Linux) as a token;
-#   - RESULT.txt shows 0 failed (a break set judges its designed failure as a PASS, so it too
+#   - summary.txt shows 0 failed (a break set checks its designed failure as a PASS, so it too
 #     must show 0 failed).
 # Exit 0 when every set passes.
 set -euo pipefail
 # shellcheck source=common/lib.sh
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/lib.sh"
-sfab_init gate --no-record "$@"
-[ "${#SFAB_ARGS[@]}" -gt 0 ] || die "usage: gate.sh SET_DIR..."
+sfab_init check-results --no-save "$@"
+[ "${#SFAB_ARGS[@]}" -gt 0 ] || die "usage: check-results.sh RUN_DIR..."
 
 for set in "${SFAB_ARGS[@]}"; do
-  [ -d "$set" ] || { bad "result set $set" "no such directory"; continue; }
+  [ -d "$set" ] || { bad "run directory $set" "no such directory"; continue; }
   set="$(cd "$set" && pwd -P)"
-  case "$set" in "$RENDERDIR/audits/"*) ;; *) bad "result set $(basename "$set")" "not under $RENDERDIR/audits"; continue ;; esac
+  case "$set" in "$RENDERDIR/runs/"*) ;; *) bad "run directory $(basename "$set")" "not under $RENDERDIR/runs"; continue ;; esac
   name="$(basename "$set")"
-  sec "gate $name"
+  sec "check results $name"
 
   out="$(py - "$set" "$STATEDIR/secrets.env" "$SFAB_COMMON/audit" <<'PY'
 import os, re, sys, zlib
@@ -82,12 +82,12 @@ PY
 )"
   if [ -z "$out" ]; then ok "secret scan clean"; else bad "secret scan clean" "$(printf '%s\n' "$out" | head -n 3 | paste -sd ';' -)"; fi
 
-  if [ -f "$set/RESULT.txt" ]; then
-    res="$(grep -E '^== RESULT: ' "$set/RESULT.txt" | tail -n 1)"
+  if [ -f "$set/summary.txt" ]; then
+    res="$(grep -E '^== RESULT: ' "$set/summary.txt" | tail -n 1)"
     f="$(printf '%s' "$res" | sed -n 's/.* \([0-9][0-9]*\) failed.*/\1/p')"
     if [ "${f:-x}" = 0 ]; then ok "RESULT shows 0 failed"; else bad "RESULT shows 0 failed" "${res:-no RESULT line}"; fi
   else
-    bad "RESULT shows 0 failed" "no RESULT.txt"
+    bad "RESULT shows 0 failed" "no summary.txt"
   fi
 done
 

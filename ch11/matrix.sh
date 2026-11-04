@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ch11/matrix.sh: every cell of the population and endpoint matrix, its mode asserted, recorded as audits/sfab-ch11_matrix_<UTC>/ with matrix.md, verdict.txt, requests.tsv,
+# ch11/matrix.sh: every cell of the population and endpoint matrix, its mode asserted, saved as runs/sfab-ch11_matrix_<UTC>/ with matrix.md, results.txt, requests.tsv,
 # lookups/, requests/, keys/, fw/, routers/ and api-gateway/.
 #
 # gen/matrix.json is the matrix as render/decisions.py computes it from the spec: chapter 2's four
@@ -8,9 +8,9 @@
 # (the layers that would refuse it if every earlier layer let it through). Chapter 2's runner
 # (common/matrix/matrix.sh and matrix.py) tries each cell from the population's own client and asserts
 # its mode with its evidence. The internet users' chat cell names its own caller (key_caller inetapp
-# in gen/matrix.json): its own request carries inetapp's key, and the judge wants the API gateway's
+# in gen/matrix.json): its own request carries inetapp's key, and the checker wants the API gateway's
 # access log to name that caller. matrix.md prints each cell's depth and its layers beside its
-# evidence, and the judge checks the cells' depth counts against the plan's.
+# evidence, and the checker checks the cells' depth counts against the plan's.
 set -euo pipefail
 # shellcheck source=common/lib.sh
 . "$(dirname "$0")/../common/lib.sh"

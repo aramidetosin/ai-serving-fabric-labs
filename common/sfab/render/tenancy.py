@@ -2,7 +2,7 @@
 (chapters 8 to 11), resolved against the lab's model so the lab host needs no PyYAML and a changed
 plan is drift to `sfab check`.
 
-The audit groups (common/audit/lib-tenancy.sh, judged by common/audit/tenancy.py) and the held
+The audit groups (common/audit/lib-tenancy.sh, checked by common/audit/tenancy.py) and the held
 connections (common/trace/hold_conns.py) read it. Each section is present from the step that adds
 what it checks:
 
@@ -27,7 +27,7 @@ what it checks:
                 (the ISP router's own link address toward the firewall); every population's typed
                 names on its own resolver for the AAAA check; the uplink side's public server, which
                 publishes no platform name; the ISP router, which must hold no route into the
-                inside prefixes; the Envoy certificate Secrets Cilium copies (recorded, not judged);
+                inside prefixes; the Envoy certificate Secrets Cilium copies (saved, not checked);
                 and the internet client's connect to the published address, with the outcome the
                 firewall gives it at this step (render/decisions.py's path); the nodes whose
                 Envoy's loaded certificates the audit records (both ingress nodes and the first
@@ -69,12 +69,12 @@ REFUSED_ID = "fe000000"
 # The TCP timeouts show session info prints on the pinned PA-VM 12.1.2 with no session setting
 # configured (seconds), the values the chapter quotes; discard is the time a denied TCP session holds
 # its entry. PAN-OS 12.1 help, "Session Timeouts", gives the same values but for half closed, which it
-# documents as 120 s and the pinned release prints as 30 s (the lab's first ch10 deploy).
+# documents as 120 s and the pinned release prints as 30 s.
 SESSION_TIMEOUTS = {"tcp": 3600, "tcp_handshake": 10, "tcp_init": 5, "tcp_half_closed": 30, "tcp_time_wait": 15,
                     "discard_tcp": 90}
 HOLD_KEYS = {"n", "hold_s", "every_s", "sport", "chat", "slack", "populations"}
 INSIDE = ("10.0.0.0/8",)
-# what the audit runs in each recorded node's Cilium agent pod to list the certificates its Envoy has
+# what the audit runs in each audited node's Cilium agent pod to list the certificates its Envoy has
 # loaded (Envoy's admin /certs: names, serials and expiry, never a key); the subcommand is the
 # one the pinned agent answers
 ENVOY_CERTS_CMD = ("cilium-dbg", "envoy", "admin", "certs")
@@ -548,8 +548,8 @@ __all__ = ["render", "on", "plan", "SESSION_TIMEOUTS", "CILIUM_LEASE_KEYS"]
 # --------------------------------------------------------------------------------------------
 # Part III's drills (chapter.yaml drills.list, rendered into gen/drills.json by render/drills.py)
 
-P3_DRILL_KEYS = ("lease_loss", "isolation", "leaked_key")
-P3_TIMING_DEFAULTS = {
+TENANT_DRILL_KEYS = ("lease_loss", "isolation", "leaked_key")
+TT_TIMING_DEFAULTS = {
     "lead_s": 20,           # the probes running before the cut, or before the forbidden tries begin
     "hold_s": 30,           # a lease drill's ports stay shut this long
     "tail_s": 30,           # the probes keep running after the restore, or after the last try
@@ -721,7 +721,7 @@ def leaked_key_drill(model, inv: dict, k: dict, d: dict, where: str) -> dict:
             "probe": inf["probe"]["name"], "ca_root": "/shared/ca/root.crt"}
 
 
-def p3_drill(model, inv: dict, d: dict, seen: set, ctx) -> dict:
+def tt_drill(model, inv: dict, d: dict, seen: set, ctx) -> dict:
     """One of Part III's drills, from render/drills.py: the lease-holder loss (chapter 8) or the
     isolation drill under load (chapter 11)."""
     from . import k8s  # noqa: PLC0415
@@ -731,7 +731,7 @@ def p3_drill(model, inv: dict, d: dict, seen: set, ctx) -> dict:
     if not re.match(r"^[a-z][a-z0-9-]*$", did) or did in seen:
         _err(where, "id must be a new name of lower case letters, digits and hyphens")
     seen.add(did)
-    extra = set(d) - {"id", "title", "max_passes"} - set(P3_DRILL_KEYS)
+    extra = set(d) - {"id", "title", "max_passes"} - set(TENANT_DRILL_KEYS)
     if extra:
         _err(where, f"unknown keys {sorted(extra)}")
     k = k8s.summary(model, ctx)

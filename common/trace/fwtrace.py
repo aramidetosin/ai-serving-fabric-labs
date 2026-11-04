@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""fwtrace.py: chapter 4's firewall trace, its plan and its judgment (common/trace/lib-fwtrace.sh).
+"""fwtrace.py: chapter 4's firewall trace, its plan and its check (common/trace/lib-fwtrace.sh).
 
     fwtrace.py session-env --plan gen/trace.json --id ID     shell assignments for one session
     fwtrace.py pull-env    --plan gen/trace.json             shell assignments for the pull
     fwtrace.py points      --plan gen/trace.json             the pull's capture points, one per line
     fwtrace.py session-id  --file FILE --src A --sport N     the session's id in show session all
-    fwtrace.py judge       --set DIR --plan gen/trace.json --inv INV [--stamp TEXT]
+    fwtrace.py check       --set DIR --plan gen/trace.json --inv INV [--stamp TEXT]
 
-The plan is gen/trace.json (sfab.render.trace). judge reads the saved files only and prints the
-result vocabulary, appending each line to $SFAB_VERDICT, then writes trace.md:
+The plan is gen/trace.json (sfab.render.trace). check reads the saved files only and prints the
+result vocabulary, appending each line to $SFAB_RESULTS, then writes trace.md:
 
   each session  the reply (status and echoed message, the connection held after it), the session
                 as show session all lists it (found by the client's address and pinned source port:
@@ -22,7 +22,7 @@ result vocabulary, appending each line to $SFAB_VERDICT, then writes trace.md:
 
 Rule names in the CLI's traffic log are cut to 19 characters, and compared that way. The session
 formats are the CLI's documented shapes:
-every field the judge could not read is named in its FAIL line. Standard library only.
+every field the checker could not read is named in its FAIL line. Standard library only.
 """
 
 from __future__ import annotations
@@ -108,10 +108,10 @@ def cmd_session_id(a) -> int:
 
 
 # --------------------------------------------------------------------------------------------
-# judgment
+# check
 
 
-def judge_session(v, rs: Path, s: dict, plan: dict) -> dict:
+def check_session(v, rs: Path, s: dict, plan: dict) -> dict:
     d = rs / "sessions" / s["id"]
     ex = s.get("expect") or {}
     v.sec(f"session {s['id']}: {s['client']} ({s['client_addr']}) to https://{s['fqdn']}{s['path']} at {s['dst_addr']}:443"
@@ -202,7 +202,7 @@ def cmd_pull_sport(a) -> int:
     return 0
 
 
-def judge_pull(v, rs: Path, p: dict) -> dict:
+def check_pull(v, rs: Path, p: dict) -> dict:
     d = rs / "pull"
     ex = p.get("expect") or {}
     v.sec(f"pull: {p['node']} ({p['node_addr']}) pulls {p['image']} from the registry {p['registry_addr']}:{p['registry_port']}")
@@ -254,20 +254,20 @@ def judge_pull(v, rs: Path, p: dict) -> dict:
             if not e else f"rule {e['rule']}, {e['action']}, {e['from']} to {e['to']}")
     out["tlog"] = e
     rmi = read(d / "rmi.txt")
-    v.ok(f"the image removed from {p['node']} again, so the next trace pulls it whole ({(rmi.strip().splitlines() or ['no output'])[-1][:80]}; not judged)")
+    v.ok(f"the image removed from {p['node']} again, so the next trace pulls it whole ({(rmi.strip().splitlines() or ['no output'])[-1][:80]}; not checked)")
     out["points"] = pts
     out["frames"] = {k: len(x) for k, x in dec.items()}
     return out
 
 
-def judge(a) -> int:
+def run_checks(a) -> int:
     rs = Path(a.set)
     plan = load(a.plan)
     inv = load(a.inv)
-    v = vocab.Vocab(known=set(inv.get("known") or []) or None)
-    sessions = [judge_session(v, rs, s, plan) for s in plan.get("sessions") or []]
-    pull = judge_pull(v, rs, plan["pull"]) if plan.get("pull") else None
-    counts = vocab.counts_of(os.environ["SFAB_VERDICT"]) if os.environ.get("SFAB_VERDICT") else v.counts()
+    v = vocab.Vocab()
+    sessions = [check_session(v, rs, s, plan) for s in plan.get("sessions") or []]
+    pull = check_pull(v, rs, plan["pull"]) if plan.get("pull") else None
+    counts = vocab.counts_of(os.environ["SFAB_RESULTS"]) if os.environ.get("SFAB_RESULTS") else v.counts()
     write_md(rs, inv, plan, sessions, pull, counts, a.stamp)
     return 1 if v.counts()["fail"] else 0
 
@@ -288,7 +288,7 @@ def write_md(rs: Path, inv: dict, plan: dict, sessions: list, pull, counts: dict
     repo = run.get("labs_repo") or {}
     commit = repo.get("commit") or "none"
     uncommitted = " (with uncommitted changes)" if repo.get("dirty") is True else ""
-    verdict = read(rs / "verdict.txt")
+    results = read(rs / "results.txt")
     L = ["# Firewall trace", "",
          f"- Lab: `{inv.get('lab')}`; labs repo commit `{commit}`{uncommitted}; UTC {run.get('utc_start') or 'unknown'}",
          f"- Firewall `{plan.get('fw')}`, public address {plan.get('public')}; {len(plan.get('sessions') or [])} sessions"
@@ -300,7 +300,7 @@ def write_md(rs: Path, inv: dict, plan: dict, sessions: list, pull, counts: dict
         ex = s.get("expect") or {}
         L.append(f"| `{s['id']}` | {s['client']} {s['client_addr']}[{s['sport']}] | {s['dst_addr']}:443 | {s.get('translated_addr') or 'none'} | "
                  f"`{ex.get('rule')}` | {('`' + ex['nat_rule'] + '`') if ex.get('nat_rule') else 'none'} | {s['hold_s']} |")
-    L += ["", "## Verdict", "", "```"] + [l for l in verdict.splitlines() if l.strip()] + ["```", ""]
+    L += ["", "## Results", "", "```"] + [l for l in results.splitlines() if l.strip()] + ["```", ""]
     for s in sessions:
         d = rs / "sessions" / s["id"]
         L += [f"## Session {s['id']}", ""]
@@ -325,7 +325,7 @@ def write_md(rs: Path, inv: dict, plan: dict, sessions: list, pull, counts: dict
             if pk:
                 L += [f"- `{pull.get(at)}` (`pull/captures/{pull.get(at)}.txt:{pk['line']}`)", "", "  ```", f"  {pk['head']}", "  ```", ""]
     L += ["## Files", "",
-          "- `verdict.txt`, `commands.txt`; per session `sessions/<id>/`: `request.txt`, `session-all.txt` and `.xml`, `session-detail.txt` and `.xml`, `traffic-log.txt`",
+          "- `results.txt`, `commands.txt`; per session `sessions/<id>/`: `request.txt`, `session-all.txt` and `.xml`, `session-detail.txt` and `.xml`, `traffic-log.txt`",
           "- `pull/`: `pull.txt`, `rmi.txt`, `points.tsv`, `traffic-log.txt`, `captures/<point>.pcap` and `.txt` (decoded with `tcpdump -nn -e -tttt -v -S -r`); "
           f"each point keeps the pull's first {os.environ.get('SFAB_TRACE_CAP_FRAMES') or 5000} frames on the registry's port (`tcpdump -c`), so the frame counts and the reply bytes are of those frames",
           "", vocab.result_line(counts), ""]
@@ -349,14 +349,14 @@ def main(argv=None) -> int:
     s = sub.add_parser("pull-sport")
     s.add_argument("--set", required=True)
     s.add_argument("--plan", required=True)
-    s = sub.add_parser("judge")
+    s = sub.add_parser("check")
     s.add_argument("--set", required=True)
     s.add_argument("--plan", required=True)
     s.add_argument("--inv", required=True)
     s.add_argument("--stamp")
     a = p.parse_args(argv)
     return {"session-env": cmd_session_env, "pull-env": cmd_pull_env, "points": cmd_points, "session-id": cmd_session_id,
-            "pull-sport": cmd_pull_sport, "judge": judge}[a.cmd](a)
+            "pull-sport": cmd_pull_sport, "check": run_checks}[a.cmd](a)
 
 
 if __name__ == "__main__":

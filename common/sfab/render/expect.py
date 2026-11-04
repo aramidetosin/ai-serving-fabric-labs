@@ -2,7 +2,7 @@
 , and gen/klish-normalize.json, the parity table in a form the lab host reads
 without PyYAML.
 
-The audit judges, boot parity and wait_fabric read these files. Build A switches hold VLANs,
+The audit checks, boot parity and wait_fabric read these files. Build A switches hold VLANs,
 PortChannels with their members, access ports and an MCLAG domain, and no address on any VLAN,
 PortChannel or data port and no route; build B adds BGP, EVPN and Ethernet segments here.
 

@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
-# ch02/audit.sh: the lab's audit (book Examples 2-2 and 2-12), recorded as a
-# result set under audits/.
+# ch02/audit.sh: the lab's audit, saved as a
+# run directory under runs/.
 #
 #   ./audit.sh                  the full audit
 #   ./audit.sh --quick          switches, the firewall, storage, the container links the MAC tables
-#                               need, the placement group and the keys group; not recorded (finish
+#                               need, the placement group and the keys group; not saved (finish
 #                               runs it)
-#   ./audit.sh --table FILE     the placement group judged against another table than the rendered
+#   ./audit.sh --table FILE     the placement group checked against another table than the rendered
 #                               bootstrap/k8s/serving.env
 #
-# Chapter 1's build A whole, as chapter 1's audit judges it, with chapter 2's forwarding-only reads
+# Chapter 1's build A whole, as chapter 1's audit checks it, with chapter 2's forwarding-only reads
 # on every switch: the pair, both rail switches and the out-of-band switch each with no address on
 # any served VLAN, PortChannel or host port (show ip interfaces lists only Management0, in VRF mgmt,
 # and on a pair member its two keepalive addresses, Ethernet12 and Vlan3966, in VRF VrfMclagKa; no
@@ -43,12 +43,12 @@ if [ "$SFAB_QUICK" = 1 ]; then
 else
   audit_collect                                                  # every node's plan
 fi
-audit_judge                                                      # shared: switches, firewall, guests, rails, VLANs, MAC tables
+audit_check                                                      # shared: switches, firewall, guests, rails, VLANs, MAC tables
 audit_forwarding_only fe-sw1 fe-sw2 rail-sw1 rail-sw2 oob-sw     # chapter 2's forwarding-only reads
 audit_mclag_pair fe-sw1 fe-sw2                                   # the pair, every PortChannel
-_judge pair-roles fe-sw1 fe-sw2                                  # chapter 3: roles and the ICCP session
+_run_check pair-roles fe-sw1 fe-sw2                                  # chapter 3: roles and the ICCP session
 mapfile -t _bl < <(bonded_nodes)
-judge_present bond-legs "${_bl[@]}" ${FW_NODE:+"$FW_NODE"} "${STORAGE[@]+"${STORAGE[@]}"}"   # chapter 3: every bond's legs
+check_present bond-legs "${_bl[@]}" ${FW_NODE:+"$FW_NODE"} "${STORAGE[@]+"${STORAGE[@]}"}"   # chapter 3: every bond's legs
 audit_rail_backend rail-sw1 rail-sw2                             # chapter 5: the absences, the ports, the namespaces
 audit_placement                                                  # chapter 6: the pods against the placement table
 audit_gateway_layer                                              # chapter 7: the keys; in a full audit the gateway layer

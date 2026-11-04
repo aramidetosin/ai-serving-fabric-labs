@@ -4,13 +4,13 @@
 # break ID   refuses when state/breaks/ID exists (a break is never applied twice); types each
 #            klish action of break: in its own session (configure terminal, the context, the lines,
 #            end), and when the switch answers "% Error" types the action's fallback instead,
-#            recording which form the switch took; marks state/breaks/ID; runs record: (the show
+#            saving which form the switch took; marks state/breaks/ID; runs observe: (the show
 #            reads, saved as the switches printed them, and each connect probe passes times, the
-#            failing share of every pass printed); then judges expect_broken:.
+#            failing share of every pass printed); then checks expect_broken:.
 # heal ID    types heal: (a restore replays the switch's render, the lines its running configuration
-#            misses, then checks parity); clears the mark; reads record:'s show lines again and runs
-#            the connect probes that expect_healed: names, once each; judges expect_healed:; then
-#            runs the chapter audit (audit.sh, its own recorded set; SFAB_HEAL_AUDIT=quick for
+#            misses, then checks parity); clears the mark; reads observe:'s show lines again and runs
+#            the connect probes that expect_healed: names, once each; checks expect_healed:; then
+#            runs the chapter audit (audit.sh, its own run directory; SFAB_HEAL_AUDIT=quick for
 #            audit.sh --quick, 0 for none).
 # heal all   heals every break marked as applied, then restores every switch (replay plus parity).
 #
@@ -59,7 +59,7 @@
 # reads the Secret's fields and fingerprints and every API gateway pod's sidecar log; the heal's
 # gateway_restart deletes the held pod so its Deployment makes it again; the check key_pods reads
 # which pods accepted the key. A break may carry cleanup: actions, run after expect_healed: is
-# judged (key_revoke: the break's key revoked, so the Secret is the lab's again before the audit).
+# checked (key_revoke: the break's key revoked, so the Secret is the lab's again before the audit).
 #
 # A resolver view (chapter 2): a dns_answer action installs, in a copy of the view's primary's render
 # inside its container, the view's forward zone rendered with some names answering another address,
@@ -72,7 +72,7 @@
 # ports, into probes/<id>-<mode>/; the check cell_mode reads the mode a cell's evidence shows
 # (common/matrix/matrix.py observe), and for a log line the rule that logged it.
 #
-# The result set is audits/<lab>_break-ID_<UTC>/ or audits/<lab>_heal-ID_<UTC>/; a break set judges
+# The run directory is runs/<lab>_break-ID_<UTC>/ or runs/<lab>_heal-ID_<UTC>/; a break set checks
 # the designed failure as PASS. A break is never saved on a switch (no write memory follows it), so a
 # switch rebooted while broken comes back without it; a restore saves the replayed render, as
 # replay.sh always does.
@@ -101,7 +101,7 @@ BFILE="$RENDERDIR/gen/breaks.json"
 # shellcheck source=common/matrix/matrix.sh
 . "$SFAB_COMMON/matrix/matrix.sh"
 MARKS="$STATEDIR/breaks"
-mkdir -p "$MARKS" "$RS/record" "$RS/probes"
+mkdir -p "$MARKS" "$RS/observe" "$RS/probes"
 exec 8>"$STATEDIR/lock"
 flock -n 8 || die "another run holds $STATEDIR/lock for $LAB"
 
@@ -116,7 +116,7 @@ has_error() { grep -qE '%[[:space:]]?Error' "$1"; }
 klish_action() {
   local js="$1" tag="$2" node out
   node="$(jf "$js" node)"
-  out="$RS/record/$tag-$node.txt"
+  out="$RS/observe/$tag-$node.txt"
   mapfile -t _sess < <(jf "$js" session)
   SW "$node" "${_sess[@]}" >"$out" 2>&1 || true
   if ! has_error "$out"; then
@@ -130,9 +130,9 @@ klish_action() {
     return 1
   fi
   echo "breakheal: $node answered $(grep -m1 -E '%[[:space:]]?Error' "$out"); typing the fallback"
-  SW "$node" "${_fb[@]}" >"$RS/record/$tag-$node-fallback.txt" 2>&1 || true
-  if has_error "$RS/record/$tag-$node-fallback.txt"; then
-    bad "$node: the break's lines and its fallback" "both answered % Error (see record/$tag-$node.txt and $tag-$node-fallback.txt)"
+  SW "$node" "${_fb[@]}" >"$RS/observe/$tag-$node-fallback.txt" 2>&1 || true
+  if has_error "$RS/observe/$tag-$node-fallback.txt"; then
+    bad "$node: the break's lines and its fallback" "both answered % Error (see observe/$tag-$node.txt and $tag-$node-fallback.txt)"
     return 1
   fi
   ok "$node: the first form was refused ($(grep -m1 -E '%[[:space:]]?Error' "$out" | tr -s ' ')); the fallback $(jf "$js" fallback_lines | paste -sd ';' -) accepted: fix the break file to it"
@@ -143,9 +143,9 @@ show_action() {
   local js="$1" tag="$2" node l
   node="$(jf "$js" node)"
   mapfile -t _lines < <(jf "$js" lines)
-  SW "$node" "${_lines[@]}" >"$RS/record/$tag-$node-session.txt" 2>&1 || true
+  SW "$node" "${_lines[@]}" >"$RS/observe/$tag-$node-session.txt" 2>&1 || true
   for l in "${_lines[@]}"; do
-    klish_body "$l" <"$RS/record/$tag-$node-session.txt" >"$RS/record/$tag-$node-$(printf '%s' "$l" | tr -cs 'A-Za-z0-9' '_' | sed 's/_$//').txt" 2>/dev/null || true
+    klish_body "$l" <"$RS/observe/$tag-$node-session.txt" >"$RS/observe/$tag-$node-$(printf '%s' "$l" | tr -cs 'A-Za-z0-9' '_' | sed 's/_$//').txt" 2>/dev/null || true
   done
 }
 
@@ -159,7 +159,7 @@ probe_action() {
   for p in $(seq 1 "$passes"); do
     X "$node" bash -c "$loop" >"$RS/probes/$pid-$MODE-pass$p.log" 2>&1 || true
     read -r n f <<<"$(py "$BH" share --log "$RS/probes/$pid-$MODE-pass$p.log")"
-    ok "$pid, $MODE, pass $p: $f of $n connects from $node to $dst:$port failed (recorded; the exercise names no share)"
+    ok "$pid, $MODE, pass $p: $f of $n connects from $node to $dst:$port failed (saved; the exercise names no share)"
     printf '%s %s %s\n' "$p" "$n" "$f" >>"$RS/probes/$pid-$MODE.shares"
   done
 }
@@ -171,7 +171,7 @@ fwapi() { "$SFAB_COMMON/fw/fw-api.sh" --lab "$RENDERDIR" "$@"; }
 panos_action() {
   local js="$1" tag="$2" op rule out
   op="$(jf "$js" op)" rule="$(jf "$js" rule)"
-  out="$RS/record/$tag-panos-$op-$rule.txt"
+  out="$RS/observe/$tag-panos-$op-$rule.txt"
   if [ "$op" = edit ]; then
     if fwapi edit "$(jf "$js" xpath)" "$(jf "$js" element)" >"$out" 2>&1; then
       ok "fw: security rule $rule's $(jf "$js" field) set to $(jf "$js" members | paste -sd ',' -) through the XML API (the render's: $(jf "$js" rendered | paste -sd ',' -); $(tail -n 1 "$out"))"
@@ -200,10 +200,10 @@ panos_action() {
 
 # panos_commit TAG: one commit after a part's firewall actions
 panos_commit() {
-  if fwapi commit "sfab $MODE-$BID" >"$RS/record/$1-commit.txt" 2>&1; then
-    ok "fw: committed ($(tail -n 1 "$RS/record/$1-commit.txt"))"
+  if fwapi commit "sfab $MODE-$BID" >"$RS/observe/$1-commit.txt" 2>&1; then
+    ok "fw: committed ($(tail -n 1 "$RS/observe/$1-commit.txt"))"
   else
-    bad "fw: committed" "$(tail -n 1 "$RS/record/$1-commit.txt")"
+    bad "fw: committed" "$(tail -n 1 "$RS/observe/$1-commit.txt")"
     return 1
   fi
 }
@@ -216,17 +216,17 @@ fw_show_action() {
   local js="$1" tag="$2" l
   FWSHOW_N=$((FWSHOW_N + 1))
   mapfile -t _lines < <(jf "$js" lines)
-  FW "${_lines[@]}" >"$RS/record/$tag-fw$FWSHOW_N-session.txt" 2>&1 || true
+  FW "${_lines[@]}" >"$RS/observe/$tag-fw$FWSHOW_N-session.txt" 2>&1 || true
   for l in "${_lines[@]}"; do
-    py "$SFAB_COMMON/audit/judge.py" body --style panos --command "$l" <"$RS/record/$tag-fw$FWSHOW_N-session.txt" \
-      >"$RS/record/$tag-fw$FWSHOW_N-$(printf '%s' "$l" | tr -cs 'A-Za-z0-9' '_' | sed 's/_$//').txt" 2>/dev/null || true
+    py "$SFAB_COMMON/audit/checks.py" body --style panos --command "$l" <"$RS/observe/$tag-fw$FWSHOW_N-session.txt" \
+      >"$RS/observe/$tag-fw$FWSHOW_N-$(printf '%s' "$l" | tr -cs 'A-Za-z0-9' '_' | sed 's/_$//').txt" 2>/dev/null || true
   done
 }
 
 # fw_counters OUT: show counter global, all values, CLI (OUT.txt) and XML (OUT.xml)
 fw_counters() {
   FW "show counter global filter value all" >"$1.session" 2>&1 || true
-  py "$SFAB_COMMON/audit/judge.py" body --style panos --command "show counter global filter value all" <"$1.session" >"$1.txt" 2>/dev/null ||
+  py "$SFAB_COMMON/audit/checks.py" body --style panos --command "show counter global filter value all" <"$1.session" >"$1.txt" 2>/dev/null ||
     cp "$1.session" "$1.txt"
   rm -f "$1.session"
   FWX "<show><counter><global><filter><value>all</value></filter></global></counter></show>" >"$1.xml" 2>/dev/null || true
@@ -249,7 +249,7 @@ ping_action() {
     fi
     [ -z "$c" ] || fw_counters "$RS/probes/$pid-$MODE-pass$p-counters-after"
     read -r n f <<<"$(py "$BH" pingshare --log "$RS/probes/$pid-$MODE-pass$p.log")"
-    ok "$pid, $MODE, pass $p: $f of $n pings from $node to $(jf "$js" dst_addr) unanswered (recorded)"
+    ok "$pid, $MODE, pass $p: $f of $n pings from $node to $(jf "$js" dst_addr) unanswered (saved)"
     printf '%s %s %s\n' "$p" "$n" "$f" >>"$RS/probes/$pid-$MODE.shares"
   done
   echo ping >"$RS/probes/$pid-$MODE.kind"
@@ -265,7 +265,7 @@ http_action() {
   for p in $(seq 1 "$passes"); do
     X "$node" bash -c "$loop" >"$RS/probes/$pid-$MODE-pass$p.log" 2>&1 || true
     read -r n f <<<"$(py "$BH" share --log "$RS/probes/$pid-$MODE-pass$p.log")"
-    ok "$pid, $MODE, pass $p: $f of $n requests from $node to $url answered other than 200 (recorded)"
+    ok "$pid, $MODE, pass $p: $f of $n requests from $node to $url answered other than 200 (saved)"
     printf '%s %s %s\n' "$p" "$n" "$f" >>"$RS/probes/$pid-$MODE.shares"
   done
   echo request >"$RS/probes/$pid-$MODE.kind"
@@ -301,7 +301,7 @@ syn_probe_action() {
     _evid "$node" container "$(cat "$RS/probes/$pid-$MODE-pass$p.log")"
     RAILCAP_DECODE="-nn -tt -e -v -S" railcap_stop
     read -r n f <<<"$(py "$BH" share --log "$RS/probes/$pid-$MODE-pass$p.log")"
-    ok "$pid, $MODE, pass $p: $f of $n connects from $node (source ports $sp to $((sp + count - 1))) to $dst:$port failed (recorded)"
+    ok "$pid, $MODE, pass $p: $f of $n connects from $node (source ports $sp to $((sp + count - 1))) to $dst:$port failed (saved)"
     printf '%s %s %s\n' "$p" "$n" "$f" >>"$RS/probes/$pid-$MODE.shares"
   done
   echo connect >"$RS/probes/$pid-$MODE.kind"
@@ -311,7 +311,7 @@ syn_probe_action() {
 relay_action() {
   local js="$1" tag="$2" node ns out
   node="$(jf "$js" node)" ns="$(jf "$js" ns)"
-  out="$RS/record/$tag-$node-$ns-route-rail$(jf "$js" to_rail).txt"
+  out="$RS/observe/$tag-$node-$ns-route-rail$(jf "$js" to_rail).txt"
   if H "$node" "$(jf "$js" command) && $(jf "$js" show)" >"$out" 2>&1; then
     ok "$node, namespace $ns: $(jf "$js" command) (reads back: $(tail -n 1 "$out" | tr -s ' '))"
     printf '%s\t%s\n' "$node" "$(jf "$js" command)" >>"$RS/taken.txt"
@@ -327,7 +327,7 @@ ns_show_action() {
   node="$(jf "$js" node)"
   mapfile -t _lines < <(jf "$js" lines)
   for l in "${_lines[@]}"; do
-    H "$node" "$l" >"$RS/record/$tag-$node-$(printf '%s' "$l" | tr -cs 'A-Za-z0-9' '_' | sed 's/_$//').txt" 2>&1 || true
+    H "$node" "$l" >"$RS/observe/$tag-$node-$(printf '%s' "$l" | tr -cs 'A-Za-z0-9' '_' | sed 's/_$//').txt" 2>&1 || true
   done
 }
 
@@ -353,7 +353,7 @@ rail_probe_action() {
       [ -n "$id" ] || continue
       H "$node" "ip netns exec $ns ping -c $count -i $iv -W $to $dst" >"$RS/probes/$pid-$MODE-pass$p-$id.log" 2>&1 || true
       read -r n f <<<"$(py "$BH" pingshare --log "$RS/probes/$pid-$MODE-pass$p-$id.log")"
-      ok "$pid, $MODE, pass $p: $f of $n pings from $node (namespace $ns) to $dst unanswered (recorded)"
+      ok "$pid, $MODE, pass $p: $f of $n pings from $node (namespace $ns) to $dst unanswered (saved)"
       printf '%s %s %s\n' "$p" "$n" "$f" >>"$RS/probes/$pid-$MODE.shares"
     done < <(rail_rows "$js")
     [ "$cap" = 0 ] || railcap_stop
@@ -367,14 +367,14 @@ dns_answer_action() {
   local js="$1" tag="$2" node dir f c
   node="$(jf "$js" node)" dir="$(jf "$js" dir)" f="$(jf "$js" file)"
   c="$(ctr "$node")"
-  py -c 'import json, sys; sys.stdout.write(json.loads(sys.argv[1])["content"])' "$js" >"$RS/record/$tag-$node-$(basename "$f").txt"
-  X "$node" sh -c "rm -rf $dir && mkdir -p $dir && cp -R /sfab/bootstrap/. $dir/" >"$RS/record/$tag-$node-copy.txt" 2>&1 || true
-  _evid "$node" container "+ cat >$dir/$f (record/$tag-$node-$(basename "$f").txt)"
-  dk exec -i "$c" sh -c "cat >$dir/$f" <"$RS/record/$tag-$node-$(basename "$f").txt" || { bad "$node: the zone written" "docker exec failed"; return 1; }
-  if dns_reload "$node" "$dir" "$RS/record/$tag-$node-reload.txt"; then
-    ok "$node: view $(jf "$js" view) answers $(jf "$js" names | paste -sd ' ' -) with $(jf "$js" address) ($(jf "$js" answer)), rendered $(jf "$js" rendered); BIND reloaded on the copy ($(tail -n 1 "$RS/record/$tag-$node-reload.txt"))"
+  py -c 'import json, sys; sys.stdout.write(json.loads(sys.argv[1])["content"])' "$js" >"$RS/observe/$tag-$node-$(basename "$f").txt"
+  X "$node" sh -c "rm -rf $dir && mkdir -p $dir && cp -R /sfab/bootstrap/. $dir/" >"$RS/observe/$tag-$node-copy.txt" 2>&1 || true
+  _evid "$node" container "+ cat >$dir/$f (observe/$tag-$node-$(basename "$f").txt)"
+  dk exec -i "$c" sh -c "cat >$dir/$f" <"$RS/observe/$tag-$node-$(basename "$f").txt" || { bad "$node: the zone written" "docker exec failed"; return 1; }
+  if dns_reload "$node" "$dir" "$RS/observe/$tag-$node-reload.txt"; then
+    ok "$node: view $(jf "$js" view) answers $(jf "$js" names | paste -sd ' ' -) with $(jf "$js" address) ($(jf "$js" answer)), rendered $(jf "$js" rendered); BIND reloaded on the copy ($(tail -n 1 "$RS/observe/$tag-$node-reload.txt"))"
   else
-    bad "$node: BIND reloaded with the moved answer" "$(tail -n 2 "$RS/record/$tag-$node-reload.txt" | paste -sd ';' -)"
+    bad "$node: BIND reloaded with the moved answer" "$(tail -n 2 "$RS/observe/$tag-$node-reload.txt" | paste -sd ';' -)"
     return 1
   fi
   dns_converge "$node" "$tag"
@@ -413,12 +413,12 @@ PY
         got="$(EVID_OFF=1 X "$sec" rndc -k /run/named/rndc.key zonestatus "$zone" IN "$v" 2>/dev/null | sed -n 's/^serial: //p')"
         [ -z "$want" ] || [ "$got" != "$want" ] || break
         if [ "$i" = 5 ] && [ -n "$want" ] && [ -n "$got" ] && serial_behind "$want" "$got"; then
-          X "$sec" rndc -k /run/named/rndc.key retransfer "$zone" IN "$v" >"$RS/record/$tag-$sec-$v-retransfer.txt" 2>&1 || true
+          X "$sec" rndc -k /run/named/rndc.key retransfer "$zone" IN "$v" >"$RS/observe/$tag-$sec-$v-retransfer.txt" 2>&1 || true
           how="the primary's serial behind the $got it held, so taken by rndc retransfer"
         fi
         sleep 2
       done
-      X "$sec" rndc -k /run/named/rndc.key zonestatus "$zone" IN "$v" >"$RS/record/$tag-$sec-$v-zonestatus.txt" 2>&1 || true
+      X "$sec" rndc -k /run/named/rndc.key zonestatus "$zone" IN "$v" >"$RS/observe/$tag-$sec-$v-zonestatus.txt" 2>&1 || true
       if [ -n "$want" ] && [ "$got" = "$want" ]; then
         ok "$sec, the secondary: view $v's $zone at the primary's serial $want ($how)"
       else
@@ -461,10 +461,10 @@ dns_reload() {
 # restore_dns NODE: the DNS server's render installed again and reloaded, the break's copy removed
 restore_dns() {
   local node="$1"
-  if dns_reload "$node" /sfab/bootstrap "$RS/record/restore-$node.txt"; then
-    ok "$node: the rendered zones installed again and reloaded ($(tail -n 1 "$RS/record/restore-$node.txt"))"
+  if dns_reload "$node" /sfab/bootstrap "$RS/observe/restore-$node.txt"; then
+    ok "$node: the rendered zones installed again and reloaded ($(tail -n 1 "$RS/observe/restore-$node.txt"))"
   else
-    bad "$node: the rendered zones reloaded" "$(tail -n 2 "$RS/record/restore-$node.txt" | paste -sd ';' -)"
+    bad "$node: the rendered zones reloaded" "$(tail -n 2 "$RS/observe/restore-$node.txt" | paste -sd ';' -)"
     return 1
   fi
   X "$node" rm -rf "$DNS_BREAK_DIR" >/dev/null 2>&1 || true
@@ -481,7 +481,7 @@ matrix_cells_action() {
   mkdir -p "$d"
   matrix_cells "$d" "${cells[@]}" </dev/null
   py "$MXP" observe --plan "$MX_PLAN" --dir "$d" --only "${cells[@]}" >"$d/observed.jsonl" 2>&1 || true
-  ok "$pid, $MODE: ${#cells[@]} cells of the matrix tried from their own source ports (recorded in probes/$pid-$MODE/)"
+  ok "$pid, $MODE: ${#cells[@]} cells of the matrix tried from their own source ports (saved in probes/$pid-$MODE/)"
   echo cells >"$RS/probes/$pid-$MODE.kind"
 }
 
@@ -500,26 +500,26 @@ restore_switch() {
   local sw="$1" rc=0 norm=()
   [ ! -f "$RENDERDIR/gen/klish-normalize.json" ] || norm=(--normalize "$RENDERDIR/gen/klish-normalize.json")
   _creds "$sw" || { bad "$sw: restored" "no login in its container"; return 1; }
-  SFAB_LABDIR="$RENDERDIR" SFAB_SW_PASSWORD="$CRED_PASS" "$SFAB_COMMON/klish/replay.sh" "$sw" >"$RS/record/restore-$sw.txt" 2>&1 || rc=$?
+  SFAB_LABDIR="$RENDERDIR" SFAB_SW_PASSWORD="$CRED_PASS" "$SFAB_COMMON/klish/replay.sh" "$sw" >"$RS/observe/restore-$sw.txt" 2>&1 || rc=$?
   case "$rc" in
     0) ;;
     3) echo "breakheal: replay.sh $sw left a live MCLAG domain block alone (as it always does)" ;;
-    *) bad "$sw: the render replayed" "replay.sh exited $rc ($(tail -n 2 "$RS/record/restore-$sw.txt" | paste -sd ';' -))"; return 1 ;;
+    *) bad "$sw: the render replayed" "replay.sh exited $rc ($(tail -n 2 "$RS/observe/restore-$sw.txt" | paste -sd ';' -))"; return 1 ;;
   esac
-  ok "$sw: the render replayed where the running configuration missed it ($(tail -n 1 "$RS/record/restore-$sw.txt"))"
+  ok "$sw: the render replayed where the running configuration missed it ($(tail -n 1 "$RS/observe/restore-$sw.txt"))"
   parity_check "$sw"
 }
 
 parity_check() {
   local sw="$1" rc=0 norm=()
   [ ! -f "$RENDERDIR/gen/klish-normalize.json" ] || norm=(--normalize "$RENDERDIR/gen/klish-normalize.json")
-  SW "$sw" "show running-configuration" | klish_body "show running-configuration" >"$RS/record/running-$sw.txt" 2>/dev/null || true
-  py "$SFAB_COMMON/klish/parity.py" "$RENDERDIR/bootstrap/$sw/startup-config.cfg" "$RS/record/running-$sw.txt" --switch "$sw" \
-    "${norm[@]+"${norm[@]}"}" --json "$RS/record/parity-$sw.json" >"$RS/record/parity-$sw.txt" 2>&1 || rc=$?
+  SW "$sw" "show running-configuration" | klish_body "show running-configuration" >"$RS/observe/running-$sw.txt" 2>/dev/null || true
+  py "$SFAB_COMMON/klish/parity.py" "$RENDERDIR/bootstrap/$sw/startup-config.cfg" "$RS/observe/running-$sw.txt" --switch "$sw" \
+    "${norm[@]+"${norm[@]}"}" --json "$RS/observe/parity-$sw.json" >"$RS/observe/parity-$sw.txt" 2>&1 || rc=$?
   if [ "$rc" -eq 0 ]; then
     ok "$sw: parity, 0 missing lines"
   else
-    bad "$sw: parity" "$(grep -E '^ +missing \(' "$RS/record/parity-$sw.txt" | head -n 2 | sed 's/^ *//' | paste -sd ';' -)"
+    bad "$sw: parity" "$(grep -E '^ +missing \(' "$RS/observe/parity-$sw.txt" | head -n 2 | sed 's/^ *//' | paste -sd ';' -)"
     return 1
   fi
 }
@@ -530,11 +530,11 @@ check_action() {
   case "$kind" in
     vlan_member)
       node="$(jf "$js" node)" vlan="$(jf "$js" vlan)" port="$(jf "$js" port)" present="$(jf "$js" present)" mode="$(jf "$js" mode)"
-      SW "$node" "show vlan" | klish_body "show vlan" >"$RS/record/check-$node-show_vlan.txt" 2>/dev/null || true
+      SW "$node" "show vlan" | klish_body "show vlan" >"$RS/observe/check-$node-show_vlan.txt" 2>/dev/null || true
       local pres=0 want
       [ "$present" = True ] && pres=1
       want="$port $( [ "$pres" = 1 ] && echo "in" || echo "not in") Vlan$vlan${mode:+ ($mode)}"
-      if out="$(py "$BH" vlan --file "$RS/record/check-$node-show_vlan.txt" --vlan "$vlan" --port "$port" --present "$pres" ${mode:+--mode "$mode"})"; then
+      if out="$(py "$BH" vlan --file "$RS/observe/check-$node-show_vlan.txt" --vlan "$vlan" --port "$port" --present "$pres" ${mode:+--mode "$mode"})"; then
         ok "$node: show vlan has $want: $out"
       else
         bad "$node: show vlan has $want" "$out"
@@ -543,8 +543,8 @@ check_action() {
     mclag_iface)
       local mpc mst mout
       node="$(jf "$js" node)" mpc="$(jf "$js" portchannel)" mst="$(jf "$js" status)"
-      SW "$node" "show mclag brief" | klish_body "show mclag brief" >"$RS/record/check-$MODE-$node-show_mclag_brief.txt" 2>/dev/null || true
-      if mout="$(py "$BH" mclag --file "$RS/record/check-$MODE-$node-show_mclag_brief.txt" --portchannel "$mpc" --status "$mst")"; then
+      SW "$node" "show mclag brief" | klish_body "show mclag brief" >"$RS/observe/check-$MODE-$node-show_mclag_brief.txt" 2>/dev/null || true
+      if mout="$(py "$BH" mclag --file "$RS/observe/check-$MODE-$node-show_mclag_brief.txt" --portchannel "$mpc" --status "$mst")"; then
         ok "$node: show mclag brief has $mpc $mst (Local/Remote): $mout"
       else
         bad "$node: show mclag brief has $mpc $mst (Local/Remote)" "$mout"
@@ -567,7 +567,7 @@ check_action() {
     route_src)
       local rnode rns rout
       rnode="$(jf "$js" node)" rns="$(jf "$js" ns)"
-      rout="$RS/record/check-$MODE-$rnode-$rns-route-rail$(jf "$js" to_rail).txt"
+      rout="$RS/observe/check-$MODE-$rnode-$rns-route-rail$(jf "$js" to_rail).txt"
       H "$rnode" "$(jf "$js" command)" >"$rout" 2>&1 || true
       if [ "$(jf "$js" pinned)" = True ]; then
         if grep -qE " src $(jf "$js" src)( |$)" "$rout"; then
@@ -600,10 +600,10 @@ check_action() {
       pid="$(jf "$js" probe)"
       tcmd="$(py "$BH" tlogcmd --breaks "$BFILE" --id "$BID" --probe "$pid")"
       for i in $(seq 1 "${SFAB_BREAK_TLOG_TRIES:-9}"); do
-        FW "$tcmd" >"$RS/record/check-$MODE-tlog-$pid-session.txt" 2>&1 || true
-        py "$SFAB_COMMON/audit/judge.py" body --style panos --command "$tcmd" <"$RS/record/check-$MODE-tlog-$pid-session.txt" \
-          >"$RS/record/check-$MODE-tlog-$pid.txt" 2>/dev/null || true
-        if tout="$(py "$BH" tlogrule --breaks "$BFILE" --id "$BID" --dir "$RS/probes" --mode "$MODE" --file "$RS/record/check-$MODE-tlog-$pid.txt" --check "$js")"; then
+        FW "$tcmd" >"$RS/observe/check-$MODE-tlog-$pid-session.txt" 2>&1 || true
+        py "$SFAB_COMMON/audit/checks.py" body --style panos --command "$tcmd" <"$RS/observe/check-$MODE-tlog-$pid-session.txt" \
+          >"$RS/observe/check-$MODE-tlog-$pid.txt" 2>/dev/null || true
+        if tout="$(py "$BH" tlogrule --breaks "$BFILE" --id "$BID" --dir "$RS/probes" --mode "$MODE" --file "$RS/observe/check-$MODE-tlog-$pid.txt" --check "$js")"; then
           break
         fi
         case "$tout" in "missing "*) sleep "${SFAB_BREAK_TLOG_PAUSE_S:-10}" ;; *) break ;; esac
@@ -620,10 +620,10 @@ check_action() {
     vip_arp) vip_arp_check "$js" ;;
     route_set) route_set_check "$js" ;;
     rule_order)
-      if fwapi order >"$RS/record/check-order-$MODE.txt" 2>&1; then
-        ok "fw: the running rulebase in the render's order ($(paste -sd ';' "$RS/record/check-order-$MODE.txt"))"
+      if fwapi order >"$RS/observe/check-order-$MODE.txt" 2>&1; then
+        ok "fw: the running rulebase in the render's order ($(paste -sd ';' "$RS/observe/check-order-$MODE.txt"))"
       else
-        bad "fw: the running rulebase in the render's order" "$(grep -m1 differs "$RS/record/check-order-$MODE.txt" || tail -n 1 "$RS/record/check-order-$MODE.txt")"
+        bad "fw: the running rulebase in the render's order" "$(grep -m1 differs "$RS/observe/check-order-$MODE.txt" || tail -n 1 "$RS/observe/check-order-$MODE.txt")"
       fi ;;
     probe_share)
       pid="$(jf "$js" probe)"
@@ -688,7 +688,7 @@ do_break() {
   printf 'applied %s\n' "$(utc)" >"$MARKS/$id"
   cat "$RS/taken.txt" >>"$MARKS/$id" 2>/dev/null || true
   sleep "${SFAB_BREAK_SETTLE_S:-5}"
-  sec "break-$id: recorded"
+  sec "break-$id: saved"
   while IFS=$'\t' read -r kind node js; do
     case "$kind" in
       show) show_action "$js" broken ;;
@@ -708,7 +708,7 @@ do_break() {
       k8s_read) k8s_read_action "$js" broken ;;
       probe_lookup) lookup_probe_action "$js" ;;
     esac
-  done < <(steps "$id" record)
+  done < <(steps "$id" observe)
   sec "break-$id: broken as designed"
   while IFS=$'\t' read -r kind node js; do check_action "$js"; done < <(steps "$id" expect_broken)
 }
@@ -733,7 +733,7 @@ do_heal() {
   [ "$fwc" = 0 ] || panos_commit heal || true
   rm -f "$MARKS/$id"
   sleep "${SFAB_BREAK_SETTLE_S:-5}"
-  sec "heal-$id: recorded"
+  sec "heal-$id: saved"
   probes="$(steps "$id" expect_healed | awk -F'\t' '$1 == "probe_share" || $1 == "counter" || $1 == "far_capture" || $1 == "key_pods" || $1 == "syn_at" || $1 == "tlog_rule" || $1 == "cell_mode" || $1 == "lookup_answer"' | while IFS=$'\t' read -r _ _ j; do jf "$j" probe; done | tr '\n' ' ')"
   while IFS=$'\t' read -r kind node js; do
     case "$kind" in
@@ -754,7 +754,7 @@ do_heal() {
       k8s_read) k8s_read_action "$js" healed ;;
       probe_lookup) case " $probes " in *" $(jf "$js" id) "*) lookup_probe_action "$js" ;; esac ;;
     esac
-  done < <(steps "$id" record)
+  done < <(steps "$id" observe)
   sec "heal-$id: healed"
   while IFS=$'\t' read -r kind node js; do check_action "$js"; done < <(steps "$id" expect_healed)
   if [ -n "$(steps "$id" cleanup)" ]; then
@@ -766,7 +766,7 @@ do_heal() {
     done < <(steps "$id" cleanup)
   fi
   if [ "${STAGE_SERVING:-0}" = 1 ]; then
-    events_archive "$RS/record/events" "$(k8s_get serving.namespace)" "$(k8s_get inference.namespace)"
+    events_archive "$RS/observe/events" "$(k8s_get serving.namespace)" "$(k8s_get inference.namespace)"
   fi
 }
 
@@ -780,7 +780,7 @@ heal_audit() {
   sec "the chapter audit after the heal"
   res="$(grep -E '^== RESULT: ' "$out" | tail -n 1 || true)"
   case "$res" in
-    *", 0 failed,"*) ok "audit.sh after the heal: ${res#== } ($(grep -E '^== result set: ' "$out" | tail -n 1 | sed 's/^== result set: //' || true))" ;;
+    *", 0 failed,"*) ok "audit.sh after the heal: ${res#== } ($(grep -E '^== run directory: ' "$out" | tail -n 1 | sed 's/^== run directory: //' || true))" ;;
     *) bad "audit.sh after the heal" "${res:-no RESULT line}" ;;
   esac
 }

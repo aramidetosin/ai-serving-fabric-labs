@@ -20,16 +20,16 @@ Memory: a budget of 162.75 GiB, and preflight wants MemAvailable to cover it plu
 ```
 cd ch07
 make render          # topo.clab.yml, bootstrap/ and gen/ (the Gateways, the inference files, trace.json, drills.json, breaks.json)
-make up              # preflight, up, boot, finish (the cluster, the Gateway layer, the serving recipe, the API gateway, router and identity provider), audit (Example 7-1)
-make audit           # audits/sfab-ch07_audit_<UTC>/ (Examples 7-2 to 7-6)
-make serve           # the serving recipe again with bootstrap/k8s/serving.env (Example 7-7)
-make client          # one chat completion from the operator's client as an OpenAI-compatible client sends it, base URL and key only (Example 7-7)
-make load USERS=10 SECONDS=60   # concurrent streaming clients from the operator's client, through the IPsec tunnel (Example 7-7)
-make trace           # audits/sfab-ch07_trace_<UTC>/ with trace.md (Examples 7-8 and 7-9)
-make drills          # audits/sfab-ch07_drills_<UTC>/ with drills.md (Examples 7-10 and 7-11)
-make record          # after the drills: audit, trace, then the gate on both sets (Example 7-12)
-make break-7a        # audits/sfab-ch07_break-7a_<UTC>/ (Exercise 4)
-make heal-7a         # audits/sfab-ch07_heal-7a_<UTC>/, then the chapter audit
+make up              # preflight, up, boot, finish (the cluster, the Gateway layer, the serving recipe, the API gateway, router and identity provider), audit
+make audit           # runs/sfab-ch07_audit_<UTC>/
+make serve           # the serving recipe again with bootstrap/k8s/serving.env
+make client          # one chat completion from the operator's client as an OpenAI-compatible client sends it, base URL and key only
+make load USERS=10 SECONDS=60   # concurrent streaming clients from the operator's client, through the IPsec tunnel
+make trace           # runs/sfab-ch07_trace_<UTC>/ with trace.md
+make drills          # runs/sfab-ch07_drills_<UTC>/ with drills.md
+make verify          # after the drills: audit, trace, then the results check on both sets
+make break-7a        # runs/sfab-ch07_break-7a_<UTC>/
+make heal-7a         # runs/sfab-ch07_heal-7a_<UTC>/, then the chapter audit
 make down            # keeps state/ disks; make wipe removes them
 ```
 
@@ -39,4 +39,4 @@ Once the lab is up, `ssh admin@sfab-ch07-<node>` from the lab host logs in to `b
 
 ## What the checks do
 
-`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `audits/` in this directory, which git ignores. `spec/known.yaml` lists the known limits of the virtual platforms.
+`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `runs/` in this directory, which git ignores. `spec/limitations.yaml` lists the known limits of the virtual platforms.

@@ -1,6 +1,6 @@
 # shellcheck shell=bash
-# common/trace/lib-hold.sh: chapter 10's session measurement, recorded as audits/<lab>_hold_<UTC>/
-# with hold.md, verdict.txt, the held connections' events and the firewall's reads. A chapter's
+# common/trace/lib-hold.sh: chapter 10's session measurement, saved as runs/<lab>_hold_<UTC>/
+# with hold.md, results.txt, the held connections' events and the firewall's reads. A chapter's
 # hold.sh is
 #
 #   . "$(dirname "$0")/../common/lib.sh"; sfab_init hold "$@"
@@ -14,7 +14,7 @@
 # one chat completion per population with its own caller's key (the transcript off around the
 # key's hand-over); the counts read once more; the connections kept until each client ends its own
 # load at hold_s (hold_end, so the run holds them as long as the plan says), the load stopped and the
-# counts read after it. Then holdrun.py judges the files and writes hold.md, with the Little's law
+# counts read after it. Then holdrun.py checks the files and writes hold.md, with the Little's law
 # arithmetic per zone.
 #
 # Changes nothing on any device; every process it starts it stops, and the files it leaves under
@@ -48,12 +48,12 @@ hold_run() {
   hold_counts "$d" after
   trap - EXIT
   [ -z "${SFAB_TICK_STAMP:-}" ] || stamp_args=(--stamp "$SFAB_TICK_STAMP")
-  py "$SFAB_COMMON/trace/holdrun.py" judge --set "$d" --plan "$TN_PLAN" --factor "$factor" "${stamp_args[@]+"${stamp_args[@]}"}" || true
+  py "$SFAB_COMMON/trace/holdrun.py" check --set "$d" --plan "$TN_PLAN" --factor "$factor" "${stamp_args[@]+"${stamp_args[@]}"}" || true
   summary
 }
 
 # hold_end DIR ROW DEADLINE: wait until the row's client reports its load done (hold_conns.py ends it
-# itself at hold_s), until the epoch second DEADLINE at most; the stop file is the harness's only
+# itself at hold_s), until the epoch second DEADLINE at most; the stop file is the lab tooling's only
 # after that
 hold_end() {
   local d="$1" i="$2" until="$3" pop

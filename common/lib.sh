@@ -5,7 +5,7 @@
 #
 # sfab_init reads the lab's gen/inventory.json, sets the lab's identity (LAB, BUILD, STATE, STEP,
 # PREFIX, CLABDIR, MGMT_NET, INV and the node tables), refuses to go on unless the identity guard
-# passes, and opens a result set when the category records one. After it:
+# passes, and opens a run directory when the category records one. After it:
 #
 #   dk ...                docker, refusing any container whose name does not start with $PREFIX
 #   clab ...              containerlab deploy or destroy on this lab's own topology, never --cleanup
@@ -21,8 +21,8 @@
 #                         (a manifest on a pipe). The bastion holds no admin kubeconfig.
 #   FR rtr cmd            vtysh in an FRR container
 #
-# and the result vocabulary (sec, ok, bad, skip, known, chk, ge, summary; vocab.py prints the same
-# lines). With a result set open every runner appends one block to its commands.txt: a
+# and the result vocabulary (sec, ok, bad, skip, limitation, chk, ge, summary; vocab.py prints the same
+# lines). With a run directory open every runner appends one block to its commands.txt: a
 # "### <UTC> <node> <surface>" header, the session as the device printed it (prompts and all),
 # or "+ <command>" and the output where the surface has no prompt. EVID_OFF=1 switches the
 # transcript off around keyed requests. Credentials never reach a command line: switch and
@@ -101,7 +101,6 @@ arr("PAIRS", st.get("pairs") or [])
 arr("STORAGE", st.get("storage") or [])
 arr("MODULES", st.get("modules") or [])
 arr("WATCH_ORDER", (d.get("watchdog") or {}).get("order") or [])
-arr("KNOWN_IDS", d.get("known") or [])
 arr("GPU_GUESTS", [n for n in order if nodes[n].get("kind") == "vm-node" and nodes[n].get("group") == "gpu"])
 arr("RELAY_GUESTS", [n for n in order if nodes[n].get("relay")])
 for name, key in (("NODE_MGMT", "mgmt"), ("NODE_KIND", "kind"), ("NODE_CTR", "container"), ("NODE_ROLE", "role"),
@@ -117,9 +116,9 @@ out.append("declare -gA PAIR_MEMBERS=(" + " ".join(f"[{q(p)}]={q(' '.join(m))}" 
 for k, v in sorted((d.get("timeouts") or {}).items()):
     if isinstance(v, (int, float)) and not isinstance(v, bool):
         out.append(f"TO_{k.upper()}={q(v)}")
-for k, v in sorted((d.get("harness") or {}).items()):
+for k, v in sorted((d.get("tooling") or {}).items()):
     if isinstance(v, (int, float)) and not isinstance(v, bool):
-        out.append(f"HN_{k.upper()}={q(v)}")
+        out.append(f"TOOL_{k.upper()}={q(v)}")
 print("\n".join(out))
 PY
 }
@@ -153,22 +152,22 @@ sfab_identity() {
   [ "${#problems[@]}" -eq 0 ] || printf '%s\n' "${problems[@]}"
 }
 
-# sfab_init CATEGORY [--quick] [--record|--no-record] [--set DIR] [--nodes a,b] [ARGS...]
-# Categories audit, trace, label, matrix, drills, teardown, settle and break-* record a result set unless --no-record
-# (--quick implies --no-record). Leftover arguments are in SFAB_ARGS.
+# sfab_init CATEGORY [--quick] [--save|--no-save] [--set DIR] [--nodes a,b] [ARGS...]
+# Categories audit, trace, label, matrix, drills, teardown, settle and break-* record a run directory unless --no-save
+# (--quick implies --no-save). Leftover arguments are in SFAB_ARGS.
 sfab_init() {
   SFAB_CATEGORY="${1:?sfab_init needs a category}"
   shift
   SFAB_QUICK=0
   SFAB_ARGS=()
   SFAB_NODES=()
-  local record="" set_dir="" a
+  local save="" set_dir="" a
   while [ $# -gt 0 ]; do
     a="$1"
     case "$a" in
       --quick) SFAB_QUICK=1 ;;
-      --record) record=1 ;;
-      --no-record) record=0 ;;
+      --save) save=1 ;;
+      --no-save) save=0 ;;
       --set) set_dir="${2:?--set needs a directory}"; shift ;;
       --nodes) IFS=',' read -r -a SFAB_NODES <<<"${2:?--nodes needs a list}"; shift ;;
       *) SFAB_ARGS+=("$a") ;;
@@ -193,8 +192,7 @@ sfab_init() {
   PREFIX="$LAB-"
   CLABDIR="$RENDERDIR/clab-$LAB"
   export SFAB_LABDIR="$LABDIR" VARIANT SFAB_INV="$INV" SFAB_RENDERDIR="$RENDERDIR" SFAB_STATEDIR="$STATEDIR" CLABDIR
-  export SFAB_KNOWN_IDS="${KNOWN_IDS[*]}"
-  local problems
+    local problems
   problems="$(sfab_identity)"
   [ -z "$problems" ] || die "identity guard refuses this lab: $(printf '%s' "$problems" | paste -sd ';' -)"
   mkdir -p "$STATEDIR/run" "$STATEDIR/logs" "$STATEDIR/stage"
@@ -202,39 +200,39 @@ sfab_init() {
   export SFAB_TMP
   SFAB_TICK_STAMP=""
   case "$SFAB_CATEGORY" in
-    audit|trace|label|matrix|dbs|rpf|attach|hold|drills|teardown|settle|break-*|heal-*) [ -n "$record" ] || record=1 ;;
-    *) [ -n "$record" ] || record=0 ;;
+    audit|trace|label|matrix|dbs|rpf|attach|hold|drills|teardown|settle|break-*|heal-*) [ -n "$save" ] || save=1 ;;
+    *) [ -n "$save" ] || save=0 ;;
   esac
-  [ "$SFAB_QUICK" = 1 ] && [ "$record" = 1 ] && [ -z "$set_dir" ] && record=0
+  [ "$SFAB_QUICK" = 1 ] && [ "$save" = 1 ] && [ -z "$set_dir" ] && save=0
   RS="" RS_OWNER=0
-  export RS_RECORD=0
+  export RS_SAVE=0
   if [ -n "$set_dir" ]; then
-    RS="$(cd "$set_dir" && pwd -P)" || die "no result set $set_dir"
-    SFAB_VERDICT="$RS/verdict.txt"
+    RS="$(cd "$set_dir" && pwd -P)" || die "no run directory $set_dir"
+    SFAB_RESULTS="$RS/results.txt"
     EVID="${EVID:-$RS/commands.txt}"
-  elif [ "$record" = 1 ]; then
-    _tick_gate
-    rs_open "$SFAB_CATEGORY" "$RENDERDIR/audits"
-    export RS_RECORD=1
+  elif [ "$save" = 1 ]; then
+    _tick_stamp
+    rs_open "$SFAB_CATEGORY" "$RENDERDIR/runs"
+    export RS_SAVE=1
   else
     case "$SFAB_CATEGORY" in
       audit|collect|dbs|rpf|attach) rs_open "$SFAB_CATEGORY" "$STATEDIR/run/sets" ;;
-      *) SFAB_VERDICT="$(mktemp "$STATEDIR/run/verdict.$SFAB_CATEGORY.XXXXXX")" ;;
+      *) SFAB_RESULTS="$(mktemp "$STATEDIR/run/results.$SFAB_CATEGORY.XXXXXX")" ;;
     esac
   fi
-  export RS SFAB_VERDICT
+  export RS SFAB_RESULTS
   [ -z "${EVID:-}" ] || export EVID
 }
 
-# Read the host tick before recording and stamp the result set when it is not 10000. The tick is
+# Read the host tick before saving and stamp the run directory when it is not 10000. The tick is
 # never a reason to refuse: another workload on a shared host can move it (any
 # container holding CAP_SYS_TIME adjusts the one clock).
-_tick_gate() {
+_tick_stamp() {
   local t rc=0
   t="$(py "$SFAB_COMMON/bin/tick.py" 2>/dev/null)" || rc=$?
   [ "$rc" -eq 0 ] && return 0
   SFAB_TICK_STAMP="host-tick: ${t:-unreadable}"
-  warn "$SFAB_TICK_STAMP (recorded, not refused)"
+  warn "$SFAB_TICK_STAMP (saved, not refused)"
   return 0
 }
 
@@ -552,7 +550,7 @@ FW() {
   [ -n "$fw" ] || { warn "no firewall in $LAB"; return 2; }
   _creds "$fw" || return 2
   # No scripting mode: with it on, PAN-OS stops echoing each command after its prompt, and the
-  # splitter (judge.py split) finds a command's output by that echo.
+  # splitter (checks.py split) finds a command's output by that echo.
   input="$(printf 'set cli pager off\n'; printf '%s\n' "$@"; printf 'exit\n')"
   _CAP_SSHPASS="$CRED_PASS" _session "$fw" panos-cli "$input" \
     sshpass -e ssh -tt "${_SSH_PW[@]}" "$CRED_USER@$(node_mgmt "$fw")"
@@ -663,7 +661,7 @@ FR() {
 }
 
 # klish_body CMD: from a KLISH session on stdin, the output of CMD without its prompt line.
-klish_body() { py "$SFAB_COMMON/audit/judge.py" body --style klish --command "$1"; }
+klish_body() { py "$SFAB_COMMON/audit/checks.py" body --style klish --command "$1"; }
 
 # retry1 ARGV...: run, and once more after a pause (the first packets of a new flow are lost to ARP).
 retry1() { "$@" && return 0; sleep "${SFAB_RETRY_PAUSE:-2}"; "$@"; }
@@ -680,7 +678,7 @@ pchk() {
 _one() { printf '%s' "$*" | tr '\n\t' '  ' | tr -s ' ' | sed -e 's/^ //' -e 's/ $//'; }
 _vline() {
   printf '%s\n' "$1"
-  [ -z "${SFAB_VERDICT:-}" ] || printf '%s\n' "$1" >>"$SFAB_VERDICT"
+  [ -z "${SFAB_RESULTS:-}" ] || printf '%s\n' "$1" >>"$SFAB_RESULTS"
 }
 sec() { _vline "== $(_one "$*")"; }
 ok() { _vline "  PASS  $(_one "$*")"; }
@@ -699,15 +697,7 @@ skip() {
   r="$(_one "$*")"
   _vline "  SKIP  $l${r:+ ($r)}"
 }
-known() {
-  local id="$1"
-  shift
-  if [[ " ${KNOWN_IDS[*]:-} " != *" $id "* ]]; then
-    bad "$*" "KNOWN id $id is not in spec/known.yaml"
-    return 0
-  fi
-  _vline "  KNOWN $(_one "$*"): $id"
-}
+limitation() { _vline "  LIMITATION  $(_one "$*")"; }
 chk() { if [ "$2" = "$3" ]; then ok "$1"; else bad "$1" "want $2, got $3"; fi; }
 ge() {
   if [[ "$3" =~ ^-?[0-9]+$ ]] && [[ "$2" =~ ^-?[0-9]+$ ]] && [ "$3" -ge "$2" ]; then ok "$1"; else bad "$1" "want >= $2, got $3"; fi
@@ -720,14 +710,14 @@ check() {
 }
 
 vcounts() {
-  awk '/^  PASS  /{p++} /^  FAIL  /{f++} /^  KNOWN /{k++} /^  SKIP  /{s++} END{printf "%d %d %d %d\n", p, f, k, s}' "${1:-$SFAB_VERDICT}" 2>/dev/null || echo "0 0 0 0"
+  awk '/^  PASS  /{p++} /^  FAIL  /{f++} /^  LIMITATION /{k++} /^  SKIP  /{s++} END{printf "%d %d %d %d\n", p, f, k, s}' "${1:-$SFAB_RESULTS}" 2>/dev/null || echo "0 0 0 0"
 }
-fails_now() { local p f k s; read -r p f k s <<<"$(vcounts "$SFAB_VERDICT")"; printf '%s\n' "$f"; }
+fails_now() { local p f k s; read -r p f k s <<<"$(vcounts "$SFAB_RESULTS")"; printf '%s\n' "$f"; }
 
-# summary: the RESULT line; closes the result set this process opened; non-zero on any FAIL.
+# summary: the RESULT line; closes the run directory this process opened; non-zero on any FAIL.
 summary() {
   local p f k s
-  read -r p f k s <<<"$(vcounts "$SFAB_VERDICT")"
+  read -r p f k s <<<"$(vcounts "$SFAB_RESULTS")"
   [ -z "${SFAB_TICK_STAMP:-}" ] || _vline "== $SFAB_TICK_STAMP"
   _vline "== RESULT: $p passed, $f failed, $k known platform limitation(s), $s skipped"
   if [ -n "${RS:-}" ] && [ "${RS_OWNER:-0}" = 1 ]; then rs_close; fi
@@ -758,7 +748,7 @@ marker_text() {
 }
 
 # stage_step STAGE STEP ARGV...: skip when the marker matches; else run, and write the marker on
-# success. ARGV returning 3 means it could not judge (a missing tool): success, no marker.
+# success. ARGV returning 3 means it could not check (a missing tool): success, no marker.
 stage_step() {
   local st="$1" step="$2" f want rc=0 t0=$SECONDS
   shift 2
@@ -771,7 +761,7 @@ stage_step() {
   rm -f "$f"
   "$@" || rc=$?
   if [ "$rc" -eq 3 ]; then
-    printf '  step    %s.%s ran without a verdict; no marker written\n' "$st" "$step"
+    printf '  step    %s.%s ran without a result; no marker written\n' "$st" "$step"
     return 0
   fi
   if [ "$rc" -ne 0 ]; then
@@ -783,7 +773,7 @@ stage_step() {
 }
 
 # ---------------------------------------------------------------------------------------------
-# result sets
+# run directories
 
 rs_open() {
   local cat="$1" base="$2"
@@ -792,13 +782,13 @@ rs_open() {
   [ ! -e "$RS" ] || { sleep 1; RS_TS="$(utc_compact)"; RS="$base/${LAB}_${cat}_${RS_TS}"; }
   mkdir -p "$RS/raw"
   RS_OWNER=1
-  SFAB_VERDICT="$RS/verdict.txt"
+  SFAB_RESULTS="$RS/results.txt"
   EVID="$RS/commands.txt"
-  : >"$SFAB_VERDICT"
+  : >"$SFAB_RESULTS"
   : >"$EVID"
   RS_START="$(utc)"
   RS_REPO=""
-  export RS SFAB_VERDICT EVID
+  export RS SFAB_RESULTS EVID
   _run_json
   if [ "$base" = "$STATEDIR/run/sets" ]; then
     # keep the three newest scratch sets, newest by the UTC stamp that ends each name (a sort on the
@@ -878,11 +868,11 @@ rs_close() {
   {
     printf 'lab: %s\ncategory: %s\nset: %s\nutc: %s to %s\n' "$LAB" "$SFAB_CATEGORY" "$(basename "$RS")" "$RS_START" "$RS_END"
     [ -z "${SFAB_TICK_STAMP:-}" ] || printf '%s\n' "$SFAB_TICK_STAMP"
-    grep -E '^== RESULT: ' "$SFAB_VERDICT" | tail -n 1
-  } >"$RS/RESULT.txt"
+    grep -E '^== RESULT: ' "$SFAB_RESULTS" | tail -n 1
+  } >"$RS/summary.txt"
   find "$RS/raw" -type d -empty -delete 2>/dev/null || true
   redact "$RS"
-  printf '== result set: %s\n' "${RS#"$SFAB_ROOT"/}"
+  printf '== run directory: %s\n' "${RS#"$SFAB_ROOT"/}"
   RS_OWNER=0
 }
 
@@ -895,7 +885,7 @@ rs_close() {
 redact() { py "$SFAB_COMMON/audit/redact.py" --secrets "$STATEDIR/secrets.env" --key "$STATEDIR/secrets/redact.key" "$1"; }
 
 # ---------------------------------------------------------------------------------------------
-# audits: collection from common/audit/cmds/, judgment from the saved files
+# audits: collection from common/audit/cmds/, check from the saved files
 
 audit_collect() {
   local args=(--set "$RS")
@@ -907,37 +897,37 @@ audit_collect() {
   [ "$rc" -le 1 ] || bad "collection" "collect.sh exited $rc"
 }
 
-_judge() {
+_run_check() {
   local rc=0
-  py "$SFAB_COMMON/audit/judge.py" run --set "$RS" --inv "$INV" --render "$RENDERDIR" "$@" || rc=$?
-  [ "$rc" -le 1 ] || bad "judge $1" "judge.py exited $rc"
+  py "$SFAB_COMMON/audit/checks.py" run --set "$RS" --inv "$INV" --render "$RENDERDIR" "$@" || rc=$?
+  [ "$rc" -le 1 ] || bad "check $1" "checks.py exited $rc"
 }
 
 _in_set() { local n; for n in "$@"; do [ -d "$RS/$n" ] && printf '%s\n' "$n"; done; true; }
 
-# audit_judge: the shared checks every lab gets, then the firewall, guests and rails it holds.
-audit_judge() {
+# audit_check: the shared checks every lab gets, then the firewall, guests and rails it holds.
+audit_check() {
   local sws fws gs rs
   mapfile -t sws < <(_in_set "${SWITCHES[@]}")
   mapfile -t fws < <(_in_set ${FW_NODE:+"$FW_NODE"})
   mapfile -t gs < <(_in_set "${GUESTS[@]}")
   mapfile -t rs < <(_in_set "${RELAY_GUESTS[@]}")
   if [ ${#sws[@]} -gt 0 ]; then
-    _judge shared "${sws[@]}"
-    _judge vlans "${sws[@]}"
-    _judge mac-tables "${sws[@]}"
+    _run_check shared "${sws[@]}"
+    _run_check vlans "${sws[@]}"
+    _run_check mac-tables "${sws[@]}"
   fi
-  [ ${#fws[@]} -eq 0 ] || _judge firewall "${fws[@]}"
-  [ ${#gs[@]} -eq 0 ] || _judge guests "${gs[@]}"
-  [ ${#rs[@]} -eq 0 ] || _judge rails "${rs[@]}"
+  [ ${#fws[@]} -eq 0 ] || _run_check firewall "${fws[@]}"
+  [ ${#gs[@]} -eq 0 ] || _run_check guests "${gs[@]}"
+  [ ${#rs[@]} -eq 0 ] || _run_check rails "${rs[@]}"
 }
 
-audit_forwarding_only() { _judge forwarding-only "$@"; }
-audit_mclag_pair() { _judge mclag-pair "$@"; }
-audit_l2_hygiene() { _judge l2-hygiene "$@"; }
-audit_firewall() { _judge firewall "$@"; }
-audit_guests() { _judge guests "$@"; }
-audit_rails() { _judge rails "$@"; }
+audit_forwarding_only() { _run_check forwarding-only "$@"; }
+audit_mclag_pair() { _run_check mclag-pair "$@"; }
+audit_l2_hygiene() { _run_check l2-hygiene "$@"; }
+audit_firewall() { _run_check firewall "$@"; }
+audit_guests() { _run_check guests "$@"; }
+audit_rails() { _run_check rails "$@"; }
 
 # audit_preflight: the last preflight's lines, then the checks that can change since (the tick,
 # other labs), read now without side effects.
@@ -946,11 +936,11 @@ audit_preflight() {
   if [ -f "$last" ]; then
     sec "preflight, as run at $(sed -n 's/^# preflight //p' "$last" | head -n 1)"
     while IFS= read -r l; do
-      case "$l" in "  PASS  "*|"  FAIL  "*|"  SKIP  "*|"  KNOWN "*) _vline "$l" ;; esac
+      case "$l" in "  PASS  "*|"  FAIL  "*|"  SKIP  "*|"  LIMITATION  "*) _vline "$l" ;; esac
     done <"$last"
   else
     sec "preflight"
-    bad "preflight record" "no $last: run make up"
+    bad "preflight output" "no $last: run make up"
   fi
   # shellcheck source=common/stages/preflight.sh
   SFAB_PF_LIB=1 . "$SFAB_COMMON/stages/preflight.sh"

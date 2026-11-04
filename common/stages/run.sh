@@ -9,7 +9,7 @@
 # The run holds flock state/lock for its whole length (a second run of the same lab is refused);
 # up and down take the host-wide /run/lock/sfab.lock around containerlab themselves. Each stage is
 # logged to state/logs/<stage>-<UTC>.log and its duration kept in state/stage/durations.json for
-# the next result set's RUN.json. The first stage that fails stops the run. When the run ends, for
+# the next run directory's RUN.json. The first stage that fails stops the run. When the run ends, for
 # any reason, the guest hold up.sh made is removed, so no guest waits past the run that held it.
 set -euo pipefail
 # shellcheck source=common/lib.sh
@@ -35,10 +35,10 @@ status() {
   markers="$(find "$STATEDIR/stage" -maxdepth 1 -name '*.ok' 2>/dev/null | sed 's:.*/::; s/\.ok$//' | sort | paste -sd ' ' -)"
   echo "markers: ${markers:-none}"
   [ ! -f "$STATEDIR/shared/hold-guests" ] || echo "guests held: state/shared/hold-guests"
-  if [ -d "$RENDERDIR/audits" ]; then
-    echo "latest result sets:"
-    find "$RENDERDIR/audits" -mindepth 1 -maxdepth 1 -type d -name "${LAB}_*" | sort | tail -n 5 | while read -r d; do
-      printf '  %s  %s\n' "$(basename "$d")" "$(grep -h '^== RESULT' "$d/RESULT.txt" 2>/dev/null | tail -n 1)"
+  if [ -d "$RENDERDIR/runs" ]; then
+    echo "latest run directories:"
+    find "$RENDERDIR/runs" -mindepth 1 -maxdepth 1 -type d -name "${LAB}_*" | sort | tail -n 5 | while read -r d; do
+      printf '  %s  %s\n' "$(basename "$d")" "$(grep -h '^== RESULT' "$d/summary.txt" 2>/dev/null | tail -n 1)"
     done
   fi
 }
@@ -58,9 +58,9 @@ flock -n 8 || die "another run holds $STATEDIR/lock for $LAB"
 export SFAB_IN_RUN=1 SFAB_RUN_STAGES="${stages[*]}"
 trap 'rm -f "$STATEDIR/shared/hold-guests"' EXIT
 
-# record_duration STAGE SECONDS: into state/stage/durations.json, the directory made again when
+# save_duration STAGE SECONDS: into state/stage/durations.json, the directory made again when
 # missing (wipe removes it with the stage markers)
-record_duration() {
+save_duration() {
   py - "$STATEDIR/stage/durations.json" "$1" "$2" <<'PY'
 import json, os, sys
 p, stage, secs = sys.argv[1], sys.argv[2], int(sys.argv[3])
@@ -90,7 +90,7 @@ for st in "${stages[@]}"; do
   t0=$SECONDS
   rc=0
   "${cmd[@]}" "${args[@]}" 2>&1 | tee -a "$log" || rc=${PIPESTATUS[0]}
-  record_duration "$st" "$((SECONDS - t0))"
+  save_duration "$st" "$((SECONDS - t0))"
   if [ "$rc" -ne 0 ]; then
     printf '== stage %s failed (exit %s) after %ss\n' "$st" "$rc" "$((SECONDS - t0))"
     exit "$rc"

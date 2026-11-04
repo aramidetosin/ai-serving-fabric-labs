@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# ch05/drills.sh [--drills "ID ..."] [--passes N]: the chapter's dark-switch drill (book Examples 5-8
-# and 5-9), recorded as audits/sfab-ch05_drills_<UTC>/ with pass<N>/<drill>/ and
+# ch05/drills.sh [--drills "ID ..."] [--passes N]: the chapter's dark-switch drill, saved as runs/sfab-ch05_drills_<UTC>/ with pass<N>/<drill>/ and
 # drills.md. make drills runs it with PASSES=3.
 #
 #   dark-switch   every port rail-sw1 uses shut in one KLISH session (interface range
@@ -14,7 +13,7 @@
 #
 # The restore is pushed before the shut, run from the EXIT trap whatever happens. Every time is the
 # lab host's clock: tcpdump on the host in both nodes' container ports on every rail, and preflight's
-# host tick of 10000 checked when the result set opens. A lost ping is a round trip. The plan is
+# host tick of 10000 checked when the run directory opens. A lost ping is a round trip. The plan is
 # chapter.yaml's drills block, rendered to gen/drills.json (common/drill/lib-raildrill.sh).
 set -euo pipefail
 # shellcheck source=common/lib.sh

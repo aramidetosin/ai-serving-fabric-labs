@@ -23,7 +23,7 @@ cluster-bootstrap.sh (images/vm-node/node-files, run by sfab-cluster.service) re
                            operator enables its Gateway controller only when they exist at start
   20-cilium-values.yaml    the init node: the Cilium release's values
 
-bootstrap/k8s/, applied by the finish stage with the harness's kubectl, which runs on the init node
+bootstrap/k8s/, applied by the finish stage with the lab's kubectl, which runs on the init node
 with the admin kubeconfig kubeadm wrote there (common/lib.sh K; the bastion holds none):
 
   05-namespaces.yaml       the Gateways', the test backend's and cert-manager's namespaces
@@ -152,7 +152,7 @@ FILES = {
 APPLY_ORDER = ("namespaces", "operators", "crds", "multus", "pools", "l2", "pki", "gateways", "test_backend", "identity", "netpol")
 NODE_FILES = {"env": "cluster.env", "kubeadm": "kubeadm.yaml", "kube_vip": "kube-vip.yaml",
               "kube_vip_init": "kube-vip-init.yaml", "kubeadm_user": "kubeadm-user.yaml"}
-# Where the harness's kubectl finds the cluster's admin kubeconfig on the init node (kubeadm writes
+# Where the lab's kubectl finds the cluster's admin kubeconfig on the init node (kubeadm writes
 # it there, and it never leaves the node), and the operators' defaults (k8s.operators).
 ADMIN_KUBECONFIG = "/etc/kubernetes/admin.conf"
 OPERATORS = {"users": [], "group": "operators", "cluster_role": "view", "validity_h": 8}
@@ -1399,7 +1399,7 @@ def _container(model: Model, node: str) -> str:
     return f"{model.lab}-{node}"
 
 
-# The harness's kubectl wrapper, relative to the repository root.
+# The lab's kubectl wrapper, relative to the repository root.
 SFAB_KUBECTL = "common/bin/sfab-kubectl"
 
 
@@ -1478,7 +1478,7 @@ def serving_summary(model: Model) -> dict:
     if pop is None or not pop.answer_address:
         raise RenderError(f"spec serving.load.client {client}: no population of this lab answers its names")
     if not model.k8s.init:
-        raise RenderError("the serving recipe runs the harness's kubectl on the init node, which this lab does not hold")
+        raise RenderError("the serving recipe runs the lab's kubectl on the init node, which this lab does not hold")
     first = next(iter(model.models))
     return {
         "namespace": str(s["namespace"]),
@@ -1503,7 +1503,7 @@ def serving_summary(model: Model) -> dict:
         "route": {"name": "serving", "gateway": gw, "namespace": gateway_namespace(model), "section": ls["name"],
                   "hostname": fqdn, "request": f"{int(s['route']['request_s'])}s",
                   "backend_request": f"{int(s['route']['backend_request_s'])}s"},
-        # the harness's kubectl on the init node (common/bin/sfab-kubectl, the lab's render directory
+        # the lab's kubectl on the init node (common/bin/sfab-kubectl, the lab's render directory
         # relative to the repository root); serving.py resolves a relative path against that root
         "kubectl": SFAB_KUBECTL,
         "wait_daemonsets": [f"{SYSTEM_NS}/{MULTUS_DS}"],
@@ -1663,7 +1663,7 @@ def charts_list(model: Model, ctx) -> str:
 
 def apply_list(model: Model, ctx) -> str:
     head = header(model, "manifests", ctx) + [
-        "Applied in this order with the harness's kubectl (kubectl apply --server-side on the init node); a file whose kinds a chart",
+        "Applied in this order with the lab's kubectl (kubectl apply --server-side on the init node); a file whose kinds a chart",
         "brings (cert-manager's) waits until the charts are in.",
     ]
     return "".join(f"# {h}\n" for h in head) + "".join(FILES[k] + "\n" for k in APPLY_ORDER if _wanted(model, k))

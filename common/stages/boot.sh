@@ -23,7 +23,7 @@
 #                 kubeadm join token from state/secrets.env into state/shared/cluster/kubeadm.env
 #                 (0600), never printed.
 #   fabric        build A: show mclag brief and show PortChannel summary as rendered, in two
-#                 consecutive polls 15 s apart (judge.py mclag-pair, the audit's own check). While
+#                 consecutive polls 15 s apart (checks.py mclag-pair, the audit's own check). While
 #                 the guests are held their bonds cannot be up, so this wait leaves out the
 #                 PortChannels that face a guest, and those that face a storage node, whose data
 #                 bond only finish's storage setup makes (truenas-setup.py).
@@ -50,7 +50,7 @@ set -euo pipefail
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/lib.sh"
 sfab_init boot "$@"
 
-JUDGE="$SFAB_COMMON/audit/judge.py"
+CHECKS="$SFAB_COMMON/audit/checks.py"
 RUNDIR="$STATEDIR/run/boot"
 mkdir -p "$RUNDIR"
 
@@ -165,7 +165,7 @@ gro_check() {
       fails=1
       continue
     fi
-    if probs="$(py "$JUDGE" offloads --nics "${NODE_NUM_NICS[$sw]}" "$RUNDIR/gro-$sw.txt")"; then
+    if probs="$(py "$CHECKS" offloads --nics "${NODE_NUM_NICS[$sw]}" "$RUNDIR/gro-$sw.txt")"; then
       ok "$sw: GRO, rx-gro-hw and LRO off on all ${NODE_NUM_NICS[$sw]} data NICs"
     else
       bad "$sw: GRO, rx-gro-hw and LRO off" "$(printf '%s' "$probs" | head -n 3 | paste -sd ';' -)"
@@ -384,7 +384,7 @@ join_token() {
 
 # --- the fabric ------------------------------------------------------------------------------------
 
-# fabric_poll DIR [EXCEPT]: read the pairs into a scratch result set and judge them; 0 when all
+# fabric_poll DIR [EXCEPT]: read the pairs into a scratch run directory and check them; 0 when all
 # hold. EXCEPT (comma-separated nodes) leaves out the PortChannels that face those nodes.
 fabric_poll() {
   local dir="$1" except="${2:-}" p a b sw rc=0
@@ -395,10 +395,10 @@ fabric_poll() {
       mkdir -p "$dir/$sw"
       SW "$sw" "show mclag brief" "show PortChannel summary" >"$dir/$sw.session" 2>/dev/null || true
       printf '01\tmclag_brief\tklish\t.txt\tshow mclag brief\n02\tportchannel_summary\tklish\t.txt\tshow PortChannel summary\n' >"$dir/$sw.plan"
-      py "$JUDGE" split --style klish --plan "$dir/$sw.plan" --session "$dir/$sw.session" --out "$dir/$sw" >/dev/null || true
+      py "$CHECKS" split --style klish --plan "$dir/$sw.plan" --session "$dir/$sw.session" --out "$dir/$sw" >/dev/null || true
     done
-    SFAB_VERDICT="$dir/verdict-$p.txt" py "$JUDGE" run --set "$dir" --inv "$INV" --render "$RENDERDIR" \
-      --except-peers "$except" mclag-pair "$a" "$b" >"$dir/judge-$p.txt" 2>&1 || rc=1
+    SFAB_RESULTS="$dir/results-$p.txt" py "$CHECKS" run --set "$dir" --inv "$INV" --render "$RENDERDIR" \
+      --except-peers "$except" mclag-pair "$a" "$b" >"$dir/checks-$p.txt" 2>&1 || rc=1
   done
   return "$rc"
 }
@@ -418,7 +418,7 @@ pair_wait() {
   done
   if [ "$good" -lt "$need" ]; then
     for p in "${PAIRS[@]}"; do
-      grep -E '^  FAIL  ' "$dir/judge-$p.txt" 2>/dev/null | head -n 5 | sed 's/^  FAIL  /        last poll: /' || true
+      grep -E '^  FAIL  ' "$dir/checks-$p.txt" 2>/dev/null | head -n 5 | sed 's/^  FAIL  /        last poll: /' || true
     done
   fi
   if [ "$good" -ge "$need" ]; then

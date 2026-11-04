@@ -23,7 +23,7 @@ The companion lab repository for the book *The AI Serving Fabric: A Platform Eng
 | `spec/` | The specification every lab is rendered from: addresses, VLANs, nodes, firewall, cluster, models, and every version pin in `spec/versions.yaml` |
 | `common/sfab/` | The generator (`common/bin/sfab render`, `check`, `lint`, `show`) |
 | `common/stages/`, `common/lib.sh`, `common/mk/chapter.mk` | The deploy stages and the make targets every lab shares |
-| `common/audit/`, `common/trace/`, `common/drill/`, `common/break/`, `common/matrix/` | The audit, trace, failure drill, break exercise and matrix harness |
+| `common/audit/`, `common/trace/`, `common/drill/`, `common/break/`, `common/matrix/` | The audit, trace, failure drill, break exercise and matrix tooling |
 | `images/` | The Dockerfiles and init scripts of the lab's own `sfab/*` images (`images/README.md`), and where to get the vendor images (`images/VENDOR-IMAGES.md`) |
 | `platform/` | How to build the switch and firewall images from your own licensed copies, with the launcher changes the labs need |
 | `serving-layer/` | The model-serving recipe: `make serve`, `make load` and `make client` |
@@ -49,7 +49,7 @@ The companion lab repository for the book *The AI Serving Fabric: A Platform Eng
   apt install make git python3 python3-yaml sshpass tcpdump util-linux ethtool openssl openssh-client curl coreutils iproute2
   ```
 
-- The kernel tick at 10000, which a stock kernel has. Preflight reads it with `common/bin/tick.py` and never refuses on it; a result set taken at another value is stamped. `python3 common/bin/tick.py --set` as root sets it until the next reboot.
+- The kernel tick at 10000, which a stock kernel has. Preflight reads it with `common/bin/tick.py` and never refuses on it; a run directory taken at another value is stamped. `python3 common/bin/tick.py --set` as root sets it until the next reboot.
 - A kernel that lets a Linux bridge forward LACP (`group_fwd_mask 0x4004`), if you want the path the book's runs took. A stock kernel refuses that mask, and `images/vm-node/vm-init.sh` then joins each data NIC of a VM node to its tap with a tc mirred redirect instead. Each VM node's container log names the mode of every data NIC. To force the redirect on any kernel, set `guest.nic_link: tc` in `spec/common.yaml` and run `make render` in the lab.
 - Memory, CPUs and disk for the lab, which preflight checks before every deploy. Memory is MemAvailable, the lab's budget plus a 16 GiB floor; vCPUs must fit within twice the host's CPU count. The images come on top of the disk figures.
 
@@ -90,14 +90,14 @@ make up        # preflight, deploy, boot, finish, audit
 make audit     # the lab's audit
 make trace     # the lab's path trace
 make drills    # the lab's failure drills, three passes
-make record    # audit, trace, label and matrix (each the lab has), then the closing checks
+make verify    # audit, trace, label and matrix (each the lab has), then the closing checks
 make break-4a  # the chapter's break exercise; make heal-4a undoes it
 make down      # keeps the disks; make wipe removes them
 ```
 
 `make help` in a lab lists every target. `make up BG=1` runs the deploy as the transient unit `<lab>-up`; follow it with `journalctl -fu <lab>-up`. A lab's containers are named `<lab>-<node>`, for example `sfab-ch04-fw`, and only one `sfab-` lab can run at a time.
 
-Every check prints to the terminal and saves its files in a timestamped directory under the lab's `audits/`, which git ignores: for example `ch04/audits/sfab-ch04_trace_<UTC>/` with `trace.md`, `verdict.txt`, `RESULT.txt`, `RUN.json` and the saved outputs. Redaction replaces each secret in those files with a keyed mark before the run ends. `make check` at the top of the repository confirms every lab's committed files match a fresh render, with no lab, no root and no vendor image.
+Every check prints to the terminal and saves its files in a timestamped directory under the lab's `runs/`, which git ignores: for example `ch04/runs/sfab-ch04_trace_<UTC>/` with `trace.md`, `results.txt`, `summary.txt`, `RUN.json` and the saved outputs. Redaction replaces each secret in those files with a keyed mark before the run ends. `make check` at the top of the repository confirms every lab's committed files match a fresh render, with no lab, no root and no vendor image.
 
 ## What `make up` changes on the host
 
@@ -123,7 +123,7 @@ Keep the host and the lab's management network away from any network you do not 
 
 - `spec/` is the single source: change an address, a port or a size there, run `make render` in the lab and redeploy. Never edit a rendered file by hand.
 - A stage that fails can run again.
-- Runtime state (node disks, `state/`, `clab-*` directories, `audits/`) is never committed.
+- Runtime state (node disks, `state/`, `clab-*` directories, `runs/`) is never committed.
 - The timing figures a lab prints are functional checks of the build, not benchmarks. Measured throughput figures and model server timings are replaced in the saved files by a `[redacted: <class>]` marker.
 
 ## Reporting problems

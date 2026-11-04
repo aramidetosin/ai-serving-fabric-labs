@@ -39,7 +39,7 @@ value that exists:
   (32 letters and digits, each OIDC client's secret) and SFAB_IDP_PASSWORD_<person> (each person's
   password) in state/secrets.env. finish writes the identity provider's Secret from them
   (common/bin/idp-secret.py: the client secrets and bcrypt hashes of the passwords, never the
-  passwords themselves); the harness hands a person's password to that person's client only.
+  passwords themselves); the lab tooling hands a person's password to that person's client only.
 - state/secrets/redact.key (0600): 64 hex digits, the key under which common/audit/redact.py
   marks a redacted value (an HMAC, so nobody without the key can test a guess against a mark). No
   container or device ever sees it. check passes without it, so a lab made before the key existed

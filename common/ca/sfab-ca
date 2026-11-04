@@ -20,14 +20,14 @@
 #                                           CA's key pair (tls.crt is the chain to the root, ca.crt
 #                                           the root) for a cert-manager CA issuer, on a pipe only:
 #                                           it refuses a terminal; the finish stage pipes it to the
-#                                           harness's kubectl on the init node and nothing prints it
+#                                           lab tooling's kubectl on the init node and nothing prints it
 #
 # LABDIR is the lab's render directory (the lab, or its variant's directory), the current directory
 # by default. What it reads: the render at LABDIR/bootstrap/ca (root.cnf, one <intermediate>.cnf
 # each, one leaf-<leaf>.cnf per node leaf, and proof.json). What it keeps: LABDIR/state/ca, mode
 # 0700, which the topology binds into no node: every key (0600), every certificate,
 # issued/<name>-<UTC>.crt for each signing, and proof/ for the last proof (the proof leaves'
-# certificates and openssl's verdicts; their keys are thrown away).
+# certificates and openssl's results; their keys are thrown away).
 #
 # The rules:
 #   - The root is made once, from root.cnf, and never again: a root that exists is kept, and a
@@ -51,9 +51,9 @@
 #     fail with a name-constraint error; every published node leaf must verify and match its key.
 #     Any other outcome fails the proof, and init with it.
 #
-# Nothing is installed into the lab host's own trust store. Output lines use the harness vocabulary
+# Nothing is installed into the lab host's own trust store. Output lines use the lab tooling vocabulary
 # (PASS, FAIL, RESULT). Exit 0 when everything held. SFAB_CA_CONF, SFAB_CA_STATE, SFAB_SHARED and
-# SFAB_TLS_DIR move the directories (the tests).
+# SFAB_TLS_DIR move the directories.
 set -euo pipefail
 
 LAB=.
@@ -164,7 +164,7 @@ root() {
 
 # sign NAME CNF KEY CRT CA_CRT CA_KEY DEFAULT_DAYS: sign CRT for KEY from CNF with the CA, when it is
 # due (the rules above); NAME in the log and the issued/ copy. The .cnf it was signed from is
-# recorded beside the certificate (CRT.cnf.sha256).
+# saved beside the certificate (CRT.cnf.sha256).
 sign() {
   local name=$1 cnf=$2 k=$3 c=$4 cacrt=$5 cakey=$6 ddays=$7 why="" days renew csr chain
   days=$(cnf_get "$cnf" days)

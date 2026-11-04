@@ -13,7 +13,7 @@
 #                               Secret into the client container: DIR/key-<NAME> (the key alone) and
 #                               DIR/hdr-<NAME> (its Authorization header line), both 0600 under a
 #                               0700 DIR; NAME is the model's name unless given. The value travels
-#                               through pipes only, from the harness's kubectl (on the init node) to the client's own
+#                               through pipes only, from the lab's kubectl (on the init node) to the client's own
 #                               file: no transcript block, no file on the lab host, no command line
 #                               holds it. Prints the key's field and fingerprint, and with
 #                               KEY_MARK=1 its mark under the lab's redaction key (chapter 7);
@@ -32,16 +32,16 @@
 #                               grant, with the scope that asks for the API gateway's audience,
 #                               or with noaud without it), and keeps DIR/hdr-NAME (the token's
 #                               Authorization header line, 0600) and DIR/claims-NAME.json (the
-#                               claims a judge reads: iss, aud, azp, email, email_verified and the
+#                               claims a checker reads: iss, aud, azp, email, email_verified and the
 #                               token's lifetime; never the token). The config and the response
 #                               are removed. Prints the token endpoint's HTTP status
 #   key_unknown CLIENT DIR NAME a key no Secret holds, made in the client from its own random bytes in
 #                               the shape of the lab's keys, as DIR/key-NAME and DIR/hdr-NAME (0600):
 #                               the probe of an unknown key (chapter 7)
 #   secret_mark NS SECRET FIELD the field's fingerprint and mark ("FIELD sha256:... <redacted hmac:...>"),
-#                               read through a pipe from the harness's kubectl
+#                               read through a pipe from the lab's kubectl
 #   kapply FILE                 kubectl apply --server-side --force-conflicts of FILE, a manifest
-#                               (no secret), fed to the harness's kubectl on its standard input
+#                               (no secret), fed to the lab's kubectl on its standard input
 #   kcreate FILE                kubectl create of FILE the same way
 #   pod_phase NS POD MAX_S      the pod's phase once Succeeded or Failed, polled every 2 s for MAX_S
 #                               at most (unknown otherwise)

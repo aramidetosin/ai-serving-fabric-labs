@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 # common/trace/lib-walktrace.sh: chapter 1's walk,
-# recorded as audits/<lab>_trace_<UTC>/ with trace.md, verdict.txt, dns/, fw/, pair/, rail/,
+# saved as runs/<lab>_trace_<UTC>/ with trace.md, results.txt, dns/, fw/, pair/, rail/,
 # cluster/, sessions/, request/, refuse/ and captures/. A chapter's trace.sh is
 #
 #   . "$(dirname "$0")/../common/lib.sh"; sfab_init trace "$@"
@@ -38,7 +38,7 @@
 #                its own pinned source port while the captures run
 #  10. captures stopped (SIGINT) and decoded with tcpdump -nn -tt -e -v -S; the traffic log read for
 #                the refused port and the refused requests; the keys' files removed from the client
-#  11. walktrace.py judges the evidence and writes trace.md
+#  11. walktrace.py checks the evidence and writes trace.md
 #
 # The only change it makes on any device is the rail switches' interface counters, cleared before the
 # request; every process it starts it stops, and no file it writes holds a key.
@@ -93,7 +93,7 @@ walktrace_fw_tables() {
 # interface all, answered y, in a session of its own typed a line every WT_CLEAR_PACE_S seconds (5;
 # lib.sh _paced: an exit typed ahead of the answer is never read), then show interface counters; PHASE after:
 # show interface counters and show mac address-table. Each read is stamped on the lab host's clock
-# (rail/stamps.tsv: switch, phase, start, end), so the judge counts only the frames captured between
+# (rail/stamps.tsv: switch, phase, start, end), so the checker counts only the frames captured between
 # the before read and the after read.
 walktrace_counters() {
   local ph="$1" sw t0 t1
@@ -253,9 +253,9 @@ walktrace_run() {
   trap - EXIT
   key_clear "$client" "$ST_DIR"
   [ -z "${SFAB_TICK_STAMP:-}" ] || stamp_args=(--stamp "$SFAB_TICK_STAMP")
-  py "$WTP" judge --set "$RS" --plan "$ST_PLAN" --inv "$INV" "${stamp_args[@]+"${stamp_args[@]}"}" || true
-  # the judge writes trace.md last: a judge that stopped before it (a traceback above) left the
+  py "$WTP" check --set "$RS" --plan "$ST_PLAN" --inv "$INV" "${stamp_args[@]+"${stamp_args[@]}"}" || true
+  # the checker writes trace.md last: a checker that stopped before it (a traceback above) left the
   # set without the table the chapter prints, so the set fails
-  [ -s "$RS/trace.md" ] || bad "trace.md written by the judge" "missing: walktrace.py judge stopped before it (see above)"
+  [ -s "$RS/trace.md" ] || bad "trace.md written by the checker" "missing: walktrace.py check stopped before it (see above)"
   summary
 }

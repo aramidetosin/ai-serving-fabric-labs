@@ -36,7 +36,7 @@
 # /run/sfab/bastion.ready; `bastion-init.sh --health` (the image's HEALTHCHECK) is healthy while
 # that file exists and sshd runs.
 #
-# SFAB_DRY_RUN=1 prints every change and exits after the build, starting nothing (the tests).
+# SFAB_DRY_RUN=1 prints every change and exits after the build, starting nothing.
 # SFAB_BOOTSTRAP, SFAB_INIT_ENV, SFAB_OPERATOR_DIR, SFAB_CA_ROOT, SFAB_AUTHORIZED_KEYS and
 # SFAB_LINK_WAIT_S move what the topology binds; SFAB_RESOLV_CONF names another resolv.conf.
 set -uo pipefail

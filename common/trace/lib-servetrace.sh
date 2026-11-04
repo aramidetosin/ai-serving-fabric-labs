@@ -1,5 +1,5 @@
 # shellcheck shell=bash
-# common/trace/lib-servetrace.sh: chapter 6's serving trace, recorded as audits/<lab>_trace_<UTC>/ with trace.md, verdict.txt, cluster/, request/ and
+# common/trace/lib-servetrace.sh: chapter 6's serving trace, saved as runs/<lab>_trace_<UTC>/ with trace.md, results.txt, cluster/, request/ and
 # captures/. A chapter's trace.sh is
 #
 #   . "$(dirname "$0")/../common/lib.sh"; sfab_init trace "$@"
@@ -26,7 +26,7 @@
 #                times: a miss's captures are stopped and discarded, and request/attempts.txt
 #                names each try and the copy that did not take it
 #   6. captures stopped (SIGINT), decoded with tcpdump -nn -tt -e -v; the key's file removed
-#   7. servetrace.py judges the evidence and writes trace.md
+#   7. servetrace.py checks the evidence and writes trace.md
 #
 # Chapter 7's keyed form (the plan's keys.capture): the API gateway's and the router's cluster
 # interfaces are captured whole, each pcap taken out of its guest on a pipe through keyscrub.py
@@ -178,7 +178,7 @@ servetrace_pinned() {
     sleep "${SFAB_TRACE_PIN_GAP_S:-20}"
   done
   printf '%s\n' "$sport" >"$RS/request/sport.txt"
-  warn "trace: $pod took none of $tries tries; the last one is judged"
+  warn "trace: $pod took none of $tries tries; the last one is checked"
 }
 
 servetrace_cleanup() {
@@ -250,6 +250,6 @@ servetrace_run() {
   trap - EXIT
   st_clear "$client"
   [ -z "${SFAB_TICK_STAMP:-}" ] || stamp_args=(--stamp "$SFAB_TICK_STAMP")
-  py "$STP" judge --set "$RS" --plan "$ST_PLAN" --inv "$INV" "${stamp_args[@]+"${stamp_args[@]}"}" || true
+  py "$STP" check --set "$RS" --plan "$ST_PLAN" --inv "$INV" "${stamp_args[@]+"${stamp_args[@]}"}" || true
   summary
 }

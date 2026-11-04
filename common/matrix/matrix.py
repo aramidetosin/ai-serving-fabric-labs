@@ -25,10 +25,10 @@ break-2a's cell_mode check.
                                                  the saved logs do not hold yet (0 when every one is there)
     matrix.py observe --plan P --dir D [--only CELL...]
                                                  each cell's mode as the evidence shows it, as JSON lines
-    matrix.py judge --plan P --dir D [--stamp S] [--only CELL...]
-                                                 verdict lines (PASS/FAIL) and D/matrix.md
+    matrix.py check --plan P --dir D [--stamp S] [--only CELL...]
+                                                 result lines (PASS/FAIL) and D/matrix.md
 
-The evidence matrix.sh saves under D (the result set, or a break's record/matrix-<mode>/):
+The evidence matrix.sh saves under D (the run directory, or a break's observe/matrix-<mode>/):
 
     lookups/<row>-<name>.txt    the client's lookup of the name through its own resolver (dig in a
                                 container, getent ahostsv4 in a VM guest)
@@ -41,26 +41,26 @@ The evidence matrix.sh saves under D (the result set, or a break's record/matrix
     fw/routing-route.txt        the firewall's routing table (show routing route)
     fw/counters-before.txt      every counter's value before the requests and after them (show counter
     fw/counters-after.txt       global filter value all), when a cell of the plan is dropped by zone
-                                protection's strict IP check: the judge reads the drop from their difference
+                                protection's strict IP check: the checker reads the drop from their difference
     fw/drops.txt                the drop counters' delta view over the run (show counter global filter delta
                                 yes severity drop, read before the requests and after them, between the two
-                                value reads), recorded beside them: the firewall can start a new sampling
-                                between its two reads, so the view is not what the judge decides by
+                                value reads), saved beside them: the firewall can start a new sampling
+                                between its two reads, so the view is not what the checker decides by
     routers/<node>-ip-route.txt each router's routing table (show ip route)
     api-gateway/access.txt      the API gateway pods' access log over the run
 
 A mode is observed from that evidence alone: a connect that opened or an HTTP status is an answer
 (allowed, or 200, 401 and 404 by the status); an attempt that got none is a log line when the
 traffic log holds a deny for its source port, unanswered when the log holds it allowed, and silence
-when no log line names it. The judge then asserts each cell's mode with its evidence, never only its
+when no log line names it. The checker then asserts each cell's mode with its evidence, never only its
 outcome: a log line names the rule and the zones, and the client's view (a timeout or an error such
-as an ICMP unreachable) is recorded; a 404 comes with no line for the request's marker in the API
+as an ICMP unreachable) is saved; a 404 comes with no line for the request's marker in the API
 gateway's log, which must itself hold the run's model requests; a 401 carries the API gateway's own
 message; an operator cell refused at the firewall needs the router's static route for the
 destination via the public address; a silent cell names the device that dropped it with that
 device's evidence (a router's table without the route, the firewall's discard route, or for zone
 protection's strict IP check the firewall's route back to the source out another interface and the
-drop counter that counted it). Standard library only, plus the harness's panos_parse and vocab.
+drop counter that counted it). Standard library only, plus the lab tooling's panos_parse and vocab.
 """
 
 from __future__ import annotations
@@ -175,7 +175,7 @@ def requests(plan: dict, only=None) -> list:
             kind = "connect" if q["id"] == "connect" else "http"
             answer = "1" if (kind == "connect" and c["mode"] == "allowed") or (kind == "http" and q.get("expect")) else "0"
             # a cell whose view holds no record for its name (pin) is asked at its address with
-            # curl --resolve: the lookup is judged on its own (NXDOMAIN), the request by the layers behind
+            # curl --resolve: the lookup is checked on its own (NXDOMAIN), the request by the layers behind
             pin = f"{c['hostname']}:{c['port']}:{c['address']}" if c.get("pin") and c.get("hostname") and c.get("address") else "-"
             out.append((c["id"], q["id"], kind, c["client"], c["client_kind"], c["client_addr"], c.get("address") or "-", str(c["port"]),
                         str(q["sport"]), q.get("method") or "-", q.get("url") or "-", q.get("key") or "-", q.get("marker") or "-", answer,
@@ -380,7 +380,7 @@ def cmd_tlog_missing(a) -> int:
 
 
 # --------------------------------------------------------------------------------------------
-# the judge
+# the checker
 
 
 def _covers(prefix: str, address) -> bool:
@@ -449,7 +449,7 @@ def view_text(o: dict) -> str:
     return str(o.get("outcome") or "none")
 
 
-def judge_cell(v, d: Path, plan: dict, c: dict, ob: dict, rows: dict, cols: dict, gwlog: str) -> dict:
+def check_cell(v, d: Path, plan: dict, c: dict, ob: dict, rows: dict, cols: dict, gwlog: str) -> dict:
     r, col = rows[c["row"]], cols[c["column"]]
     name = f"{r['label']} / {col['label']}"
     res = {"cell": c["id"], "ok": True, "text": "", "cites": []}
@@ -631,7 +631,7 @@ def gw_log_read(gwlog: str) -> bool:
     return any("/models/" in l for l in gwlog.splitlines())
 
 
-def cmd_judge(a) -> int:
+def cmd_check(a) -> int:
     d = Path(a.dir)
     plan = load(a.plan)
     v = vocab.Vocab()
@@ -646,7 +646,7 @@ def cmd_judge(a) -> int:
             continue
         v.sec(f"{r['label']}: {r['client']} ({r['address']}), resolver {r['resolver']}, view {r['view']}")
         for c in mine:
-            out[c["id"]] = judge_cell(v, d, plan, c, obs[c["id"]], rows, cols, gwlog)
+            out[c["id"]] = check_cell(v, d, plan, c, obs[c["id"]], rows, cols, gwlog)
     if not a.only:
         v.sec("the matrix")
         cnt = {m: sum(1 for c in cells if c["mode"] == m) for m in ("allowed", "log-line", "404", "silence")}
@@ -715,10 +715,10 @@ def write_md(d: Path, plan: dict, out: dict, stamp=None):
     L += ["", f"Silence: {', '.join(plan['silence']['cells']) or 'no cell'}; its evidence is {plan['silence']['evidence']}.", ""]
     if deep and (plan.get("counts") or {}).get("depth"):
         L += ["Cells by depth: " + ", ".join(f"depth {k} {n}" for k, n in sorted(plan["counts"]["depth"].items())) + ".", ""]
-    verdict = read(d / "verdict.txt")
-    L += ["## Verdict", "", "```"] + [l for l in verdict.splitlines() if l.strip()] + ["```", ""]
+    results = read(d / "results.txt")
+    L += ["## Results", "", "```"] + [l for l in results.splitlines() if l.strip()] + ["```", ""]
     L += ["## Files", "",
-          "- `verdict.txt`, `commands.txt`, `matrix.json` (the plan), `requests.tsv` (one line an attempt)",
+          "- `results.txt`, `commands.txt`, `matrix.json` (the plan), `requests.tsv` (one line an attempt)",
           "- `lookups/`: each client's lookup of the names it asks for, through its own resolver",
           "- `requests/`: each attempt as the client saw it, and each answer's headers and body; no request header is saved",
           "- `fw/`: the traffic log read for the refused cells; `routers/`: the routing table of each router in front of the firewall",
@@ -741,14 +741,14 @@ def main(argv=None) -> int:
         s.add_argument("--plan", required=True)
         s.add_argument("--dir", required=True)
         s.add_argument("--only", nargs="*")
-    s = sub.add_parser("judge")
+    s = sub.add_parser("check")
     s.add_argument("--plan", required=True)
     s.add_argument("--dir", required=True)
     s.add_argument("--stamp")
     s.add_argument("--only", nargs="*")
     a = p.parse_args(argv)
     return {"get": cmd_get, "requests": cmd_requests, "lookups": cmd_lookups, "tlog-ports": cmd_tlog_ports,
-            "tlog-missing": cmd_tlog_missing, "observe": cmd_observe, "judge": cmd_judge, "strict-ip": cmd_strict_ip}[a.cmd](a)
+            "tlog-missing": cmd_tlog_missing, "observe": cmd_observe, "check": cmd_check, "strict-ip": cmd_strict_ip}[a.cmd](a)
 
 
 if __name__ == "__main__":

@@ -359,7 +359,7 @@ def _ntp(model: Model) -> dict:
 
 # Where containerd sends a pull when the mirror fails: docker.io's API lives elsewhere. An offline
 # lab cannot reach either, so a pull the mirror cannot serve fails rather than leaving the lab.
-# The same table and file as images/registry/seed.py (hosts_toml), which the tests hold equal.
+# The same table and file as images/registry/seed.py (hosts_toml).
 UPSTREAM_SERVER = {"docker.io": "https://registry-1.docker.io"}
 
 

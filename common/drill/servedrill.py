@@ -18,7 +18,7 @@ analysis (common/drill/lib-servedrill.sh).
 
 Every time is the lab host's clock: the moments lib-servedrill.sh stamped (timeline.txt: the
 fault's KLISH session started and returned, the restore's session started and returned, every
-Service whole again), the EndpointSlices read with the harness's kubectl every interval (each read stamped
+Service whole again), the EndpointSlices read with the lab's kubectl every interval (each read stamped
 when it began and when it ended), and the gateway probe's requests, stamped in the client container,
 whose clock is the host's.
 
@@ -43,7 +43,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent / "audit"))
 import evfile  # noqa: E402
-import judge as J  # noqa: E402
+import checks as J  # noqa: E402
 import vocab  # noqa: E402
 
 PHASES = ("before", "at the cut", "down", "at the restore", "returning", "after")
@@ -335,7 +335,7 @@ def cmd_analyze(a) -> int:
     tl = timeline(d)
     ips = pod_ips(d / "pods-before.json")
     reads = ep_reads(d / "endpoints.jsonl")
-    v = vocab.Vocab(known=vocab.known_ids_default() or None)
+    v = vocab.Vocab()
     tag = f"pass {a.pass_} {a.drill}"
     rd = plan["serving"]["readiness"]
     bound = f"the readiness bound: a probe every {rd['period_s']} s, out after {rd['failure_threshold']} failures, each up to {rd['timeout_s']} s"
@@ -361,7 +361,7 @@ def cmd_analyze(a) -> int:
                     "; ".join(f"{x['pod']} missing from {x['reads']} reads, first {x['first_after_cut_s']} s after the cut" for x in e["lost_live"]))
     stayed = (drill.get("expect") or {}).get("in_node") or []
     if stayed:
-        v.known("L9", f"{tag}: {', '.join(stayed)} on {drill['switch']}'s rails stayed in their Services: each copy's RPC runs inside its "
+        v.limitation(f"{tag}: {', '.join(stayed)} on {drill['switch']}'s rails stayed in their Services: each copy's RPC runs inside its "
                       "node through the rail NIC's macvlan bridge, and a KLISH shutdown drops no carrier at the rail NICs (on hardware "
                       "the NICs would lose carrier and these copies would leave too; each model's copies on the other rail switch's "
                       "rails would answer)")

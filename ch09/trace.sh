@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# ch09/trace.sh: Part III's trace, recorded as audits/sfab-ch09_trace_<UTC>/ with
-# trace.md, verdict.txt and captures/ (common/trace/lib-p3trace.sh, judged by common/trace/p3trace.py).
+# ch09/trace.sh: Part III's trace, saved as runs/sfab-ch09_trace_<UTC>/ with
+# trace.md, results.txt and captures/ (common/trace/lib-tenanttrace.sh, checked by common/trace/tenanttrace.py).
 #
 # The split-horizon trace (chapter.yaml trace.dns): each population's lookup of the users' hostname
 # captured at its own resolver, the resolver's query to its authority (or its cached answer), then the
@@ -13,6 +13,6 @@ set -euo pipefail
 # shellcheck source=common/lib.sh
 . "$(dirname "$0")/../common/lib.sh"
 sfab_init trace "$@"
-# shellcheck source=common/trace/lib-p3trace.sh
-. "$SFAB_COMMON/trace/lib-p3trace.sh"
-p3trace_run
+# shellcheck source=common/trace/lib-tenanttrace.sh
+. "$SFAB_COMMON/trace/lib-tenanttrace.sh"
+tenanttrace_run

@@ -22,11 +22,11 @@ cd ch11
 make render
 make up
 make audit
-make label           # audits/sfab-ch11_label_<UTC>/
-make matrix          # audits/sfab-ch11_matrix_<UTC>/
-make trace           # audits/sfab-ch11_trace_<UTC>/ (the capture ladder)
-make drills          # audits/sfab-ch11_drills_<UTC>/ (isolation-under-load and leaked-key, PASSES=3)
-make break-11a       # Exercise 4
+make label           # runs/sfab-ch11_label_<UTC>/
+make matrix          # runs/sfab-ch11_matrix_<UTC>/
+make trace           # runs/sfab-ch11_trace_<UTC>/ (the capture ladder)
+make drills          # runs/sfab-ch11_drills_<UTC>/ (isolation-under-load and leaked-key, PASSES=3)
+make break-11a
 make heal-11a
 make down
 ```
@@ -35,4 +35,4 @@ make down
 
 ## What the checks do
 
-`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `audits/` in this directory, which git ignores. `spec/known.yaml` lists the known limits of the virtual platforms.
+`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `runs/` in this directory, which git ignores. `spec/limitations.yaml` lists the known limits of the virtual platforms.

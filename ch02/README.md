@@ -21,21 +21,21 @@ Memory: a budget of 179 GiB, and preflight wants MemAvailable to cover it plus t
 ```
 cd ch02
 make render          # topo.clab.yml, bootstrap/ and gen/ (decisions.yaml, matrix.yaml, trace.json, breaks.json)
-make up              # preflight, up, boot, finish, audit (Example 2-1)
-make audit           # audits/sfab-ch02_audit_<UTC>/ (Examples 2-2 and 2-12)
-make label           # audits/sfab-ch02_label_<UTC>/ with labels.md (Examples 2-3 and 2-5 to 2-8)
-make matrix          # audits/sfab-ch02_matrix_<UTC>/ with matrix.md (Examples 2-9 and 2-10)
-make trace           # audits/sfab-ch02_trace_<UTC>/ with trace.md (Example 2-11)
-make record          # audit, trace, label, matrix, then the gate on the four sets
-make break-2a        # audits/sfab-ch02_break-2a_<UTC>/ (Exercise 5)
-make heal-2a         # audits/sfab-ch02_heal-2a_<UTC>/, then the chapter audit
+make up              # preflight, up, boot, finish, audit
+make audit           # runs/sfab-ch02_audit_<UTC>/
+make label           # runs/sfab-ch02_label_<UTC>/ with labels.md
+make matrix          # runs/sfab-ch02_matrix_<UTC>/ with matrix.md
+make trace           # runs/sfab-ch02_trace_<UTC>/ with trace.md
+make verify          # audit, trace, label, matrix, then the results check on the four sets
+make break-2a        # runs/sfab-ch02_break-2a_<UTC>/
+make heal-2a         # runs/sfab-ch02_heal-2a_<UTC>/, then the chapter audit
 make down            # keeps state/ disks; make wipe removes them
 ```
 
-Example 2-4's `show ip route` on the five switches is in every full audit set (each switch's `show ip route` file) and in the label set's `forwarding/`. `make serve`, `make client` and `make load` run the serving recipe with this lab's `bootstrap/k8s/serving.env`, as in chapter 1's lab. The lab has no drills.
+`make serve`, `make client` and `make load` run the serving recipe with this lab's `bootstrap/k8s/serving.env`, as in chapter 1's lab. The lab has no drills.
 
 Once the lab is up, `ssh admin@sfab-ch02-<node>` from the lab host logs in to `bastion`, `k8s-cp1` to `k8s-cp3`, `k8s-ingress1`, `k8s-ingress2`, `k8s-gpu1`, `k8s-gpu2`, `uplink-rtr` and `ops-gw` with the lab's key or your own (`../README.md`, "Default logins"). The switches and the firewall keep their kinds' default logins, and the clients, the DNS and time servers and `inet-registry` run no SSH server: the containerlab VS Code extension's Attach shell opens a shell in each.
 
 ## What the checks do
 
-`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `audits/` in this directory, which git ignores. `spec/known.yaml` lists the known limits of the virtual platforms.
+`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `runs/` in this directory, which git ignores. `spec/limitations.yaml` lists the known limits of the virtual platforms.

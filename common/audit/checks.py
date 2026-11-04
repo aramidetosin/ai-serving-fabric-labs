@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""judge: the audit's verdicts, read from a result set's saved files only.
+"""checks: the audit's results, read from a run directory's saved files only.
 
-    judge.py plan  --inv INV --node NODE [--quick]
-    judge.py split --style klish|panos --plan PLAN --session FILE --out DIR
-    judge.py run   --set DIR --inv INV --render DIR GROUP [NODE ...]
-    judge.py body  --style klish|panos --command CMD < session
-    judge.py offloads [--nics N] FILE
+    checks.py plan  --inv INV --node NODE [--quick]
+    checks.py split --style klish|panos --plan PLAN --session FILE --out DIR
+    checks.py run   --set DIR --inv INV --render DIR GROUP [NODE ...]
+    checks.py body  --style klish|panos --command CMD < session
+    checks.py offloads [--nics N] FILE
 
 plan prints one node's collection plan, expanded from common/audit/cmds/ (see cmds/README.md),
 as tab-separated lines: number, slug, surface, extension, command. split cuts one interactive
 session (sonic-cli or the PAN-OS CLI) into the plan's files by the device's own prompt lines.
-run judges one group of checks and prints the result vocabulary (vocab.py), appending each line
-to $SFAB_VERDICT. body prints one command's output from a session on stdin; offloads lists
+run checks one group of checks and prints the result vocabulary (vocab.py), appending each line
+to $SFAB_RESULTS. body prints one command's output from a session on stdin; offloads lists
 the data NICs whose GRO, rx-gro-hw or LRO is on (boot's gro_check). Groups:
 
     shared             every switch: launcher line, NUM_NICS, GRO off, IPv6 off on the container
@@ -41,7 +41,7 @@ the data NICs whose GRO, rx-gro-hw or LRO is on (boot's gro_check). Groups:
                        resolv.conf searching the lab's domain only
     clients            clients: address, tables, TX offload, gateway, resolver, the lab root trusted
     storage            storage appliances: container health, the launcher's login (presence only)
-    cluster            the cluster as the harness's kubectl printed it on the init node
+    cluster            the cluster as the lab's kubectl printed it on the init node
     populations        each population's probe: its resolver's answers and its Gateway's replies
     pair-roles A B     chapter 3: the lower keepalive source address active, the other standby; the
                        ICCP session on TCP 8888 in the keepalive's VRF, and iccpd's keepalive state
@@ -166,19 +166,19 @@ def read_list(path: Path):
             continue
         parts = line.split(None, 2)
         if len(parts) < 3:
-            raise SystemExit(f"judge: {path.name}: malformed line: {raw!r}")
+            raise SystemExit(f"checks: {path.name}: malformed line: {raw!r}")
         slug, surface, command = parts
         quick = slug.startswith("+")
         slug = slug.lstrip("+")
         if surface not in SURFACE_EXT:
-            raise SystemExit(f"judge: {path.name}: unknown surface {surface!r}")
+            raise SystemExit(f"checks: {path.name}: unknown surface {surface!r}")
         out.append((quick, slug, surface, command))
     return out
 
 
 def plan_files(node: dict, inv: dict | None = None, name: str | None = None) -> list:
     """<kind>.list, then <role>.list; then, with the cluster on, k8s-node.list for a Kubernetes node,
-    k8s.list for the node the harness's kubectl runs on (stages.kubectl: the init node, its admin
+    k8s.list for the node the lab's kubectl runs on (stages.kubectl: the init node, its admin
     kubeconfig; never the bastion), and population.list for the node
     that probes a population (population_ctx). Without the cluster no Gateway answers, so no node
     probes a population."""
@@ -264,7 +264,7 @@ def population_ctx(inv: dict, name: str) -> dict:
         resolver_in = pop.get("resolver") in nodes and pop.get("resolver_address")
         view, vs = client_view(inv, name)
         # a view that holds no record for the admin name (the enterprise's, a public one) answers it
-        # NXDOMAIN: the request for it is pinned to the users' answer, so the Gateway still judges it
+        # NXDOMAIN: the request for it is pinned to the users' answer, so the Gateway still checks it
         held = admin in (vs.get("names") or []) if vs else True
         # a view that publishes no platform name at all (the operator's public server in state one,
         # nothing is published on the uplink: the operator names the VIP directly) answers the users' name NXDOMAIN too
@@ -430,7 +430,7 @@ def plan(inv: dict, name: str, quick: bool = False) -> list:
                     continue
                 s = re.sub(r"[^A-Za-z0-9_]+", "_", s).strip("_")
                 if s in seen:
-                    raise SystemExit(f"judge: {name}: slug {s} appears twice in its plan")
+                    raise SystemExit(f"checks: {name}: slug {s} appears twice in its plan")
                 seen.add(s)
                 rows.append({"slug": s, "surface": surface, "ext": SURFACE_EXT[surface], "command": c})
     for i, r in enumerate(rows, 1):
@@ -441,7 +441,7 @@ def plan(inv: dict, name: str, quick: bool = False) -> list:
 def cmd_plan(a) -> int:
     inv = load_inv(a.inv)
     if a.node not in inv.get("nodes", {}):
-        print(f"judge: no node {a.node} in {a.inv}", file=sys.stderr)
+        print(f"checks: no node {a.node} in {a.inv}", file=sys.stderr)
         return 2
     for r in plan(inv, a.node, a.quick):
         print("\t".join((r["nn"], r["slug"], r["surface"], r["ext"], r["command"])))
@@ -532,10 +532,10 @@ def cmd_split(a) -> int:
 
 
 # --------------------------------------------------------------------------------------------
-# reading a result set
+# reading a run directory
 
 
-class ResultSet:
+class RunDir:
     def __init__(self, path):
         self.path = Path(path)
 
@@ -1088,11 +1088,11 @@ def blk_covers(cidr: str, start: str, end: str) -> bool:
 
 
 # --------------------------------------------------------------------------------------------
-# judging
+# checking
 
 
-class Judge:
-    def __init__(self, rs: ResultSet, inv: dict, render: Path, v: vocab.Vocab, except_peers=()):
+class Checks:
+    def __init__(self, rs: RunDir, inv: dict, render: Path, v: vocab.Vocab, except_peers=()):
         self.rs, self.inv, self.render, self.v = rs, inv, Path(render), v
         self.nodes = inv.get("nodes") or {}
         # PortChannels whose far end is one of these nodes are set aside (boot's wait_fabric, while
@@ -1857,7 +1857,7 @@ class Judge:
         good = p["rx"] >= 1 and not (jumbo and p["toolong"])
         ok = self.v.check(label, good, f"{p['rx']}/{p['tx']} replies" + (", message too long" if p["toolong"] else ""))
         if good and p["dup"]:
-            self.v.known("L1", f"{label}: {p['dup']} duplicate replies (peer-link isolation is not enforced)")
+            self.v.limitation(f"{label}: {p['dup']} duplicate replies (peer-link isolation is not enforced)")
         return ok
 
     def g_rails(self, names):
@@ -2061,7 +2061,7 @@ class Judge:
             units = ((self.nodes[g].get("bond") or {}).get("vlan_ifs")) or []
             in_vlan = bool(sa) and any(ipaddress.ip_address(sa) in ipaddress.ip_interface(u["address"]).network for u in units)
             if sa and in_vlan:
-                # NVMe/TCP 4420 is judged by the audit's volume check: TrueNAS listens on it only
+                # NVMe/TCP 4420 is checked by the audit's volume check: TrueNAS listens on it only
                 # while a subsystem exists, and none does between volumes
                 sp = self.need(g, "storage_ports", f"TrueNAS's data address {sa} answers on NFS 2049")
                 if sp is not None:
@@ -2444,10 +2444,10 @@ class Judge:
         return str(org.get("zone") or org.get("domain") or "").lower()
 
     def resolv_search(self, rc: str, node: str | None = None) -> None:
-        """A recorded resolv.conf searches the node's own domain and nothing else. Docker writes a
+        """A saved resolv.conf searches the node's own domain and nothing else. Docker writes a
         container's file from the lab host's own, search line included, until the image's init
         script replaces that line (render/host.py dns_env). Any other domain is counted, never
-        printed, so the verdict cannot carry a name from the lab host."""
+        printed, so the result cannot carry a name from the lab host."""
         dom = self.node_domain(node)
         words = [w for l in rc.splitlines() if l.split()[:1] in (["search"], ["domain"]) for w in l.split()[1:]]
         other = [w for w in words if w.rstrip(".").lower() != dom]
@@ -2471,7 +2471,7 @@ class Judge:
                 self.v.check("the launcher was given a username and a password (presence and a keyed mark only, never a value)",
                              "username: present" in lg and "password: present" in lg, " ".join(lg.split())[:120])
 
-    # the cluster, from what the harness's kubectl printed on the init node -----------------------
+    # the cluster, from what the lab's kubectl printed on the init node -----------------------
 
     def k8s_names(self) -> dict:
         """gen/k8s.json (render/k8s.py): the cluster's own names, or {} before it is rendered."""
@@ -2494,13 +2494,13 @@ class Judge:
         b = st.get("kubectl")
         self.v.sec("cluster")
         if not k8s or not b:
-            self.v.bad("the cluster", "k8s is off or the lab has no init node for the harness's kubectl")
+            self.v.bad("the cluster", "k8s is off or the lab has no init node for the lab's kubectl")
             return
         if not self.rs.has(b):
             self.v.bad("the cluster", f"{b} was not collected")
             return
         kv = self.rs.json(b, "kube_version")
-        label = f"the harness's kubectl reaches the API from {b} with the admin kubeconfig kubeadm wrote there: server {k8s.get('version')}"
+        label = f"the lab's kubectl reaches the API from {b} with the admin kubeconfig kubeadm wrote there: server {k8s.get('version')}"
         if not isinstance(kv, dict):
             self.v.bad(label, "kube_version not collected or not JSON")
         else:
@@ -2756,7 +2756,7 @@ class Judge:
         gws = self.inv.get("gateways") or {}
         # from chapter 8 gen/tenancy.json's audiences.reach gives each population's connect to its own
         # Gateway at this step: one the firewall does not yet let through (the internet users in
-        # chapter 9, before the translation) is judged unanswered there, its log line the
+        # chapter 9, before the translation) is checked unanswered there, its log line the
         # split-horizon group's
         try:
             reach = {r["population"]: r for r in (json.load(open(self.render / "gen" / "tenancy.json", encoding="utf-8"))
@@ -2895,7 +2895,7 @@ def _fw_edge(self, names):
                     self.v.ok(f"{name} reads 0")
                 else:
                     self.v.skip(f"{name} reads 0", f"it reads {v0}: it counts since the counters were last cleared, "
-                                                   "and the land drill and break-4a raise it on purpose; judged by its rise below")
+                                                   "and the land drill and break-4a raise it on purpose; checked by its rise below")
                 pg = PP.ping(rd("node-public-ping.txt"))
                 who = f"{plan_.get('node')} ({plan_.get('node_addr')})"
                 self.v.check(f"{who} reaches the public address {plan_.get('public')}: {pg['received']} of {pg['sent']} requests answered",
@@ -3074,7 +3074,7 @@ def _fw_edge(self, names):
                          "no deny-all-log entry for it in the log read")
 
 
-Judge.g_fw_edge = _fw_edge
+Checks.g_fw_edge = _fw_edge
 
 
 # --------------------------------------------------------------------------------------------
@@ -3306,32 +3306,32 @@ def addr_prefix(cidr):
         return None
 
 
-Judge.g_rail_backend = _rail_backend
+Checks.g_rail_backend = _rail_backend
 
 # chapter 6: the serving pods against the placement table (placement.py)
 from placement import g_placement  # noqa: E402
 
-Judge.g_placement = g_placement
+Checks.g_placement = g_placement
 
 # chapter 7: the gateway layer and the callers' keys (gwlayer.py)
 from gwlayer import g_gateway_layer, g_keys  # noqa: E402
 
-Judge.g_gateway_layer = g_gateway_layer
-Judge.g_keys = g_keys
+Checks.g_gateway_layer = g_gateway_layer
+Checks.g_keys = g_keys
 
 # the cluster's protections and a person's token (clustersec.py)
 from clustersec import g_cluster_security, g_identity  # noqa: E402
 
-Judge.g_cluster_security = g_cluster_security
-Judge.g_identity = g_identity
+Checks.g_cluster_security = g_cluster_security
+Checks.g_identity = g_identity
 
 # Part III: the audiences, split-horizon DNS, zone-keyed translation and the negative checks (tenancy.py)
 from tenancy import g_audiences, g_isolation, g_split_horizon, g_zone_nat  # noqa: E402
 
-Judge.g_audiences = g_audiences
-Judge.g_split_horizon = g_split_horizon
-Judge.g_zone_nat = g_zone_nat
-Judge.g_isolation = g_isolation
+Checks.g_audiences = g_audiences
+Checks.g_split_horizon = g_split_horizon
+Checks.g_zone_nat = g_zone_nat
+Checks.g_isolation = g_isolation
 
 
 GROUPS = {
@@ -3349,8 +3349,8 @@ GROUPS = {
 
 def cmd_run(a) -> int:
     inv = load_inv(a.inv)
-    v = vocab.Vocab(known=set(inv.get("known") or []) or None)
-    j = Judge(ResultSet(a.set), inv, Path(a.render), v,
+    v = vocab.Vocab()
+    j = Checks(RunDir(a.set), inv, Path(a.render), v,
               except_peers=[x for x in (a.except_peers or "").split(",") if x])
     before = v.counts()["fail"]
     getattr(j, GROUPS[a.group])(list(a.nodes))
@@ -3358,7 +3358,7 @@ def cmd_run(a) -> int:
 
 
 def main(argv=None) -> int:
-    p = argparse.ArgumentParser(prog="judge", description="judge an audit result set from its saved files")
+    p = argparse.ArgumentParser(prog="checks", description="check an audit run directory from its saved files")
     sub = p.add_subparsers(dest="cmd", required=True)
     sp = sub.add_parser("plan")
     sp.add_argument("--inv", required=True)

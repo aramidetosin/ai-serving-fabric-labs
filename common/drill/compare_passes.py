@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""compare_passes.py --set DIR: the passes of one drills result set, side by side.
+"""compare_passes.py --set DIR: the passes of one drills run directory, side by side.
 
 The method: independent passes of the same drills are combined
 into the ranges that get published, so no figure depends on someone picking a representative run by
@@ -74,7 +74,7 @@ def rows_for(did: str, passes: dict) -> tuple:
                 dis.append(f"DISAGREE {did}: pass {p}: {prob}")
 
     def add(label, values, fmt="{:g}", loss=True):
-        """A loss row is judged (some passes lost nothing, others five or more); a rate or a time
+        """A loss row is checked (some passes lost nothing, others five or more); a rate or a time
         is printed as its range only."""
         ok = not (loss and conflict(values))
         rows.append((label, span(values, fmt), ok if loss else None))

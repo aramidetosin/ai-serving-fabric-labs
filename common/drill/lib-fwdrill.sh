@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 # common/drill/lib-fwdrill.sh: chapter 4's firewall drills, sourced by a chapter's drills.sh after lib.sh's sfab_init drills, which opened
-# audits/<lab>_drills_<UTC>/. The plan is gen/drills.json (sfab.render.drills): each drill changes
+# runs/<lab>_drills_<UTC>/. The plan is gen/drills.json (sfab.render.drills): each drill changes
 # the firewall live through common/fw/fw-api.sh and puts the render back after, its restore pushed
 # onto the EXIT trap before the change is made, so an interrupted drill still restores.
 #
@@ -32,7 +32,7 @@
 #   4. captures stopped; the routes edited back and committed; a name looked up again, its query
 #      allowed from the rendered source; the NTP log read until an entry from the rendered source
 #      is new since the restore; the routes read again
-# Then fwdrill.py analyze prints the drill's verdict lines.
+# Then fwdrill.py analyze prints the drill's result lines.
 
 FWD_PY="$SFAB_COMMON/drill/fwdrill.py"
 FWD_PLAN="$RENDERDIR/gen/drills.json"
@@ -46,7 +46,7 @@ fwd_tl() { printf '%s %s\n' "$(fwd_now)" "$*" >>"$D/timeline.txt"; }
 fwd_body() {
   local s
   s="$(cat)"
-  printf '%s\n' "$s" | py "$SFAB_COMMON/audit/judge.py" body --style panos --command "$1" 2>/dev/null || printf '%s\n' "$s"
+  printf '%s\n' "$s" | py "$SFAB_COMMON/audit/checks.py" body --style panos --command "$1" 2>/dev/null || printf '%s\n' "$s"
 }
 
 fwd_restore_add() { FWD_RESTORES+=("$*"); }

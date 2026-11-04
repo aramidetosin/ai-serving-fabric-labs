@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""railtrace.py: chapter 5's rail trace, its plan and its judgment (common/trace/lib-railtrace.sh).
+"""railtrace.py: chapter 5's rail trace, its plan and its check (common/trace/lib-railtrace.sh).
 
     railtrace.py get    --plan gen/trace.json PATH     a value of the plan (a list one item per line)
     railtrace.py rails  --plan gen/trace.json          every rail: r, switch, src ns, src and dst address (TSV)
     railtrace.py points --plan gen/trace.json          the capture points: id, where, node, iface or eth (TSV)
     railtrace.py flows  --plan gen/trace.json          the flows: id, node, ns, dst address, ICMP id (TSV)
     railtrace.py df     --plan gen/trace.json          the DF matrix: id, node, ns, dst address, payload, ICMP id (TSV)
-    railtrace.py judge  --set DIR --plan gen/trace.json --inv INV [--stamp TEXT]
+    railtrace.py check  --set DIR --plan gen/trace.json --inv INV [--stamp TEXT]
 
-The plan is gen/trace.json (sfab.render.trace, rails form). judge reads the saved files only and
-prints the result vocabulary, appending each line to $SFAB_VERDICT, then writes trace.md:
+The plan is gen/trace.json (sfab.render.trace, rails form). check reads the saved files only and
+prints the result vocabulary, appending each line to $SFAB_RESULTS, then writes trace.md:
 
   health     the same rail on every rail: each of the source's GPU namespaces pings the far node's
              address on its own rail (health/rail<r>.txt)
@@ -177,7 +177,7 @@ def hops(text: str) -> list:
 
 
 # --------------------------------------------------------------------------------------------
-# judgment
+# check
 
 
 def _where(pt: dict) -> str:
@@ -186,7 +186,7 @@ def _where(pt: dict) -> str:
     return f"{pt['node']} {pt['native']}, facing {pt['faces']} on rail {pt['rail']}"
 
 
-def judge_health(v, rs: Path, plan: dict) -> list:
+def check_health(v, rs: Path, plan: dict) -> list:
     src, dst = plan["src"]["node"], plan["dst"]["node"]
     v.sec(f"health: the same rail on every rail, {src}'s GPU namespaces to {dst}")
     out = []
@@ -200,7 +200,7 @@ def judge_health(v, rs: Path, plan: dict) -> list:
     return out
 
 
-def judge_flow(v, rs: Path, plan: dict, f: dict, decs: dict) -> dict:
+def check_flow(v, rs: Path, plan: dict, f: dict, decs: dict) -> dict:
     d = rs / "flows" / f["id"]
     rails = f"rail {f['rail']} to rail {f['to_rail']}"
     v.sec(f"flow {f['id']}: {f['src_node']} namespace {f['src_ns']} ({f['src_addr']}) to {f['dst_node']} {f['dst_addr']}, {rails}")
@@ -258,7 +258,7 @@ def judge_flow(v, rs: Path, plan: dict, f: dict, decs: dict) -> dict:
     return out
 
 
-def judge_df(v, rs: Path, plan: dict, decs: dict) -> list:
+def check_df(v, rs: Path, plan: dict, decs: dict) -> list:
     ceiling = min(plan["src"]["mtu"], plan["dst"]["mtu"])
     sizes = sorted({d["size"] for d in plan["df"]})
     v.sec(f"the DF probe matrix: {len(plan['flows'])} paths, both directions, at {', '.join(map(str, sizes))} bytes, "
@@ -311,7 +311,7 @@ def judge_df(v, rs: Path, plan: dict, decs: dict) -> list:
             rec["reply_df"] = rdf[0] if len(rdf) == 1 else None
             if rdf:
                 v.ok(f"... the far node's echo replies carry {'DF' if rdf == [True] else 'no DF' if rdf == [False] else 'DF at some points only'} "
-                     "(recorded: ping sets DF on its requests; the reply is the far kernel's own)")
+                     "(saved: ping sets DF on its requests; the reply is the far kernel's own)")
         else:
             seen = [k for k, x in pts.items() if x["requests"] or x["replies"]]
             v.check("... and no frame of it at any capture point", not seen, f"seen at {', '.join(seen)}")
@@ -325,17 +325,17 @@ def judge_df(v, rs: Path, plan: dict, decs: dict) -> list:
     return out
 
 
-def judge(a) -> int:
+def run_checks(a) -> int:
     rs = Path(a.set)
     plan = load(a.plan)
     inv = load(a.inv)
-    v = vocab.Vocab(known=set(inv.get("known") or []) or None)
+    v = vocab.Vocab()
     decs = {pt["id"]: frames(read(rs / "captures" / f"{pt['id']}.txt")) for pt in plan["points"]}
     ddecs = {pt["id"]: frames(read(rs / "captures-df" / f"{pt['id']}.txt")) for pt in plan["points"]}
-    health = judge_health(v, rs, plan)
-    flows = [judge_flow(v, rs, plan, f, decs) for f in plan["flows"]]
-    df = judge_df(v, rs, plan, ddecs)
-    counts = vocab.counts_of(os.environ["SFAB_VERDICT"]) if os.environ.get("SFAB_VERDICT") else v.counts()
+    health = check_health(v, rs, plan)
+    flows = [check_flow(v, rs, plan, f, decs) for f in plan["flows"]]
+    df = check_df(v, rs, plan, ddecs)
+    counts = vocab.counts_of(os.environ["SFAB_RESULTS"]) if os.environ.get("SFAB_RESULTS") else v.counts()
     write_md(rs, inv, plan, health, flows, df, decs, counts, a.stamp)
     return 1 if v.counts()["fail"] else 0
 
@@ -348,7 +348,7 @@ def write_md(rs: Path, inv: dict, plan: dict, health: list, flows: list, df: lis
     repo = run.get("labs_repo") or {}
     commit = repo.get("commit") or "none"
     uncommitted = " (with uncommitted changes)" if repo.get("dirty") is True else ""
-    verdict = read(rs / "verdict.txt")
+    results = read(rs / "results.txt")
     L = ["# Rail trace", "",
          f"- Lab: `{inv.get('lab')}`; labs repo commit `{commit}`{uncommitted}; UTC {run.get('utc_start') or 'unknown'}",
          f"- From {plan['src']['node']} to {plan['dst']['node']}: {len(plan['flows'])} flows at {len(plan['points'])} capture points, "
@@ -363,7 +363,7 @@ def write_md(rs: Path, inv: dict, plan: dict, health: list, flows: list, df: lis
     L += ["", "## Capture points", "", "| Point | Where |", "|---|---|"]
     for pt in plan["points"]:
         L.append(f"| `{pt['id']}` | {_where(pt)} |")
-    L += ["", "## Verdict", "", "```"] + [l for l in verdict.splitlines() if l.strip()] + ["```", ""]
+    L += ["", "## Results", "", "```"] + [l for l in results.splitlines() if l.strip()] + ["```", ""]
     L += ["## Frames per point", "", "| Point | " + " | ".join(f"`{f['id']}` requests (TTL) | replies (TTL)" for f in flows) + " |",
           "|---|" + "---|---|" * len(flows)]
     for pt in plan["points"]:
@@ -392,7 +392,7 @@ def write_md(rs: Path, inv: dict, plan: dict, health: list, flows: list, df: lis
         L.append(f"| `{r['id']}` | {r['size']} | {r['rx'] if r['rx'] is not None else '?'} of {r['tx'] or '?'} | {r.get('refusal') or '-'} | "
                  f"{', '.join(map(str, fr)) or 'none'} | {'set' if rd is True else 'not set' if rd is False else '-'} |")
     L += ["", "## Files", "",
-          "- `verdict.txt`, `commands.txt`, `trace.json` (the plan), `points.tsv`",
+          "- `results.txt`, `commands.txt`, `trace.json` (the plan), `points.tsv`",
           "- `health/rail<r>.txt`; `flows/<flow>/ping.txt` and `traceroute.txt`; `df/<row>.txt`",
           "- `captures/<point>.pcap` and `.txt` (the flows), `captures-df/<point>.pcap` and `.txt` (the DF matrix), decoded with "
           "`tcpdump -nn -e -tttt -v -r` (a guest's in the guest)",
@@ -409,13 +409,13 @@ def main(argv=None) -> int:
     for name in ("rails", "points", "flows", "df"):
         s = sub.add_parser(name)
         s.add_argument("--plan", required=True)
-    s = sub.add_parser("judge")
+    s = sub.add_parser("check")
     s.add_argument("--set", required=True)
     s.add_argument("--plan", required=True)
     s.add_argument("--inv", required=True)
     s.add_argument("--stamp")
     a = p.parse_args(argv)
-    return {"get": cmd_get, "rails": cmd_rails, "points": cmd_points, "flows": cmd_flows, "df": cmd_df, "judge": judge}[a.cmd](a)
+    return {"get": cmd_get, "rails": cmd_rails, "points": cmd_points, "flows": cmd_flows, "df": cmd_df, "check": run_checks}[a.cmd](a)
 
 
 if __name__ == "__main__":

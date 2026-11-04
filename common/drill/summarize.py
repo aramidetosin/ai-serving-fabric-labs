@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""summarize.py --set DIR [--stamp TEXT]: drills.md for one drills result set.
+"""summarize.py --set DIR [--stamp TEXT]: drills.md for one drills run directory.
 
 The method: report four things apart, per drill and per pass,
 never one word such as "no loss" for all of them: round trips never answered at the cut, at the
@@ -7,7 +7,7 @@ restore and elsewhere; replies that came back later than a second (counted as lo
 the longest stretch with nothing arriving; and where each probe ran. Nothing here decides loss from
 a gap threshold. A reboot's return is reported as an event, with the probes lost around it, never as
 a span from the departure. Every time is the lab host's clock (RUN.json records its tick). Reads
-DIR/RUN.json, DIR/verdict.txt, DIR/compare.txt and DIR/pass*/<drill>/analysis.json only. Standard
+DIR/RUN.json, DIR/results.txt, DIR/compare.txt and DIR/pass*/<drill>/analysis.json only. Standard
 library only.
 """
 
@@ -114,11 +114,11 @@ def main(argv=None) -> int:
     except OSError:
         pass
     try:
-        ver = (rs / "verdict.txt").read_text(encoding="utf-8")
+        ver = (rs / "results.txt").read_text(encoding="utf-8")
     except OSError:
         ver = ""
-    L += ["## Verdict", "", "```"] + [x for x in ver.splitlines() if x.strip() and not x.startswith("== RESULT")] + ["```", ""]
-    L += [vocab.result_line(vocab.counts_of(str(rs / "verdict.txt"))), ""]
+    L += ["## Results", "", "```"] + [x for x in ver.splitlines() if x.strip() and not x.startswith("== RESULT")] + ["```", ""]
+    L += [vocab.result_line(vocab.counts_of(str(rs / "results.txt"))), ""]
     (rs / "drills.md").write_text("\n".join(L), encoding="utf-8")
     return 0
 

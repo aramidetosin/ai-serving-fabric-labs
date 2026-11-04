@@ -30,8 +30,8 @@ k8s_patch_action() {
   local js="$1" tag="$2" res name ns out patch
   res="$(jf "$js" resource)" name="$(jf "$js" name)" ns="$(jg "$js" namespace)"
   patch="$(k8s_json "$js" patch)"
-  out="$RS/record/$tag-patch-$name.txt"
-  printf '%s\n' "$patch" >"$RS/record/$tag-patch-$name.json"
+  out="$RS/observe/$tag-patch-$name.txt"
+  printf '%s\n' "$patch" >"$RS/observe/$tag-patch-$name.json"
   if K ${ns:+-n "$ns"} patch "$res" "$name" --type merge -p "$patch" >"$out" 2>&1; then
     ok "$(jf "$js" summary)"
     printf 'patched %s %s\n' "$res" "$name" >>"$RS/taken.txt"
@@ -39,7 +39,7 @@ k8s_patch_action() {
     bad "$(jf "$js" summary)" "$(tail -n 1 "$out")"
     return 1
   fi
-  K ${ns:+-n "$ns"} get "$res" "$name" -o yaml >"$RS/record/$tag-$name.yaml" 2>&1 || true
+  K ${ns:+-n "$ns"} get "$res" "$name" -o yaml >"$RS/observe/$tag-$name.yaml" 2>&1 || true
 }
 
 k8s_read_action() {
@@ -50,24 +50,24 @@ for o in json.loads(sys.argv[1])["objects"]:
   while IFS=$'\t' read -r id res ns name; do
     [ -n "$id" ] || continue
     [ "$ns" != - ] || ns=""
-    K ${ns:+-n "$ns"} get "$res" "$name" -o yaml >"$RS/record/$tag-$(printf '%s' "$id" | tr -cs 'A-Za-z0-9' '-' | sed 's/-$//').yaml" 2>&1 || true
+    K ${ns:+-n "$ns"} get "$res" "$name" -o yaml >"$RS/observe/$tag-$(printf '%s' "$id" | tr -cs 'A-Za-z0-9' '-' | sed 's/-$//').yaml" 2>&1 || true
   done <<<"$rows"
-  ok "$tag: $(py -c 'import json, sys; print(", ".join(o["id"] for o in json.loads(sys.argv[1])["objects"]))' "$js") read whole (record/$tag-*.yaml)"
+  ok "$tag: $(py -c 'import json, sys; print(", ".join(o["id"] for o in json.loads(sys.argv[1])["objects"]))' "$js") read whole (observe/$tag-*.yaml)"
 }
 
 dnsmasq_pin_action() {
   local js="$1" tag="$2" node dir f c rec
   node="$(jf "$js" node)" dir="$(jf "$js" dir)" f="$(jf "$js" file)"
   c="$(ctr "$node")"
-  rec="$RS/record/$tag-$node-$f.txt"
+  rec="$RS/observe/$tag-$node-$f.txt"
   py -c 'import json, sys; sys.stdout.write(json.loads(sys.argv[1])["content"])' "$js" >"$rec"
-  X "$node" sh -c "rm -rf $dir && mkdir -p $dir && cp -R /sfab/bootstrap/. $dir/" >"$RS/record/$tag-$node-copy.txt" 2>&1 || true
-  _evid "$node" container "+ cat >$dir/$f (record/$(basename "$rec"))"
+  X "$node" sh -c "rm -rf $dir && mkdir -p $dir && cp -R /sfab/bootstrap/. $dir/" >"$RS/observe/$tag-$node-copy.txt" 2>&1 || true
+  _evid "$node" container "+ cat >$dir/$f (observe/$(basename "$rec"))"
   dk exec -i "$c" sh -c "cat >$dir/$f" <"$rec" || { bad "$node: dnsmasq.conf written" "docker exec failed"; return 1; }
-  if dns_reload "$node" "$dir" "$RS/record/$tag-$node-reload.txt"; then
-    ok "$node: the platform's zone no longer forwarded; $(jf "$js" names | paste -sd ' ' -) pinned to $(jf "$js" address) with address=; dnsmasq restarted on the copy ($(tail -n 1 "$RS/record/$tag-$node-reload.txt"))"
+  if dns_reload "$node" "$dir" "$RS/observe/$tag-$node-reload.txt"; then
+    ok "$node: the platform's zone no longer forwarded; $(jf "$js" names | paste -sd ' ' -) pinned to $(jf "$js" address) with address=; dnsmasq restarted on the copy ($(tail -n 1 "$RS/observe/$tag-$node-reload.txt"))"
   else
-    bad "$node: dnsmasq restarted with the pins" "$(tail -n 2 "$RS/record/$tag-$node-reload.txt" | paste -sd ';' -)"
+    bad "$node: dnsmasq restarted with the pins" "$(tail -n 2 "$RS/observe/$tag-$node-reload.txt" | paste -sd ';' -)"
     return 1
   fi
 }
@@ -118,7 +118,7 @@ vip_arp_check() {
     if [ "$n" != "$holder" ]; then asker="$n"; break; fi
   done
   iface="$(jf "$js" "ifaces.$asker")"
-  out="$RS/record/check-$MODE-arp-$g.txt"
+  out="$RS/observe/check-$MODE-arp-$g.txt"
   H "$asker" "ip neigh flush to $vip dev $iface 2>/dev/null; ping -c 2 -W 1 $vip >/dev/null 2>&1; ip neigh show to $vip dev $iface" >"$out" 2>&1 || true
   mac="$(grep -oE 'lladdr [0-9a-f:]{17}' "$out" | head -n 1 | cut -d' ' -f2 || true)"
   if [ "$(jf "$js" answered)" = True ]; then
@@ -140,7 +140,7 @@ vip_arp_check() {
 
 route_set_check() {
   local js="$1" out res
-  out="$RS/record/check-$MODE-route-$(jf "$js" route).json"
+  out="$RS/observe/check-$MODE-route-$(jf "$js" route).json"
   EVID_OFF=1 K -n "$(jf "$js" namespace)" get httproute "$(jf "$js" route)" -o json >"$out" 2>/dev/null || true
   if res="$(py "$BH" routeset --file "$out" --check "$js")"; then
     ok "$(jf "$js" route): $res"

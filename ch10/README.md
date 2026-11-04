@@ -22,13 +22,13 @@ cd ch10
 make render
 make up
 make audit
-make trace           # audits/sfab-ch10_trace_<UTC>/ (the zone-keyed NAT trace)
-make hold            # audits/sfab-ch10_hold_<UTC>/ (the sessions under held connections)
-make break-10a       # Exercise 5
+make trace           # runs/sfab-ch10_trace_<UTC>/ (the zone-keyed NAT trace)
+make hold            # runs/sfab-ch10_hold_<UTC>/ (the sessions under held connections)
+make break-10a
 make heal-10a
 make down
 ```
 
 ## What the checks do
 
-`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `audits/` in this directory, which git ignores. `spec/known.yaml` lists the known limits of the virtual platforms.
+`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `runs/` in this directory, which git ignores. `spec/limitations.yaml` lists the known limits of the virtual platforms.

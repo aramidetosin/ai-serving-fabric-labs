@@ -22,12 +22,12 @@ cd ch09
 make render
 make up
 make audit
-make trace           # audits/sfab-ch09_trace_<UTC>/ (the split-horizon trace)
-make break-9a        # Exercise 4
+make trace           # runs/sfab-ch09_trace_<UTC>/ (the split-horizon trace)
+make break-9a
 make heal-9a
 make down
 ```
 
 ## What the checks do
 
-`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `audits/` in this directory, which git ignores. `spec/known.yaml` lists the known limits of the virtual platforms.
+`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `runs/` in this directory, which git ignores. `spec/limitations.yaml` lists the known limits of the virtual platforms.

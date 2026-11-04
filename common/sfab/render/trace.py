@@ -91,7 +91,7 @@ Chapter 7 adds two settings to the serving form:
         keys: true                    the API gateway's and the router's cluster interfaces captured
                                       whole, every Authorization value replaced by its keyed mark
                                       (common/trace/keyscrub.py) before the pcap or its decode is
-                                      written, so the judge can name the key each hop carried
+                                      written, so the checker can name the key each hop carried
         refuse: {hostname: admin, path: /echo, sport: 42707}
                                       after the request, one more from the same client to a hostname
                                       the Gateway does not carry: the Gateway's 404, and no API
@@ -902,14 +902,14 @@ WALK_ROWS = (("1", "-"), ("2", "view"), ("3", "routing"), ("4", "nat"), ("5", "p
 # capture ladder. Each population's outcome is render/decisions.py's path, so a changed rule or route
 # moves the plan and `sfab check` reports it.
 
-P3_FILTER_TCP = "tcp port 443"
+TT_FILTER_TCP = "tcp port 443"
 
 
 def _vlan_aware(f: str) -> str:
     return f"({f}) or (vlan and ({f}))"
 
 
-def _p3_view(model: Model, where: str):
+def _tt_view(model: Model, where: str):
     from .panos import view  # noqa: PLC0415
 
     v = view(model) if model.firewall is not None else None
@@ -918,13 +918,13 @@ def _p3_view(model: Model, where: str):
     return v
 
 
-def _p3_path(model: Model, v, c: Host, dst: str, port: int, where: str) -> dict:
+def _tt_path(model: Model, v, c: Host, dst: str, port: int, where: str) -> dict:
     from .decisions import path  # noqa: PLC0415
 
     return path(model, v, c, dst, port, where)
 
 
-def _p3_entry(model: Model, c: Host) -> dict | None:
+def _tt_entry(model: Model, c: Host) -> dict | None:
     """Where a client's request first meets a capture point on its way to the firewall: the
     firewall's own port when the client's gateway is the firewall, else its router's port facing the
     firewall; None for a client behind a VPN router (its uplink carries ESP) or a node of the
@@ -945,7 +945,7 @@ def _p3_entry(model: Model, c: Host) -> dict | None:
     return None
 
 
-def _p3_legs(model: Model, v, vip: str, where: str) -> tuple:
+def _tt_legs(model: Model, v, vip: str, where: str) -> tuple:
     eg = _fw_iface_holding(v, vip)
     if eg is None or eg.kind != "subinterface" or not eg.parent:
         _err(where, f"{vip} is not on a subinterface of the firewall's bundle")
@@ -958,11 +958,11 @@ def _p3_legs(model: Model, v, vip: str, where: str) -> tuple:
     return legs, eg.tag
 
 
-def _p3_local_ports(c: Host) -> list:
+def _tt_local_ports(c: Host) -> list:
     return [{"id": f"0-{c.name}-{n.eth}", "node": c.name, "eth": n.eth, "role": "node"} for n in c.nics if n.role == "bond-member"]
 
 
-def _p3_population(model: Model, pid: str, where: str):
+def _tt_population(model: Model, pid: str, where: str):
     pop = model.populations.get(pid)
     if pop is None:
         _err(where, f"{pid!r} is not a population of {model.lab}")
@@ -975,9 +975,9 @@ def _p3_population(model: Model, pid: str, where: str):
     return pop, model.nodes[name]
 
 
-def _p3_flow(model: Model, v, c: Host, dst: str, port: int, sport: int, where: str) -> dict:
+def _tt_flow(model: Model, v, c: Host, dst: str, port: int, sport: int, where: str) -> dict:
     """One connect's plan: the path's outcome, and the capture points it must and must not reach."""
-    p = _p3_path(model, v, c, dst, port, where)
+    p = _tt_path(model, v, c, dst, port, where)
     local = any(h.get("row") is None and h.get("device") == c.name for h in p["hops"])
     out = {"address": dst, "port": port, "sport": sport, "outcome": p["outcome"], "local": local,
            "at": p.get("at"), "rule": p.get("rule"), "nat_rule": p.get("nat_rule"), "from_zone": p.get("from_zone"),
@@ -996,14 +996,14 @@ def dns_plan(model: Model, raw: dict) -> dict:
     where = "chapter.yaml trace.dns"
     if not isinstance(raw, dict) or set(raw) - DNS_KEYS:
         _err(where, f"a mapping of {', '.join(sorted(DNS_KEYS))}")
-    v = _p3_view(model, where)
+    v = _tt_view(model, where)
     fqdn = model.org.fqdn(str(raw.get("name") or "llm"))
     base = int(_num(raw.get("sport", 42900), f"{where}.sport"))
     from .dns import client_view  # noqa: PLC0415
 
     rows, points = [], {}
     for k, pid in enumerate(raw.get("populations") or []):
-        pop, c = _p3_population(model, str(pid), f"{where}.populations")
+        pop, c = _tt_population(model, str(pid), f"{where}.populations")
         res = model.nodes.get(c.resolver or "")
         if not isinstance(res, Host):
             _err(f"{where}.populations", f"{c.name}'s resolver {c.resolver} is not in this lab")
@@ -1019,20 +1019,20 @@ def dns_plan(model: Model, raw: dict) -> dict:
         reth = "bond0" if res.bond is not None else next((x.eth for x in res.ifaces if x.address), "eth1")
         rp = {"id": f"0-{res.name}-{reth}", "node": res.name, "eth": reth, "role": "resolver"}
         points[rp["id"]] = dict(rp, filter=_vlan_aware("port 53"))
-        f = _p3_flow(model, v, c, cv.answer_address, 443, base + k, f"{where}.populations[{pid}]")
+        f = _tt_flow(model, v, c, cv.answer_address, 443, base + k, f"{where}.populations[{pid}]")
         seen, unseen, seen_any = [], [], []
         if f["local"]:
-            for x in _p3_local_ports(c):
-                points[x["id"]] = dict(x, filter=_vlan_aware(P3_FILTER_TCP))
+            for x in _tt_local_ports(c):
+                points[x["id"]] = dict(x, filter=_vlan_aware(TT_FILTER_TCP))
                 unseen.append(x["id"])
         else:
-            e = _p3_entry(model, c)
+            e = _tt_entry(model, c)
             if e is not None:
-                points[e["id"]] = dict(e, filter=_vlan_aware(P3_FILTER_TCP))
+                points[e["id"]] = dict(e, filter=_vlan_aware(TT_FILTER_TCP))
                 (seen if f["outcome"] != "silence" or f.get("device") == model.firewall.name else unseen).append(e["id"])
-            legs, _tag = _p3_legs(model, v, _gw_vip(model), where)
+            legs, _tag = _tt_legs(model, v, _gw_vip(model), where)
             for x in legs:
-                points[x["id"]] = dict(x, filter=_vlan_aware(P3_FILTER_TCP))
+                points[x["id"]] = dict(x, filter=_vlan_aware(TT_FILTER_TCP))
             if f["outcome"] == "reached":
                 seen_any = [x["id"] for x in legs]
             else:
@@ -1061,7 +1061,7 @@ def nat_plan(model: Model, raw: dict) -> dict:
     where = "chapter.yaml trace.nat"
     if not isinstance(raw, dict) or set(raw) - NAT_KEYS:
         _err(where, f"a mapping of {', '.join(sorted(NAT_KEYS))}")
-    v = _p3_view(model, where)
+    v = _tt_view(model, where)
     hold = _num(raw.get("hold_s", 20), f"{where}.hold_s")
     base = int(_num(raw.get("sport", 42950), f"{where}.sport"))
     label = str(raw.get("hostname") or "llm")
@@ -1071,7 +1071,7 @@ def nat_plan(model: Model, raw: dict) -> dict:
     path = str(raw.get("path") or f"{tb.get('path') or '/echo'}?msg=sfab-trace-nat")
     sessions, points = [], {}
     for k, pid in enumerate(raw.get("populations") or []):
-        pop, c = _p3_population(model, str(pid), f"{where}.populations")
+        pop, c = _tt_population(model, str(pid), f"{where}.populations")
         if c.kind != "client":
             _err(f"{where}.populations", f"{c.name} must be a client container (hold_request.py runs in its python3)")
         aud = model.audiences.get(pop.audience)
@@ -1079,17 +1079,17 @@ def nat_plan(model: Model, raw: dict) -> dict:
         if g is None:
             _err(f"{where}.populations", f"population {pop.name} has no Gateway")
         dst = pop.answer_address
-        f = _p3_flow(model, v, c, dst, 443, base + k, f"{where}.populations[{pid}]")
+        f = _tt_flow(model, v, c, dst, 443, base + k, f"{where}.populations[{pid}]")
         if f["outcome"] != "reached" or f["at"] != g.vip:
             _err(f"{where}.populations", f"{c.name} does not reach {g.name} at {dst}: {f['outcome']}")
-        legs, tag = _p3_legs(model, v, g.vip, where)
+        legs, tag = _tt_legs(model, v, g.vip, where)
         pts = []
-        e = _p3_entry(model, c)
+        e = _tt_entry(model, c)
         if e is not None:
-            points[e["id"]] = dict(e, filter=_vlan_aware(P3_FILTER_TCP))
+            points[e["id"]] = dict(e, filter=_vlan_aware(TT_FILTER_TCP))
             pts.append(e["id"])
         for x in legs:
-            points[x["id"]] = dict(x, filter=_vlan_aware(P3_FILTER_TCP))
+            points[x["id"]] = dict(x, filter=_vlan_aware(TT_FILTER_TCP))
             pts.append(x["id"])
         resolver_in = bool(c.resolver and c.resolver in model.nodes)
         m = re.search(r"[?&]msg=([^&]+)", path)
@@ -1123,16 +1123,16 @@ def ladder_plan(model: Model, raw: dict) -> dict:
 
     if not decisions.on(model):
         _err(where, "the ladder runs the matrix's Gateway cells: chapter.yaml needs decisions: true")
-    v = _p3_view(model, where)
+    v = _tt_view(model, where)
     mx = decisions.matrix(model)
     tries = int(_num(raw.get("tries", 3), f"{where}.tries"))
     base = int(_num(raw.get("sport", 42970), f"{where}.sport"))
     gws = {g.name: g for g in model.gateways.values()}
     vips = {g.vip: g.name for g in gws.values()}
-    legs, tag = _p3_legs(model, v, next(iter(gws.values())).vip, where)
+    legs, tag = _tt_legs(model, v, next(iter(gws.values())).vip, where)
     points = {}
     for x in legs:
-        points[x["id"]] = dict(x, filter=_vlan_aware(P3_FILTER_TCP), rung=3)
+        points[x["id"]] = dict(x, filter=_vlan_aware(TT_FILTER_TCP), rung=3)
     ingress = [h for h in model.by_group("ingress") if isinstance(h, Host)]
     if not ingress:
         ingress = [h for h in model.nodes.values() if isinstance(h, Host) and h.bond is not None
@@ -1145,11 +1145,11 @@ def ladder_plan(model: Model, raw: dict) -> dict:
             nat_ = sw.nic(n.peer.eth).native if sw is not None and sw.nic(n.peer.eth) is not None else n.peer.eth
             pid = f"4-{n.peer.node}-{nat_}"
             points[pid] = {"id": pid, "node": n.peer.node, "eth": n.peer.eth, "native": nat_, "faces": h.name, "role": "pair-port",
-                           "filter": _vlan_aware(P3_FILTER_TCP), "rung": 4}
+                           "filter": _vlan_aware(TT_FILTER_TCP), "rung": 4}
         unit = next((u for u in getattr(h.bond, "vlan_ifs", ()) or () if u.vlan == tag), None)
         if unit is not None:
             pid = f"5-{h.name}-{unit.name}"
-            points[pid] = {"id": pid, "node": h.name, "iface": unit.name, "role": "holder", "guest": True, "filter": P3_FILTER_TCP,
+            points[pid] = {"id": pid, "node": h.name, "iface": unit.name, "role": "holder", "guest": True, "filter": TT_FILTER_TCP,
                            "rung": 5}
     rows = {r["id"]: r for r in mx["rows"]}
     flows, k = [], 0
@@ -1162,10 +1162,10 @@ def ladder_plan(model: Model, raw: dict) -> dict:
         if not isinstance(c, Host):
             continue
         g = gws[col["ref"].split(":", 1)[1]]
-        f = _p3_flow(model, v, c, cell["address"], int(cell["port"]), base + k * tries, f"{where} {cell['id']}")
-        e = None if f["local"] else _p3_entry(model, c)
+        f = _tt_flow(model, v, c, cell["address"], int(cell["port"]), base + k * tries, f"{where} {cell['id']}")
+        e = None if f["local"] else _tt_entry(model, c)
         if e is not None:
-            points[e["id"]] = dict(e, filter=_vlan_aware(P3_FILTER_TCP), rung=int(e["id"].split("-")[0]))
+            points[e["id"]] = dict(e, filter=_vlan_aware(TT_FILTER_TCP), rung=int(e["id"].split("-")[0]))
         # the rungs the flow may reach: up to its refusal; past it, its tally
         if f["local"]:
             may, refused_at = [], c.name

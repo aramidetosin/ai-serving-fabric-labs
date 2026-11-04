@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 # common/drill/lib-raildrill.sh: chapter 5's dark-switch drill, sourced by a chapter's drills.sh after lib.sh's sfab_init drills, which opened
-# audits/<lab>_drills_<UTC>/. The plan is gen/drills.json (sfab.render.drills, a drill with dark:).
+# runs/<lab>_drills_<UTC>/. The plan is gen/drills.json (sfab.render.drills, a drill with dark:).
 #
 #   raildrills_main                --drills "ID ..." --passes N: every pass runs every drill, then
 #                                  raildrill.py summarize writes drills.md
@@ -256,7 +256,7 @@ raildrill_run() {
   rd_quick_audit
   py "$RDP" analyze --plan "$RD_PLAN" --dir "$D" --drill "$DRILL_ID" --pass "$PASS" >"$D/analyze.out" 2>&1 || true
   cat "$D/analysis.txt" 2>/dev/null || cat "$D/analyze.out"
-  known L9 "pass $PASS $DRILL_ID: a KLISH shutdown drops no carrier at the GPU NICs, so the dark rail shows only as silence ($(cat "$D"/links-during-*.txt 2>/dev/null | awk '{print $1 "=" $2}' | paste -sd ' ' - | cut -c1-160))"
+  limitation "pass $PASS $DRILL_ID: a KLISH shutdown drops no carrier at the GPU NICs, so the dark rail shows only as silence ($(cat "$D"/links-during-*.txt 2>/dev/null | awk '{print $1 "=" $2}' | paste -sd ' ' - | cut -c1-160))"
   return "$rc"
 }
 

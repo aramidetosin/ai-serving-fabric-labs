@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ch06/attach.sh: chat-c-server-0's two networks (book Chapter 6, "Rail-Aware Model Placement"),
-# recorded as audits/sfab-ch06_attach_<UTC>/ with FOLLOWED.txt, verdict.txt and one directory a
+# saved as runs/sfab-ch06_attach_<UTC>/ with FOLLOWED.txt, results.txt and one directory a
 # view: k8s/ (the pod and its network-status annotation), node/ (its route table, read on its node),
 # services/ (the EndpointSlices of the Services that select it), dns/ (a Service's cluster DNS
 # answer from inside the pod) and switch/ (rail-sw1's MAC table). common/reads/attach.sh does the

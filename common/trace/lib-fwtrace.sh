@@ -1,5 +1,5 @@
 # shellcheck shell=bash
-# common/trace/lib-fwtrace.sh: chapter 4's firewall trace, recorded as audits/<lab>_trace_<UTC>/ with trace.md, verdict.txt, sessions/ and pull/.
+# common/trace/lib-fwtrace.sh: chapter 4's firewall trace, saved as runs/<lab>_trace_<UTC>/ with trace.md, results.txt, sessions/ and pull/.
 # A chapter's trace.sh is
 #
 #   . "$(dirname "$0")/../common/lib.sh"; sfab_init trace "$@"
@@ -17,7 +17,7 @@
 #      the node pulls the image with crictl through its CRI (the registry mirror its containerd
 #      names); the captures stop with kill -INT, waited on by PID; the traffic log is read for the
 #      pull; the image is removed from the node again, so the next trace pulls it whole
-#   3. fwtrace.py judges the saved files and writes trace.md
+#   3. fwtrace.py checks the saved files and writes trace.md
 #
 # Every process this starts it stops; the only change it makes on any device is the image pulled
 # and removed again on the pull's node.
@@ -35,7 +35,7 @@ fwtrace_cleanup() {
 fwt_body() {
   local s
   s="$(cat)"
-  printf '%s\n' "$s" | py "$SFAB_COMMON/audit/judge.py" body --style panos --command "$1" 2>/dev/null || printf '%s\n' "$s"
+  printf '%s\n' "$s" | py "$SFAB_COMMON/audit/checks.py" body --style panos --command "$1" 2>/dev/null || printf '%s\n' "$s"
 }
 
 # fwt_tlog OUT CMD ARGS...: the traffic log, read until panos_parse.py tlog ARGS finds an entry
@@ -162,6 +162,6 @@ fwtrace_run() {
   fwtrace_pull
   trap - EXIT
   [ -z "${SFAB_TICK_STAMP:-}" ] || stamp_args=(--stamp "$SFAB_TICK_STAMP")
-  py "$FWT" judge --set "$RS" --plan "$FWT_PLAN" --inv "$INV" "${stamp_args[@]+"${stamp_args[@]}"}" || true
+  py "$FWT" check --set "$RS" --plan "$FWT_PLAN" --inv "$INV" "${stamp_args[@]+"${stamp_args[@]}"}" || true
   summary
 }

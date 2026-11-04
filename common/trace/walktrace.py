@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""walktrace.py: chapter 1's walk, its capture points and its judgment (common/trace/lib-walktrace.sh).
+"""walktrace.py: chapter 1's walk, its capture points and its check (common/trace/lib-walktrace.sh).
 
     walktrace.py get         --plan gen/trace.json PATH        a value of the plan (servetrace.py get)
     walktrace.py points      --plan gen/trace.json --set DIR --inv INV
@@ -13,15 +13,15 @@
                                                                headers.txt and body.json
     walktrace.py tlog-has    --file F --src A SPORT...         exit 0 when the saved traffic log holds a
                                                                line from A for every SPORT
-    walktrace.py judge       --set DIR --plan gen/trace.json --inv INV [--stamp TEXT]
+    walktrace.py check       --set DIR --plan gen/trace.json --inv INV [--stamp TEXT]
 
 The plan is gen/trace.json (sfab.render.trace, walk form). The frontend's points are the plan's (the
 client's port, the firewall's interface facing it, both legs of the bundle, the pair's ports facing
 the legs) and the pair's ports facing the lease holder's bond, found from the lease the set saved; the
 serving trace's follow, numbered after them (servetrace.py point_rows with the plan's depth_base).
 
-judge reads the saved files only and prints the result vocabulary, appending each line to
-$SFAB_VERDICT, then writes trace.md. It walks the request inward, each device with the table it
+check reads the saved files only and prints the result vocabulary, appending each line to
+$SFAB_RESULTS, then writes trace.md. It walks the request inward, each device with the table it
 consults:
 
   the names     the client's resolver answering the users' hostname with the Gateway's VIP (the view the
@@ -53,7 +53,7 @@ consults:
   the refusals  the admin hostname: the Gateway's 404, and no API gateway pod saw it; another model's
                 key: the API gateway's 401 with the unknown key's message, the API gateway pod saw the
                 request with that key's mark, and no router pod received any request but the walked
-                one; a node's port: the client's view recorded, the SYN on the client's port and the
+                one; a node's port: the client's view saved, the SYN on the client's port and the
                 firewall's interface and on no leg or point past it, and the traffic log naming the
                 last rule with its action
 
@@ -74,7 +74,7 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / "audit"))
 import evfile  # noqa: E402
 import fwtrace as FT  # noqa: E402
-import judge as J  # noqa: E402
+import checks as J  # noqa: E402
 import panos_parse as PP  # noqa: E402
 import servetrace as ST  # noqa: E402
 import vocab  # noqa: E402
@@ -371,10 +371,10 @@ def yaml_block(text: str, head_rx: str, next_rx: str = r"^\s*- ") -> tuple:
 
 
 # --------------------------------------------------------------------------------------------
-# judgment
+# check
 
 
-def judge_names(v, rs: Path, plan: dict) -> dict:
+def check_names(v, rs: Path, plan: dict) -> dict:
     d = plan["dns"]
     v.sec(f"the names: {plan['client']['node']} asks for {d['hostname']}")
     c = dig(read(rs / "dns" / "client-dig.txt"))
@@ -393,7 +393,7 @@ def judge_names(v, rs: Path, plan: dict) -> dict:
     return out
 
 
-def judge_firewall(v, rs: Path, plan: dict) -> dict:
+def check_firewall(v, rs: Path, plan: dict) -> dict:
     f = plan["firewall"]
     vip = plan["gateway"]["vip"]
     v.sec(f"the firewall's tables: {f['ingress']} (zone {f['ingress_zone']}) toward {vip}")
@@ -419,11 +419,11 @@ def judge_firewall(v, rs: Path, plan: dict) -> dict:
             and "443" in (fields.get("application/service") or ("", 0))[0] and bool(first) and first[0][1] == f["rule"],
             f"destination {dst or 'none'}, action {(fields.get('action') or ('none', 0))[0]}, first rule {first[0][1] if first else 'none'}")
     s = plan["sessions"][0]
-    sess = FT.judge_session(v, rs, s, plan)
+    sess = FT.check_session(v, rs, s, plan)
     return {"route": best, "nat": nat, "rule": r, "session": sess}
 
 
-def judge_wire(v, rs: Path, plan: dict, inv: dict, pk: dict, holder) -> dict:
+def check_wire(v, rs: Path, plan: dict, inv: dict, pk: dict, holder) -> dict:
     """The walked SYN from the client's port to the lease holder's bond."""
     fe = plan["frontend"]
     caddr, vip, sport = plan["client"]["address"], plan["gateway"]["vip"], plan["sport"]
@@ -493,7 +493,7 @@ def judge_wire(v, rs: Path, plan: dict, inv: dict, pk: dict, holder) -> dict:
     return out
 
 
-def judge_pair(v, rs: Path, plan: dict, inv: dict, holder, wire: dict) -> dict:
+def check_pair(v, rs: Path, plan: dict, inv: dict, holder, wire: dict) -> dict:
     fe = plan["frontend"]
     h = ((inv.get("nodes") or {}).get(holder or "") or {}).get("bond") or {}
     mac, pc = (h.get("mac") or "").lower(), h.get("pc")
@@ -509,7 +509,7 @@ def judge_pair(v, rs: Path, plan: dict, inv: dict, holder, wire: dict) -> dict:
     return out
 
 
-def judge_cluster(v, rs: Path, plan: dict, inv: dict, holder, j: dict) -> dict:
+def check_cluster(v, rs: Path, plan: dict, inv: dict, holder, j: dict) -> dict:
     gw = plan["gateway"]
     out = {}
     v.sec("the tables the cluster's hops consult")
@@ -584,7 +584,7 @@ def judge_cluster(v, rs: Path, plan: dict, inv: dict, holder, j: dict) -> dict:
     return out
 
 
-def judge_rail(v, rs: Path, plan: dict, j: dict, decs: dict) -> dict:
+def check_rail(v, rs: Path, plan: dict, j: dict, decs: dict) -> dict:
     copy = j.get("copy")
     v.sec("the rail switch: its counters and its MAC table")
     if not copy:
@@ -630,7 +630,7 @@ def judge_rail(v, rs: Path, plan: dict, j: dict, decs: dict) -> dict:
     return out
 
 
-def judge_refusals(v, rs: Path, plan: dict, inv: dict, pk: dict, j: dict, rows: list) -> dict:
+def check_refusals(v, rs: Path, plan: dict, inv: dict, pk: dict, j: dict, rows: list) -> dict:
     rf = plan["refusals"]
     caddr, gw = plan["client"]["address"], plan["gateway"]
     holder = ST.lease_holder(rs)
@@ -689,7 +689,7 @@ def judge_refusals(v, rs: Path, plan: dict, inv: dict, pk: dict, j: dict, rows: 
     pr = read(rs / "refuse" / "port-result.txt").split()
     outcome = pr[4] if len(pr) > 4 else "none"
     v.check(f"the client's view: {outcome} after {pr[5] if len(pr) > 5 else '-'} s, from port {p['sport']} to {p['address']}:{p['port']} "
-            "(recorded, not assumed)", bool(pr) and outcome != "CONNECTED" and outcome != "none", f"outcome {outcome}")
+            "(saved, not assumed)", bool(pr) and outcome != "CONNECTED" and outcome != "none", f"outcome {outcome}")
     cp = next(x for x in pts if x["role"] == "client")
     ip_ = next(x for x in pts if x["role"] == "ingress")
     at = {x["id"]: syns(pk.get(x["id"]) or [], src=caddr, sport=p["sport"], dst=p["address"], dport=p["port"])
@@ -711,11 +711,11 @@ def judge_refusals(v, rs: Path, plan: dict, inv: dict, pk: dict, j: dict, rows: 
     return out
 
 
-def judge(a) -> int:
+def run_checks(a) -> int:
     rs = Path(a.set)
     plan = load(a.plan)
     inv = load(a.inv)
-    v = vocab.Vocab(known=set(inv.get("known") or []) or None)
+    v = vocab.Vocab()
     holder = ST.lease_holder(rs)
     fe_rows = frontend_rows(plan, rs, inv)
     sv_rows = ST.point_rows(plan, rs)
@@ -723,16 +723,16 @@ def judge(a) -> int:
     texts = {r[0]: read(rs / "captures" / f"{r[0]}.txt") for r in rows}
     decs = {k: ST.frames(t) for k, t in texts.items()}
     pk = {k: packets(t) for k, t in texts.items()}
-    names = judge_names(v, rs, plan)
-    fw = judge_firewall(v, rs, plan)
-    wire = judge_wire(v, rs, plan, inv, pk, holder)
-    pair = judge_pair(v, rs, plan, inv, holder, wire)
-    j = ST.judge_serving(v, rs, plan, sv_rows, decs)
-    keyhops = ST.judge_keys(v, rs, plan, sv_rows, j["pi"], j["agp"], j["rop"], j["srv_ip"])
-    cl = judge_cluster(v, rs, plan, inv, holder, j)
-    rail = judge_rail(v, rs, plan, j, decs)
-    ref = judge_refusals(v, rs, plan, inv, pk, j, rows)
-    counts = vocab.counts_of(os.environ["SFAB_VERDICT"]) if os.environ.get("SFAB_VERDICT") else v.counts()
+    names = check_names(v, rs, plan)
+    fw = check_firewall(v, rs, plan)
+    wire = check_wire(v, rs, plan, inv, pk, holder)
+    pair = check_pair(v, rs, plan, inv, holder, wire)
+    j = ST.check_serving(v, rs, plan, sv_rows, decs)
+    keyhops = ST.check_keys(v, rs, plan, sv_rows, j["pi"], j["agp"], j["rop"], j["srv_ip"])
+    cl = check_cluster(v, rs, plan, inv, holder, j)
+    rail = check_rail(v, rs, plan, j, decs)
+    ref = check_refusals(v, rs, plan, inv, pk, j, rows)
+    counts = vocab.counts_of(os.environ["SFAB_RESULTS"]) if os.environ.get("SFAB_RESULTS") else v.counts()
     write_md(rs, inv, plan, rows, decs, holder, names, fw, wire, pair, j, keyhops, cl, rail, ref, counts, a.stamp)
     return 1 if v.counts()["fail"] else 0
 
@@ -824,7 +824,7 @@ def write_md(rs: Path, inv: dict, plan: dict, rows: list, decs: dict, holder, na
     repo = run.get("labs_repo") or {}
     commit = repo.get("commit") or "none"
     uncommitted = " (with uncommitted changes)" if repo.get("dirty") is True else ""
-    verdict = read(rs / "verdict.txt")
+    results = read(rs / "results.txt")
     gw, rf = plan["gateway"], plan["refusals"]
     h = j.get("headers") or {}
     L = ["# Request walk", "",
@@ -874,13 +874,13 @@ def write_md(rs: Path, inv: dict, plan: dict, rows: list, decs: dict, holder, na
         for k, rid in zip(range(first_refusal, len(L)), ("hostname", "key", "port")):
             head, rest = L[k].split(" | ", 1)
             L[k] = f"{head} | {row(rrow.get(rid))} | {rest}"
-    L += ["", "## Verdict", "", "```"] + [l for l in verdict.splitlines() if l.strip()] + ["```", ""]
+    L += ["", "## Results", "", "```"] + [l for l in results.splitlines() if l.strip()] + ["```", ""]
     L += ["## Frames per point", "", "| Point | Kind | Node | Interface | Filter | Frames | Data segments |", "|---|---|---|---|---|---|---|"]
     for r in rows:
         fr = decs.get(r[0]) or []
         L.append(f"| `{r[0]}` | {r[1]} | {r[2]} | {r[5]} | `{r[6]}` | {len(fr)} | {sum(1 for f in fr if f['length'] > 0)} |")
     L += ["", "## Files", "",
-          "- `verdict.txt`, `commands.txt`, `trace.json` (the plan), `points.tsv`",
+          "- `results.txt`, `commands.txt`, `trace.json` (the plan), `points.tsv`",
           "- `dns/`: the client's lookup through its resolver, and the resolver's own from its address",
           "- `fw/`: the routing table, the security and NAT rulebases (one CLI session), and the traffic log read for the refused requests",
           "- `sessions/walk/`: the held request's reply and its session as `show session all` and `show session id` print it (CLI and XML), "
@@ -915,14 +915,14 @@ def main(argv=None) -> int:
     s.add_argument("--file", required=True)
     s.add_argument("--src", required=True)
     s.add_argument("sports", nargs="+")
-    s = sub.add_parser("judge")
+    s = sub.add_parser("check")
     s.add_argument("--set", required=True)
     s.add_argument("--plan", required=True)
     s.add_argument("--inv", required=True)
     s.add_argument("--stamp")
     a = p.parse_args(argv)
     return {"get": cmd_get, "points": cmd_points, "cmdata": cmd_cmdata, "split-reply": cmd_split_reply, "tlog-has": cmd_tlog_has,
-            "judge": judge}[a.cmd](a)
+            "check": run_checks}[a.cmd](a)
 
 
 if __name__ == "__main__":

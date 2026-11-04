@@ -8,11 +8,11 @@
 # (inetapp is not in staff's group). The layer that should have refused it is the route set, and the
 # audit's route-set check (each Gateway's routes equal its audience's row) is what catches it.
 #
-# record: the route read whole, and the internet users' cells for chat and staff tried as matrix.sh
+# observe: the route read whole, and the internet users' cells for chat and staff tried as matrix.sh
 # tries them. While broken the staff cell is no longer the route set's 404, the one the Gateway's own
 # proxy answers (at: gateway, told by the response's headers: an upstream's answer carries Envoy's
 # upstream service time), and the route's rules are no longer its audience's row (the audit's
-# route-set check, as the cluster holds the route); which answer the cell then gets is recorded
+# route-set check, as the cluster holds the route); which answer the cell then gets is saved
 # before the exercise text names it. The heal patches the rendered rules back, and the cells and the
 # route are checked against the render.
 title: the internet Gateway's model route carries staff's path beside chat's
@@ -20,7 +20,7 @@ exercise: 4
 since: 11
 break:
   - route_rules: {route: models-gw-inet, add: [staff]}
-record:
+observe:
   - k8s_read: {objects: ["route:models-gw-inet"]}
   - matrix_cells: {id: cells, cells: [internet/staff, internet/chat]}
 expect_broken:

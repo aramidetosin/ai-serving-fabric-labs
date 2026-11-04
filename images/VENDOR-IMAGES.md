@@ -9,7 +9,7 @@ The labs run four images this repository cannot ship: the switch, the firewall a
 | TrueNAS 27.0.0-RC.1 | `vrnetlab/truenas_truenas:27.0.0-RC.1` (`images.truenas`) | `TrueNAS-27.0.0-RC.1.iso` | `truenas/truenas` at `c89aa5e8cdb3`, with `common/` from `da55d7cf48c1` | `ch01`, `ch02`, `ch03`, `ch04`, `ch11` |
 | ONTAP 9.17.1 simulator | `vrnetlab/netapp_ontap:9.17.1` (`images.ontap`) | `vsim-netapp-DOT9.17.1-cm_nodar.ova` | `netapp/ontap` at `c89aa5e8cdb3`, with `common/` from `da55d7cf48c1` | build B's storage; no lab here runs it |
 
-Build each image in its own vrnetlab clone: the builds use different commits and change tracked files. Every Dockerfile at these commits builds from `ghcr.io/srl-labs/vrnetlab-base:0.3.0`, which Docker pulls by that tag. A lab's preflight prints each image's ID (`PASS image <tag> present (<id>)`) and every result set records the IDs in its `RUN.json`; yours differ from the book's, since every build makes its own image.
+Build each image in its own vrnetlab clone: the builds use different commits and change tracked files. Every Dockerfile at these commits builds from `ghcr.io/srl-labs/vrnetlab-base:0.3.0`, which Docker pulls by that tag. A lab's preflight prints each image's ID (`PASS image <tag> present (<id>)`) and every run directory records the IDs in its `RUN.json`; yours differ from the book's, since every build makes its own image.
 
 Each vendor's own terms are the ones that apply to you; this page only says where they are and what their public parts say.
 

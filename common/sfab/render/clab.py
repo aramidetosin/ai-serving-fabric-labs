@@ -7,7 +7,7 @@ build's own, and every node gets a static mgmt-ipv4 from the spec.
 
 Per kind:
 - SONiC switches: kind dell_sonic, NUM_NICS from ports.num_nics, CLAB_MGMT_PASSTHROUGH where the
-  spec sets it (build A's pair: Management0 on the harness address the stages reach the switch on;
+  spec sets it (build A's pair: Management0 on the lab tooling address the stages reach the switch on;
   the keepalive runs on its own link, so the renderer refuses a pair member without passthrough only
   when its keepalive would ride the management VRF), and the KLISH startup file bound at
   /config/startup-config.cfg read-only, and IPv6 off by default in the container's namespace
@@ -15,7 +15,7 @@ Per kind:
 - PA-VM: kind paloalto_panos, the rendered XML as startup-config and QEMU sizing. No USERNAME or
   PASSWORD: containerlab's paloalto_panos kind gives the launcher its default login on its command
   line, and the launcher never reads those two from the environment. So the PA-VM keeps the kind's default login, as the switches do, no firewall
-  password is generated, and the harness and common/fw read the login from the container's
+  password is generated, and the lab tooling and common/fw read the login from the container's
   launcher arguments.
 - TrueNAS: kind generic_vm, the launcher's env, persistence under state/nodes/<n>/persist.
 - VM guests (vm-node): kind linux, restart-policy "no" (a guest that powers off stays off),
@@ -450,7 +450,7 @@ def build(model: Model, ctx) -> tuple:
     else:
         header += [
             "No credential is referenced here: the nodes that log in with a password keep their kinds'",
-            "default logins, which the harness reads from each container. No secret is written here.",
+            "default logins, which the lab tooling reads from each container. No secret is written here.",
         ]
     mg = {"network": model.mgmt.network}
     if model.mgmt.bridge:

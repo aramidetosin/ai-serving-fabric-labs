@@ -9,7 +9,7 @@ as a bcrypt hash (SFAB_IDP_HASH_<person>, from SFAB_IDP_PASSWORD_<person>). The 
 the lab's state/secrets.env, which common/bin/secrets.py made; the plain passwords never enter the
 cluster. The hash's salt is derived from the person and the password, so the same password gives
 the same Secret at every run and an apply changes nothing. It refuses a terminal: the finish stage
-pipes it to the harness's kubectl, and nothing prints it.
+pipes it to the lab's kubectl, and nothing prints it.
 
 The hash is crypt(3)'s bcrypt ($2b$, cost 10) through Python's crypt module where the interpreter
 still has it and its crypt(3) knows bcrypt (glibc's libxcrypt, musl), else `htpasswd -niBC 10`

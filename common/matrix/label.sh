@@ -2,8 +2,8 @@
 # common/matrix/label.sh: chapter 2's label run, sourced after lib.sh's sfab_init by
 # a lab's label.sh.
 #
-#   label_run    for every row of gen/decisions.json (the decision table, Table 2-1), read the live
-#                object behind it into the result set ($RS), then common/matrix/label.py names each
+#   label_run    for every row of gen/decisions.json (the decision table), read the live
+#                object behind it into the run directory ($RS), then common/matrix/label.py names each
 #                object with the decision label it carries and writes labels.md
 #
 # The reads, one directory a row (label.py's docstring lists the files):
@@ -122,6 +122,6 @@ label_run() {
   label_cluster
   label_forwarding
   [ -z "${SFAB_TICK_STAMP:-}" ] || stamp_args=(--stamp "$SFAB_TICK_STAMP")
-  py "$LBP" judge --plan "$LB_PLAN" --dir "$RS" "${stamp_args[@]+"${stamp_args[@]}"}" || true
+  py "$LBP" check --plan "$LB_PLAN" --dir "$RS" "${stamp_args[@]+"${stamp_args[@]}"}" || true
   summary
 }

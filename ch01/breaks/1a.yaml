@@ -9,17 +9,17 @@
 # either leg of the bundle; the traffic log names deny-all-log for every attempt.
 #
 # The break replaces the rule's destination node through the XML API (an edit, so the rendered
-# member does not stay beside the new one) and commits. record: runs ten requests from the
+# member does not stay beside the new one) and commits. observe: runs ten requests from the
 # enterprise client to the users' hostname through its own resolver, then three connects to the
 # users' VIP from pinned source ports while the firewall's enterprise interface and both legs of ae1
 # are captured on the lab host, and reads the running security rulebase. The heal edits the rendered
-# destination back and commits, and its record runs the same probes.
+# destination back and commits, and its observe step runs the same probes.
 title: the enterprise rule's destination moved off the users' Gateway VIP
 exercise: 4
 since: 1
 break:
   - panos_api: {edit: security, rule: staff-to-users-gateway, destination: ["10.20.11.211"]}
-record:
+observe:
   - probe_http: {id: users, from: ent-client, hostname: llm, path: "/echo?msg=sfab-break-1a", count: 10, interval_s: 0.5, timeout_s: 5, passes: 1}
   - probe_syn: {id: syn, from: ent-client, to: "vip:gw-users", port: 443, count: 3, sport: 42150, timeout_s: 5, passes: 1, capture: ["fw:eth4", "fw:eth1", "fw:eth2"]}
   - fw_show: {lines: [show running security-policy]}

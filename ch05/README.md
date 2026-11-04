@@ -20,14 +20,14 @@ Memory: a budget of 55 GiB, and preflight wants MemAvailable to cover it plus th
 ```
 cd ch05
 make render          # topo.clab.yml, bootstrap/ and gen/ (gen/trace.json, gen/drills.json, gen/breaks.json among them)
-make up              # preflight, up, boot, finish, audit (book Example 5-1)
-make audit           # audits/sfab-ch05_audit_<UTC>/ (Example 5-2)
-make trace           # audits/sfab-ch05_trace_<UTC>/ with trace.md (Examples 5-5 to 5-7)
-make drills          # audits/sfab-ch05_drills_<UTC>/ with drills.md, three passes (Examples 5-9 and 5-10)
-make record          # after the drills: audit, trace, then the gate on both sets (Example 5-11)
-make rpf             # audits/sfab-ch05_rpf_<UTC>/: rp_filter's all and per-interface values on the cross-rail flow, three cases, then put back (Example 5-8)
-make break-5a        # audits/sfab-ch05_break-5a_<UTC>/ (Exercises 1 and 4)
-make heal-5a         # audits/sfab-ch05_heal-5a_<UTC>/, then the chapter audit
+make up              # preflight, up, boot, finish, audit
+make audit           # runs/sfab-ch05_audit_<UTC>/
+make trace           # runs/sfab-ch05_trace_<UTC>/ with trace.md
+make drills          # runs/sfab-ch05_drills_<UTC>/ with drills.md, three passes
+make verify          # after the drills: audit, trace, then the results check on both sets
+make rpf             # runs/sfab-ch05_rpf_<UTC>/: rp_filter's all and per-interface values on the cross-rail flow, three cases, then put back
+make break-5a        # runs/sfab-ch05_break-5a_<UTC>/
+make heal-5a         # runs/sfab-ch05_heal-5a_<UTC>/, then the chapter audit
 make down            # keeps state/ disks; make wipe removes them
 ```
 
@@ -37,4 +37,4 @@ Once the lab is up, `ssh admin@sfab-ch05-<node>` from the lab host logs in to `k
 
 ## What the checks do
 
-`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `audits/` in this directory, which git ignores. `spec/known.yaml` lists the known limits of the virtual platforms.
+`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `runs/` in this directory, which git ignores. `spec/limitations.yaml` lists the known limits of the virtual platforms.

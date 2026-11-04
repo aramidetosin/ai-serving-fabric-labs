@@ -21,7 +21,7 @@ rides (the destination's rail), into the destination's port on that rail, the re
 destination's port on the rail it rides (the source's rail) and into the source's port. Requests
 are grouped by when they were sent: before the cut, at the cut (while the shut's session ran),
 dark (from the session's return to the restore's start), at the restore, after it. A reply later
-than late_ms counts as lost. A dark row is judged silent where the plan says: with its request's
+than late_ms counts as lost. A dark row is checked silent where the plan says: with its request's
 rail dead, the requests leave the source and none reach the destination; with only its reply's
 rail dead, the destination answers and no reply reaches the source. After the restore, the first
 answered request is an event, timed from the restore's session start. Beside the counts it records,
@@ -45,7 +45,7 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / "audit"))
 import analyze_ping as AP  # noqa: E402
 import evfile  # noqa: E402
-import judge as J  # noqa: E402
+import checks as J  # noqa: E402
 import vocab  # noqa: E402
 
 WARM_S = 1.0     # requests sent in the probes' first second are warm-up (a new flow's first packet can be lost to ARP)
@@ -259,7 +259,7 @@ def cmd_analyze(a) -> int:
         print(f"raildrill: no dark drill {a.drill}", file=sys.stderr)
         return 2
     d = Path(a.dir)
-    v = vocab.Vocab(known=set(os.environ.get("SFAB_KNOWN_IDS", "").split()) or None)
+    v = vocab.Vocab()
     tag = f"pass {a.pass_} {a.drill}"
     tl = timeline(d)
     need = {"T0": "INJECT", "T0e": "INJECTED", "T1": "RESTORE", "T1e": "RESTORED"}
@@ -301,7 +301,7 @@ def cmd_analyze(a) -> int:
                 r["tail"]["sent"] > 0 and r["tail"]["answered"] == r["tail"]["sent"], f"{r['tail']['sent'] - r['tail']['answered']} lost")
         if r["guest_received"] is not None and r["guest_received"] != r["captured_answered"]:
             v.ok(f"{tag}: ... DISAGREE: the guest's ping log counts {r['guest_received']} replies, the host's captures "
-                 f"{r['captured_answered']} answered in time (recorded, not resolved)")
+                 f"{r['captured_answered']} answered in time (saved, not resolved)")
     out = {"drill": a.drill, "pass": int(a.pass_), "switch": sw, "dead_rails": dead, "live_rails": dr["live_rails"], "timeline": tl,
            "late_ms": late, "rows": recs}
     (d / "analysis.json").write_text(json.dumps(out, indent=1, sort_keys=True) + "\n", encoding="utf-8")
@@ -333,7 +333,7 @@ def cmd_summarize(a) -> int:
     found = {evfile.plain_name(p): p for p in [*rs.glob("pass*/*/analysis.json.gz"), *rs.glob("pass*/*/analysis.json")]}
     sets = sorted(found.values(), key=lambda p: (int(p.parent.parent.name[4:]), p.parent.name))
     runs = [load(p) for p in sets]
-    res = vocab.counts_of(str(rs / "verdict.txt"))
+    res = vocab.counts_of(str(rs / "results.txt"))
     try:
         run = load(rs / "RUN.json")
     except (OSError, ValueError):
@@ -368,7 +368,7 @@ def cmd_summarize(a) -> int:
         L += [f"Every pass {'agrees' if agree else 'does not agree'} on which rows went dark.", ""]
         for x in rr:
             L += [f"Pass {x['pass']} (`pass{x['pass']}/{drill}/analysis.txt`):", "", "```"] + text(x).rstrip().splitlines() + ["```", ""]
-    L += ["The verdict so far (`verdict.txt`; the run's own RESULT line follows it there):", "", vocab.result_line(res), ""]
+    L += ["The result so far (`results.txt`; the run's own RESULT line follows it there):", "", vocab.result_line(res), ""]
     (rs / "drills.md").write_text("\n".join(L), encoding="utf-8")
     return 0
 

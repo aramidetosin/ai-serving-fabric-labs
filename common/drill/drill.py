@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""drill.py: the Python half of the drill harness (common/drill/lib-drill.sh).
+"""drill.py: the Python half of the drill tooling (common/drill/lib-drill.sh).
 
     drill.py get     --plan gen/drills.json PATH           a value of the plan (lists space-joined)
     drill.py ids     --plan P --attempt N                  the ICMP ids of placement try N
@@ -37,7 +37,7 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / "audit"))
 import analyze_ping as AP  # noqa: E402
 import evfile  # noqa: E402
-import judge  # noqa: E402
+import checks  # noqa: E402
 
 
 def load(p):
@@ -155,7 +155,7 @@ def tcp_attempts(plan, frames_, a=None, b=None) -> dict:
     return out
 
 
-def judge_place(plan: dict, drill: dict, target: str, ping: dict, tcp: dict) -> tuple:
+def check_place(plan: dict, drill: dict, target: str, ping: dict, tcp: dict) -> tuple:
     """(placed, reasons): the drill's place: requirements against what the captures show."""
     members = (plan.get("pair") or {}).get("members") or []
     ok, why = True, []
@@ -197,7 +197,7 @@ def cmd_place(a) -> int:
     if "tcp" in drill["probes"]:
         s, _ = decodes(d, "tcp", plan, "place")
         tcp = tcp_attempts(plan, s, start, end)
-    placed, why = judge_place(plan, drill, a.target, ping, tcp)
+    placed, why = check_place(plan, drill, a.target, ping, tcp)
     rec = {"attempt": int(a.attempt), "window": [start, end], "target": a.target, "placed": placed, "why": why,
            "ping": ping, "tcp": {str(k): v for k, v in sorted(tcp.items())}}
     (d / f"placement-{a.attempt}.json").write_text(json.dumps(rec, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -226,7 +226,7 @@ def cmd_place(a) -> int:
 
 
 def bond_problems(text: str, members: list, sysmac: str) -> list:
-    b = judge.p_bond_legs(text)
+    b = checks.p_bond_legs(text)
     probs = []
     for m in members:
         leg = b["legs"].get(m)
@@ -258,7 +258,7 @@ def cmd_bonds(a) -> int:
 
 
 def cmd_legs(a) -> int:
-    b = judge.p_bond_legs(sys.stdin.read())
+    b = checks.p_bond_legs(sys.stdin.read())
     up = [s for s, leg in sorted(b["legs"].items()) if leg["agg"] == b["active_agg"] and leg["mii"] == "up"]
     print(",".join(up) or "none")
     return 0

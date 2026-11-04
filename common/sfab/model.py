@@ -34,7 +34,7 @@ class Meta:
     chapter: Any  # sfab.spec.Chapter
     features: dict
     versions: dict
-    known: dict
+    limitations: dict
     normalize: dict
     spec_files: dict
     root: str
@@ -1009,7 +1009,7 @@ class Model:
     ca: Ca | None
     k8s: K8s | None
     registry: Registry | None
-    common: dict              # kinds, switch, host, guest, timeouts, harness, naming
+    common: dict              # kinds, switch, host, guest, timeouts, tooling, naming
     warnings: tuple
     spec: dict                # the merged, when-filtered profile tree (before slicing), read-only
 
@@ -1106,7 +1106,7 @@ class Model:
         return best
 
     def to_json(self) -> dict:
-        """A JSON-ready dict of the model (meta's versions, known and normalize left out)."""
+        """A JSON-ready dict of the model (meta's versions, limitations and normalize left out)."""
         out = {}
         for f in dataclasses.fields(self):
             if f.name in ("meta", "spec", "common"):
@@ -1520,7 +1520,7 @@ class _Builder:
         populations = self._populations(nodes)
         audiences = self._audiences(populations)
         reg = self._registry(nodes)
-        common = {k: self.t.get(k) for k in ("kinds", "switch", "host", "guest", "timeouts", "harness", "naming") if k in self.t}
+        common = {k: self.t.get(k) for k in ("kinds", "switch", "host", "guest", "timeouts", "tooling", "naming") if k in self.t}
         return Model(
             meta=self.meta, lab=self.meta.lab, profile=self.meta.profile, build=str(self.t.get("build", self.meta.profile.upper())),
             state=self.meta.state, step=self.meta.step, variant=self.meta.variant, features=dict(self.meta.features),

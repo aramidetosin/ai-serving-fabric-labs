@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# ch05/audit.sh: the lab's audit (book Examples 5-2 and 5-10), recorded as a
-# result set under audits/.
+# ch05/audit.sh: the lab's audit, saved as a
+# run directory under runs/.
 #
 #   ./audit.sh            the full audit
-#   ./audit.sh --quick    the switches and the container links the MAC tables need, not recorded
+#   ./audit.sh --quick    the switches and the container links the MAC tables need, not saved
 #                         (finish runs it, and drills.sh after each drill)
 #
 # The shared checks every lab gets come first (every switch's launcher line, NUM_NICS, GRO off,
@@ -11,7 +11,7 @@
 # TX offload and management table; the relay namespaces, the 9000-byte DF ping on every rail and
 # cross-rail through the relay), then chapter 2's forwarding-only reads on every switch and the
 # pair. Chapter 5 adds, without repeating those, the rail-backend group
-# (common/audit/lib-audit.sh audit_rail_backend, then judge.py rail-backend), and in a full audit
+# (common/audit/lib-audit.sh audit_rail_backend, then checks.py rail-backend), and in a full audit
 # chapter 3's Layer 2 hygiene on the pair and both rail switches (spanning-tree mode pvst, every used
 # port at its rendered MTU, BPDU guard with port-shutdown on every edge port, which on a rail switch
 # is every rail access port, and storm control on each):
@@ -44,7 +44,7 @@ if [ "$SFAB_QUICK" = 1 ]; then
 else
   audit_collect                                                  # every node's plan
 fi
-audit_judge                                                      # shared: switches, guests, rails, VLANs, MAC tables
+audit_check                                                      # shared: switches, guests, rails, VLANs, MAC tables
 audit_forwarding_only fe-sw1 fe-sw2 rail-sw1 rail-sw2 oob-sw     # chapter 2's forwarding-only reads
 audit_mclag_pair fe-sw1 fe-sw2                                   # the pair the guests' bonds land on
 audit_rail_backend rail-sw1 rail-sw2                             # chapter 5: the absences, the ports, the namespaces

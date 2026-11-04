@@ -11,7 +11,7 @@
 # everywhere. The switches are untouched: the break is one route inside one node, and parity on both
 # rail switches says so.
 #
-# record: reads the namespace's routes and route get for k8s-gpu2's rail 2 and rail 3 addresses,
+# observe: reads the namespace's routes and route get for k8s-gpu2's rail 2 and rail 3 addresses,
 # then pings from k8s-gpu1's namespace gpu1 to k8s-gpu2's rail 2 address in three passes, each with
 # k8s-gpu2's rail 2 NIC and relay bridge captured in the guest (exercise 1: what the far node's
 # capture shows), and the controls once each. The heal puts the rendered route back, with its source
@@ -21,7 +21,7 @@ exercise: 4
 since: 5
 break:
   - relay_route: {node: k8s-gpu1, rail: 1, to_rail: 2, src: none}
-record:
+observe:
   - ns_show: {node: k8s-gpu1, rail: 1, to: k8s-gpu2, get: [2, 3]}
   - probe_rail: {id: rail1-to-rail2, from: k8s-gpu1, to: k8s-gpu2, rail: 1, to_rail: 2, count: 10, interval_s: 0.2, timeout_s: 1, passes: 3, capture: true}
   - probe_rail: {id: rail1-to-rail3, from: k8s-gpu1, to: k8s-gpu2, rail: 1, to_rail: 3, count: 10, interval_s: 0.2, timeout_s: 1, passes: 1}

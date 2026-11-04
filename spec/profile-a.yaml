@@ -146,7 +146,7 @@ switches:
 # the management interface does not offer redundancy"); a backup keepalive session runs over a VLAN
 # interface carried on the peer link only (VLAN 3966: 4.6.0 reserves 3967 to 4094; the VLAN
 # interface needs mclag-separate-ip, or both ends share the active's MAC). The first member takes
-# the first address of each /31. passthrough keeps Management0 on the harness address the stages
+# the first address of each /31. passthrough keeps Management0 on the lab tooling address the stages
 # reach the switch on; nothing of the pair's own runs over it.
 pairs:
   fe:
@@ -379,7 +379,7 @@ hosts:
   # own VLAN, which the firewall's administrative interface answers from. It serves no DNS, no time
   # and no CA, has no leg in the BMC VLAN and holds no standing cluster-admin credential: an
   # operator's kubeconfig there is a client certificate valid for operator_kubeconfig_h hours,
-  # issued on the init node, and the harness's own kubectl runs on the init node (k8s.admin_node).
+  # issued on the init node, and the lab tooling's own kubectl runs on the init node (k8s.admin_node).
   bastion:
     kind: bastion
     group: bastion
@@ -809,7 +809,7 @@ firewall:
   # interface only, and there only to the jump host itself (VLAN 300 holds nothing else, so it is the
   # dedicated admin VLAN); nothing administrative is published on the uplink, and every other
   # interface answers ping only. The PA-VM's own management port stays on containerlab's
-  # management network, where vrnetlab's launcher and the harness reach it.
+  # management network, where vrnetlab's launcher and the lab tooling reach it.
   admin: {interface: ae1.300, profile: bastion-admin, allow: [https, ssh, ping], permitted: ["node:bastion"], since: 4}
   # Security rules, in order. Every rule logs at session end. deny-all-log is always last.
   rules:
@@ -947,7 +947,7 @@ k8s:
   # Operators: the bastion holds no standing cluster-admin
   # kubeconfig. Each operator user gets a kubeconfig there whose client certificate kubeadm issues on
   # the init node (kubeadm kubeconfig user) for validity_h hours, in group, bound to cluster_role by
-  # one ClusterRoleBinding; finish issues it again at every run. The harness's own kubectl runs on the
+  # one ClusterRoleBinding; finish issues it again at every run. The lab tooling's own kubectl runs on the
   # init node with the admin kubeconfig kubeadm wrote there, which never leaves it.
   operators: {users: [admin], group: operators, cluster_role: view, validity_h: 8}
 
@@ -1305,7 +1305,7 @@ ca:
 # dec-<prefix>-<the object's name>, and every switch with the forwarding decision below. A lab
 # without it renders neither and stamps only the ids the elements carry.
 #
-# rows are the layers a request meets, in that order (Table 2-1): layer, owner (the device that
+# rows are the layers a request meets, in that order: layer, owner (the device that
 # owns it), object, decision, evidence and refusal are the table's columns as the chapter states
 # them; prefix names the row in a derived id. The objects of each row are found in the model:
 # the DNS views, the firewall's routes and the routers' static routes, the NAT rules, the security
@@ -1431,7 +1431,7 @@ decisions:
   other:
     - {decision: dec-storage-data-address, why: "the storage classes carry NFS and NVMe/TCP to the storage system's data address on its own Layer 2 VLAN, and the CSI driver's API calls go to its management address: an addressing choice no layer refuses on"}
 
-# The population and endpoint matrix (Table 2-2): each population against each endpoint, every
+# The population and endpoint matrix: each population against each endpoint, every
 # cell's mode computed from the spec as the request meets the layers above (render/decisions.py),
 # and tried by matrix.sh by TCP connect and HTTP request, never by ping. A row is a population and
 # the client it tries from; a column is either

@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
-"""p3drill.py: Part III's drills, the plan read and the evidence judged (common/drill/lib-p3drill.sh).
+"""tenantdrill.py: Part III's drills, the plan read and the evidence checked (common/drill/lib-tenantdrill.sh).
 
-    p3drill.py get --plan gen/drills.json PATH         a value of the plan (list.<id> names a drill)
-    p3drill.py whole --plan P --tenancy T --dir D [--explain]
+    tenantdrill.py get --plan gen/drills.json PATH         a value of the plan (list.<id> names a drill)
+    tenantdrill.py whole --plan P --tenancy T --dir D [--explain]
                                                        yes when both ingress nodes' bonds are up on
                                                        both legs and every Gateway's lease is on an
                                                        ingress node (the reads in D)
-    p3drill.py holder --plan P --drill ID --leases FILE
+    tenantdrill.py holder --plan P --drill ID --leases FILE
                                                        the ingress node holding the most leases
-    p3drill.py iso-plan --plan P --drill ID --row N    the isolation drill's plan for one client
-    p3drill.py analyze-lease --plan P --dir D --drill ID --pass N
-    p3drill.py analyze-isolation --plan P --dir D --drill ID --pass N
-    p3drill.py analyze-leak --plan P --dir D --drill ID --pass N
-    p3drill.py summarize --set DIR [--stamp TEXT]      drills.md
+    tenantdrill.py iso-plan --plan P --drill ID --row N    the isolation drill's plan for one client
+    tenantdrill.py analyze-lease --plan P --dir D --drill ID --pass N
+    tenantdrill.py analyze-isolation --plan P --dir D --drill ID --pass N
+    tenantdrill.py analyze-leak --plan P --dir D --drill ID --pass N
+    tenantdrill.py summarize --set DIR [--stamp TEXT]      drills.md
 
 analyze-lease (chapter 8) reads the drill's timeline, the leases read every 0.5 s, the probes' logs,
 the firewall's ARP tables and the EndpointSlices, and prints:
@@ -35,12 +35,12 @@ the firewall's ARP tables and the EndpointSlices, and prints:
                 run on the ingress nodes too); and when the cut node's endpoints left each Service
                 (the EndpointSlices)
 
-analyze-isolation (chapter 11) prints, for each load factor, the held connections judged as chapter
-10's measurement judges them (common/audit/tenancy.py judge_hold) and one line a population: its own
+analyze-isolation (chapter 11) prints, for each load factor, the held connections checked as chapter
+10's measurement checks them (common/audit/tenancy.py check_hold) and one line a population: its own
 Gateway's answers, its allowed cells' and the forbidden cells' attempts that got through, which must
 be zero.
 
-analyze-leak (chapter 11) judges the one cell no network layer holds: the new key of another
+analyze-leak (chapter 11) checks the one cell no network layer holds: the new key of another
 audience's caller minted, answered 200 from the internet client through its own Gateway and named
 under that caller in the API gateway's access log, then refused after its revoke, and the key Secret
 the same after the drill as before. Every time is the lab host's clock. Standard library only.
@@ -294,8 +294,8 @@ def analyze_lease(v, dr: dict, d: Path, pas: str) -> dict:
             v.ok(f"{lab}: {c} through {e['gateway']}, a lease the cut node did not hold: {gp['lost']} of {gp['sent']} echo requests lost, "
                  f"{tcp['lost']} of {tcp['sent']} connects failed")
     during = read(d / "arp-during.txt")
-    # the firewall learns a VIP's MAC only from traffic it forwards to it: the entry is judged for a
-    # Gateway an echo probe drives through the firewall, and recorded for any other (the internet
+    # the firewall learns a VIP's MAC only from traffic it forwards to it: the entry is checked for a
+    # Gateway an echo probe drives through the firewall, and saved for any other (the internet
     # Gateway in chapter 8, which no population reaches yet)
     driven = {e["gateway"] for e in dr["echo"]}
     for g in held_by_cut:
@@ -303,8 +303,8 @@ def analyze_lease(v, dr: dict, d: Path, pas: str) -> dict:
         want = ((dr["candidates"].get(new) or {}).get("mac") or "").lower() if new else ""
         got = arp_mac(during, dr["vips"][g])
         if g not in driven:
-            v.ok(f"{lab}: the firewall's ARP entry for {g}'s VIP {dr['vips'][g]} while {cut} is cut names {got or 'nothing'} (recorded, not "
-                 f"judged: no probe of the drill reaches {g} through the firewall)")
+            v.ok(f"{lab}: the firewall's ARP entry for {g}'s VIP {dr['vips'][g]} while {cut} is cut names {got or 'nothing'} (saved, not "
+                 f"checked: no probe of the drill reaches {g} through the firewall)")
             continue
         v.check(f"{lab}: the firewall's ARP entry for {g}'s VIP {dr['vips'][g]} names {new or 'the new holder'}'s bond MAC {want or '?'} while "
                 f"{cut} is cut (arp-during.txt)", bool(want) and got == want, f"names {got or 'nothing'}")
@@ -352,7 +352,7 @@ def analyze_isolation(v, dr: dict, d: Path, pas: str) -> dict:
     for f in dr["factors"]:
         sub = d / f"x{f}"
         v.sec(f"{lab}: {hp['n'] * f} held connection(s) a population")
-        T.judge_hold(v, sub, hp, "held", f, label=f"{lab} x{f} ")
+        T.check_hold(v, sub, hp, "held", f, label=f"{lab} x{f} ")
         res = {}
         for r in dr["rows"]:
             recs = [x for x in jsonl(sub / f"iso-{r['population']}.jsonl") if "what" in x]
@@ -471,14 +471,14 @@ def cmd_summarize(a) -> int:
         for dd in sorted(x for x in pd.iterdir() if x.is_dir()):
             L += [f"## {dd.name}: {pd.name}", ""]
             an = read(dd / "analyze.out").splitlines()
-            L += ["```"] + [x for x in an if x.startswith(("  PASS", "  FAIL", "  SKIP", "  KNOWN", "=="))] + ["```", ""]
-    L += ["## Verdict", "", "```"] + [x for x in read(rs / "verdict.txt").splitlines() if x.strip()] + ["```", ""]
+            L += ["```"] + [x for x in an if x.startswith(("  PASS", "  FAIL", "  SKIP", "  LIMITATION", "=="))] + ["```", ""]
+    L += ["## Results", "", "```"] + [x for x in read(rs / "results.txt").splitlines() if x.strip()] + ["```", ""]
     (rs / "drills.md").write_text("\n".join(L), encoding="utf-8")
     return 0
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(prog="p3drill")
+    ap = argparse.ArgumentParser(prog="tenantdrill")
     sub = ap.add_subparsers(dest="cmd", required=True)
     s = sub.add_parser("get")
     s.add_argument("--plan", required=True)

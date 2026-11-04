@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# ch04/trace.sh: the firewall trace (book Examples 4-6, 4-7 and 4-11), recorded as
-# audits/sfab-ch04_trace_<UTC>/ with trace.md, verdict.txt, sessions/ and pull/.
+# ch04/trace.sh: the firewall trace, saved as
+# runs/sfab-ch04_trace_<UTC>/ with trace.md, results.txt, sessions/ and pull/.
 #
-# Proof moves from probes to state. One HTTPS request from each side of the firewall, each held open
+# This trace reads state, not probes. One HTTPS request from each side of the firewall, each held open
 # after its reply: the enterprise client to the users' VIP (no translation), and the operator's
 # client to the internal Gateway's VIP through the IPsec tunnel from its site router into zone
 # operator-vpn (no translation; nothing is published on the public address). While each is held, its

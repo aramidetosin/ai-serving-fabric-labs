@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# ch11/label.sh: the live object behind every row of the decision table, recorded as audits/sfab-ch11_label_<UTC>/ with labels.md, verdict.txt and one
+# ch11/label.sh: the live object behind every row of the decision table, saved as runs/sfab-ch11_label_<UTC>/ with labels.md, results.txt and one
 # directory a row: view/, fw/, routing/, routeset/, key/, placement/ and forwarding/.
 #
-# gen/decisions.json is the decision table (Table 2-1) as render/decisions.py resolves it from the
+# gen/decisions.json is the decision table as render/decisions.py resolves it from the
 # spec, with the objects of this lab that implement each row and the decision id each carries. For
 # each row it reads the live object: the population's own lookup and the zone file's entry, the
 # firewall's routing table and its NAT and security rulebases in order with each rule's description,

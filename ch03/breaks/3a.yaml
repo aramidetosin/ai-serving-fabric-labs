@@ -5,9 +5,9 @@
 # fe-sw2 leg are tagged 200 into a port that no longer carries VLAN 200, so which of the bastion's
 # connections to the storage management address fail depends on which leg the firewall hashes each
 # connection and its ARP onto, and on peer-link forwarding without isolation. The exercise names no
-# share: record: measures it in each of three passes, and expect_broken asks only that some
+# share: observe: measures it in each of three passes, and expect_broken asks only that some
 # connects fail and some succeed. Whether SONiC flags the mismatch itself is not tested here; the
-# exercise does not depend on it, and show mclag brief is recorded so the run shows what it prints.
+# exercise does not depend on it, and show mclag brief is saved so the run shows what it prints.
 #
 # The KLISH line as SONiC 4.6.0 takes it: fe-sw2 then prints "switchport trunk allowed Vlan
 # 100,110,130-131,300" under PortChannel10, and the heal's replay of the rendered "switchport trunk
@@ -22,7 +22,7 @@ break:
       context: interface PortChannel 10
       lines: [switchport trunk allowed Vlan remove 200]
       fallback: [no switchport trunk allowed Vlan 200]
-record:
+observe:
   - show: {node: fe-sw1, lines: [show vlan, show running-configuration interface PortChannel 10, show mclag brief]}
   - show: {node: fe-sw2, lines: [show vlan, show running-configuration interface PortChannel 10, show mclag brief]}
   - probe_tcp: {id: bastion-stor-mgmt, from: bastion, to: truenas1, address: mgmt_if, port: 443, count: 60, interval_s: 0.5, timeout_s: 2, passes: 3}

@@ -1,7 +1,7 @@
 # Chapter 3, "Layer 2 Frontend with MCLAG" (second row), lab sfab-ch03.
 #
 # Build A's one-tenant state with its full slice and features, so the pair
-# runs its full port plan: 19 data ports on each switch (book Table 3-2). The chapter prints
+# runs its full port plan: 19 data ports on each switch. The chapter prints
 # both pair members, so both deploy whole (step 7). Serving stays off: the drills
 # and the trace reach the test backend behind the users' Gateway, not a model.
 lab: sfab-ch03
@@ -17,7 +17,7 @@ variants: {}
 # The four-point SYN trace (trace.sh, common/trace/): one SYN from the enterprise client to the
 # users' VIP (VLAN 110), seen leaving the firewall on one ae1 leg tagged 110, entering the pair on
 # the trunk port that leg lands on, leaving that switch tagged 110 on the server port toward the
-# lease holder (an ingress node), and on the holder's bond0. same_frame asks the judge for one frame
+# lease holder (an ingress node), and on the holder's bond0. same_frame asks the checker for one frame
 # at all four points: the same source and destination MACs, addresses, IP id, TTL and sequence
 # number, so nothing between the firewall and the node routed it. ttl_drop_after 0: every point is
 # past the firewall.
@@ -68,7 +68,7 @@ trace:
 # whole and every bond back on two legs: the keepalive probe saw the standby shut its own MCLAG
 # PortChannels when the keepalive link alone failed while the backup was up, and hold them down
 # for delay-restore (300 s) after the link returned. The monitor reads both switches every few
-# seconds through each of these, so the standby's shut and return are recorded as events.
+# seconds through each of these, so the standby's shut and return are saved as events.
 #
 # Both probes run every 0.3 s: the keepalive drills hold their captures through the 300 s hold-down,
 # and a faster probe makes the captures and decodes much larger. The drills can run as three sets of

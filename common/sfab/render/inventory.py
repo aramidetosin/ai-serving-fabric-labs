@@ -149,7 +149,7 @@ def _node(m: Model, n) -> dict:
 
 
 def _firewall_extra(m: Model) -> dict:
-    """What the chapter 4 harness reads of the firewall as this lab renders it (render/panos.py's
+    """What the chapter 4 tooling reads of the firewall as this lab renders it (render/panos.py's
     view): the security and NAT rule names in order, the system services with their service
     routes, and the administrative profile with its interface."""
     from .panos import view  # noqa: PLC0415
@@ -243,7 +243,7 @@ def services(m: Model) -> dict:
             "gateway_class": k.gateway_class, "labels": dict(k.labels), "l2_announce": dict(k.l2_announce),
             "cilium_devices": list(ks.get("cilium_devices") or []),
             "gateway_namespace": ks.get("gateway_namespace"),
-            # the harness's kubectl: on this node, with the admin kubeconfig kubeadm wrote there (lib.sh K)
+            # the lab's kubectl: on this node, with the admin kubeconfig kubeadm wrote there (lib.sh K)
             "admin_node": k.init, "admin_kubeconfig": "/etc/kubernetes/admin.conf",
             "test_backend": {key: tb.get(key) for key in ("name", "namespace", "port", "path", "replicas", "gateways")} if tb else None,
         }
@@ -356,7 +356,7 @@ def inventory(m: Model) -> dict:
             "fw": fw.name if fw else None,
             "storage": sorted(m.storage, key=natural),
             "bastion": bastion,
-            # the node the harness's kubectl runs on (common/lib.sh K), with the admin kubeconfig
+            # the node the lab's kubectl runs on (common/lib.sh K), with the admin kubeconfig
             # kubeadm wrote there: the init node, never the bastion
             "kubectl": m.k8s.init if m.k8s is not None else None,
             "fw_bootstrap": fw is not None,
@@ -395,12 +395,11 @@ def inventory(m: Model) -> dict:
         "images": dict(sorted(images.items())),
         "host": {"tick": host_c.get("tick", 10000), "boot_batch": host_c.get("boot_batch"), "startup_delay_s": host_c.get("startup_delay_s")},
         "timeouts": m.common.get("timeouts") or {},
-        "harness": m.common.get("harness") or {},
+        "tooling": m.common.get("tooling") or {},
         "naming": m.common.get("naming") or {},
         "switch": {k: v for k, v in (m.common.get("switch") or {}).items()},
         "guest": {"user": (m.common.get("guest") or {}).get("user", "admin"), "tables": (m.common.get("guest") or {}).get("tables") or {}},
         "trace": ch.trace if ch else {},
-        "known": sorted(k["id"] for k in (m.meta.known or {}).get("known") or []),
         "warnings": list(m.warnings),
     }
     inv.update(services(m))

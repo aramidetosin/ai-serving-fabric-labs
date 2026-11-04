@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# ch08/trace.sh: the keyed trace, recorded as audits/sfab-ch08_trace_<UTC>/ with
-# trace.md, verdict.txt, cluster/, request/ and captures/.
+# ch08/trace.sh: the keyed trace, saved as runs/sfab-ch08_trace_<UTC>/ with
+# trace.md, results.txt, cluster/, request/ and captures/.
 #
 # Chapter 7's keyed serving trace from k8s-cp2, a node of the cluster (chapter.yaml trace.serving,
 # common/trace/lib-servetrace.sh): the node's own datapath answers every Gateway VIP, so its requests

@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 # common/drill/lib-servedrill.sh: chapter 6's serving drills, sourced by a chapter's drills.sh after lib.sh's sfab_init drills, which opened
-# audits/<lab>_drills_<UTC>/. The plan is gen/drills.json (sfab.render.drills: serve-dark,
+# runs/<lab>_drills_<UTC>/. The plan is gen/drills.json (sfab.render.drills: serve-dark,
 # worker-port and rail-move drills).
 #
 #   servedrills_main            --drills "ID ..." --passes N: every pass runs every drill, then
@@ -12,7 +12,7 @@
 # stamps its requests in the client container, whose clock is the host's):
 #   1. whole     every pod of the table Ready, every Service holding its servers, every rail switch's
 #                rendered ports up, in two consecutive polls 5 s apart; else the drill is not run
-#   2. probes    the endpoints probe: the serving namespace's EndpointSlices read from the lab host with the harness's kubectl (on the init node)
+#   2. probes    the endpoints probe: the serving namespace's EndpointSlices read from the lab host with the lab's kubectl (on the init node)
 #                every interval, each read stamped when it began and ended (endpoints.jsonl); the
 #                gateway probe: each model's key handed to the client (lib-servecap.sh), then
 #                probe_gateway.py in the client, one chat completion a model every interval through
@@ -311,7 +311,7 @@ servedrill_fault() {
   py "$SDP" analyze --plan "$SD_PLAN" --dir "$D" --drill "$DRILL_ID" --pass "$PASS" >"$D/analyze.out" 2>&1 || true
   cat "$D/analyze.out"
   cat "$D/analysis.txt" 2>/dev/null || true
-  known L9 "pass $PASS $DRILL_ID: a KLISH shutdown drops no carrier at the GPU NICs, so the dead rail shows only as silence: readiness over the rail is the only detector ($(cat "$D"/links-during-*.txt 2>/dev/null | awk '{print $1 "=" $2}' | paste -sd ' ' - | cut -c1-160))"
+  limitation "pass $PASS $DRILL_ID: a KLISH shutdown drops no carrier at the GPU NICs, so the dead rail shows only as silence: readiness over the rail is the only detector ($(cat "$D"/links-during-*.txt 2>/dev/null | awk '{print $1 "=" $2}' | paste -sd ' ' - | cut -c1-160))"
   return "$rc"
 }
 

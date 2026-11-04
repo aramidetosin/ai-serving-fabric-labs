@@ -21,14 +21,14 @@ Memory: a budget of 162.75 GiB, and preflight wants MemAvailable to cover it plu
 cd ch08
 make render          # topo.clab.yml, bootstrap/ and gen/
 make up              # preflight, up, boot, finish, audit
-make audit           # audits/sfab-ch08_audit_<UTC>/
-make trace           # audits/sfab-ch08_trace_<UTC>/ (the keyed trace from k8s-cp2 through two Gateways)
-make drills          # audits/sfab-ch08_drills_<UTC>/ (lease-holder-loss, PASSES=3)
-make break-8a        # audits/sfab-ch08_break-8a_<UTC>/ (Exercise 5)
-make heal-8a         # audits/sfab-ch08_heal-8a_<UTC>/, then the chapter audit
+make audit           # runs/sfab-ch08_audit_<UTC>/
+make trace           # runs/sfab-ch08_trace_<UTC>/ (the keyed trace from k8s-cp2 through two Gateways)
+make drills          # runs/sfab-ch08_drills_<UTC>/ (lease-holder-loss, PASSES=3)
+make break-8a        # runs/sfab-ch08_break-8a_<UTC>/
+make heal-8a         # runs/sfab-ch08_heal-8a_<UTC>/, then the chapter audit
 make down            # keeps state/ disks; make wipe removes them
 ```
 
 ## What the checks do
 
-`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `audits/` in this directory, which git ignores. `spec/known.yaml` lists the known limits of the virtual platforms.
+`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `runs/` in this directory, which git ignores. `spec/limitations.yaml` lists the known limits of the virtual platforms.

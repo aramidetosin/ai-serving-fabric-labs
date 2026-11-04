@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
-"""p3trace.py: Part III's traces (common/trace/lib-p3trace.sh), their capture points and their
-judgment: the per-population DNS trace (chapter 9), the zone-keyed NAT trace (chapter 10) and the
+"""tenanttrace.py: Part III's traces (common/trace/lib-tenanttrace.sh), their capture points and their
+check: the per-population DNS trace (chapter 9), the zone-keyed NAT trace (chapter 10) and the
 capture ladder (chapter 11).
 
-    p3trace.py get    --plan gen/trace.json PATH        a value of the plan (a list one item a line)
-    p3trace.py points --plan gen/trace.json [--session ID]
+    tenanttrace.py get    --plan gen/trace.json PATH        a value of the plan (a list one item a line)
+    tenanttrace.py points --plan gen/trace.json [--session ID]
                                                         the capture points, TSV: id, host or guest, node,
                                                         port or interface, filter
-    p3trace.py flows  --plan gen/trace.json             the ladder's connects, TSV: id, client, kind,
+    tenanttrace.py flows  --plan gen/trace.json             the ladder's connects, TSV: id, client, kind,
                                                         address, port, first source port, tries, allowed
-    p3trace.py tlog-missing --set DIR --plan gen/trace.json
+    tenanttrace.py tlog-missing --set DIR --plan gen/trace.json
                                                         the DNS trace's connects through the firewall the
                                                         traffic log in DIR does not hold yet
-    p3trace.py judge  --set DIR --plan gen/trace.json --inv INV [--stamp TEXT]
+    tenanttrace.py check  --set DIR --plan gen/trace.json --inv INV [--stamp TEXT]
 
-The plan is gen/trace.json (sfab.render.trace: dns, nat or ladder). judge reads the saved files only
-and prints the result vocabulary, appending each line to $SFAB_VERDICT, then writes trace.md:
+The plan is gen/trace.json (sfab.render.trace: dns, nat or ladder). check reads the saved files only
+and prints the result vocabulary, appending each line to $SFAB_RESULTS, then writes trace.md:
 
   dns      for each population: its resolver received its client's query for the name and answered
            the view's address; the resolver's own query to its authorities, and their answer, or
@@ -182,8 +182,8 @@ def run_header(rs: Path, plan: dict, stamp) -> list:
     return L
 
 
-def verdict_block(rs: Path) -> list:
-    return ["## Verdict", "", "```"] + [x for x in read(rs / "verdict.txt").splitlines() if x.strip()] + ["```", ""]
+def results_block(rs: Path) -> list:
+    return ["## Results", "", "```"] + [x for x in read(rs / "results.txt").splitlines() if x.strip()] + ["```", ""]
 
 
 # --------------------------------------------------------------------------------------------
@@ -249,7 +249,7 @@ def cmd_tlog_missing(a) -> int:
 # the DNS trace
 
 
-def judge_dns(v, rs: Path, plan: dict) -> list:
+def check_dns(v, rs: Path, plan: dict) -> list:
     decs = {p["id"]: packets(read(rs / "captures" / f"{p['id']}.txt")) for p in plan["points"]}
     tl = read(rs / "fw" / "traffic-log-443.txt")
     out = []
@@ -331,7 +331,7 @@ def md_dns(rs: Path, plan: dict, res: list, stamp) -> None:
                  f"{s['rule']} ({'allowed' if s['outcome'] == 'reached' else 'refused'}), {s['from_zone']} to {s['to_zone']}")
         L.append(f"| {r['population']} | {r['client']} | {r['resolver']} | {r['view']} | {', '.join(x['answer']) or '-'} | "
                  f"{'yes' if x['forwarded'] else 'no, from its cache'} | {x['connect']} | {where} |")
-    L += [""] + verdict_block(rs)
+    L += [""] + results_block(rs)
     L += ["## Files", "", "- `captures/<point>.pcap` and `.txt`: each resolver's port (port 53) and each rung the connects cross (tcp 443)",
           "- `lookups/<population>.txt`: the client's own lookup; `connects/<population>.txt`: its connect (syn_connect.py)",
           "- `warmup/<population>.txt`: the warm-up connect before the captures, for each population whose connect is answered, "
@@ -344,12 +344,12 @@ def md_dns(rs: Path, plan: dict, res: list, stamp) -> None:
 # the NAT trace
 
 
-def judge_nat(v, rs: Path, plan: dict) -> list:
+def check_nat(v, rs: Path, plan: dict) -> list:
     import fwtrace as FT  # noqa: PLC0415
 
     out = []
     for s in plan["sessions"]:
-        j = FT.judge_session(v, rs, s, plan)
+        j = FT.check_session(v, rs, s, plan)
         d = rs / "captures" / s["id"]
         decs = {pid: packets(read(d / f"{pid}.txt")) for pid in s["points"]}
         want_dst = s.get("translated_addr") or s["dst_addr"]
@@ -369,7 +369,7 @@ def judge_nat(v, rs: Path, plan: dict) -> list:
         lc = cite(f"captures/{s['id']}/{on[0]}.txt", f["line"]) if f else "-"
         v.check(f"{s['id']}: the same SYN on exactly one leg ({', '.join(on) or 'none'}), tagged {s['vlan']}: {what} ({lc})", good,
                 f"on {len(on)} legs" + (f", destination {f['dst']}, VLAN {f.get('vlan')}" if f else ""))
-        out.append({"session": s, "seq": seq, "leg": on[0] if len(on) == 1 else None, "leg_frame": f, "judged": j})
+        out.append({"session": s, "seq": seq, "leg": on[0] if len(on) == 1 else None, "leg_frame": f, "checked": j})
     return out
 
 
@@ -385,7 +385,7 @@ def md_nat(rs: Path, plan: dict, res: list, stamp) -> None:
         L.append(f"| {s['id']} | {s['client']} ({s['client_addr']}) | {s['dst_addr']} | {s.get('translated_addr') or s['dst_addr']} | "
                  f"{ex['from_zone']} to {ex['to_zone']} | {ex['rule']} | {ex.get('nat_rule') or 'none'} | {x['seq'] if x['seq'] is not None else '-'} | "
                  f"{x['leg'] or '-'} |")
-    L += [""] + verdict_block(rs)
+    L += [""] + results_block(rs)
     L += ["## Files", "", "- `sessions/<population>/`: the held request, show session all (CLI and XML), show session id, the traffic log",
           "- `captures/<population>/<point>.pcap` and `.txt`: the outside point and both legs, captured while that request ran", ""]
     (rs / "trace.md").write_text("\n".join(L), encoding="utf-8")
@@ -425,7 +425,7 @@ def mac_ports(rs: Path, plan: dict, inv: dict) -> dict:
     return out
 
 
-def judge_ladder(v, rs: Path, plan: dict, inv: dict) -> dict:
+def check_ladder(v, rs: Path, plan: dict, inv: dict) -> dict:
     pts = plan["points"]
     decs = {p["id"]: packets(read(rs / "captures" / f"{p['id']}.txt")) for p in pts}
     hold = holders(rs, plan)
@@ -501,7 +501,7 @@ def md_ladder(rs: Path, plan: dict, res: dict, stamp) -> None:
     L += ["", "Forbidden tally per rung: " + ", ".join(f"`{k}` {n}" for k, n in res["tally"].items()), "",
           "Lease holders: " + ", ".join(f"{g} {h}" for g, h in sorted(res["holders"].items())) + "; the pair's ports facing each, by its MAC: "
           + "; ".join(f"{n}: {', '.join(sorted(x)) or 'none'}" for n, x in sorted(res["macp"].items())), ""]
-    L += verdict_block(rs)
+    L += results_block(rs)
     L += ["## Files", "", "- `captures/<rung>.pcap` and `.txt`: every rung, captured over the whole run",
           "- `connects/<flow>.txt`: each flow's connects (syn_connect.py, one line a source port); `warmup/`: the warm-up connects",
           "- `pair/<switch>-mac.txt`: the pair's MAC tables after the warm-up; `cluster/leases.json`: the Gateways' leases", ""]
@@ -511,23 +511,23 @@ def md_ladder(rs: Path, plan: dict, res: dict, stamp) -> None:
 # --------------------------------------------------------------------------------------------
 
 
-def cmd_judge(a) -> int:
+def cmd_check(a) -> int:
     rs, plan, inv = Path(a.set), load(a.plan), load(a.inv)
-    v = vocab.Vocab(known=set(inv.get("known") or []) or None)
+    v = vocab.Vocab()
     kind = plan.get("kind")
     if kind == "dns":
-        md_dns(rs, plan, judge_dns(v, rs, plan), a.stamp)
+        md_dns(rs, plan, check_dns(v, rs, plan), a.stamp)
     elif kind == "nat":
-        md_nat(rs, plan, judge_nat(v, rs, plan), a.stamp)
+        md_nat(rs, plan, check_nat(v, rs, plan), a.stamp)
     elif kind == "ladder":
-        md_ladder(rs, plan, judge_ladder(v, rs, plan, inv), a.stamp)
+        md_ladder(rs, plan, check_ladder(v, rs, plan, inv), a.stamp)
     else:
         v.bad("the trace's plan", f"kind {kind!r} is none of dns, nat, ladder")
     return 1 if v.counts()["fail"] else 0
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(prog="p3trace")
+    ap = argparse.ArgumentParser(prog="tenanttrace")
     sub = ap.add_subparsers(dest="cmd", required=True)
     s = sub.add_parser("get")
     s.add_argument("--plan", required=True)
@@ -540,13 +540,13 @@ def main(argv=None) -> int:
     s = sub.add_parser("tlog-missing")
     s.add_argument("--set", required=True)
     s.add_argument("--plan", required=True)
-    s = sub.add_parser("judge")
+    s = sub.add_parser("check")
     s.add_argument("--set", required=True)
     s.add_argument("--plan", required=True)
     s.add_argument("--inv", required=True)
     s.add_argument("--stamp")
     a = ap.parse_args(argv)
-    return {"get": cmd_get, "points": cmd_points, "flows": cmd_flows, "tlog-missing": cmd_tlog_missing, "judge": cmd_judge}[a.cmd](a)
+    return {"get": cmd_get, "points": cmd_points, "flows": cmd_flows, "tlog-missing": cmd_tlog_missing, "check": cmd_check}[a.cmd](a)
 
 
 if __name__ == "__main__":

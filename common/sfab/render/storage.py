@@ -34,7 +34,7 @@ The CSI driver calls TrueNAS's API on its management address (csi.api: mgmt), ov
 the firewall's csi-to-storage-api rule: storage data sits on its own Layer 2 VLAN with no gateway,
 which no node's API traffic uses, so the reply leaves by the management bond the request came in
 on. The web interface and API are bound to the management address and to the user-mode NIC the
-harness reaches the system through (the ui step), never to the data address. The NVMe/TCP class is the cluster's default, a lab
+tooling reaches the system through (the ui step), never to the data address. The NVMe/TCP class is the cluster's default, a lab
 choice: the driver's README marks every one of its freenas-api drivers experimental. NFS serves
 ReadWriteMany.
 
@@ -313,7 +313,7 @@ def truenas_setup(model: Model, s: Storage, ctx) -> str:
         "domain": model.org.names,
         "steps": ["wait", "network", "services", "users", "csi", "ui"],
         # where the web interface and API answer: the management address, and the user-mode NIC the
-        # harness's setup session arrives on (a lab harness path, never a design network)
+        # lab tooling's setup session arrives on (a lab tooling address, never a design network)
         "ui": {"addresses": [str(addr.ip(s.mgmt_if.address)), str(addr.ip(qemu["address"]))]},
         "api": {"host": s.mgmt, "port": API_PORT, "path": API_PATH, "user": ADMIN_USER,
                 "password_from": "the launcher's --password, read from the container"},
@@ -355,7 +355,7 @@ def truenas_setup(model: Model, s: Storage, ctx) -> str:
             "runtime_fields": list(CSI_RUNTIME_FIELDS),
         }
         if _csi_enabled(model) and model.k8s is not None and model.k8s.init:
-            # the harness's kubectl: common/bin/sfab-kubectl with the lab's render directory (relative to
+            # the lab's kubectl: common/bin/sfab-kubectl with the lab's render directory (relative to
             # the repository root), kubectl with the admin kubeconfig on the init node over SSH
             from .k8s import SFAB_KUBECTL, _render_dir  # noqa: PLC0415
 

@@ -2,7 +2,7 @@
 # common/audit/lib-audit.sh: the audit helpers a build A lab with the cluster shares.
 # Sourced after lib.sh's sfab_init audit:
 #
-#   judge_present GROUP NODE...   judge GROUP on the named nodes this set collected
+#   check_present GROUP NODE...   check GROUP on the named nodes this set collected
 #   of_kind KIND                  the lab's nodes of one kind
 #   k8s_nodes                     the guests with a Kubernetes role
 #   bonded_nodes                  the hosts with a bond toward the pair, the bastion included
@@ -10,30 +10,30 @@
 #                                 their container links: the switches learn those MACs)
 #   storage_volumes               a volume on each storage class, written and read back, in the
 #                                 namespace sfab-audit, deleted again
-#   audit_build_a_cluster         every judge of a build A lab with the cluster after the pair
+#   audit_build_a_cluster         every check of a build A lab with the cluster after the pair
 #   audit_rail_backend SW...      chapter 5: each GPU node's namespace links read into the set's
-#                                 rail-backend/ (not in a quick audit), then judge.py rail-backend
+#                                 rail-backend/ (not in a quick audit), then checks.py rail-backend
 #                                 on the rail switches and every GPU node the set collected
 #   audit_placement               chapter 6: the serving pods, their Services and rail attachments,
 #                                 each pod's routes on its node, and a request a model through each
 #                                 model route a client of the lab reaches, read into placement/ (a
-#                                 quick audit too), then judge.py placement against the table
+#                                 quick audit too), then checks.py placement against the table
 #                                 (bootstrap/k8s/serving.env, or the one audit.sh --table names)
 #   audit_gateway_layer           chapter 7: each model route's refusals from its client and the
 #                                 per-pod key probe, read into keys/ (a quick audit too), then
-#                                 judge.py keys; in a full audit also the Gateways, routes,
+#                                 checks.py keys; in a full audit also the Gateways, routes,
 #                                 namespaces, leases, the Gateways' CiliumEnvoyConfigs and the
 #                                 inference ConfigMaps, the VIPs from a GPU node, each VIP's chain
 #                                 from the bastion and the CA's proof (on the lab host), read into gateway-layer/,
-#                                 then judge.py gateway-layer
+#                                 then checks.py gateway-layer
 
-# judge_present GROUP NODE...: judge GROUP on the named nodes this set collected; nothing when
+# check_present GROUP NODE...: check GROUP on the named nodes this set collected; nothing when
 # none of them was collected (a quick audit collects only the switches and the firewall).
-judge_present() {
+check_present() {
   local group="$1" n have=()
   shift
   for n in "$@"; do [ -d "$RS/$n" ] && have+=("$n"); done
-  [ ${#have[@]} -eq 0 ] || _judge "$group" "${have[@]}"
+  [ ${#have[@]} -eq 0 ] || _run_check "$group" "${have[@]}"
 }
 of_kind() { local n; for n in "${NODES[@]}"; do [ "${NODE_KIND[$n]}" != "$1" ] || printf '%s\n' "$n"; done; }
 k8s_nodes() { local g; for g in "${GUESTS[@]+"${GUESTS[@]}"}"; do [ -z "${NODE_K8S[$g]:-}" ] || printf '%s\n' "$g"; done; }
@@ -41,7 +41,7 @@ k8s_nodes() { local g; for g in "${GUESTS[@]+"${GUESTS[@]}"}"; do [ -z "${NODE_K
 # storage_volumes: for each storage class the render names, a PersistentVolumeClaim; a pod on a GPU
 # node writes 1 MiB to it with fsync and prints its sha256; then a second pod mounts the same claim
 # and prints the sha256 of what it reads (the first pod's unmount flushed the node's cache of it).
-# Applied and read with the harness's kubectl (the init node); everything it made is deleted again.
+# Applied and read with the lab's kubectl (the init node); everything it made is deleted again.
 volume_pod() {  # volume_pod NS NAME CLAIM NODE IMAGE SCRIPT
   KSH "kubectl -n $1 apply -f - <<'EOF'
 apiVersion: v1
@@ -225,7 +225,7 @@ for n in d["order"]:
 PY
 }
 
-# services_nodes: the platform's DNS and time servers (judge.py services): the authoritative pair,
+# services_nodes: the platform's DNS and time servers (checks.py services): the authoritative pair,
 # the resolvers, the corporate resolver and the time reference.
 services_nodes() {
   py - "$INV" <<'PY'
@@ -241,28 +241,28 @@ PY
 audit_build_a_cluster() {
   local _k8s _rtr _reg _cli
   mapfile -t _k8s < <(k8s_nodes)
-  judge_present cluster-nodes "${_k8s[@]}"
-  judge_present bastion ${BASTION:+"$BASTION"}
+  check_present cluster-nodes "${_k8s[@]}"
+  check_present bastion ${BASTION:+"$BASTION"}
   local _svc
   mapfile -t _svc < <(services_nodes)
-  judge_present services "${_svc[@]}"
+  check_present services "${_svc[@]}"
   mapfile -t _rtr < <(of_kind frr)
   mapfile -t _reg < <(of_kind registry)
-  judge_present routers "${_rtr[@]}"
-  judge_present registry "${_reg[@]}"
+  check_present routers "${_rtr[@]}"
+  check_present registry "${_reg[@]}"
   mapfile -t _cli < <(of_kind client)
-  judge_present clients "${_cli[@]}"
-  judge_present storage "${STORAGE[@]+"${STORAGE[@]}"}"
-  [ "$STAGE_CLUSTER" != 1 ] || _judge populations
-  [ "$STAGE_CLUSTER" != 1 ] || _judge cluster
+  check_present clients "${_cli[@]}"
+  check_present storage "${STORAGE[@]+"${STORAGE[@]}"}"
+  [ "$STAGE_CLUSTER" != 1 ] || _run_check populations
+  [ "$STAGE_CLUSTER" != 1 ] || _run_check cluster
   [ "$STAGE_CLUSTER" != 1 ] || storage_volumes
   [ "$STAGE_CLUSTER" != 1 ] || audit_cluster_security
 }
 
 # ---------------------------------------------------------------------------------------------
-# chapter 4: the firewall edge (judge.py fw-edge)
+# chapter 4: the firewall edge (checks.py fw-edge)
 #
-# audit_fw_edge [NODE]: the active reads the fw-edge group judges, saved under fw-edge/ with
+# audit_fw_edge [NODE]: the active reads the fw-edge group checks, saved under fw-edge/ with
 # plan.json naming what was used, then the group itself. NODE is the node whose requests to the
 # public address are read around show counter global (default: the source of the lab's drills
 # public probe, else its first Kubernetes node). In order, every read on the lab host's clock:
@@ -329,7 +329,7 @@ published = bool(fw.get("published"))
 # listener (the wildcard name) answers it; an address alone names no listener in TLS
 igw = next((g for g in (inv.get("gateways") or {}).values() if g.get("audience") == "internal"), {})
 op_fqdn = (igw.get("hostnames") or [""])[0]
-# The operator's forbidden cells of chapter 2's matrix (Table 2-2), in its order, each tried at
+# The operator's forbidden cells of chapter 2's matrix, in its order, each tried at
 # its own address and port: the users' Gateway, the API server, a node's SSH, that node's BMC (its
 # out-of-band address), the storage data address on NFS and the storage management address.
 cells = []
@@ -409,7 +409,7 @@ PY
     : >"$d/ntp-reads.txt"
     while :; do
       n=$((n + 1))
-      FW "show ntp" | judge_body_panos "show ntp" >"$d/ntp.txt" 2>/dev/null || true
+      FW "show ntp" | panos_body "show ntp" >"$d/ntp.txt" 2>/dev/null || true
       { printf '### %s read %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$n"; cat "$d/ntp.txt"; } >>"$d/ntp-reads.txt"
       grep -q 'NTP synched to' "$d/ntp.txt" && break
       [ $((SECONDS - t0)) -lt "${SFAB_FWE_NTP_WAIT_S:-1200}" ] || break
@@ -419,10 +419,10 @@ PY
 
   # the LAND counter around a node's requests to the public address
   if [ -n "$FWE_COUNTER" ] && [ -n "$FWE_NODE" ] && [ -n "$FWE_PUBLIC" ]; then
-    FW "show counter global filter value all" | judge_body_panos "show counter global filter value all" >"$d/counters-before.txt" 2>/dev/null || true
+    FW "show counter global filter value all" | panos_body "show counter global filter value all" >"$d/counters-before.txt" 2>/dev/null || true
     FWX "<show><counter><global><filter><value>all</value></filter></global></counter></show>" >"$d/counters-before.xml" 2>/dev/null || true
     fw_edge_ping "$FWE_NODE" "$FWE_PUBLIC" >"$d/node-public-ping.txt" 2>&1 || true
-    FW "show counter global filter value all" | judge_body_panos "show counter global filter value all" >"$d/counters-after.txt" 2>/dev/null || true
+    FW "show counter global filter value all" | panos_body "show counter global filter value all" >"$d/counters-after.txt" 2>/dev/null || true
     FWX "<show><counter><global><filter><value>all</value></filter></global></counter></show>" >"$d/counters-after.xml" 2>/dev/null || true
   fi
 
@@ -459,11 +459,11 @@ PY
   if [ ${#FWE_CELLS[@]} -gt 0 ]; then
     # the counters read around the connects (a cell outside the tunnel is dropped by zone
     # protection before any rule, and only a counter says so): every counter's value before and
-    # after them (show counter global filter value all), whose difference the judge reads, and
-    # between those two reads the drop counters' delta view, recorded beside them. The values
+    # after them (show counter global filter value all), whose difference the checker reads, and
+    # between those two reads the drop counters' delta view, saved beside them. The values
     # decide: the firewall can start a new delta sampling between the view's two reads, and the
     # view then misses the drops before it.
-    FW "show counter global filter value all" | judge_body_panos "show counter global filter value all" \
+    FW "show counter global filter value all" | panos_body "show counter global filter value all" \
       >"$d/operator-counters-before.txt" 2>/dev/null || true
     FW "show counter global filter delta yes severity drop" >/dev/null 2>&1 || true
     for cell in "${FWE_CELLS[@]}"; do
@@ -471,7 +471,7 @@ PY
       fw_edge_connect "$FWE_OPERATOR" "$a" "$p" >"$d/operator-cells-$i.txt"
     done
     FW "show counter global filter delta yes severity drop" >"$d/operator-drops.txt" 2>&1 || true
-    FW "show counter global filter value all" | judge_body_panos "show counter global filter value all" \
+    FW "show counter global filter value all" | panos_body "show counter global filter value all" \
       >"$d/operator-counters-after.txt" 2>/dev/null || true
     fw_edge_tlog "$d/operator-cells-tlog" "show log traffic direction equal backward receive_time in last-15-minutes" \
       "$FWE_OPERATOR_ADDR" "${FWE_CELLS[@]}"
@@ -480,24 +480,24 @@ PY
   # the service routes: a name resolved through the DNS one, then the firewall's own DNS and NTP in the log
   if [ -n "$FWE_SVC_SRC" ]; then
     [ -z "$FWE_BASTION_FQDN" ] || FW "ping source $FWE_SVC_SRC count 1 host $FWE_BASTION_FQDN" |
-      judge_body_panos "ping source $FWE_SVC_SRC count 1 host $FWE_BASTION_FQDN" >"$d/fw-dns.txt" 2>/dev/null || true
+      panos_body "ping source $FWE_SVC_SRC count 1 host $FWE_BASTION_FQDN" >"$d/fw-dns.txt" 2>/dev/null || true
     sleep "${SFAB_FWE_LOG_PAUSE_S:-10}"
     {
       FW "show log traffic direction equal backward receive_time in last-15-minutes dport equal 53" |
-        judge_body_panos "show log traffic direction equal backward receive_time in last-15-minutes dport equal 53"
+        panos_body "show log traffic direction equal backward receive_time in last-15-minutes dport equal 53"
       FW "show log traffic direction equal backward receive_time in last-hour dport equal 123" |
-        judge_body_panos "show log traffic direction equal backward receive_time in last-hour dport equal 123"
+        panos_body "show log traffic direction equal backward receive_time in last-hour dport equal 123"
     } >"$d/svc-tlog.txt" 2>/dev/null || true
   fi
-  _judge fw-edge "$FW_NODE"
+  _run_check fw-edge "$FW_NODE"
 }
 
-# judge_body_panos CMD: one PAN-OS command's output from a session on stdin, without its prompt line
+# panos_body CMD: one PAN-OS command's output from a session on stdin, without its prompt line
 # (the whole session when the CLI wrapped the echo and it cannot be found).
-judge_body_panos() {
+panos_body() {
   local s
   s="$(cat)"
-  printf '%s\n' "$s" | py "$SFAB_COMMON/audit/judge.py" body --style panos --command "$1" 2>/dev/null || printf '%s\n' "$s"
+  printf '%s\n' "$s" | py "$SFAB_COMMON/audit/checks.py" body --style panos --command "$1" 2>/dev/null || printf '%s\n' "$s"
 }
 
 # fw_edge_try OUT ARGV...: run into OUT, and once more after a pause when it fails (the first
@@ -565,7 +565,7 @@ fw_edge_tlog() {
   done
   for i in $(seq 1 "${SFAB_FWE_TLOG_TRIES:-9}"); do
     for p in "${ports[@]}"; do
-      FW "$cmd dport equal $p" | judge_body_panos "$cmd dport equal $p" >"$pre-$p.txt" 2>/dev/null || true
+      FW "$cmd dport equal $p" | panos_body "$cmd dport equal $p" >"$pre-$p.txt" 2>/dev/null || true
     done
     miss=0
     for c in "$@"; do
@@ -580,8 +580,8 @@ fw_edge_tlog() {
 # audit_rail_backend SWITCH...: chapter 5's group. A full audit first reads, in every GPU node it
 # collected, each GPU namespace's links (ip -n <ns> -j link show: the rail macvlan's and the relay
 # veth's MTU, which the guest's own ip -j addr does not show) into rail-backend/<node>-<ns>-links.json.
-# Then judge.py rail-backend judges the switches' absences and ports and, for each GPU node the set
-# holds, its namespaces; a quick audit, which collects the switches only, judges the switches.
+# Then checks.py rail-backend checks the switches' absences and ports and, for each GPU node the set
+# holds, its namespaces; a quick audit, which collects the switches only, checks the switches.
 audit_rail_backend() {
   local g ns dir="$RS/rail-backend"
   if [ "$SFAB_QUICK" != 1 ]; then
@@ -593,11 +593,11 @@ audit_rail_backend() {
       done
     done
   fi
-  judge_present rail-backend "$@"
+  check_present rail-backend "$@"
 }
 
 # ---------------------------------------------------------------------------------------------
-# chapter 6: the serving pods against the placement table (judge.py placement)
+# chapter 6: the serving pods against the placement table (checks.py placement)
 #
 # audit_placement: with serving on, reads into the set's placement/, every read on the lab host's
 # clock: the serving namespace's pods, EndpointSlices, Services and rail attachments (JSON, and the
@@ -607,7 +607,7 @@ audit_rail_backend() {
 # reaches (gen/k8s.json inference.routes, the client of the population that Gateway answers), one
 # chat completion a model with the model's key, handed to the client as a 0600 header file
 # (lib-servecap.sh: the transcript off), its status and the response headers saved
-# (gateway-<route>-<model>-*); the request's headers are never saved. The table judged is copied in
+# (gateway-<route>-<model>-*); the request's headers are never saved. The table checked is copied in
 # as placement/serving.env, with the recipe's render of it beside it (placement/rendered/, its
 # output in placement/render.txt). A quick audit reads all of it too.
 audit_placement() {
@@ -640,7 +640,7 @@ audit_placement() {
   EVID_OFF=1 K -n "$sns" get persistentvolumeclaims -o json >"$dir/pvcs.json" 2>/dev/null || true
   EVID_OFF=1 K get persistentvolumes -l "app.kubernetes.io/name=serving" -o json >"$dir/pvs.json" 2>/dev/null || true
   K get persistentvolumes -l "app.kubernetes.io/name=serving" -o wide >"$dir/pvs.txt" 2>&1 || true
-  # the manifests the recipe renders from the table judged (no cluster read: serving.py render), so
+  # the manifests the recipe renders from the table checked (no cluster read: serving.py render), so
   # a set holds the pod manifests and Services as rendered beside what the cluster runs
   (cd "$dir" && py "$SFAB_ROOT/serving-layer/serving.py" render --env serving.env --out rendered >render.txt 2>&1) || true
   while read -r pod node; do
@@ -677,7 +677,7 @@ for i in d.get("items") or []:
     fi
     key_clear "$client" "$kdir"
   done < <(audit_gateway_targets)
-  _judge placement
+  _run_check placement
 }
 
 # audit_gateway_targets: one line a model route and model a client of the lab reaches, tab-separated:
@@ -784,7 +784,7 @@ audit_gateway_layer() {
   if [ ${#checks[@]} -gt 0 ]; then
     keyprobe_run "$(k8s_get inference.probe.name)-audit" "$d/probe.log" 30 "${checks[@]}" || true
   fi
-  _judge keys
+  _run_check keys
   [ "$SFAB_QUICK" != 1 ] || return 0
   audit_identity
   dir="$RS/gateway-layer"
@@ -871,11 +871,11 @@ print("-", "client", sys.argv[3])' "$INV" "$g" "$vip" "$RENDERDIR/gen/tenancy.js
     printf '== state/ca/proof/%s\n' "$(basename "$f")"
     cat "$f"
   done >"$dir/ca-proof-outside.txt" 2>&1 || true
-  _judge gateway-layer
+  _run_check gateway-layer
 }
 
 # ---------------------------------------------------------------------------------------------
-# the cluster's protections: judge.py cluster-security
+# the cluster's protections: checks.py cluster-security
 
 audit_cluster_security() {
   local dir n init sec c ns pod img vip holder client addr t port name lease
@@ -961,11 +961,11 @@ except ValueError:
       H "$holder" "cat /tmp/sfab-reply.txt; rm -f /tmp/sfab-reply.txt" >"$dir/reply-capture.txt" 2>&1 || true
     fi
   fi
-  _judge cluster-security
+  _run_check cluster-security
 }
 
 # ---------------------------------------------------------------------------------------------
-# the identity provider and the people's tokens at the API gateway (chapter 7): judge.py identity
+# the identity provider and the people's tokens at the API gateway (chapter 7): checks.py identity
 
 audit_identity() {
   local dir kdir=/tmp/sfab-audit-idp client person gw host pin ns pod m rt rgw url model rpin
@@ -1031,5 +1031,5 @@ except ValueError:
     pass'); do
     EVID_OFF=1 K -n "$ns" logs "$pod" -c apisix --since=15m 2>/dev/null | grep '"consumer"' | sed "s/^/$pod /" >>"$dir/api-gateway-log.txt" || true
   done
-  _judge identity
+  _run_check identity
 }

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""probe_isolation.py: chapter 11's isolation drill in one client (common/drill/lib-p3drill.sh).
+"""probe_isolation.py: chapter 11's isolation drill in one client (common/drill/lib-tenantdrill.sh).
 
     probe_isolation.py --plan PLAN.json --log FILE
 
-PLAN (p3drill.py iso-plan) names the population's own Gateway's /echo URL (with its pin when the
+PLAN (tenantdrill.py iso-plan) names the population's own Gateway's /echo URL (with its pin when the
 client's resolver is not in the lab), the matrix's cells it tries (a connect or a GET each, with its
 mode), the rounds, the interval and the connect timeout. Every interval, one round: the own probe,
 then every cell once, each from a fresh source port. One JSON line an attempt in FILE:

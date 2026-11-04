@@ -30,7 +30,7 @@ overrides it). Every step checks before it changes anything, so a second run cha
             the data address; each service enabled and running.
   users     the CSI user, an administrator of its own, with the administrator's password.
   csi       one Secret per democratic-csi class, holding the driver's configuration with the
-            password and the NVMe-oF port ids, applied with the harness's kubectl (setup.json's
+            password and the NVMe-oF port ids, applied with the lab's kubectl (setup.json's
             csi.kubernetes.kubectl: common/bin/sfab-kubectl and the lab's directory, kubectl with
             the admin kubeconfig on the init node over SSH) with kubectl apply --server-side. The values files in bootstrap/k8s/ name these Secrets, so the
             democratic-csi releases install after this step.
@@ -52,7 +52,7 @@ request and, for the CSI Secrets, on kubectl's standard input. Everything printe
 a redactor.
 
 Every docker call names a container of this lab (the setup.json lab name plus a dash, as the
-harness's dk does) and is refused otherwise.
+lab tooling's dk does) and is refused otherwise.
 
 Exit status: 0 done; 1 a step failed; 2 a usage or file error; 5 TrueNAS refused the password.
 Standard library only, Python 3.10 or later.
@@ -97,7 +97,7 @@ DUMP_CALLS = (
 
 
 class Timing:
-    """Tries and pauses (seconds). The tests shrink them."""
+    """Tries and pauses (seconds)."""
 
     health_wait_s = 1800.0
     health_poll_s = 10.0
@@ -590,7 +590,7 @@ def commit(ctx, changed: list) -> None:
         S.reconnect()
     # Ask before checking in: interface.checkin_waiting is the seconds left before TrueNAS rolls the
     # change back, or null when nothing waits (a check-in already arrived, or there was nothing to
-    # roll back). Whether the change stuck is judged afterwards from the interfaces themselves.
+    # roll back). Whether the change stuck is checked afterwards from the interfaces themselves.
     last = None
     for i in range(Timing.checkin_tries):
         try:
@@ -714,7 +714,7 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fi
 
 
 def run_kubectl(argv, args: list, stdin: str) -> str:
-    """The harness's kubectl (argv: the program and its leading arguments, the program relative to the
+    """The lab's kubectl (argv: the program and its leading arguments, the program relative to the
     repository root unless absolute), the manifest on its standard input; its output, redacted."""
     argv = list(argv)
     if argv and not os.path.isabs(argv[0]):
@@ -752,7 +752,7 @@ def step_csi(ctx) -> None:
 
 def step_ui(ctx) -> None:
     """The web interface and API answer only on the addresses setup.json names (the storage
-    management address, and the user-mode NIC the harness reaches the system through): bound
+    management address, and the user-mode NIC the lab tooling reaches the system through): bound
     there, never on the data address. Rebinding restarts the web server, which drops this session."""
     S, setup, log = ctx["S"], ctx["setup"], ctx["log"]
     ui = setup.get("ui") or {}

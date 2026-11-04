@@ -1,6 +1,6 @@
 # shellcheck shell=bash
-# common/drill/lib-drill.sh: the drill harness, sourced by a chapter's
-# drills.sh after lib.sh's sfab_init drills, which opened audits/<lab>_drills_<UTC>/. The plan is
+# common/drill/lib-drill.sh: the drill tooling, sourced by a chapter's
+# drills.sh after lib.sh's sfab_init drills, which opened runs/<lab>_drills_<UTC>/. The plan is
 # gen/drills.json (rendered from chapter.yaml's drills block by sfab.render.drills).
 #
 #   drills_main                    --drills "ID ..." --passes N: every pass runs every drill, in the
@@ -8,7 +8,7 @@
 #   drill_run PASS ID              one drill, one pass, into pass<PASS>/<ID>/
 #
 # One drill, in order, every time on the lab host's clock (date +%s.%N here, tcpdump -tt there):
-#   1. whole     the pair's session, roles and every PortChannel as rendered (judge.py mclag-pair on
+#   1. whole     the pair's session, roles and every PortChannel as rendered (checks.py mclag-pair on
 #                show mclag brief and show PortChannel summary), and every bond toward the pair on
 #                its legs under the system MAC, in two consecutive polls 5 s apart; else the drill
 #                is not run (a drill that starts from a broken lab measures nothing)
@@ -28,7 +28,7 @@
 #   8. tail      the probes run tail_s more (return_tail_s after a return); then everything this
 #                drill started stops: pings with SIGINT (so ping prints its statistics), the loops,
 #                the monitor, the captures (kill -INT, waiting on their PIDs)
-#   9. after     the lab whole again (as in 1, the verdict line says so), GRO and parity on a
+#   9. after     the lab whole again (as in 1, the result line says so), GRO and parity on a
 #                rebooted switch, then audit.sh --quick; drill.py analyze writes analysis.json
 #
 # Nothing here uses docker pause or takes a link down from the container side; a fault is a KLISH
@@ -68,10 +68,10 @@ drill_cleanup() {
 # --------------------------------------------------------------------------------------------
 # the lab whole
 
-# pair_poll DIR: the pair's session, roles and every PortChannel as rendered (judge.py mclag-pair).
+# pair_poll DIR: the pair's session, roles and every PortChannel as rendered (checks.py mclag-pair).
 # As in drill_shut, the session's echo must reach the closing `exit`: on the lab host a read of
 # fe-sw1 just after keepalive-link's restore echoed `show PortChannel summary` and printed nothing
-# more, which judged every PortChannel absent and took the drill's whole return wait. A read cut
+# more, which checked every PortChannel absent and took the drill's whole return wait. A read cut
 # short, or still running after $SFAB_DRILL_SESSION_S (90 s; a read takes about 4 s), is typed
 # again, up to three times, each short try named on a RETYPED timeline line and kept as
 # <sw>.session.tryN until the next poll empties DIR.
@@ -90,10 +90,10 @@ pair_poll() {
       tl RETYPED "pair read on $sw cut short before its exit (try $try, $(basename "$dir")/$sw.session.try$try)"
     done
     printf '01\tmclag_brief\tklish\t.txt\tshow mclag brief\n02\tportchannel_summary\tklish\t.txt\tshow PortChannel summary\n' >"$dir/$sw.plan"
-    py "$SFAB_COMMON/audit/judge.py" split --style klish --plan "$dir/$sw.plan" --session "$dir/$sw.session" --out "$dir/$sw" >/dev/null || true
+    py "$SFAB_COMMON/audit/checks.py" split --style klish --plan "$dir/$sw.plan" --session "$dir/$sw.session" --out "$dir/$sw" >/dev/null || true
   done
-  SFAB_VERDICT="$dir/verdict.txt" py "$SFAB_COMMON/audit/judge.py" run --set "$dir" --inv "$INV" --render "$RENDERDIR" \
-    mclag-pair "$a" "$b" >"$dir/judge.txt" 2>&1
+  SFAB_RESULTS="$dir/results.txt" py "$SFAB_COMMON/audit/checks.py" run --set "$dir" --inv "$INV" --render "$RENDERDIR" \
+    mclag-pair "$a" "$b" >"$dir/checks.txt" 2>&1
 }
 
 # bond_read NODE: the node's bonding file (a VM guest over SSH, the bastion by docker exec)
@@ -144,7 +144,7 @@ lab_whole() {
     ok "$label: the pair's session, roles and PortChannels as rendered, and every bond on its legs under the system MAC (poll $i)"
     return 0
   fi
-  bad "$label" "$( { grep -h '^  FAIL  ' "$dir/pair/judge.txt" 2>/dev/null | head -n 2 | sed 's/^  FAIL  //'; head -n 2 "$dir/bonds/bonds.txt" 2>/dev/null; } | paste -sd ';' -)"
+  bad "$label" "$( { grep -h '^  FAIL  ' "$dir/pair/checks.txt" 2>/dev/null | head -n 2 | sed 's/^  FAIL  //'; head -n 2 "$dir/bonds/bonds.txt" 2>/dev/null; } | paste -sd ';' -)"
   return 1
 }
 
@@ -368,8 +368,8 @@ monitor_fw_loop() {
     EVID_OFF=1 FW "show lacp aggregate-ethernet all" >"$tmp" 2>/dev/null || true
     sel="$(py -c 'import sys
 sys.path.insert(0, sys.argv[1])
-import judge
-g = judge.p_panos_lacp(open(sys.argv[2]).read())
+import checks
+g = checks.p_panos_lacp(open(sys.argv[2]).read())
 print(",".join(",".join(m for m, x in sorted(v["members"].items()) if x.get("selected")) for v in g.values()) or "none")' "$SFAB_COMMON/audit" "$tmp" 2>/dev/null || echo '?')"
     printf '%s %s\n' "$(now)" "$sel" >>"$D/monitor-fw.log"
     sleep "${SFAB_DRILL_FW_S:-3}"
@@ -633,7 +633,7 @@ drill_run() {
 # rendered and every bond back on its legs, in two consecutive polls, the first no sooner than 10 s
 # after the restore; then the probes run return_tail_s more. The standby that shut its MCLAG ports
 # while the keepalive was gone holds them down for delay-restore once it is back (the keepalive
-# probe), so this is a wait for an event, recorded with the time it was seen.
+# probe), so this is a wait for an event, saved with the time it was seen.
 drill_await_return() {
   local t1="$1" rmax rtail good=0 el
   rmax="$(dget timing.return_max_s)" rtail="$(dget timing.return_tail_s)"
@@ -648,8 +648,8 @@ drill_await_return() {
       [ "$good" -lt 2 ] || break
     else
       good=0
-      if grep -q '^  FAIL  ' "$D/return/pair/judge.txt" 2>/dev/null; then
-        printf '+%s s pair: %s\n' "$el" "$(grep -h -m1 '^  FAIL  ' "$D/return/pair/judge.txt" | sed 's/^  FAIL  //')" >>"$D/return/polls.txt"
+      if grep -q '^  FAIL  ' "$D/return/pair/checks.txt" 2>/dev/null; then
+        printf '+%s s pair: %s\n' "$el" "$(grep -h -m1 '^  FAIL  ' "$D/return/pair/checks.txt" | sed 's/^  FAIL  //')" >>"$D/return/polls.txt"
       else
         printf '+%s s pair ok, bonds: %s\n' "$el" "$(head -n 1 "$D/return/bonds/bonds.txt" 2>/dev/null)" >>"$D/return/polls.txt"
       fi
@@ -662,21 +662,21 @@ drill_await_return() {
     sleep "$rtail"
     return 0
   fi
-  bad "pass $PASS $DRILL_ID: the pair whole again within ${rmax} s of the restore" "$( { grep -h '^  FAIL  ' "$D/return/pair/judge.txt" 2>/dev/null | head -n 2 | sed 's/^  FAIL  //'; head -n 2 "$D/return/bonds/bonds.txt" 2>/dev/null; } | paste -sd ';' -)"
+  bad "pass $PASS $DRILL_ID: the pair whole again within ${rmax} s of the restore" "$( { grep -h '^  FAIL  ' "$D/return/pair/checks.txt" 2>/dev/null | head -n 2 | sed 's/^  FAIL  //'; head -n 2 "$D/return/bonds/bonds.txt" 2>/dev/null; } | paste -sd ';' -)"
   return 1
 }
 
-# drill_known KIND: the platform limits that bear on what this drill's figures mean (spec/known.yaml)
+# drill_known KIND: the platform limits that bear on what this drill's figures mean (spec/limitations.yaml)
 drill_known() {
   local dups
   if [ "$1" = shut ]; then
-    known L9 "pass $PASS $DRILL_ID: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure"
+    limitation "pass $PASS $DRILL_ID: a KLISH shutdown drops no carrier at the far end, so every member figure here is an LACP-timeout figure"
   else
-    known L2 "pass $PASS $DRILL_ID: delay-restore holds nothing down, so the return is boot plus LACP, recorded as an event and never as a span"
+    limitation "pass $PASS $DRILL_ID: delay-restore holds nothing down, so the return is boot plus LACP, saved as an event and never as a span"
   fi
   dups="$(py -c 'import json, sys; print(json.load(open(sys.argv[1])).get("ping", {}).get("dup", 0))' "$D/analysis.json" 2>/dev/null || echo 0)"
   if [ "${dups:-0}" != 0 ]; then
-    known L1 "pass $PASS $DRILL_ID: $dups duplicate ping replies (peer-link isolation is not enforced)"
+    limitation "pass $PASS $DRILL_ID: $dups duplicate ping replies (peer-link isolation is not enforced)"
   fi
 }
 
@@ -686,7 +686,7 @@ drill_reboot_checks() {
   local sw="$1" rc=0 probs norm=() prc=0
   # shellcheck disable=SC2016 # expanded by the switch's shell
   SH "$sw" 'for i in $(ls /sys/class/net | grep "^eth[1-9][0-9]*$" | sort -V); do echo "== $i"; /usr/sbin/ethtool -k "$i" | grep -E "^(generic-receive-offload|rx-gro-hw|large-receive-offload):"; done' >"$D/gro-$sw.txt" 2>&1 || true
-  if probs="$(py "$SFAB_COMMON/audit/judge.py" offloads --nics "${NODE_NUM_NICS[$sw]}" "$D/gro-$sw.txt")"; then
+  if probs="$(py "$SFAB_COMMON/audit/checks.py" offloads --nics "${NODE_NUM_NICS[$sw]}" "$D/gro-$sw.txt")"; then
     ok "pass $PASS $DRILL_ID: $sw after its reboot: GRO, rx-gro-hw and LRO off on all ${NODE_NUM_NICS[$sw]} data NICs"
   else
     bad "pass $PASS $DRILL_ID: $sw after its reboot: GRO, rx-gro-hw and LRO off" "$(printf '%s' "$probs" | head -n 2 | paste -sd ';' -)"
@@ -726,7 +726,7 @@ drill_events_archive() {
 }
 
 # drill_quick_audit: audit.sh --quick on the devices the drill touched (the switches and the
-# firewall), its verdict kept in the drill's directory
+# firewall), its result kept in the drill's directory
 drill_quick_audit() {
   local out="$D/audit-quick.txt" res
   if [ "${SFAB_DRILL_AUDIT:-1}" = 0 ]; then

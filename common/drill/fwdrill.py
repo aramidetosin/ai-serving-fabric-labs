@@ -9,7 +9,7 @@
 
 analyze reads one pass of one drill from its directory (the files lib-fwdrill.sh saved), writes
 analysis.json and analysis.txt there and prints the result vocabulary, appending each line to
-$SFAB_VERDICT.
+$SFAB_RESULTS.
 
   land        the counter's name in the firewall's own counter table (else nothing here relies on
               it, and the line says so); with the rule in place the node's requests answered and
@@ -168,7 +168,7 @@ def analyze_land(v, plan: dict, dr: dict, d: Path, pas: int) -> dict:
         v.check(f"{pre}: ... and {name} rose by {deltas['broken']} while {pk['sent']} requests were sent", (deltas["broken"] or 0) > 0,
                 "it did not rise")
     v.ok(f"{pre}: drop counters that moved during it: " + (", ".join(f"{k} +{x}" for k, x in sorted(moved.items())) or "none")
-         + " (recorded; not judged)")
+         + " (saved; not checked)")
     # the delta view read right after the probe (its baseline read right before it)
     dv = PP.counters_cli(PP.read(d / "drop-delta-after.txt"))
     a["delta_view"] = {k: x.get("value") for k, x in dv.items()}
@@ -185,7 +185,7 @@ def analyze_land(v, plan: dict, dr: dict, d: Path, pas: int) -> dict:
             v.check(f"{pre}: the drop stage captured {len(fr)} frame(s) from {dr['diag']['source']} to {dr['diag']['destination']} "
                     "(diag/drop.decode.txt)", len(fr) > 0, "none: see diag/drop.view.txt for what the firewall printed")
         else:
-            v.ok(f"{pre}: the {st} stage captured {len(fr)} frame(s) from {dr['diag']['source']} to {dr['diag']['destination']} (recorded)")
+            v.ok(f"{pre}: the {st} stage captured {len(fr)} frame(s) from {dr['diag']['source']} to {dr['diag']['destination']} (saved)")
     a["diag"] = diag
     host = {}
     for eth in (dr.get("capture") or {}).get("eths") or []:
@@ -262,7 +262,7 @@ def analyze_ntp(v, plan: dict, dr: dict, d: Path, pas: int) -> dict:
     v.check(f"{pre}: no {what} frame from {dr['to']['address']} reached the server's side (the bundle: {inside} frames)", inside == 0,
             f"{inside} frames")
     if eths:
-        v.ok(f"{pre}: {what} frames from {dr['to']['address']} on the uplink ({eths[-1]}): {host.get(eths[-1], 0)} (recorded; not judged)")
+        v.ok(f"{pre}: {what} frames from {dr['to']['address']} on the uplink ({eths[-1]}): {host.get(eths[-1], 0)} (saved; not checked)")
     try:
         back = json.loads(PP.read(d / "restored-entries.json") or "[]")
     except ValueError:
@@ -301,7 +301,7 @@ def cmd_analyze(a) -> int:
     dr = drill_of(plan, a.drill)
     d = Path(a.dir)
     tee = _Tee()
-    v = vocab.Vocab(known=None, out=tee)
+    v = vocab.Vocab(out=tee)
     before = v.counts()["fail"]
     res = analyze_land(v, plan, dr, d, a.pass_) if dr["kind"] == "fw_nat_removed" else analyze_ntp(v, plan, dr, d, a.pass_)
     res["fails"] = v.counts()["fail"] - before
@@ -365,9 +365,9 @@ def cmd_summarize(a) -> int:
                     L.append(f"| {p} | {svc} | {e.get('rule', '-')} | {e.get('action', '-')} | {e.get('from', '-')} | {e.get('to', '-')} | "
                              f"{inside} | {b.get('rule', '-')} |")
         L.append("")
-    verdict = PP.read(rs / "verdict.txt")
-    L += ["## Verdict", "", "```"] + [l for l in verdict.splitlines() if l.strip()] + ["```", ""]
-    counts = vocab.counts_of(str(rs / "verdict.txt"))
+    results = PP.read(rs / "results.txt")
+    L += ["## Results", "", "```"] + [l for l in results.splitlines() if l.strip()] + ["```", ""]
+    counts = vocab.counts_of(str(rs / "results.txt"))
     L += [vocab.result_line(counts), ""]
     (rs / "drills.md").write_text("\n".join(L), encoding="utf-8")
     return 0

@@ -19,7 +19,7 @@ default) before its next. Every request ends one of three ways:
 
 The report counts each, and the failed requests by what ended them, and prints the repository's
 PASS, FAIL and RESULT lines: no failed request (the criterion every drill under load uses), no
-stream cut mid-answer (with --cut-ok it is reported beside the count, not judged), and at least
+stream cut mid-answer (with --cut-ok it is reported beside the count, not checked), and at least
 one request answered. Nothing here measures how fast: the report and the records hold no
 duration, token count or rate. --records writes one JSON line per request (its user, when it
 started in whole seconds from the start of the run, its status, its outcome and what ended it).
@@ -220,7 +220,7 @@ def report(a, records: list, resolve, out=sys.stdout) -> int:
     chk(answered > 0, "at least one request answered", "none")
     chk(not failed, f"no failed request ({len(failed)} of {n})", f"{len(failed)} failed")
     if a.cut_ok:
-        print(f"  streams cut mid-answer: {len(cut)} (reported, not judged)", file=out)
+        print(f"  streams cut mid-answer: {len(cut)} (reported, not checked)", file=out)
     else:
         chk(not cut, f"no stream cut mid-answer ({len(cut)} of {n})", f"{len(cut)} cut")
     print(f"== RESULT: {passed} passed, {bad} failed, 0 known platform limitation(s), 0 skipped", file=out, flush=True)

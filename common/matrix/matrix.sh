@@ -1,11 +1,11 @@
 # shellcheck shell=bash
 # common/matrix/matrix.sh: chapter 2's matrix run, sourced after lib.sh's sfab_init
-# by a lab's matrix.sh, and by common/break/breakheal.sh for break-2a's matrix_cells record.
+# by a lab's matrix.sh, and by common/break/breakheal.sh for break-2a's matrix_cells observe step.
 #
-#   matrix_run                  every cell of gen/matrix.json into the result set ($RS), judged by
+#   matrix_run                  every cell of gen/matrix.json into the run directory ($RS), checked by
 #                               common/matrix/matrix.py, which writes matrix.md
 #   matrix_cells DIR [CELL...]  the named cells (every cell without one) into DIR: the evidence only,
-#                               which matrix.py observe and judge read
+#                               which matrix.py observe and check read
 #
 # Each population's cells are tried from its own client, by TCP connect (common/trace/syn_connect.py,
 # from a pinned source port) and HTTP request (curl, its source port pinned with --local-port), never
@@ -49,7 +49,7 @@ mx_guest_in() {
     "$GUEST_USER@$(node_mgmt "$n")" "sudo bash -c $(printf '%q' "$*")"
 }
 
-# mx_in NODE KIND CMD: CMD in a client container (sh -c) or a VM guest (H), recorded in the transcript
+# mx_in NODE KIND CMD: CMD in a client container (sh -c) or a VM guest (H), saved in the transcript
 mx_in() {
   local n="$1" kind="$2"
   shift 2
@@ -182,9 +182,9 @@ matrix_cells() {
   done
   # 3. requests; where a cell of them is dropped by zone protection's strict IP check, which no log
   # line records, the firewall's drop counters are read around them: every counter's value
-  # (show counter global filter value all) before and after, which the judge compares, and between
+  # (show counter global filter value all) before and after, which the checker compares, and between
   # those two reads the delta view (its first read starts the sampling, the second holds what was
-  # dropped since), recorded beside them. The values decide: the firewall can start a new delta
+  # dropped since), saved beside them. The values decide: the firewall can start a new delta
   # sampling between the two delta reads, and the view then misses what came before it.
   local sip=""
   [ -z "${FW_NODE:-}" ] || sip="$(py "$MXP" strict-ip --plan "$MX_PLAN" "${only[@]+"${only[@]}"}")"
@@ -248,6 +248,6 @@ matrix_run() {
   sec "the matrix: $(mx_get counts.cells) cells, $(mx_get counts.allowed) allowed and $(mx_get counts.forbidden) forbidden"
   matrix_cells "$RS"
   [ -z "${SFAB_TICK_STAMP:-}" ] || stamp_args=(--stamp "$SFAB_TICK_STAMP")
-  py "$MXP" judge --plan "$MX_PLAN" --dir "$RS" "${stamp_args[@]+"${stamp_args[@]}"}" || true
+  py "$MXP" check --plan "$MX_PLAN" --dir "$RS" "${stamp_args[@]+"${stamp_args[@]}"}" || true
   summary
 }

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Part III's audit groups of judge.py (chapters 8 to 11), judged from the files
+"""Part III's audit groups of checks.py (chapters 8 to 11), checked from the files
 common/audit/lib-tenancy.sh saves, against gen/tenancy.json (sfab.render.tenancy).
 
 audiences (audiences/, chapter 8): a Gateway per audience
@@ -42,8 +42,8 @@ split-horizon (split-horizon/, chapter 9): one hostname, an answer per populatio
   the SYN       the internet client's connect to the published address meets the firewall as the
                 render says at this step (deny-all-log from isp to isp before the translation is
                 configured, the translation and isp-to-internet-gateway after)
-  Envoy's       Cilium's copies of the Gateway certificates recorded, and the certificates each
-  copies        recorded node's Envoy has loaded (both ingress nodes and the first control node):
+  Envoy's       Cilium's copies of the Gateway certificates saved, and the certificates each
+  copies        audited node's Envoy has loaded (both ingress nodes and the first control node):
                 every node's Envoy holds every Gateway's key, Chapter 8; the audit records it and
                 does not fail on it
 
@@ -218,8 +218,7 @@ def session_count(text: str) -> int | None:
     return int(m.group(1)) if m else None
 
 
-# PAN-OS 12.1.2 prints the discard timeouts on the line after their heading (recorded on the lab's
-# first ch10 deploy): "Session timeout in discard state:" then "TCP: 90 secs, UDP: 60 secs, ..."
+# PAN-OS 12.1.2 prints the discard timeouts on the line after their heading: "Session timeout in discard state:" then "TCP: 90 secs, UDP: 60 secs, ..."
 DISCARD_HEAD = re.compile(r"(?i)^\s*Session timeout in discard state:\s*$")
 DISCARD_TCP = re.compile(r"(?i)^\s*TCP:\s*(\d+)\s*secs")
 
@@ -239,7 +238,7 @@ def session_timeouts(text: str) -> dict:
     return out
 
 
-def judge_hold(v, d: Path, hp: dict, tag: str, factor: int = 1, label: str = "") -> dict:
+def check_hold(v, d: Path, hp: dict, tag: str, factor: int = 1, label: str = "") -> dict:
     """The held connections of every hold row in d: each connection held with every reply 200, and
     the row's session count within its bound (times factor, the isolation drill's doubled load)."""
     out = {}
@@ -309,7 +308,7 @@ def _certs(text: str) -> dict:
 
 def _cert_serials(text: str) -> dict:
     """gateway-certs.txt (and audiences/certs.txt): Gateway -> (its Secret, its certificate's serial in lower-case hex, or
-    None when the file holds no serial line: sets recorded before the serial was read)."""
+    None when the file holds no serial line)."""
     out, cur = {}, None
     for line in (text or "").splitlines():
         m = re.match(r"^== (\S+) (\S+)", line)
@@ -458,10 +457,10 @@ def g_audiences(self, names):
                 bool(b) and a == b and f"{rm['caller']}.{rm['id']}" not in a, f"before {len(b)}, after {len(a)}")
     col = p.get("column")
     if col:
-        judge_column(v, d, plan_of(self.render), col)
+        check_column(v, d, plan_of(self.render), col)
 
 
-def judge_column(v, d: Path, tp: dict, col: dict):
+def check_column(v, d: Path, tp: dict, col: dict):
     """The internet Gateway's column: each other population's connect to its VIP as the render says."""
     import panos_parse as PP  # noqa: PLC0415
 
@@ -579,9 +578,9 @@ def g_split_horizon(self, names):
     serials = _cert_serials(_text(d / "gateway-certs.txt"))
     copies = _secret_copies(_text(d / "cilium-secrets.txt"))
     owners = sorted({o for o in copies.values() if o})
-    v.ok(f"Cilium's copies of the Gateway certificates in {ec['namespace']} recorded ({len(copies)} copies, each named by a hash, "
+    v.ok(f"Cilium's copies of the Gateway certificates in {ec['namespace']} saved ({len(copies)} copies, each named by a hash, "
          f"labelled with the Secret it copies: {', '.join(owners) or 'none'}); every node's Envoy loads them, which the audit "
-         f"records and does not judge")
+         f"records and does not check")
     for n in ec.get("nodes") or []:
         t = _text(d / f"envoy-certs-{n}.txt")
         held = _envoy_serials(t)
@@ -591,8 +590,8 @@ def g_split_horizon(self, names):
         else:
             what = (f"{len(held)} certificates loaded; by serial, the certificates of {', '.join(named) or 'no Gateway'}"
                     + (f", {len(held) - len(named)} other" if len(held) > len(named) else ""))
-        v.ok(f"{n}'s Envoy: its loaded certificates as {' '.join(ec.get('command') or [])} lists them recorded "
-             f"(envoy-certs-{n}.txt, {what}), not judged")
+        v.ok(f"{n}'s Envoy: its loaded certificates as {' '.join(ec.get('command') or [])} lists them saved "
+             f"(envoy-certs-{n}.txt, {what}), not checked")
 
 
 # --------------------------------------------------------------------------------------------
@@ -601,7 +600,7 @@ def g_split_horizon(self, names):
 
 def _blocks(text: str) -> dict:
     """show running security-policy or nat-policy: name -> {index, line, fields {key: (value, line)}}
-    (walktrace.py's reading, kept here so the judge needs no trace module)."""
+    (walktrace.py's reading, kept here so the checker needs no trace module)."""
     import panos_parse as PP  # noqa: PLC0415
 
     out, cur = {}, None
@@ -662,8 +661,7 @@ def g_zone_nat(self, names):
     got_nat, got_all = PP.policy(nat_t), PP.policy(sec_t)
     v.check(f"the NAT rulebase in the rendered order: {', '.join(p['nat_order'])}", got_nat == p["nat_order"], f"running {', '.join(got_nat) or 'none'}")
     # PAN-OS 12.1.2 lists its predefined rules after the rulebase in show running security-policy, as
-    # "vsys1+intrazone-default" and "vsys1+interzone-default" (recorded on the lab's first ch10
-    # deploy); they are not the rulebase's, so the order is judged without them and each is checked
+    # "vsys1+intrazone-default" and "vsys1+interzone-default"; they are not the rulebase's, so the order is checked without them and each is checked
     # to deny, as the render overrides them
     predef = [x for x in got_all if PREDEFINED.match(x)]
     got_sec = [x for x in got_all if not PREDEFINED.match(x)]
@@ -718,7 +716,7 @@ def g_zone_nat(self, names):
     hp = tp.get("hold")
     if hp:
         v.sec("zone-keyed translation: sessions per zone under the held connections (chapter 10)")
-        judge_hold(v, d, hp, "held")
+        check_hold(v, d, hp, "held")
 
 
 # --------------------------------------------------------------------------------------------

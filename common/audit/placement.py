@@ -1,8 +1,8 @@
-"""The placement group of judge.py (chapter 6): the serving pods read back against the placement table.
+"""The placement group of checks.py (chapter 6): the serving pods read back against the placement table.
 
-audit_placement in lib-audit.sh saves the reads into the set's placement/ (the table it judges
+audit_placement in lib-audit.sh saves the reads into the set's placement/ (the table it checks
 against as placement/serving.env: the rendered bootstrap/k8s/serving.env, or the one audit.sh
---table names), then `judge.py run ... placement` judges them, from the saved files only:
+--table names), then `checks.py run ... placement` checks them, from the saved files only:
 
   the table       the recipe's own rules (serving-layer/serving.py check): every pod of a copy on one
                   rail, one server and at least one worker a copy, every rail address inside its
@@ -136,7 +136,7 @@ def g_placement(self, names):
     except sv.ServingError as e:
         v.bad("the table keeps the recipe's rules (every pod of a copy on one rail, one server and a worker a copy, every address once)", str(e))
         s = None
-        # judge the rows anyway: the table may break the rules and still name every pod
+        # check the rows anyway: the table may break the rules and still name every pod
         try:
             pods_ = sv.table(env, "POD")
             nads_ = sv.table(env, "NAD")

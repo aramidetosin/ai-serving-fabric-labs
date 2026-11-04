@@ -20,16 +20,16 @@ Memory: a budget of 126.5 GiB, and preflight wants MemAvailable to cover it plus
 ```
 cd ch03
 make render          # topo.clab.yml, bootstrap/ and gen/ (gen/drills.json and gen/breaks.json among them)
-make up              # preflight, up, boot, finish, audit (book Example 3-1)
-make audit           # audits/sfab-ch03_audit_<UTC>/ (Example 3-2)
-make trace           # audits/sfab-ch03_trace_<UTC>/ with trace.md (Example 3-5)
-make dbs             # audits/sfab-ch03_dbs_<UTC>/: k8s-gpu1's member Ethernet6 on fe-sw1 through SONiC's databases, read-only (Examples 3-6 to 3-9, Table 3-3)
-make drills          # audits/sfab-ch03_drills_<UTC>/ with drills.md, three passes (Examples 3-10 to 3-12)
-make record          # after the drills: audit, trace, then the gate on both sets (Example 3-13)
-make break-3a        # audits/sfab-ch03_break-3a_<UTC>/ (Exercise 4)
-make heal-3a         # audits/sfab-ch03_heal-3a_<UTC>/, then the chapter audit
-make break-3b        # audits/sfab-ch03_break-3b_<UTC>/ (Exercise 5)
-make heal-3b         # audits/sfab-ch03_heal-3b_<UTC>/, then the chapter audit
+make up              # preflight, up, boot, finish, audit
+make audit           # runs/sfab-ch03_audit_<UTC>/
+make trace           # runs/sfab-ch03_trace_<UTC>/ with trace.md
+make dbs             # runs/sfab-ch03_dbs_<UTC>/: k8s-gpu1's member Ethernet6 on fe-sw1 through SONiC's databases, read-only
+make drills          # runs/sfab-ch03_drills_<UTC>/ with drills.md, three passes
+make verify          # after the drills: audit, trace, then the results check on both sets
+make break-3a        # runs/sfab-ch03_break-3a_<UTC>/
+make heal-3a         # runs/sfab-ch03_heal-3a_<UTC>/, then the chapter audit
+make break-3b        # runs/sfab-ch03_break-3b_<UTC>/
+make heal-3b         # runs/sfab-ch03_heal-3b_<UTC>/, then the chapter audit
 make down            # keeps state/ disks; make wipe removes them
 ```
 
@@ -39,4 +39,4 @@ Once the lab is up, `ssh admin@sfab-ch03-<node>` from the lab host logs in to `b
 
 ## What the checks do
 
-`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `audits/` in this directory, which git ignores. `spec/known.yaml` lists the known limits of the virtual platforms.
+`audit.sh`, `trace.sh`, the other scripts in this directory and `breaks/` each open with a description of what they check and change. Each run prints to the terminal and saves its files under `runs/` in this directory, which git ignores. `spec/limitations.yaml` lists the known limits of the virtual platforms.

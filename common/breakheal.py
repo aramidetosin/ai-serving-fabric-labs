@@ -26,8 +26,8 @@
 
 Run from a lab directory (make break-3a does). The breaks are the lab's breaks/<id>.yaml, rendered
 to gen/breaks.json (sfab.render.drills), so nothing here needs PyYAML. break and heal hand over to
-common/break/breakheal.sh, which holds the lab's lock, owns the result set
-(audits/<lab>_break-<id>_<UTC>/ or audits/<lab>_heal-<id>_<UTC>/) and runs the device actions with
+common/break/breakheal.sh, which holds the lab's lock, owns the run directory
+(runs/<lab>_break-<id>_<UTC>/ or runs/<lab>_heal-<id>_<UTC>/) and runs the device actions with
 lib.sh's runners; the other subcommands are its helpers. state/breaks/<id> marks a break as applied,
 so the same break is never applied twice.
 
@@ -69,10 +69,10 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE / "audit"))
-import judge  # noqa: E402
+import checks  # noqa: E402
 import panos_parse as PP  # noqa: E402
 
-PARTS = ("break", "record", "expect_broken", "heal", "expect_healed", "cleanup")
+PARTS = ("break", "observe", "expect_broken", "heal", "expect_healed", "cleanup")
 
 
 def labdir() -> Path:
@@ -110,12 +110,12 @@ def cmd_vlan(a) -> int:
     except OSError:
         print("show vlan not saved")
         return 1
-    got = judge.p_vlan(text)
+    got = checks.p_vlan(text)
     if a.vlan not in got:
         print(f"Vlan{a.vlan} absent")
         return 1
     mode = got[a.vlan].get(a.port)
-    print(f"Vlan{a.vlan}: " + (",".join(f"{p}({m})" for p, m in sorted(got[a.vlan].items(), key=lambda kv: judge.natural(kv[0]))) or "no members"))
+    print(f"Vlan{a.vlan}: " + (",".join(f"{p}({m})" for p, m in sorted(got[a.vlan].items(), key=lambda kv: checks.natural(kv[0]))) or "no members"))
     want_present = a.present == "1"
     if want_present:
         return 0 if mode is not None and (not a.mode or mode == a.mode) else 1
@@ -130,7 +130,7 @@ def cmd_mclag(a) -> int:
     except OSError:
         print("show mclag brief not saved")
         return 1
-    got = (judge.p_mclag(text).get("_interfaces") or {}).get(a.portchannel)
+    got = (checks.p_mclag(text).get("_interfaces") or {}).get(a.portchannel)
     if got is None:
         print(f"{a.portchannel} is not among the MLAG interfaces it lists")
         return 1
@@ -187,7 +187,7 @@ def echoes(text: str) -> list:
 
 def cmd_farcap(a) -> int:
     b = load_breaks(Path(a.breaks)).get(a.id) or {}
-    pr = next((x for x in b.get("record") or [] if x.get("kind") == "probe_rail" and x.get("id") == a.probe), None)
+    pr = next((x for x in b.get("observe") or [] if x.get("kind") == "probe_rail" and x.get("id") == a.probe), None)
     cap = (pr or {}).get("capture")
     if not cap:
         print(f"no probe_rail {a.probe} with a capture in break {a.id}")
@@ -229,7 +229,7 @@ SYN_TCP = re.compile(r"(\d+\.\d+\.\d+\.\d+)\.(\d+) > (\d+\.\d+\.\d+\.\d+)\.(\d+)
 
 def _syn_probe(breaks: Path, bid: str, probe: str):
     b = load_breaks(breaks).get(bid) or {}
-    return next((x for x in b.get("record") or [] if x.get("kind") == "probe_syn" and x.get("id") == probe), None)
+    return next((x for x in b.get("observe") or [] if x.get("kind") == "probe_syn" and x.get("id") == probe), None)
 
 
 def _syn_sports(d: Path, probe: str, mode: str) -> list:
@@ -485,13 +485,13 @@ def cmd_lookup(a) -> int:
                 parts.append(f"{t} {r['rcode']} with {r['answers']} answer(s)")
             else:
                 parts.append(f"{t} {'resolved' if r['ok'] else 'failed'} in {r['seconds']} s")
-        print("; ".join(parts) or "nothing recorded")
+        print("; ".join(parts) or "nothing saved")
         return 0
     c = json.loads(a.check)
     if c.get("tool"):
         r = got.get(c["tool"])
         if r is None:
-            print(f"{c['tool']}: not recorded")
+            print(f"{c['tool']}: not saved")
             return 1
         what = f"{c['tool']} {'resolved' if r['ok'] else 'failed'} in {r['seconds']} s, exit {r['exit']}" + (f" ({r['line']})" if r.get("line") else "")
         print(what)
@@ -499,7 +499,7 @@ def cmd_lookup(a) -> int:
     t = {"A": "dig-a", "AAAA": "dig-aaaa"}[c["type"]]
     r = got.get(t)
     if r is None:
-        print(f"{t}: not recorded")
+        print(f"{t}: not saved")
         return 1
     want = r["rcode"] == c["rcode"] and (c.get("answers") is None or r["answers"] == c["answers"])
     if c.get("not"):

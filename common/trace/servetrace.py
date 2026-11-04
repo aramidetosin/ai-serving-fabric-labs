@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""servetrace.py: chapter 6's serving trace, its capture points and its judgment
+"""servetrace.py: chapter 6's serving trace, its capture points and its check
 (common/trace/lib-servetrace.sh).
 
     servetrace.py get    --plan gen/trace.json PATH          a value of the plan (a list one item a line)
@@ -7,7 +7,7 @@
                                                              lease the set saved (cluster/): TSV, one a line,
                                                              id, kind, node, namespace, pod, interface,
                                                              filter, capture length, keyed (1 or 0)
-    servetrace.py judge  --set DIR --plan gen/trace.json --inv INV [--stamp TEXT]
+    servetrace.py check  --set DIR --plan gen/trace.json --inv INV [--stamp TEXT]
 
 The plan is gen/trace.json (sfab.render.trace, serving form). The points are found when the trace
 runs: the node the users' VIP's lease names (its bond0, port 443 to the VIP), every API gateway pod
@@ -16,8 +16,8 @@ rail attachment, every worker on its rail attachment, and the rail switch ports 
 nodes on its rail (each a container port on the lab host). A pod's capture runs inside its network
 namespace in its node's guest and is decoded there.
 
-judge reads the saved files only and prints the result vocabulary, appending each line to
-$SFAB_VERDICT, then writes trace.md. It follows the request hop by hop, by the addresses each hop
+check reads the saved files only and prints the result vocabulary, appending each line to
+$SFAB_RESULTS, then writes trace.md. It follows the request hop by hop, by the addresses each hop
 sends to and the segments that carry data (a segment with a TCP payload; the kubelet's probes of the
 API gateway carry none, and its probes of the router come from no API gateway pod):
 
@@ -46,7 +46,7 @@ Decodes are tcpdump -nn -tt -e -v -r. Standard library only.
 Chapter 7's keyed trace (the plan's keys.capture) captures the API gateway's and the router's
 cluster interfaces whole instead, each pcap scrubbed on its way out of the guest
 (common/trace/keyscrub.py: every Authorization value replaced by its keyed mark) and decoded twice,
-<point>.txt as above and <point>-payload.txt with -A. The judge then reads the HTTP requests each
+<point>.txt as above and <point>-payload.txt with -A. The checker then reads the HTTP requests each
 hop carried, from the payload decodes:
 
   hop 1       the request from the Gateway's proxy to the API gateway pod: POST on the model's path,
@@ -351,10 +351,10 @@ def headers(text: str) -> dict:
 
 
 # --------------------------------------------------------------------------------------------
-# judgment
+# check
 
 
-def judge(a) -> int:
+def run_checks(a) -> int:
     rs = Path(a.set)
     plan = load(a.plan)
     inv = load(a.inv)
@@ -362,20 +362,20 @@ def judge(a) -> int:
     sp = read(rs / "request" / "sport.txt").strip()
     if plan.get("pin") and sp.isdigit():
         plan["sport"] = int(sp)
-    v = vocab.Vocab(known=set(inv.get("known") or []) or None)
+    v = vocab.Vocab()
     rows = point_rows(plan, rs)
     decs = {r[0]: frames(read(rs / "captures" / f"{r[0]}.txt")) for r in rows}
-    j = judge_serving(v, rs, plan, rows, decs)
-    keyhops = judge_keys(v, rs, plan, rows, j["pi"], j["agp"], j["rop"], j["srv_ip"]) if (plan.get("keys") or {}).get("capture") else []
-    also = judge_also(v, rs, plan, rows) if plan.get("also") else []
-    refused = judge_refuse(v, rs, plan, rows, decs, j["pi"]) if plan.get("refuse") else None
-    counts = vocab.counts_of(os.environ["SFAB_VERDICT"]) if os.environ.get("SFAB_VERDICT") else v.counts()
+    j = check_serving(v, rs, plan, rows, decs)
+    keyhops = check_keys(v, rs, plan, rows, j["pi"], j["agp"], j["rop"], j["srv_ip"]) if (plan.get("keys") or {}).get("capture") else []
+    also = check_also(v, rs, plan, rows) if plan.get("also") else []
+    refused = check_refuse(v, rs, plan, rows, decs, j["pi"]) if plan.get("refuse") else None
+    counts = vocab.counts_of(os.environ["SFAB_RESULTS"]) if os.environ.get("SFAB_RESULTS") else v.counts()
     write_md(rs, inv, plan, rows, decs, j["hops"], j["copy"], j["status"], j["headers"], counts, a.stamp, keyhops, refused, also)
     return 1 if v.counts()["fail"] else 0
 
 
-def judge_serving(v, rs: Path, plan: dict, rows: list, decs: dict) -> dict:
-    """The serving form's judgment from the client's answer to the model's other copies: the hops,
+def check_serving(v, rs: Path, plan: dict, rows: list, decs: dict) -> dict:
+    """The serving form's check from the client's answer to the model's other copies: the hops,
     the copy that served, the answer's status and headers, and the pods that took the request
     (chapter 1's walk reuses it with its own points before these)."""
     pi = pods(rs, plan["api_gateway"]["namespace"])
@@ -543,7 +543,7 @@ def judge_serving(v, rs: Path, plan: dict, rows: list, decs: dict) -> dict:
     return {"hops": hops, "copy": copy, "status": status, "headers": h, "pi": pi, "agp": agp, "rop": rop, "srv_ip": srv_ip}
 
 
-def judge_keys(v, rs: Path, plan: dict, rows: list, pi: dict, agp, rop, srv_ip) -> list:
+def check_keys(v, rs: Path, plan: dict, rows: list, pi: dict, agp, rop, srv_ip) -> list:
     """The keys at the in-cluster hops, from the scrubbed payload decodes."""
     k = plan["keys"]
     caller, master, backend = (key_line(rs / "request" / f) for f in ("key.txt", "master-key.txt", "backend-key.txt"))
@@ -596,7 +596,7 @@ def judge_keys(v, rs: Path, plan: dict, rows: list, pi: dict, agp, rop, srv_ip) 
     return out
 
 
-def judge_refuse(v, rs: Path, plan: dict, rows: list, decs: dict, pi: dict) -> dict:
+def check_refuse(v, rs: Path, plan: dict, rows: list, decs: dict, pi: dict) -> dict:
     rf, gw, ag = plan["refuse"], plan["gateway"], plan["api_gateway"]
     v.sec(f"the refusal: {rf['hostname']} sent to {rf.get('gateway') or gw['name']}, which does not carry it")
     res = read(rs / "request" / "refuse-result.txt").split()
@@ -627,7 +627,7 @@ def judge_refuse(v, rs: Path, plan: dict, rows: list, decs: dict, pi: dict) -> d
     return {"status": status, "server": srv, "syn": (syn or [None])[0], "holder": holder}
 
 
-def judge_also(v, rs: Path, plan: dict, rows: list) -> list:
+def check_also(v, rs: Path, plan: dict, rows: list) -> list:
     """Part III (chapter 8): the same key on the same path sent to another Gateway, whose route set
     does not carry the model: that Gateway's 404, and no request with its marker at any API gateway
     pod (the keyed captures hold every request they received)."""
@@ -659,7 +659,7 @@ def write_md(rs: Path, inv: dict, plan: dict, rows: list, decs: dict, hops: list
     repo = run.get("labs_repo") or {}
     commit = repo.get("commit") or "none"
     uncommitted = " (with uncommitted changes)" if repo.get("dirty") is True else ""
-    verdict = read(rs / "verdict.txt")
+    results = read(rs / "results.txt")
     gw = plan["gateway"]
     L = ["# Serving trace", "",
          f"- Lab: `{inv.get('lab')}`; labs repo commit `{commit}`{uncommitted}; UTC {run.get('utc_start') or 'unknown'}",
@@ -696,13 +696,13 @@ def write_md(rs: Path, inv: dict, plan: dict, rows: list, decs: dict, hops: list
         L += ["", "## The refusal", "",
               f"`{rf['url']}` from {plan['client']['node']} (source port {rf['sport']}) to {rf.get('gateway') or plan['gateway']['name']}: "
               f"HTTP {refused['status'] or 'none'}, server {refused['server'] or 'none'}; no API gateway pod saw it."]
-    L += ["", "## Verdict", "", "```"] + [l for l in verdict.splitlines() if l.strip()] + ["```", ""]
+    L += ["", "## Results", "", "```"] + [l for l in results.splitlines() if l.strip()] + ["```", ""]
     L += ["## Frames per point", "", "| Point | Kind | Node | Interface | Filter | Frames | Data segments |", "|---|---|---|---|---|---|---|"]
     for r in rows:
         fr = decs.get(r[0]) or []
         L.append(f"| `{r[0]}` | {r[1]} | {r[2]} | {r[5]} | `{r[6]}` | {len(fr)} | {sum(1 for f in fr if f['length'] > 0)} |")
     L += ["", "## Files", "",
-          "- `verdict.txt`, `commands.txt`, `trace.json` (the plan), `points.tsv`",
+          "- `results.txt`, `commands.txt`, `trace.json` (the plan), `points.tsv`",
           "- `cluster/`: the pods of both namespaces, the users' VIP's lease and the serving EndpointSlices, read before the captures",
           "- `request/`: the warm-up's and the request's status (`result.txt`), response headers and body; no request header is saved",
           "- `captures/<point>.pcap` and `.txt`, decoded with `tcpdump -nn -tt -e -v -r` (a guest's and a pod's in the guest); a pod's "
@@ -722,13 +722,13 @@ def main(argv=None) -> int:
     s = sub.add_parser("points")
     s.add_argument("--plan", required=True)
     s.add_argument("--set", required=True)
-    s = sub.add_parser("judge")
+    s = sub.add_parser("check")
     s.add_argument("--set", required=True)
     s.add_argument("--plan", required=True)
     s.add_argument("--inv", required=True)
     s.add_argument("--stamp")
     a = p.parse_args(argv)
-    return {"get": cmd_get, "points": cmd_points, "judge": judge}[a.cmd](a)
+    return {"get": cmd_get, "points": cmd_points, "check": run_checks}[a.cmd](a)
 
 
 if __name__ == "__main__":

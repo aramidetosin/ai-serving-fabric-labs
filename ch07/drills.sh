@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# ch07/drills.sh [--drills "ID ..."] [--passes N]: the chapter's gateway drills (book Examples 7-10
-# and 7-11), recorded as audits/sfab-ch07_drills_<UTC>/ with pass<N>/<drill>/ and
+# ch07/drills.sh [--drills "ID ..."] [--passes N]: the chapter's gateway drills, saved as runs/sfab-ch07_drills_<UTC>/ with pass<N>/<drill>/ and
 # drills.md. make drills runs it with PASSES=3; idle-timeout runs in the first pass only (its
 # max_passes), since each run rolls Cilium twice.
 #
