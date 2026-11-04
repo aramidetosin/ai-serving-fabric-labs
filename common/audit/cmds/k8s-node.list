@@ -1,0 +1,15 @@
+# A Kubernetes node (a VM guest with a k8s role, stages.cluster), after vm-node.list and its role's
+# list: SLUG SURFACE COMMAND. judge.py's "cluster-nodes" group judges these files.
+cluster_unit         guest       systemctl show -p ActiveState -p SubState -p ExecMainStatus -p ExecMainExitTimestampMonotonic -p NRestarts sfab-cluster.service
+kubelet_active       guest       systemctl is-active kubelet
+containerd_hosts     guest       for f in /etc/containerd/certs.d/*/hosts.toml; do echo "== $f"; cat "$f"; done
+registry_v2          guest       curl -sS -o /dev/null -D - --max-time 15 --cacert {ca_root} {registry_url}/v2/
+ntp_resolvers        guest       for a in {ntp_servers}; do python3 -c 'import socket, sys; s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.settimeout(5); s.sendto(b"\x23" + 47 * b"\0", (sys.argv[1], 123)); d = s.recv(48); print("stratum", d[1], "from", sys.argv[1])' "$a" 2>&1 | tail -n 1; done
+timesync             guest       timedatectl show-timesync --all 2>&1 | grep -E '^(SystemNTPServers|ServerName|ServerAddress)=' ; timedatectl show -p NTPSynchronized
+dns_users            guest       dig +time=5 +tries=2 +short {users_fqdn} @{resolver_address}
+dns_both             guest       for r in {resolver_addresses}; do printf '%s ' "$r"; dig +time=5 +tries=2 +short {users_fqdn} @"$r" | tr '\n' ' '; echo; done
+dns_storage          guest       dig +time=5 +tries=2 +short {storage_fqdn} @{resolver_address}
+# NFS only: TrueNAS listens on NVMe/TCP 4420 only while a subsystem exists (a bound volume), so the
+# audit's volume check probes 4420 from every node while its claim is bound.
+storage_ports        guest       for p in 2049; do if timeout 5 bash -c "</dev/tcp/{storage_addr}/$p" 2>/dev/null; then echo "$p open"; else echo "$p closed"; fi; done
+ping_storage         guest       ping -c 3 -W 2 {storage_addr}

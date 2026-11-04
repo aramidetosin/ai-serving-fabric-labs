@@ -1,0 +1,527 @@
+{
+  "breaks": {
+    "5a": {
+      "break": [
+        {
+          "command": "ip -n gpu1 route replace 10.21.2.0/24 via 10.21.250.2 dev relay",
+          "dest": "10.21.2.0/24",
+          "dev": "relay",
+          "kind": "relay_route",
+          "mode": "none",
+          "node": "k8s-gpu1",
+          "ns": "gpu1",
+          "rail": 1,
+          "show": "ip -n gpu1 route show 10.21.2.0/24",
+          "src": "10.21.1.11",
+          "to_rail": 2,
+          "via": "10.21.250.2"
+        }
+      ],
+      "exercise": 4,
+      "expect_broken": [
+        {
+          "command": "ip -n gpu1 route show 10.21.2.0/24",
+          "dest": "10.21.2.0/24",
+          "dev": "relay",
+          "kind": "route_src",
+          "node": "k8s-gpu1",
+          "ns": "gpu1",
+          "pinned": false,
+          "rail": 1,
+          "src": "10.21.1.11",
+          "to_rail": 2,
+          "via": "10.21.250.2"
+        },
+        {
+          "command": "ip -n gpu1 route show 10.21.3.0/24",
+          "dest": "10.21.3.0/24",
+          "dev": "relay",
+          "kind": "route_src",
+          "node": "k8s-gpu1",
+          "ns": "gpu1",
+          "pinned": true,
+          "rail": 1,
+          "src": "10.21.1.11",
+          "to_rail": 3,
+          "via": "10.21.250.3"
+        },
+        {
+          "failing": "all",
+          "kind": "probe_share",
+          "probe": "rail1-to-rail2"
+        },
+        {
+          "kind": "far_capture",
+          "probe": "rail1-to-rail2",
+          "src": "relay"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "rail1-to-rail3"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "k8s-gpu2-rail1-to-rail2"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "same-rail-k8s-gpu1"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "same-rail-k8s-gpu2"
+        },
+        {
+          "kind": "parity",
+          "node": "rail-sw1"
+        },
+        {
+          "kind": "parity",
+          "node": "rail-sw2"
+        }
+      ],
+      "expect_healed": [
+        {
+          "command": "ip -n gpu1 route show 10.21.2.0/24",
+          "dest": "10.21.2.0/24",
+          "dev": "relay",
+          "kind": "route_src",
+          "node": "k8s-gpu1",
+          "ns": "gpu1",
+          "pinned": true,
+          "rail": 1,
+          "src": "10.21.1.11",
+          "to_rail": 2,
+          "via": "10.21.250.2"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "rail1-to-rail2"
+        },
+        {
+          "kind": "far_capture",
+          "probe": "rail1-to-rail2",
+          "src": "rail"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "rail1-to-rail3"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "same-rail-k8s-gpu1"
+        },
+        {
+          "kind": "parity",
+          "node": "rail-sw1"
+        },
+        {
+          "kind": "parity",
+          "node": "rail-sw2"
+        }
+      ],
+      "heal": [
+        {
+          "command": "ip -n gpu1 route replace 10.21.2.0/24 via 10.21.250.2 dev relay src 10.21.1.11",
+          "dest": "10.21.2.0/24",
+          "dev": "relay",
+          "kind": "relay_route",
+          "mode": "rendered",
+          "node": "k8s-gpu1",
+          "ns": "gpu1",
+          "rail": 1,
+          "show": "ip -n gpu1 route show 10.21.2.0/24",
+          "src": "10.21.1.11",
+          "to_rail": 2,
+          "via": "10.21.250.2"
+        }
+      ],
+      "id": "5a",
+      "note": null,
+      "record": [
+        {
+          "kind": "ns_show",
+          "lines": [
+            "ip -n gpu1 route show",
+            "ip -n gpu1 route get 10.21.2.12",
+            "ip -n gpu1 route get 10.21.3.12"
+          ],
+          "node": "k8s-gpu1",
+          "ns": "gpu1",
+          "rail": 1
+        },
+        {
+          "capture": {
+            "bridge": "relay0",
+            "dst_addr": "10.21.2.12",
+            "ifaces": [
+              "rail2",
+              "relay0"
+            ],
+            "node": "k8s-gpu2",
+            "rail_iface": "rail2",
+            "relay_prefix": "10.21.250.0/24",
+            "src_addr": "10.21.1.11"
+          },
+          "count": 10,
+          "id": "rail1-to-rail2",
+          "interval_s": 0.2,
+          "kind": "probe_rail",
+          "node": "k8s-gpu1",
+          "passes": 3,
+          "rows": [
+            {
+              "dst": "k8s-gpu2",
+              "dst_addr": "10.21.2.12",
+              "id": "r1-r2",
+              "kind": "cross",
+              "ns": "gpu1",
+              "rail": 1,
+              "reply_rail": 1,
+              "reply_switch": "rail-sw1",
+              "request_rail": 2,
+              "request_switch": "rail-sw2",
+              "src": "k8s-gpu1",
+              "src_addr": "10.21.1.11",
+              "to_rail": 2
+            }
+          ],
+          "timeout_s": 1,
+          "to": "k8s-gpu2"
+        },
+        {
+          "capture": null,
+          "count": 10,
+          "id": "rail1-to-rail3",
+          "interval_s": 0.2,
+          "kind": "probe_rail",
+          "node": "k8s-gpu1",
+          "passes": 1,
+          "rows": [
+            {
+              "dst": "k8s-gpu2",
+              "dst_addr": "10.21.3.12",
+              "id": "r1-r3",
+              "kind": "cross",
+              "ns": "gpu1",
+              "rail": 1,
+              "reply_rail": 1,
+              "reply_switch": "rail-sw1",
+              "request_rail": 3,
+              "request_switch": "rail-sw1",
+              "src": "k8s-gpu1",
+              "src_addr": "10.21.1.11",
+              "to_rail": 3
+            }
+          ],
+          "timeout_s": 1,
+          "to": "k8s-gpu2"
+        },
+        {
+          "capture": null,
+          "count": 10,
+          "id": "k8s-gpu2-rail1-to-rail2",
+          "interval_s": 0.2,
+          "kind": "probe_rail",
+          "node": "k8s-gpu2",
+          "passes": 1,
+          "rows": [
+            {
+              "dst": "k8s-gpu1",
+              "dst_addr": "10.21.2.11",
+              "id": "r1-r2",
+              "kind": "cross",
+              "ns": "gpu1",
+              "rail": 1,
+              "reply_rail": 1,
+              "reply_switch": "rail-sw1",
+              "request_rail": 2,
+              "request_switch": "rail-sw2",
+              "src": "k8s-gpu2",
+              "src_addr": "10.21.1.12",
+              "to_rail": 2
+            }
+          ],
+          "timeout_s": 1,
+          "to": "k8s-gpu1"
+        },
+        {
+          "capture": null,
+          "count": 3,
+          "id": "same-rail-k8s-gpu1",
+          "interval_s": 0.2,
+          "kind": "probe_rail",
+          "node": "k8s-gpu1",
+          "passes": 1,
+          "rows": [
+            {
+              "dst": "k8s-gpu2",
+              "dst_addr": "10.21.1.12",
+              "id": "r1-r1",
+              "kind": "same",
+              "ns": "gpu1",
+              "rail": 1,
+              "reply_rail": 1,
+              "reply_switch": "rail-sw1",
+              "request_rail": 1,
+              "request_switch": "rail-sw1",
+              "src": "k8s-gpu1",
+              "src_addr": "10.21.1.11",
+              "to_rail": 1
+            },
+            {
+              "dst": "k8s-gpu2",
+              "dst_addr": "10.21.2.12",
+              "id": "r2-r2",
+              "kind": "same",
+              "ns": "gpu2",
+              "rail": 2,
+              "reply_rail": 2,
+              "reply_switch": "rail-sw2",
+              "request_rail": 2,
+              "request_switch": "rail-sw2",
+              "src": "k8s-gpu1",
+              "src_addr": "10.21.2.11",
+              "to_rail": 2
+            },
+            {
+              "dst": "k8s-gpu2",
+              "dst_addr": "10.21.3.12",
+              "id": "r3-r3",
+              "kind": "same",
+              "ns": "gpu3",
+              "rail": 3,
+              "reply_rail": 3,
+              "reply_switch": "rail-sw1",
+              "request_rail": 3,
+              "request_switch": "rail-sw1",
+              "src": "k8s-gpu1",
+              "src_addr": "10.21.3.11",
+              "to_rail": 3
+            },
+            {
+              "dst": "k8s-gpu2",
+              "dst_addr": "10.21.4.12",
+              "id": "r4-r4",
+              "kind": "same",
+              "ns": "gpu4",
+              "rail": 4,
+              "reply_rail": 4,
+              "reply_switch": "rail-sw2",
+              "request_rail": 4,
+              "request_switch": "rail-sw2",
+              "src": "k8s-gpu1",
+              "src_addr": "10.21.4.11",
+              "to_rail": 4
+            },
+            {
+              "dst": "k8s-gpu2",
+              "dst_addr": "10.21.5.12",
+              "id": "r5-r5",
+              "kind": "same",
+              "ns": "gpu5",
+              "rail": 5,
+              "reply_rail": 5,
+              "reply_switch": "rail-sw1",
+              "request_rail": 5,
+              "request_switch": "rail-sw1",
+              "src": "k8s-gpu1",
+              "src_addr": "10.21.5.11",
+              "to_rail": 5
+            },
+            {
+              "dst": "k8s-gpu2",
+              "dst_addr": "10.21.6.12",
+              "id": "r6-r6",
+              "kind": "same",
+              "ns": "gpu6",
+              "rail": 6,
+              "reply_rail": 6,
+              "reply_switch": "rail-sw2",
+              "request_rail": 6,
+              "request_switch": "rail-sw2",
+              "src": "k8s-gpu1",
+              "src_addr": "10.21.6.11",
+              "to_rail": 6
+            },
+            {
+              "dst": "k8s-gpu2",
+              "dst_addr": "10.21.7.12",
+              "id": "r7-r7",
+              "kind": "same",
+              "ns": "gpu7",
+              "rail": 7,
+              "reply_rail": 7,
+              "reply_switch": "rail-sw1",
+              "request_rail": 7,
+              "request_switch": "rail-sw1",
+              "src": "k8s-gpu1",
+              "src_addr": "10.21.7.11",
+              "to_rail": 7
+            },
+            {
+              "dst": "k8s-gpu2",
+              "dst_addr": "10.21.8.12",
+              "id": "r8-r8",
+              "kind": "same",
+              "ns": "gpu8",
+              "rail": 8,
+              "reply_rail": 8,
+              "reply_switch": "rail-sw2",
+              "request_rail": 8,
+              "request_switch": "rail-sw2",
+              "src": "k8s-gpu1",
+              "src_addr": "10.21.8.11",
+              "to_rail": 8
+            }
+          ],
+          "timeout_s": 1,
+          "to": "k8s-gpu2"
+        },
+        {
+          "capture": null,
+          "count": 3,
+          "id": "same-rail-k8s-gpu2",
+          "interval_s": 0.2,
+          "kind": "probe_rail",
+          "node": "k8s-gpu2",
+          "passes": 1,
+          "rows": [
+            {
+              "dst": "k8s-gpu1",
+              "dst_addr": "10.21.1.11",
+              "id": "r1-r1",
+              "kind": "same",
+              "ns": "gpu1",
+              "rail": 1,
+              "reply_rail": 1,
+              "reply_switch": "rail-sw1",
+              "request_rail": 1,
+              "request_switch": "rail-sw1",
+              "src": "k8s-gpu2",
+              "src_addr": "10.21.1.12",
+              "to_rail": 1
+            },
+            {
+              "dst": "k8s-gpu1",
+              "dst_addr": "10.21.2.11",
+              "id": "r2-r2",
+              "kind": "same",
+              "ns": "gpu2",
+              "rail": 2,
+              "reply_rail": 2,
+              "reply_switch": "rail-sw2",
+              "request_rail": 2,
+              "request_switch": "rail-sw2",
+              "src": "k8s-gpu2",
+              "src_addr": "10.21.2.12",
+              "to_rail": 2
+            },
+            {
+              "dst": "k8s-gpu1",
+              "dst_addr": "10.21.3.11",
+              "id": "r3-r3",
+              "kind": "same",
+              "ns": "gpu3",
+              "rail": 3,
+              "reply_rail": 3,
+              "reply_switch": "rail-sw1",
+              "request_rail": 3,
+              "request_switch": "rail-sw1",
+              "src": "k8s-gpu2",
+              "src_addr": "10.21.3.12",
+              "to_rail": 3
+            },
+            {
+              "dst": "k8s-gpu1",
+              "dst_addr": "10.21.4.11",
+              "id": "r4-r4",
+              "kind": "same",
+              "ns": "gpu4",
+              "rail": 4,
+              "reply_rail": 4,
+              "reply_switch": "rail-sw2",
+              "request_rail": 4,
+              "request_switch": "rail-sw2",
+              "src": "k8s-gpu2",
+              "src_addr": "10.21.4.12",
+              "to_rail": 4
+            },
+            {
+              "dst": "k8s-gpu1",
+              "dst_addr": "10.21.5.11",
+              "id": "r5-r5",
+              "kind": "same",
+              "ns": "gpu5",
+              "rail": 5,
+              "reply_rail": 5,
+              "reply_switch": "rail-sw1",
+              "request_rail": 5,
+              "request_switch": "rail-sw1",
+              "src": "k8s-gpu2",
+              "src_addr": "10.21.5.12",
+              "to_rail": 5
+            },
+            {
+              "dst": "k8s-gpu1",
+              "dst_addr": "10.21.6.11",
+              "id": "r6-r6",
+              "kind": "same",
+              "ns": "gpu6",
+              "rail": 6,
+              "reply_rail": 6,
+              "reply_switch": "rail-sw2",
+              "request_rail": 6,
+              "request_switch": "rail-sw2",
+              "src": "k8s-gpu2",
+              "src_addr": "10.21.6.12",
+              "to_rail": 6
+            },
+            {
+              "dst": "k8s-gpu1",
+              "dst_addr": "10.21.7.11",
+              "id": "r7-r7",
+              "kind": "same",
+              "ns": "gpu7",
+              "rail": 7,
+              "reply_rail": 7,
+              "reply_switch": "rail-sw1",
+              "request_rail": 7,
+              "request_switch": "rail-sw1",
+              "src": "k8s-gpu2",
+              "src_addr": "10.21.7.12",
+              "to_rail": 7
+            },
+            {
+              "dst": "k8s-gpu1",
+              "dst_addr": "10.21.8.11",
+              "id": "r8-r8",
+              "kind": "same",
+              "ns": "gpu8",
+              "rail": 8,
+              "reply_rail": 8,
+              "reply_switch": "rail-sw2",
+              "request_rail": 8,
+              "request_switch": "rail-sw2",
+              "src": "k8s-gpu2",
+              "src_addr": "10.21.8.12",
+              "to_rail": 8
+            }
+          ],
+          "timeout_s": 1,
+          "to": "k8s-gpu1"
+        }
+      ],
+      "title": "the source pin of k8s-gpu1's relay route from rail 1 to rail 2 removed"
+    }
+  },
+  "lab": "sfab-ch05",
+  "schema": 1
+}

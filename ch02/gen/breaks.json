@@ -1,0 +1,122 @@
+{
+  "breaks": {
+    "2a": {
+      "break": [
+        {
+          "address": "10.20.11.200",
+          "answer": "vip:gw-internal",
+          "content": "; sfab-ch02 dns-auth1, view enterprise, zone ai.tarnwick.example: rendered from spec/profile-a.yaml by render/dns.py; edit the spec and run make render\n; break: admin.ai.tarnwick.example, grafana.ai.tarnwick.example answer 10.20.11.200 (vip:gw-internal) in this view\n; decision dec-view-enterprise\n$ORIGIN ai.tarnwick.example.\n$TTL 300\n@ IN SOA dns-auth1.ai.tarnwick.example. hostmaster.ai.tarnwick.example. (\n    756238120 ; serial, from the zone's data\n    3600 ; refresh\n    600 ; retry\n    86400 ; expire\n    60 ) ; negative answers\n@         IN NS  dns-auth1.ai.tarnwick.example.\n@         IN NS  dns-auth2.ai.tarnwick.example.\ndns-auth1 IN A   10.20.13.11 ; name server\ndns-auth2 IN A   10.20.14.11 ; name server\nllm       IN A   10.20.11.210 ; decision dec-view-enterprise: a name users type\nid        IN A   10.20.11.210 ; decision dec-view-enterprise: the identity provider\nadmin     IN A   10.20.11.200 ; added by the break\ngrafana   IN A   10.20.11.200 ; added by the break\n",
+          "dir": "/tmp/sfab-break-dns",
+          "file": "zones/db.enterprise.ai.tarnwick.example",
+          "kind": "dns_answer",
+          "names": [
+            "admin.ai.tarnwick.example",
+            "grafana.ai.tarnwick.example"
+          ],
+          "node": "dns-auth1",
+          "rendered": "10.20.11.210",
+          "view": "enterprise"
+        }
+      ],
+      "exercise": 5,
+      "expect_broken": [
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "users"
+        },
+        {
+          "cell": "enterprise/admin",
+          "kind": "cell_mode",
+          "mode": "log-line",
+          "probe": "cells",
+          "rule": "deny-all-log"
+        },
+        {
+          "cell": "enterprise/gw-users",
+          "kind": "cell_mode",
+          "mode": "allowed",
+          "probe": "cells"
+        },
+        {
+          "cell": "enterprise/chat",
+          "kind": "cell_mode",
+          "mode": "allowed",
+          "probe": "cells"
+        },
+        {
+          "cell": "enterprise/staff",
+          "kind": "cell_mode",
+          "mode": "allowed",
+          "probe": "cells"
+        }
+      ],
+      "expect_healed": [
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "users"
+        },
+        {
+          "cell": "enterprise/admin",
+          "kind": "cell_mode",
+          "mode": "404",
+          "probe": "cells"
+        },
+        {
+          "cell": "enterprise/gw-users",
+          "kind": "cell_mode",
+          "mode": "allowed",
+          "probe": "cells"
+        },
+        {
+          "cell": "enterprise/chat",
+          "kind": "cell_mode",
+          "mode": "allowed",
+          "probe": "cells"
+        },
+        {
+          "cell": "enterprise/staff",
+          "kind": "cell_mode",
+          "mode": "allowed",
+          "probe": "cells"
+        }
+      ],
+      "heal": [
+        {
+          "kind": "restore",
+          "node": "dns-auth1",
+          "what": "dns"
+        }
+      ],
+      "id": "2a",
+      "note": null,
+      "record": [
+        {
+          "client_addr": "10.24.10.10",
+          "count": 10,
+          "id": "users",
+          "interval_s": 0.5,
+          "kind": "probe_http",
+          "node": "ent-client",
+          "passes": 1,
+          "timeout_s": 5,
+          "url": "https://llm.ai.tarnwick.example/echo?msg=sfab-break-2a"
+        },
+        {
+          "cells": [
+            "enterprise/admin",
+            "enterprise/gw-users",
+            "enterprise/chat",
+            "enterprise/staff"
+          ],
+          "id": "cells",
+          "kind": "matrix_cells"
+        }
+      ],
+      "title": "the enterprise view answers the admin hostnames with the internal Gateway's VIP"
+    }
+  },
+  "lab": "sfab-ch02",
+  "schema": 1
+}

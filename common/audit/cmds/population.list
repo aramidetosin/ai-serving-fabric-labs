@@ -1,0 +1,9 @@
+# The node that probes a population (judge.py population_ctx: the population's client, or for the
+# nodes population the first Kubernetes node inside it): SLUG SURFACE COMMAND. node lines run in the
+# node's own shell. A population whose resolver is not in the lab has no {pop_resolver}, so its DNS
+# lines are left out and its HTTPS lines pin the names to the answer address ({pop_pin_*}).
+pop_dns_users        node        dig +time=5 +tries=2 +short {users_fqdn} @{pop_resolver}
+pop_dns_admin        node        dig +time=5 +tries=2 +short {admin_fqdn} @{pop_resolver}
+pop_dns_infra        node        dig +time=5 +tries=2 +short {infra_fqdn} @{pop_resolver}
+pop_https_users      node        curl -sS -i --max-time 20 --cacert {ca_root} {pop_pin_users} 'https://{users_fqdn}{echo_path}?msg={echo_msg}'
+pop_https_admin      node        curl -sS -i --max-time 20 --cacert {ca_root} {pop_pin_admin} 'https://{admin_fqdn}{echo_path}?msg={echo_msg}'

@@ -1,0 +1,390 @@
+# sfab-ch07 fw: set-format lines the running configuration must hold after the startup commit.
+# Rendered from spec/profile-a.yaml beside bootstrap/fw/startup-config.xml; edit the spec and run make render.
+# Compare each line after removing trailing spaces and folding runs of spaces into one;
+# lines starting with # and blank lines are comments. Rule order is not checked here.
+# The IKE gateway and IPsec tunnel lines at the end are set by boot from bootstrap/fw/vpn.json after the startup commit,
+# with the pre-shared key from state/secrets/ipsec (its line, printed encrypted, is not listed).
+set deviceconfig system hostname fw
+set deviceconfig system timezone UTC
+set deviceconfig system dns-setting servers primary 10.20.13.21
+set deviceconfig system dns-setting servers secondary 10.20.14.21
+set deviceconfig system ntp-servers primary-ntp-server ntp-server-address 10.20.13.21
+set deviceconfig system ntp-servers secondary-ntp-server ntp-server-address 10.20.14.21
+set deviceconfig system route service dns source interface ae1.130
+set deviceconfig system route service dns source address 10.20.13.1/24
+set deviceconfig system route service ntp source interface ae1.130
+set deviceconfig system route service ntp source address 10.20.13.1/24
+set deviceconfig setting management idle-timeout 0
+set deviceconfig setting auto-mac-detect yes
+set deviceconfig setting jumbo-frame mtu 9216
+set network profiles interface-management-profile ping-only ping yes
+set network profiles interface-management-profile bastion-admin https yes
+set network profiles interface-management-profile bastion-admin ssh yes
+set network profiles interface-management-profile bastion-admin ping yes
+set network profiles interface-management-profile bastion-admin permitted-ip 10.20.3.10/32
+set network profiles zone-protection-profile zp-internet flood tcp-syn enable yes
+set network profiles zone-protection-profile zp-internet flood tcp-syn syn-cookies alarm-rate 10000
+set network profiles zone-protection-profile zp-internet flood tcp-syn syn-cookies activate-rate 10000
+set network profiles zone-protection-profile zp-internet flood tcp-syn syn-cookies maximal-rate 40000
+set network profiles zone-protection-profile zp-internet flood udp enable yes
+set network profiles zone-protection-profile zp-internet flood udp red alarm-rate 10000
+set network profiles zone-protection-profile zp-internet flood udp red activate-rate 10000
+set network profiles zone-protection-profile zp-internet flood udp red maximal-rate 40000
+set network profiles zone-protection-profile zp-internet flood icmp enable yes
+set network profiles zone-protection-profile zp-internet flood icmp red alarm-rate 10000
+set network profiles zone-protection-profile zp-internet flood icmp red activate-rate 10000
+set network profiles zone-protection-profile zp-internet flood icmp red maximal-rate 40000
+set network profiles zone-protection-profile zp-internet flood icmpv6 enable yes
+set network profiles zone-protection-profile zp-internet flood icmpv6 red alarm-rate 10000
+set network profiles zone-protection-profile zp-internet flood icmpv6 red activate-rate 10000
+set network profiles zone-protection-profile zp-internet flood icmpv6 red maximal-rate 40000
+set network profiles zone-protection-profile zp-internet flood other-ip enable yes
+set network profiles zone-protection-profile zp-internet flood other-ip red alarm-rate 10000
+set network profiles zone-protection-profile zp-internet flood other-ip red activate-rate 10000
+set network profiles zone-protection-profile zp-internet flood other-ip red maximal-rate 40000
+set network profiles zone-protection-profile zp-internet discard-ip-spoof yes
+set network profiles zone-protection-profile zp-internet discard-malformed-option yes
+set network profiles zone-protection-profile zp-internet strict-ip-check yes
+set network interface ethernet ethernet1/1 aggregate-group ae1
+set network interface ethernet ethernet1/2 aggregate-group ae1
+set network interface ethernet ethernet1/3 layer3 ip 10.20.9.254/24
+set network interface ethernet ethernet1/3 layer3 interface-management-profile ping-only
+set network interface ethernet ethernet1/4 layer3 ip 10.24.10.9/30
+set network interface ethernet ethernet1/4 layer3 interface-management-profile ping-only
+set network interface ethernet ethernet1/5 layer3 ip 198.51.100.2/29
+set network interface ethernet ethernet1/5 layer3 interface-management-profile ping-only
+set network interface ethernet ethernet1/7 layer3 ip 10.24.10.54/30
+set network interface ethernet ethernet1/7 layer3 interface-management-profile ping-only
+set network interface aggregate-ethernet ae1 layer3 mtu 9216
+set network interface aggregate-ethernet ae1 layer3 lacp enable yes
+set network interface aggregate-ethernet ae1 layer3 lacp mode active
+set network interface aggregate-ethernet ae1 layer3 lacp transmission-rate fast
+set network interface aggregate-ethernet ae1 layer3 units ae1.100 tag 100
+set network interface aggregate-ethernet ae1 layer3 units ae1.100 ip 10.20.1.1/24
+set network interface aggregate-ethernet ae1 layer3 units ae1.100 mtu 9000
+set network interface aggregate-ethernet ae1 layer3 units ae1.100 interface-management-profile ping-only
+set network interface aggregate-ethernet ae1 layer3 units ae1.110 tag 110
+set network interface aggregate-ethernet ae1 layer3 units ae1.110 ip 10.20.11.1/24
+set network interface aggregate-ethernet ae1 layer3 units ae1.110 mtu 1500
+set network interface aggregate-ethernet ae1 layer3 units ae1.110 interface-management-profile ping-only
+set network interface aggregate-ethernet ae1 layer3 units ae1.110 adjust-tcp-mss enable yes
+set network interface aggregate-ethernet ae1 layer3 units ae1.110 adjust-tcp-mss ipv4-mss-adjustment 140
+set network interface aggregate-ethernet ae1 layer3 units ae1.200 tag 200
+set network interface aggregate-ethernet ae1 layer3 units ae1.200 ip 10.20.2.1/24
+set network interface aggregate-ethernet ae1 layer3 units ae1.200 mtu 1500
+set network interface aggregate-ethernet ae1 layer3 units ae1.200 interface-management-profile ping-only
+set network interface aggregate-ethernet ae1 layer3 units ae1.300 tag 300
+set network interface aggregate-ethernet ae1 layer3 units ae1.300 ip 10.20.3.1/24
+set network interface aggregate-ethernet ae1 layer3 units ae1.300 mtu 1500
+set network interface aggregate-ethernet ae1 layer3 units ae1.300 interface-management-profile bastion-admin
+set network interface aggregate-ethernet ae1 layer3 units ae1.130 tag 130
+set network interface aggregate-ethernet ae1 layer3 units ae1.130 ip 10.20.13.1/24
+set network interface aggregate-ethernet ae1 layer3 units ae1.130 mtu 1500
+set network interface aggregate-ethernet ae1 layer3 units ae1.130 interface-management-profile ping-only
+set network interface aggregate-ethernet ae1 layer3 units ae1.131 tag 131
+set network interface aggregate-ethernet ae1 layer3 units ae1.131 ip 10.20.14.1/24
+set network interface aggregate-ethernet ae1 layer3 units ae1.131 mtu 1500
+set network interface aggregate-ethernet ae1 layer3 units ae1.131 interface-management-profile ping-only
+set network interface tunnel units tunnel.1 interface-management-profile ping-only
+set network interface tunnel units tunnel.1 mtu 1400
+set network ike crypto-profiles ike-crypto-profiles op-ike hash sha256
+set network ike crypto-profiles ike-crypto-profiles op-ike dh-group group14
+set network ike crypto-profiles ike-crypto-profiles op-ike encryption aes-256-cbc
+set network ike crypto-profiles ike-crypto-profiles op-ike lifetime hours 8
+set network ike crypto-profiles ipsec-crypto-profiles op-esp esp authentication sha256
+set network ike crypto-profiles ipsec-crypto-profiles op-esp esp encryption aes-256-cbc
+set network ike crypto-profiles ipsec-crypto-profiles op-esp dh-group group14
+set network ike crypto-profiles ipsec-crypto-profiles op-esp lifetime hours 1
+set network virtual-router core interface [ ae1.100 ae1.110 ae1.200 ae1.300 ae1.130 ae1.131 ethernet1/3 ethernet1/4 ethernet1/7 ethernet1/5 tunnel.1 ]
+set network virtual-router core routing-table ip static-route default-uplink destination 0.0.0.0/0
+set network virtual-router core routing-table ip static-route default-uplink interface ethernet1/5
+set network virtual-router core routing-table ip static-route default-uplink nexthop ip-address 198.51.100.1
+set network virtual-router core routing-table ip static-route operator-site destination 192.0.2.0/30
+set network virtual-router core routing-table ip static-route operator-site interface tunnel.1
+set network virtual-router core routing-table ip static-route discard-10 destination 10.0.0.0/8
+set network virtual-router core routing-table ip static-route discard-10 nexthop discard
+set network virtual-router core routing-table ip static-route discard-172-16 destination 172.16.0.0/12
+set network virtual-router core routing-table ip static-route discard-172-16 nexthop discard
+set network virtual-router core routing-table ip static-route discard-192-168 destination 192.168.0.0/16
+set network virtual-router core routing-table ip static-route discard-192-168 nexthop discard
+set zone k8s-nodes network layer3 ae1.100
+set zone ingress network layer3 ae1.110
+set zone stor-mgmt network layer3 ae1.200
+set zone bastion network layer3 ae1.300
+set zone services network layer3 [ ae1.130 ae1.131 ]
+set zone oob network layer3 ethernet1/3
+set zone enterprise network layer3 [ ethernet1/4 ethernet1/7 ]
+set zone uplink network layer3 ethernet1/5
+set zone uplink network zone-protection-profile zp-internet
+set zone operator-vpn network layer3 tunnel.1
+set address ent-client ip-netmask 10.24.10.10/32
+set address ent-client description "the staff client, standing in for the administrators' desks"
+set address operator-site ip-netmask 192.0.2.0/30
+set address operator-site description "the operator's site LAN, through the tunnel"
+set address collector ip-netmask 10.20.3.20/32
+set address collector description "the monitoring collector's reserved address, no host until chapter 20"
+set address-group admins static [ ent-client operator-site ]
+set address-group admins description "where administrators reach the bastion from"
+set profile-group bp-default virus default
+set profile-group bp-default spyware default
+set profile-group bp-default vulnerability default
+set profile-group bp-default file-blocking "basic file blocking"
+set service tcp-5000 protocol tcp port 5000
+set service tcp-6443 protocol tcp port 6443
+set service tcp-4460 protocol tcp port 4460
+set rulebase security rules staff-to-users-gateway from enterprise
+set rulebase security rules staff-to-users-gateway to ingress
+set rulebase security rules staff-to-users-gateway source 10.24.10.0/24
+set rulebase security rules staff-to-users-gateway destination 10.20.11.210
+set rulebase security rules staff-to-users-gateway application ssl
+set rulebase security rules staff-to-users-gateway service application-default
+set rulebase security rules staff-to-users-gateway action allow
+set rulebase security rules staff-to-users-gateway log-end yes
+set rulebase security rules staff-to-users-gateway profile-setting group bp-default
+set rulebase security rules staff-to-users-gateway description dec-policy-enterprise-users
+set rulebase security rules ent-dns-to-platform-dns from enterprise
+set rulebase security rules ent-dns-to-platform-dns to services
+set rulebase security rules ent-dns-to-platform-dns source 10.24.10.53
+set rulebase security rules ent-dns-to-platform-dns destination [ 10.20.13.11 10.20.14.11 ]
+set rulebase security rules ent-dns-to-platform-dns application dns
+set rulebase security rules ent-dns-to-platform-dns service application-default
+set rulebase security rules ent-dns-to-platform-dns action allow
+set rulebase security rules ent-dns-to-platform-dns log-end yes
+set rulebase security rules ent-dns-to-platform-dns profile-setting group bp-default
+set rulebase security rules staff-to-enterprise-dns from enterprise
+set rulebase security rules staff-to-enterprise-dns to enterprise
+set rulebase security rules staff-to-enterprise-dns source 10.24.10.0/24
+set rulebase security rules staff-to-enterprise-dns destination 10.24.10.53
+set rulebase security rules staff-to-enterprise-dns application dns
+set rulebase security rules staff-to-enterprise-dns service application-default
+set rulebase security rules staff-to-enterprise-dns action allow
+set rulebase security rules staff-to-enterprise-dns log-end yes
+set rulebase security rules staff-to-enterprise-dns profile-setting group bp-default
+set rulebase security rules admins-to-bastion from [ enterprise operator-vpn ]
+set rulebase security rules admins-to-bastion to bastion
+set rulebase security rules admins-to-bastion source admins
+set rulebase security rules admins-to-bastion destination 10.20.3.10
+set rulebase security rules admins-to-bastion application ssh
+set rulebase security rules admins-to-bastion service application-default
+set rulebase security rules admins-to-bastion action allow
+set rulebase security rules admins-to-bastion log-end yes
+set rulebase security rules admins-to-bastion profile-setting group bp-default
+set rulebase security rules bastion-to-firewall-admin from bastion
+set rulebase security rules bastion-to-firewall-admin to bastion
+set rulebase security rules bastion-to-firewall-admin source 10.20.3.10
+set rulebase security rules bastion-to-firewall-admin destination 10.20.3.1
+set rulebase security rules bastion-to-firewall-admin application [ ssl ssh ]
+set rulebase security rules bastion-to-firewall-admin service application-default
+set rulebase security rules bastion-to-firewall-admin action allow
+set rulebase security rules bastion-to-firewall-admin log-end yes
+set rulebase security rules bastion-to-firewall-admin profile-setting group bp-default
+set rulebase security rules bastion-to-nodes from bastion
+set rulebase security rules bastion-to-nodes to k8s-nodes
+set rulebase security rules bastion-to-nodes source 10.20.3.10
+set rulebase security rules bastion-to-nodes destination 10.20.1.0/24
+set rulebase security rules bastion-to-nodes application ssh
+set rulebase security rules bastion-to-nodes service application-default
+set rulebase security rules bastion-to-nodes action allow
+set rulebase security rules bastion-to-nodes log-end yes
+set rulebase security rules bastion-to-nodes profile-setting group bp-default
+set rulebase security rules bastion-to-api from bastion
+set rulebase security rules bastion-to-api to k8s-nodes
+set rulebase security rules bastion-to-api source 10.20.3.10
+set rulebase security rules bastion-to-api destination 10.20.1.0/24
+set rulebase security rules bastion-to-api application ssl
+set rulebase security rules bastion-to-api service tcp-6443
+set rulebase security rules bastion-to-api action allow
+set rulebase security rules bastion-to-api log-end yes
+set rulebase security rules bastion-to-api profile-setting group bp-default
+set rulebase security rules bastion-to-internal-gateway from bastion
+set rulebase security rules bastion-to-internal-gateway to ingress
+set rulebase security rules bastion-to-internal-gateway source 10.20.3.10
+set rulebase security rules bastion-to-internal-gateway destination 10.20.11.200
+set rulebase security rules bastion-to-internal-gateway application ssl
+set rulebase security rules bastion-to-internal-gateway service application-default
+set rulebase security rules bastion-to-internal-gateway action allow
+set rulebase security rules bastion-to-internal-gateway log-end yes
+set rulebase security rules bastion-to-internal-gateway profile-setting group bp-default
+set rulebase security rules bastion-to-stor-mgmt from bastion
+set rulebase security rules bastion-to-stor-mgmt to stor-mgmt
+set rulebase security rules bastion-to-stor-mgmt source 10.20.3.10
+set rulebase security rules bastion-to-stor-mgmt destination 10.20.2.31
+set rulebase security rules bastion-to-stor-mgmt application ssl
+set rulebase security rules bastion-to-stor-mgmt service application-default
+set rulebase security rules bastion-to-stor-mgmt action allow
+set rulebase security rules bastion-to-stor-mgmt log-end yes
+set rulebase security rules bastion-to-stor-mgmt profile-setting group bp-default
+set rulebase security rules bastion-to-bmc from bastion
+set rulebase security rules bastion-to-bmc to oob
+set rulebase security rules bastion-to-bmc source [ 10.20.3.10 collector ]
+set rulebase security rules bastion-to-bmc destination 10.20.9.0/24
+set rulebase security rules bastion-to-bmc application [ ssh ssl ]
+set rulebase security rules bastion-to-bmc service application-default
+set rulebase security rules bastion-to-bmc action allow
+set rulebase security rules bastion-to-bmc log-end yes
+set rulebase security rules bastion-to-bmc profile-setting group bp-default
+set rulebase security rules bastion-to-services-admin from bastion
+set rulebase security rules bastion-to-services-admin to services
+set rulebase security rules bastion-to-services-admin source 10.20.3.10
+set rulebase security rules bastion-to-services-admin destination [ 10.20.13.11 10.20.13.21 10.20.14.11 10.20.14.21 ]
+set rulebase security rules bastion-to-services-admin application ssh
+set rulebase security rules bastion-to-services-admin service application-default
+set rulebase security rules bastion-to-services-admin action allow
+set rulebase security rules bastion-to-services-admin log-end yes
+set rulebase security rules bastion-to-services-admin profile-setting group bp-default
+set rulebase security rules inside-to-gateway-ping from [ k8s-nodes ingress stor-mgmt services bastion oob enterprise ]
+set rulebase security rules inside-to-gateway-ping to [ k8s-nodes ingress stor-mgmt services bastion oob enterprise ]
+set rulebase security rules inside-to-gateway-ping source [ 10.20.1.0/24 10.20.11.0/24 10.20.2.0/24 10.20.13.0/24 10.20.14.0/24 10.20.3.0/24 10.20.9.0/24 10.24.10.0/24 ]
+set rulebase security rules inside-to-gateway-ping destination [ 10.20.1.1 10.20.11.1 10.20.13.1 10.20.14.1 10.20.2.1 10.20.3.1 10.20.9.254 10.24.10.9 10.24.10.54 ]
+set rulebase security rules inside-to-gateway-ping application ping
+set rulebase security rules inside-to-gateway-ping service application-default
+set rulebase security rules inside-to-gateway-ping action allow
+set rulebase security rules inside-to-gateway-ping log-end yes
+set rulebase security rules inside-to-gateway-ping profile-setting group bp-default
+set rulebase security rules inside-to-resolvers from [ k8s-nodes ingress stor-mgmt bastion oob services ]
+set rulebase security rules inside-to-resolvers to services
+set rulebase security rules inside-to-resolvers source [ 10.20.1.0/24 10.20.11.0/24 10.20.2.0/24 10.20.3.0/24 10.20.9.0/24 10.20.13.0/24 10.20.14.0/24 ]
+set rulebase security rules inside-to-resolvers destination [ 10.20.13.21 10.20.14.21 ]
+set rulebase security rules inside-to-resolvers application dns
+set rulebase security rules inside-to-resolvers service application-default
+set rulebase security rules inside-to-resolvers action allow
+set rulebase security rules inside-to-resolvers log-end yes
+set rulebase security rules inside-to-resolvers profile-setting group bp-default
+set rulebase security rules inside-to-ntp from [ k8s-nodes ingress stor-mgmt bastion oob services ]
+set rulebase security rules inside-to-ntp to services
+set rulebase security rules inside-to-ntp source [ 10.20.1.0/24 10.20.11.0/24 10.20.2.0/24 10.20.3.0/24 10.20.9.0/24 10.20.13.0/24 10.20.14.0/24 ]
+set rulebase security rules inside-to-ntp destination [ 10.20.13.21 10.20.14.21 ]
+set rulebase security rules inside-to-ntp application ntp
+set rulebase security rules inside-to-ntp service application-default
+set rulebase security rules inside-to-ntp action allow
+set rulebase security rules inside-to-ntp log-end yes
+set rulebase security rules inside-to-ntp profile-setting group bp-default
+set rulebase security rules resolvers-to-auth from services
+set rulebase security rules resolvers-to-auth to services
+set rulebase security rules resolvers-to-auth source [ 10.20.13.21 10.20.14.21 ]
+set rulebase security rules resolvers-to-auth destination [ 10.20.13.11 10.20.14.11 ]
+set rulebase security rules resolvers-to-auth application dns
+set rulebase security rules resolvers-to-auth service application-default
+set rulebase security rules resolvers-to-auth action allow
+set rulebase security rules resolvers-to-auth log-end yes
+set rulebase security rules resolvers-to-auth profile-setting group bp-default
+set rulebase security rules auth-zone-transfer from services
+set rulebase security rules auth-zone-transfer to services
+set rulebase security rules auth-zone-transfer source [ 10.20.13.11 10.20.14.11 ]
+set rulebase security rules auth-zone-transfer destination [ 10.20.13.11 10.20.14.11 ]
+set rulebase security rules auth-zone-transfer application dns
+set rulebase security rules auth-zone-transfer service application-default
+set rulebase security rules auth-zone-transfer action allow
+set rulebase security rules auth-zone-transfer log-end yes
+set rulebase security rules auth-zone-transfer profile-setting group bp-default
+set rulebase security rules ntp-upstream from services
+set rulebase security rules ntp-upstream to uplink
+set rulebase security rules ntp-upstream source [ 10.20.13.21 10.20.14.21 ]
+set rulebase security rules ntp-upstream destination 192.0.2.14
+set rulebase security rules ntp-upstream application ntp
+set rulebase security rules ntp-upstream service application-default
+set rulebase security rules ntp-upstream action allow
+set rulebase security rules ntp-upstream log-end yes
+set rulebase security rules ntp-upstream profile-setting group bp-default
+set rulebase security rules nts-ke-upstream from services
+set rulebase security rules nts-ke-upstream to uplink
+set rulebase security rules nts-ke-upstream source [ 10.20.13.21 10.20.14.21 ]
+set rulebase security rules nts-ke-upstream destination 192.0.2.14
+set rulebase security rules nts-ke-upstream application ssl
+set rulebase security rules nts-ke-upstream service tcp-4460
+set rulebase security rules nts-ke-upstream action allow
+set rulebase security rules nts-ke-upstream log-end yes
+set rulebase security rules nts-ke-upstream profile-setting group bp-default
+set rulebase security rules nodes-to-registry from k8s-nodes
+set rulebase security rules nodes-to-registry to uplink
+set rulebase security rules nodes-to-registry source 10.20.1.0/24
+set rulebase security rules nodes-to-registry destination 192.0.2.6
+set rulebase security rules nodes-to-registry application ssl
+set rulebase security rules nodes-to-registry service tcp-5000
+set rulebase security rules nodes-to-registry action allow
+set rulebase security rules nodes-to-registry log-end yes
+set rulebase security rules nodes-to-registry profile-setting group bp-default
+set rulebase security rules nodes-to-internal-gateway from k8s-nodes
+set rulebase security rules nodes-to-internal-gateway to ingress
+set rulebase security rules nodes-to-internal-gateway source 10.20.1.0/24
+set rulebase security rules nodes-to-internal-gateway destination 10.20.11.200
+set rulebase security rules nodes-to-internal-gateway application ssl
+set rulebase security rules nodes-to-internal-gateway service application-default
+set rulebase security rules nodes-to-internal-gateway action allow
+set rulebase security rules nodes-to-internal-gateway log-end yes
+set rulebase security rules nodes-to-internal-gateway profile-setting group bp-default
+set rulebase security rules csi-to-storage-api from k8s-nodes
+set rulebase security rules csi-to-storage-api to stor-mgmt
+set rulebase security rules csi-to-storage-api source 10.20.1.0/24
+set rulebase security rules csi-to-storage-api destination 10.20.2.31
+set rulebase security rules csi-to-storage-api application ssl
+set rulebase security rules csi-to-storage-api service application-default
+set rulebase security rules csi-to-storage-api action allow
+set rulebase security rules csi-to-storage-api log-end yes
+set rulebase security rules csi-to-storage-api profile-setting group bp-default
+set rulebase security rules operator-ike from uplink
+set rulebase security rules operator-ike to uplink
+set rulebase security rules operator-ike source 192.0.2.22
+set rulebase security rules operator-ike destination 198.51.100.2
+set rulebase security rules operator-ike application [ ike ipsec-esp ipsec-esp-udp ]
+set rulebase security rules operator-ike service application-default
+set rulebase security rules operator-ike action allow
+set rulebase security rules operator-ike log-end yes
+set rulebase security rules operator-ike profile-setting group bp-default
+set rulebase security rules operator-to-internal-gateway from operator-vpn
+set rulebase security rules operator-to-internal-gateway to ingress
+set rulebase security rules operator-to-internal-gateway source 192.0.2.0/30
+set rulebase security rules operator-to-internal-gateway destination 10.20.11.200
+set rulebase security rules operator-to-internal-gateway application ssl
+set rulebase security rules operator-to-internal-gateway service application-default
+set rulebase security rules operator-to-internal-gateway action allow
+set rulebase security rules operator-to-internal-gateway log-end yes
+set rulebase security rules operator-to-internal-gateway profile-setting group bp-default
+set rulebase security rules operator-to-internal-gateway description dec-policy-operator-vpn
+set rulebase security rules deny-all-log from any
+set rulebase security rules deny-all-log to any
+set rulebase security rules deny-all-log source any
+set rulebase security rules deny-all-log destination any
+set rulebase security rules deny-all-log application any
+set rulebase security rules deny-all-log service any
+set rulebase security rules deny-all-log action deny
+set rulebase security rules deny-all-log log-end yes
+set rulebase security rules deny-all-log description dec-policy-deny-all-log
+set rulebase nat rules no-nat-public from [ k8s-nodes services ]
+set rulebase nat rules no-nat-public to uplink
+set rulebase nat rules no-nat-public source any
+set rulebase nat rules no-nat-public destination 198.51.100.2
+set rulebase nat rules no-nat-public service any
+set rulebase nat rules no-nat-public description dec-nat-no-land
+set rulebase nat rules internet-snat from [ k8s-nodes services ]
+set rulebase nat rules internet-snat to uplink
+set rulebase nat rules internet-snat source any
+set rulebase nat rules internet-snat destination any
+set rulebase nat rules internet-snat service any
+set rulebase nat rules internet-snat source-translation dynamic-ip-and-port interface-address interface ethernet1/5
+set rulebase default-security-rules rules intrazone-default action deny
+set rulebase default-security-rules rules intrazone-default log-start no
+set rulebase default-security-rules rules intrazone-default log-end yes
+set rulebase default-security-rules rules interzone-default action deny
+set rulebase default-security-rules rules interzone-default log-start no
+set rulebase default-security-rules rules interzone-default log-end yes
+set import network interface [ ae1.100 ae1.110 ae1.200 ae1.300 ae1.130 ae1.131 ethernet1/3 ethernet1/4 ethernet1/7 ethernet1/5 tunnel.1 ]
+set network ike gateway ops-gw protocol ikev2 dpd enable yes
+set network ike gateway ops-gw protocol ikev2 ike-crypto-profile op-ike
+set network ike gateway ops-gw protocol version ikev2
+set network ike gateway ops-gw local-address interface ethernet1/5
+set network ike gateway ops-gw local-address ip 198.51.100.2/29
+set network ike gateway ops-gw peer-address ip 192.0.2.22
+set network ike gateway ops-gw local-id id 198.51.100.2
+set network ike gateway ops-gw local-id type ipaddr
+set network ike gateway ops-gw peer-id id 192.0.2.22
+set network ike gateway ops-gw peer-id type ipaddr
+set network tunnel ipsec ops-gw auto-key ike-gateway ops-gw
+set network tunnel ipsec ops-gw auto-key ipsec-crypto-profile op-esp
+set network tunnel ipsec ops-gw auto-key proxy-id ingress local 10.20.11.0/24
+set network tunnel ipsec ops-gw auto-key proxy-id ingress remote 192.0.2.0/30
+set network tunnel ipsec ops-gw auto-key proxy-id ingress protocol any
+set network tunnel ipsec ops-gw auto-key proxy-id bastion local 10.20.3.0/24
+set network tunnel ipsec ops-gw auto-key proxy-id bastion remote 192.0.2.0/30
+set network tunnel ipsec ops-gw auto-key proxy-id bastion protocol any
+set network tunnel ipsec ops-gw tunnel-interface tunnel.1

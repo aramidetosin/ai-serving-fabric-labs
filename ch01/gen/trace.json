@@ -1,0 +1,388 @@
+{
+  "api_gateway": {
+    "name": "api-gateway",
+    "namespace": "inference",
+    "port": 9080,
+    "selector": "app.kubernetes.io/name=api-gateway"
+  },
+  "client": {
+    "address": "10.24.10.10",
+    "ca_root": "/shared/ca/root.crt",
+    "node": "ent-client",
+    "pin": false,
+    "resolve": null,
+    "resolver": "ent-dns"
+  },
+  "copies": [
+    {
+      "copy": "a",
+      "nad": "rail3",
+      "rail": 3,
+      "server": {
+        "address": "10.21.3.100",
+        "mac": "02:5a:fe:03:00:64",
+        "node": "k8s-gpu1",
+        "pod": "chat-a-server-0"
+      },
+      "service": "chat-a",
+      "spans": false,
+      "switch": "rail-sw1",
+      "switch_ports": [
+        {
+          "eth": "eth2",
+          "faces": "k8s-gpu1",
+          "id": "11-rail-sw1-Ethernet1",
+          "native": "Ethernet1",
+          "node": "rail-sw1"
+        }
+      ],
+      "vlan": 103,
+      "workers": [
+        {
+          "address": "10.21.3.101",
+          "mac": "02:5a:fe:03:00:65",
+          "node": "k8s-gpu1",
+          "pod": "chat-a-worker0-0",
+          "remote": false
+        }
+      ]
+    },
+    {
+      "copy": "b",
+      "nad": "rail6",
+      "rail": 6,
+      "server": {
+        "address": "10.21.6.100",
+        "mac": "02:5a:fe:06:00:64",
+        "node": "k8s-gpu2",
+        "pod": "chat-b-server-0"
+      },
+      "service": "chat-b",
+      "spans": false,
+      "switch": "rail-sw2",
+      "switch_ports": [
+        {
+          "eth": "eth7",
+          "faces": "k8s-gpu2",
+          "id": "11-rail-sw2-Ethernet6",
+          "native": "Ethernet6",
+          "node": "rail-sw2"
+        }
+      ],
+      "vlan": 106,
+      "workers": [
+        {
+          "address": "10.21.6.101",
+          "mac": "02:5a:fe:06:00:65",
+          "node": "k8s-gpu2",
+          "pod": "chat-b-worker0-0",
+          "remote": false
+        }
+      ]
+    },
+    {
+      "copy": "c",
+      "nad": "rail7",
+      "rail": 7,
+      "server": {
+        "address": "10.21.7.100",
+        "mac": "02:5a:fe:07:00:64",
+        "node": "k8s-gpu1",
+        "pod": "chat-c-server-0"
+      },
+      "service": "chat-c",
+      "spans": true,
+      "switch": "rail-sw1",
+      "switch_ports": [
+        {
+          "eth": "eth4",
+          "faces": "k8s-gpu1",
+          "id": "11-rail-sw1-Ethernet3",
+          "native": "Ethernet3",
+          "node": "rail-sw1"
+        },
+        {
+          "eth": "eth8",
+          "faces": "k8s-gpu2",
+          "id": "11-rail-sw1-Ethernet7",
+          "native": "Ethernet7",
+          "node": "rail-sw1"
+        }
+      ],
+      "vlan": 107,
+      "workers": [
+        {
+          "address": "10.21.7.101",
+          "mac": "02:5a:fe:07:00:65",
+          "node": "k8s-gpu2",
+          "pod": "chat-c-worker0-0",
+          "remote": true
+        },
+        {
+          "address": "10.21.7.102",
+          "mac": "02:5a:fe:07:00:66",
+          "node": "k8s-gpu1",
+          "pod": "chat-c-worker1-0",
+          "remote": false
+        }
+      ]
+    }
+  ],
+  "depth_base": 5,
+  "dns": {
+    "answer": "10.20.11.210",
+    "authority": "dns-auth1",
+    "contrast": {
+      "answer": "10.20.11.200",
+      "node": "dns-res1",
+      "server": "10.20.13.21",
+      "source": "10.20.13.21",
+      "view": "internal"
+    },
+    "hostname": "llm.ai.tarnwick.example",
+    "resolver": "ent-dns",
+    "server": "10.24.10.53",
+    "view": "enterprise"
+  },
+  "expect": {
+    "api_base": "http://chat.serving.svc.cluster.local:8080/v1",
+    "model_name": "openai/chat",
+    "status": 200
+  },
+  "firewall": {
+    "bundle": "ae1",
+    "egress": "ae1.110",
+    "egress_zone": "ingress",
+    "ingress": "ethernet1/4",
+    "ingress_zone": "enterprise",
+    "nat_rule": null,
+    "node": "fw",
+    "route": "10.20.11.0/24",
+    "rule": "staff-to-users-gateway",
+    "tag": 110,
+    "vr": "core"
+  },
+  "frontend": {
+    "filter": "host 10.24.10.10 and (tcp port 443 or tcp port 22)",
+    "legs": [
+      {
+        "eth": "eth1",
+        "ifname": "ethernet1/1",
+        "leg": 1,
+        "native": "Ethernet2",
+        "switch": "fe-sw1",
+        "switch_eth": "eth3"
+      },
+      {
+        "eth": "eth2",
+        "ifname": "ethernet1/2",
+        "leg": 2,
+        "native": "Ethernet2",
+        "switch": "fe-sw2",
+        "switch_eth": "eth3"
+      }
+    ],
+    "pair": [
+      "fe-sw1",
+      "fe-sw2"
+    ],
+    "points": [
+      {
+        "eth": "eth1",
+        "id": "1-ent-client-eth1",
+        "node": "ent-client",
+        "role": "client",
+        "vlan": null
+      },
+      {
+        "eth": "eth4",
+        "id": "2-fw-ethernet1-4",
+        "ifname": "ethernet1/4",
+        "node": "fw",
+        "role": "ingress",
+        "vlan": null
+      },
+      {
+        "eth": "eth1",
+        "id": "3-fw-ae1-leg1",
+        "ifname": "ethernet1/1",
+        "leg": 1,
+        "node": "fw",
+        "role": "leg",
+        "vlan": 110
+      },
+      {
+        "eth": "eth2",
+        "id": "3-fw-ae1-leg2",
+        "ifname": "ethernet1/2",
+        "leg": 2,
+        "node": "fw",
+        "role": "leg",
+        "vlan": 110
+      },
+      {
+        "eth": "eth3",
+        "id": "4-fe-sw1-Ethernet2",
+        "leg": 1,
+        "node": "fe-sw1",
+        "role": "trunk",
+        "vlan": 110
+      },
+      {
+        "eth": "eth3",
+        "id": "4-fe-sw2-Ethernet2",
+        "leg": 2,
+        "node": "fe-sw2",
+        "role": "trunk",
+        "vlan": 110
+      }
+    ],
+    "server_depth": 5,
+    "snaplen": 96,
+    "vlan": 110
+  },
+  "gateway": {
+    "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-users",
+    "name": "gw-users",
+    "port": 443,
+    "route": "models-gw-users",
+    "service": "cilium-gateway-gw-users",
+    "vip": "10.20.11.210"
+  },
+  "hostname": "llm.ai.tarnwick.example",
+  "keys": {
+    "backend": {
+      "field": "key",
+      "secret": "backend-key"
+    },
+    "capture": true,
+    "master": {
+      "field": "key",
+      "secret": "router-master-key"
+    },
+    "model": "chat",
+    "namespace": "inference",
+    "router_path": "/engines/chat/chat/completions",
+    "secret": "api-keys"
+  },
+  "kind": "walk",
+  "lab": "sfab-ch01",
+  "max_tokens": 16,
+  "model": "chat",
+  "path": "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions",
+  "pin": null,
+  "rail_counters": {
+    "switches": [
+      "rail-sw1",
+      "rail-sw2"
+    ]
+  },
+  "refusals": {
+    "hostname": {
+      "device": "gw-users",
+      "expect": 404,
+      "hostname": "admin.ai.tarnwick.example",
+      "layer": "the Gateway",
+      "path": "/echo",
+      "resolve": "admin.ai.tarnwick.example:443:10.20.11.210",
+      "sport": 42107,
+      "url": "https://admin.ai.tarnwick.example/echo?msg=sfab-trace-refused"
+    },
+    "key": {
+      "device": "api-gateway",
+      "expect": 401,
+      "layer": "the API gateway",
+      "message": "Authorization Failed",
+      "model": "staff",
+      "path": "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions",
+      "route_model": "chat",
+      "sport": 42108,
+      "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+    },
+    "port": {
+      "address": "10.20.1.21",
+      "device": "fw",
+      "expect": {
+        "action": "deny",
+        "from_zone": "enterprise",
+        "rule": "deny-all-log",
+        "to_zone": "k8s-nodes"
+      },
+      "layer": "the firewall",
+      "port": 22,
+      "sport": 42109,
+      "timeout_s": 5,
+      "to": "k8s-gpu1"
+    }
+  },
+  "refuse": {
+    "expect": 404,
+    "hostname": "admin.ai.tarnwick.example",
+    "path": "/echo",
+    "resolve": "admin.ai.tarnwick.example:443:10.20.11.210",
+    "sport": 42107,
+    "url": "https://admin.ai.tarnwick.example/echo?msg=sfab-trace-refused"
+  },
+  "route_id": "a48b3df9-3b7f-58f0-9c52-c6f3004f05f7",
+  "router": {
+    "name": "router",
+    "namespace": "inference",
+    "port": 4000,
+    "selector": "app.kubernetes.io/name=router"
+  },
+  "schema": 1,
+  "serving": {
+    "http_port": 8080,
+    "namespace": "serving",
+    "rail_probe_port": 50053,
+    "rpc_port": 50052
+  },
+  "sessions": [
+    {
+      "body": "/tmp/sfab-trace/request.json",
+      "ca_root": "/shared/ca/root.crt",
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "dst_addr": "10.20.11.210",
+      "expect": {
+        "from_zone": "enterprise",
+        "nat_rule": null,
+        "rule": "staff-to-users-gateway",
+        "status": 200,
+        "to_zone": "ingress"
+      },
+      "fqdn": "llm.ai.tarnwick.example",
+      "gateway": "gw-users",
+      "header": "/tmp/sfab-trace/hdr-chat",
+      "hold_s": 30,
+      "id": "walk",
+      "method": "POST",
+      "msg": null,
+      "path": "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions",
+      "pin": false,
+      "port": 443,
+      "resolver": "ent-dns",
+      "sport": 42106,
+      "translated_addr": null,
+      "vip": "10.20.11.210"
+    }
+  ],
+  "snaplen": {
+    "http": 66,
+    "keyed": 2048,
+    "rail": 128,
+    "vip": 96
+  },
+  "sport": 42106,
+  "tables": {
+    "router": {
+      "configmap": "router-config",
+      "key": "config.yaml"
+    },
+    "routes": {
+      "configmap": "api-gateway-routes",
+      "key": "apisix.yaml"
+    }
+  },
+  "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+}

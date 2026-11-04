@@ -1,0 +1,66 @@
+# Lab output: every run writes its files under the lab's audits/ directory
+**/audits/
+# Per-lab runtime state: disks, secrets, logs, markers
+**/state/
+# containerlab runtime state
+clab-sfab-*/
+**/clab-*/
+.*.clab.yml.bak
+*.bak
+**/deploy.log
+
+# Vendor images, disks, archives and models are never committed (images/VENDOR-IMAGES.md)
+*.qcow2
+*.img
+*.iso
+*.ova
+*.vmdk
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.gguf
+# Image build inputs and outputs
+images/*/base/
+images/registry/data
+images/models
+vendor/
+# The serving recipe's default render directory and a serving.env written in place
+serving-layer/rendered/
+serving-layer/serving.env
+
+# Credentials and keys live in a lab's state/; these keep a copy made anywhere else out of git too
+secrets.env
+secrets.env.tmp
+lab_ed25519*
+redact.key
+*.key
+*.pem
+*.p12
+kubeconfig
+
+# Editors
+.DS_Store
+*.swp
+*.swo
+*~
+.#*
+\#*#
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Core dumps
+core
+!core/
+core.[0-9]*
+*.core
+vgcore.*

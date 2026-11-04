@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+# sfab-ready: the readiness probes of the serving image's two pods (serving-layer/README.md).
+#
+#   sfab-ready worker [--rpc-port 50052] <rail address>
+#       Ready while ggml-rpc-server listens on <rail address>:<rpc port> in the pod.
+#   sfab-ready server [--port 8080] [--rpc-port 50052] [--probe-port 50053] <worker rail address>...
+#       Ready only while all of these hold:
+#       1. llama-server answers GET /health with 200 on 127.0.0.1:<port>;
+#       2. for each worker, the pod holds an established RPC session to <worker>:<rpc port> with
+#          fewer than 3 retransmission timeouts in a row (a dead path stalls the session while a
+#          request is running);
+#       3. for each worker, the worker's kernel refuses a connection to <probe port>, where
+#          nothing listens, within the timeout: the refusal crosses the rail both ways, so a
+#          dead path shows while the replica is idle too. The probe opens no RPC session of its
+#          own, so it never competes with the server's session to the worker. It needs the rail
+#          to answer a closed port with a reset: a host filter on the rail must REJECT tcp/<probe
+#          port> (with a TCP reset), never DROP it, or every server's check 3 times out and every
+#          copy goes unready together.
+#       The server binds llama-server to the pod's own cluster address, so the recipe sets
+#       SFAB_READY_HOST to that address for the health check.
+#
+# It prints one line, "ready: ..." or "not ready: ...", and exits 0 or 1. Only bash, awk and
+# timeout are used, all three in the image's Debian base. For the tests, SFAB_READY_TCP names the
+# file read in place of /proc/net/tcp and SFAB_READY_HOST the address the health check opens.
+set -uo pipefail
+
+TCP=${SFAB_READY_TCP:-/proc/net/tcp}
+HOST=${SFAB_READY_HOST:-127.0.0.1}
+WAIT=${SFAB_READY_WAIT_S:-1.5}
+PORT=8080
+RPC=50052
+PROBE=50053
+
+no() { printf 'not ready: %s\n' "$*"; exit 1; }
+usage() { printf 'usage: sfab-ready worker [--rpc-port N] <address> | server [--port N] [--rpc-port N] [--probe-port N] <worker address>...\n' >&2; exit 2; }
+
+# hexaddr A.B.C.D PORT: the form /proc/net/tcp writes an IPv4 socket address in.
+hexaddr() {
+  local a b c d
+  IFS=. read -r a b c d <<<"$1"
+  printf '%02X%02X%02X%02X:%04X' "$d" "$c" "$b" "$a" "$2"
+}
+
+valid_ip() { [[ $1 =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; }
+
+# sockets STATE ADDRESS FIELD: the hex field (column) of every socket in STATE whose local (FIELD 2)
+# or remote (FIELD 3) address is ADDRESS, one per line: its retransmission count (column 7).
+sockets() {
+  awk -v st="$1" -v addr="$2" -v f="$3" 'NR > 1 && $4 == st && $f == addr { print $7 }' "$TCP" 2>/dev/null
+}
+
+health() {
+  local status=""
+  if ! { exec 3<>"/dev/tcp/$HOST/$PORT"; } 2>/dev/null; then no "llama-server does not accept connections on port $PORT"; fi
+  printf 'GET /health HTTP/1.0\r\nHost: %s\r\nConnection: close\r\n\r\n' "$HOST" >&3
+  IFS= read -r -t 2 status <&3 || true
+  exec 3<&- 3>&-
+  status=${status%$'\r'}
+  case $status in
+    "HTTP/1."?" 200"*) ;;
+    "") no "llama-server sent no answer to GET /health" ;;
+    *) no "llama-server answered GET /health with ${status#HTTP/1.? }" ;;
+  esac
+}
+
+# rail WORKER: a connection to the closed probe port, refused by the worker's kernel in time.
+rail() {
+  local out rc
+  out=$(timeout "$WAIT" bash -c "exec 3<>/dev/tcp/$1/$PROBE" 2>&1)
+  rc=$?
+  case $rc:$out in
+    0:*) no "port $PROBE answers on $1: the probe needs a port where nothing listens" ;;
+    124:*) no "no answer from $1 over the rail within ${WAIT}s" ;;
+    *"Connection refused"*) return 0 ;;
+    *) no "the rail to $1: ${out##*: }" ;;
+  esac
+}
+
+role=${1:-}
+[ $# -gt 0 ] && shift
+while [ $# -gt 0 ]; do
+  case $1 in
+    --port) PORT=${2:-}; shift 2 ;;
+    --rpc-port) RPC=${2:-}; shift 2 ;;
+    --probe-port) PROBE=${2:-}; shift 2 ;;
+    --) shift; break ;;
+    -*) usage ;;
+    *) break ;;
+  esac
+done
+for p in "$PORT" "$RPC" "$PROBE"; do [[ $p =~ ^[0-9]+$ ]] || usage; done
+[ $# -gt 0 ] || usage
+for a in "$@"; do valid_ip "$a" || usage; done
+
+case $role in
+  worker)
+    [ $# -eq 1 ] || usage
+    [ -n "$(sockets 0A "$(hexaddr "$1" "$RPC")" 2)" ] || no "ggml-rpc-server does not listen on $1:$RPC"
+    printf 'ready: ggml-rpc-server listens on %s:%s\n' "$1" "$RPC"
+    ;;
+  server)
+    health
+    for w in "$@"; do
+      sessions=$(sockets 01 "$(hexaddr "$w" "$RPC")" 3)
+      [ -n "$sessions" ] || no "no RPC session to the worker $w:$RPC"
+      for r in $sessions; do
+        [ $((16#$r)) -lt 3 ] || no "the RPC session to $w:$RPC is stalled ($((16#$r)) retransmission timeouts)"
+      done
+      rail "$w"
+    done
+    printf 'ready: llama-server answers, RPC sessions to %s established, the rail answers\n' "$*"
+    ;;
+  *) usage ;;
+esac
+exit 0

@@ -1,0 +1,13 @@
+# The in-lab registry (sfab/registry): SLUG SURFACE COMMAND. catalog reads it over HTTPS in its own
+# network namespace, the certificate verified against the lab root. access_log reads the registry's
+# own request log (docker logs) for the source addresses of the pulls. resolv_conf shows the search
+# line is the lab's domain, not the one Docker copies from the lab host.
+ip_addr              exec-json   ip -j addr show
+table_main           exec        ip route show
+table_mgmt           exec        ip route show table {inv.guest.tables.mgmt}
+tx_container         host        container_offloads
+container_links      host-json   container_links
+ping_gw              exec        ping -c 3 -W 2 {gateway}
+catalog              host-json   registry_catalog
+access_log           host        registry_access
+resolv_conf          exec        cat /etc/resolv.conf

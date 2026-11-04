@@ -1,0 +1,23 @@
+# The bastion (sfab/bastion), the jump host: SLUG SURFACE COMMAND (see README.md). exec lines run in
+# its own container. Nothing here prints a key: the CA lines print subjects, constraints and verify
+# results; the operator's kubeconfig line decodes its client certificate's subject and expiry only;
+# shared_keys (on the lab host) names each private key file under state/shared with its mode only.
+# container_links is also read by the quick audit: the switches learn the bastion's container MACs,
+# which the MAC-table check sets aside.
+init_log             host        container_log_tail
+bonding              exec        cat /proc/net/bonding/{bond.name}
+ip_addr              exec-json   ip -j addr show
+ip_rule              exec        ip rule show
+table_main           exec        ip route show
+table_mgmt           exec        ip route show table {inv.guest.tables.mgmt}
+table_oob            exec        ip route show table {oob.table}
+tx_container         host        container_offloads
++container_links     host-json   container_links
+services             exec        for p in sshd lldpd named chronyd dnsmasq; do if pgrep -x "$p" >/dev/null; then echo "$p running"; else echo "$p absent"; fi; done
+resolv_conf          exec        cat /etc/resolv.conf
+admin_kubeconfig     exec        if [ -e /root/.kube/config ]; then echo "root kubeconfig present"; else echo "root kubeconfig absent"; fi; if [ -e /shared/cluster ] || [ -e /sfab/ca ]; then echo "cluster or CA state visible"; else echo "no cluster or CA state"; fi
+operator_cert        exec        f=/home/{inv.guest.user}/.kube/config; if [ -s "$f" ]; then kubectl --kubeconfig "$f" config view --raw -o jsonpath='{{.users[0].user.client-certificate-data}}' | base64 -d | openssl x509 -noout -subject -issuer -startdate -enddate -nameopt RFC2253; date -u '+now=%b %d %H:%M:%S %Y GMT'; else echo "no kubeconfig for {inv.guest.user}"; fi
+operator_can_i       exec        f=/home/{inv.guest.user}/.kube/config; for v in "get pods -A" "list nodes" "create pods -A" "get secrets -A" "delete nodes"; do printf '%s: ' "$v"; kubectl --kubeconfig "$f" auth can-i $v 2>&1 | tail -n 1; done
+ca_certs             exec        for c in /shared/ca/*.crt; do echo "== $c"; openssl x509 -in "$c" -noout -subject -issuer -nameopt RFC2253 -ext nameConstraints 2>&1; openssl verify -CAfile {ca_root} "$c" 2>&1; done
+shared_keys          host        shared_keys
+stor_mgmt_https      exec        curl -sk -o /dev/null -D - --max-time 15 https://{stor_mgmt_addr}/ 2>&1 | head -n 1

@@ -1,0 +1,19 @@
+# sfab/registry, seeding mode: the same registry, writable, for `make -C images registry-seed`
+# only. seed.py runs it on the lab host's loopback (REGISTRY_HTTP_ADDR) with the data directory
+# bound read-write, copies every pinned image and chart into it, then stops it.
+version: 0.1
+log:
+  level: info
+  fields:
+    service: registry-seed
+storage:
+  cache:
+    blobdescriptor: inmemory
+  filesystem:
+    rootdirectory: /var/lib/registry
+  delete:
+    enabled: false
+http:
+  addr: 127.0.0.1:5000
+  headers:
+    X-Content-Type-Options: [nosniff]

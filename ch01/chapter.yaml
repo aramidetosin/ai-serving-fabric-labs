@@ -1,0 +1,22 @@
+lab: sfab-ch01
+profile: a
+state: one
+slice:
+  nodes: [fe, rail, oob, fw, k8s-gpu1, k8s-gpu2, k8s-cp1, k8s-cp2, k8s-cp3, bastion, inet-registry, uplink-rtr, ops-client, web-client, ops-dns, ent-client, truenas1]
+features: {k8s: true, serving: true, storage_setup: true}
+prints: []
+extends: ch07
+variants: {}
+
+trace:
+  walk:
+    client: ent-client
+    gateway: gw-users
+    model: chat
+    max_tokens: 16
+    sport: 42106
+    hold_s: 30
+    refuse:
+      hostname: {hostname: admin, path: /echo, sport: 42107}
+      key: {model: staff, sport: 42108}
+      port: {to: k8s-gpu1, port: 22, sport: 42109, timeout_s: 5}

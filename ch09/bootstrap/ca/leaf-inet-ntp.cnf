@@ -1,0 +1,25 @@
+# sfab-ch09 lab CA, the inet-ntp leaf: rendered from spec/profile-a.yaml by render/ca.py; edit the spec and run make render
+# sfab-ca signs it on the lab host with the internet intermediate and writes the key, the
+# certificate and the chain (the leaf, then the intermediate) to state/tls/inet-ntp/, which the
+# topology binds read-only at /sfab/tls in inet-ntp only.
+[sfab]
+key = ec-p256
+days = 397
+renew_days = 30
+ca = internet
+node = inet-ntp
+
+[req]
+prompt = no
+distinguished_name = dn
+
+[dn]
+CN = ntp.upstream.example
+
+[ext]
+basicConstraints = critical,CA:FALSE
+keyUsage = critical,digitalSignature
+extendedKeyUsage = serverAuth
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always
+subjectAltName = DNS:ntp.upstream.example,IP:192.0.2.14

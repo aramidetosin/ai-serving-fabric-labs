@@ -1,0 +1,2764 @@
+{
+  "api_gateway": {
+    "deployment": "api-gateway",
+    "namespace": "inference",
+    "rejected": {
+      "code": 401,
+      "message": "Authorization Failed"
+    },
+    "secret": "api-keys",
+    "selector": "app.kubernetes.io/name=api-gateway"
+  },
+  "ca_root": "/shared/ca/root.crt",
+  "cells": [
+    {
+      "address": "10.20.11.200",
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "client_kind": "client",
+      "column": "gw-internal",
+      "expect": {
+        "action": "deny",
+        "connect": "refused",
+        "device": "fw",
+        "from_zone": "enterprise",
+        "rule": "deny-all-log",
+        "to_zone": "ingress"
+      },
+      "fw": {
+        "from_zone": "enterprise",
+        "rule": "deny-all-log",
+        "to_zone": "ingress"
+      },
+      "hops": [
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/4 (zone enterprise): 10.20.11.0/24 connected on ae1.110, zone ingress"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone enterprise: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "deny-all-log",
+          "what": "deny-all-log: deny, zone enterprise to ingress"
+        }
+      ],
+      "id": "enterprise/gw-internal",
+      "kind": "connect",
+      "layer": "policy",
+      "mode": "log-line",
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43000
+        }
+      ],
+      "row": "enterprise",
+      "sport": 43000
+    },
+    {
+      "address": "10.20.11.210",
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "client_kind": "client",
+      "column": "gw-users",
+      "expect": {
+        "connect": "connected"
+      },
+      "fw": {
+        "from_zone": "enterprise",
+        "rule": "staff-to-users-gateway",
+        "to_zone": "ingress"
+      },
+      "hops": [
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/4 (zone enterprise): 10.20.11.0/24 connected on ae1.110, zone ingress"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone enterprise: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "staff-to-users-gateway",
+          "what": "staff-to-users-gateway: allow, zone enterprise to ingress"
+        }
+      ],
+      "id": "enterprise/gw-users",
+      "kind": "connect",
+      "layer": null,
+      "mode": "allowed",
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43004
+        }
+      ],
+      "row": "enterprise",
+      "sport": 43004
+    },
+    {
+      "address": "10.20.11.210",
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "client_kind": "client",
+      "column": "chat",
+      "expect": {
+        "status": 200
+      },
+      "fw": {
+        "from_zone": "enterprise",
+        "rule": "staff-to-users-gateway",
+        "to_zone": "ingress"
+      },
+      "gateway": "gw-users",
+      "hops": [
+        {
+          "device": "ent-dns",
+          "row": "view",
+          "what": "view enterprise: llm.ai.tarnwick.example A 10.20.11.210"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/4 (zone enterprise): 10.20.11.0/24 connected on ae1.110, zone ingress"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone enterprise: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "staff-to-users-gateway",
+          "what": "staff-to-users-gateway: allow, zone enterprise to ingress"
+        },
+        {
+          "device": "gw-users",
+          "route": "models-gw-users",
+          "row": "routeset",
+          "what": "HTTPRoute models-gw-users, /models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7: the API gateway (api-gateway)"
+        },
+        {
+          "device": "api-gateway",
+          "row": "key",
+          "what": "chat's consumer group: its own key 200, staff's key 401"
+        }
+      ],
+      "hostname": "llm.ai.tarnwick.example",
+      "id": "enterprise/chat",
+      "kind": "model",
+      "layer": null,
+      "lookup": {
+        "answer": "10.20.11.210",
+        "name": "llm.ai.tarnwick.example",
+        "resolver": "ent-dns",
+        "server": "10.24.10.53",
+        "view": "enterprise"
+      },
+      "mode": "allowed",
+      "port": 443,
+      "requests": [
+        {
+          "body": {
+            "max_tokens": 1,
+            "messages": [
+              {
+                "content": "Say yes.",
+                "role": "user"
+              }
+            ],
+            "model": "chat"
+          },
+          "expect": {
+            "status": 200
+          },
+          "id": "own",
+          "key": "chat",
+          "method": "POST",
+          "sport": 43008,
+          "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+        },
+        {
+          "body": {
+            "max_tokens": 1,
+            "messages": [
+              {
+                "content": "Say yes.",
+                "role": "user"
+              }
+            ],
+            "model": "chat"
+          },
+          "expect": {
+            "layer": "key",
+            "message": "Authorization Failed",
+            "status": 401
+          },
+          "id": "other",
+          "key": "staff",
+          "method": "POST",
+          "sport": 43010,
+          "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+        }
+      ],
+      "route": "models-gw-users",
+      "row": "enterprise",
+      "sport": 43008
+    },
+    {
+      "address": "10.20.11.210",
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "client_kind": "client",
+      "column": "staff",
+      "expect": {
+        "status": 200
+      },
+      "fw": {
+        "from_zone": "enterprise",
+        "rule": "staff-to-users-gateway",
+        "to_zone": "ingress"
+      },
+      "gateway": "gw-users",
+      "hops": [
+        {
+          "device": "ent-dns",
+          "row": "view",
+          "what": "view enterprise: llm.ai.tarnwick.example A 10.20.11.210"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/4 (zone enterprise): 10.20.11.0/24 connected on ae1.110, zone ingress"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone enterprise: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "staff-to-users-gateway",
+          "what": "staff-to-users-gateway: allow, zone enterprise to ingress"
+        },
+        {
+          "device": "gw-users",
+          "route": "models-gw-users",
+          "row": "routeset",
+          "what": "HTTPRoute models-gw-users, /models/8242d5c4-9bce-5497-8414-f5bad94fdd84: the API gateway (api-gateway)"
+        },
+        {
+          "device": "api-gateway",
+          "row": "key",
+          "what": "staff's consumer group: its own key 200, chat's key 401"
+        }
+      ],
+      "hostname": "llm.ai.tarnwick.example",
+      "id": "enterprise/staff",
+      "kind": "model",
+      "layer": null,
+      "lookup": {
+        "answer": "10.20.11.210",
+        "name": "llm.ai.tarnwick.example",
+        "resolver": "ent-dns",
+        "server": "10.24.10.53",
+        "view": "enterprise"
+      },
+      "mode": "allowed",
+      "port": 443,
+      "requests": [
+        {
+          "body": {
+            "max_tokens": 1,
+            "messages": [
+              {
+                "content": "Say yes.",
+                "role": "user"
+              }
+            ],
+            "model": "staff"
+          },
+          "expect": {
+            "status": 200
+          },
+          "id": "own",
+          "key": "staff",
+          "method": "POST",
+          "sport": 43012,
+          "url": "https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions"
+        },
+        {
+          "body": {
+            "max_tokens": 1,
+            "messages": [
+              {
+                "content": "Say yes.",
+                "role": "user"
+              }
+            ],
+            "model": "staff"
+          },
+          "expect": {
+            "layer": "key",
+            "message": "Authorization Failed",
+            "status": 401
+          },
+          "id": "other",
+          "key": "chat",
+          "method": "POST",
+          "sport": 43014,
+          "url": "https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions"
+        }
+      ],
+      "route": "models-gw-users",
+      "row": "enterprise",
+      "sport": 43012
+    },
+    {
+      "address": "10.20.11.210",
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "client_kind": "client",
+      "column": "admin",
+      "expect": {
+        "api_gateway_line": false,
+        "gateway": "gw-users",
+        "status": 404
+      },
+      "fw": {
+        "from_zone": "enterprise",
+        "rule": "staff-to-users-gateway",
+        "to_zone": "ingress"
+      },
+      "gateway": "gw-users",
+      "hops": [
+        {
+          "device": "ent-dns",
+          "row": "view",
+          "what": "view enterprise: no record for admin.ai.tarnwick.example (NXDOMAIN); the request pinned to 10.20.11.210"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/4 (zone enterprise): 10.20.11.0/24 connected on ae1.110, zone ingress"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone enterprise: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "staff-to-users-gateway",
+          "what": "staff-to-users-gateway: allow, zone enterprise to ingress"
+        },
+        {
+          "device": "gw-users",
+          "row": "routeset",
+          "what": "no HTTPRoute for admin.ai.tarnwick.example and /echo: 404"
+        }
+      ],
+      "hostname": "admin.ai.tarnwick.example",
+      "id": "enterprise/admin",
+      "kind": "name",
+      "layer": "routeset",
+      "lookup": {
+        "answer": null,
+        "expect": "nxdomain",
+        "name": "admin.ai.tarnwick.example",
+        "resolver": "ent-dns",
+        "server": "10.24.10.53",
+        "view": "enterprise"
+      },
+      "mode": "404",
+      "note": "view enterprise holds no record for admin.ai.tarnwick.example: the request is pinned to 10.20.11.210, the population's answer for the users' hostname",
+      "pin": true,
+      "port": 443,
+      "requests": [
+        {
+          "expect": {
+            "status": 404
+          },
+          "id": "request",
+          "marker": "sfab-matrix-enterprise-admin",
+          "method": "GET",
+          "sport": 43016,
+          "url": "https://admin.ai.tarnwick.example/echo?msg=sfab-matrix-enterprise-admin"
+        }
+      ],
+      "row": "enterprise",
+      "sport": 43016
+    },
+    {
+      "address": "10.20.1.10",
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "client_kind": "client",
+      "column": "api-server",
+      "expect": {
+        "action": "deny",
+        "connect": "refused",
+        "device": "fw",
+        "from_zone": "enterprise",
+        "rule": "deny-all-log",
+        "to_zone": "k8s-nodes"
+      },
+      "fw": {
+        "from_zone": "enterprise",
+        "rule": "deny-all-log",
+        "to_zone": "k8s-nodes"
+      },
+      "hops": [
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/4 (zone enterprise): 10.20.1.0/24 connected on ae1.100, zone k8s-nodes"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone enterprise: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "deny-all-log",
+          "what": "deny-all-log: deny, zone enterprise to k8s-nodes"
+        }
+      ],
+      "id": "enterprise/api-server",
+      "kind": "connect",
+      "layer": "policy",
+      "mode": "log-line",
+      "port": 6443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43020
+        }
+      ],
+      "row": "enterprise",
+      "sport": 43020
+    },
+    {
+      "address": "10.20.1.21",
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "client_kind": "client",
+      "column": "node",
+      "expect": {
+        "action": "deny",
+        "connect": "refused",
+        "device": "fw",
+        "from_zone": "enterprise",
+        "rule": "deny-all-log",
+        "to_zone": "k8s-nodes"
+      },
+      "fw": {
+        "from_zone": "enterprise",
+        "rule": "deny-all-log",
+        "to_zone": "k8s-nodes"
+      },
+      "hops": [
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/4 (zone enterprise): 10.20.1.0/24 connected on ae1.100, zone k8s-nodes"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone enterprise: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "deny-all-log",
+          "what": "deny-all-log: deny, zone enterprise to k8s-nodes"
+        }
+      ],
+      "id": "enterprise/node",
+      "kind": "connect",
+      "layer": "policy",
+      "mode": "log-line",
+      "port": 22,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43024
+        }
+      ],
+      "row": "enterprise",
+      "sport": 43024
+    },
+    {
+      "address": "10.20.9.21",
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "client_kind": "client",
+      "column": "bmc",
+      "expect": {
+        "action": "deny",
+        "connect": "refused",
+        "device": "fw",
+        "from_zone": "enterprise",
+        "rule": "deny-all-log",
+        "to_zone": "oob"
+      },
+      "fw": {
+        "from_zone": "enterprise",
+        "rule": "deny-all-log",
+        "to_zone": "oob"
+      },
+      "hops": [
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/4 (zone enterprise): 10.20.9.0/24 connected on ethernet1/3, zone oob"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone enterprise: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "deny-all-log",
+          "what": "deny-all-log: deny, zone enterprise to oob"
+        }
+      ],
+      "id": "enterprise/bmc",
+      "kind": "connect",
+      "layer": "policy",
+      "mode": "log-line",
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43028
+        }
+      ],
+      "row": "enterprise",
+      "sport": 43028
+    },
+    {
+      "address": "10.20.12.31",
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "client_kind": "client",
+      "column": "stor-data",
+      "expect": {
+        "connect": "refused",
+        "device": "fw"
+      },
+      "hops": [
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/4 (zone enterprise): 10.0.0.0/8 discard (discard-10): dropped before policy"
+        }
+      ],
+      "id": "enterprise/stor-data",
+      "kind": "connect",
+      "layer": "routing",
+      "mode": "silence",
+      "port": 2049,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43032
+        }
+      ],
+      "row": "enterprise",
+      "sport": 43032
+    },
+    {
+      "address": "10.20.2.31",
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "client_kind": "client",
+      "column": "stor-mgmt",
+      "expect": {
+        "action": "deny",
+        "connect": "refused",
+        "device": "fw",
+        "from_zone": "enterprise",
+        "rule": "deny-all-log",
+        "to_zone": "stor-mgmt"
+      },
+      "fw": {
+        "from_zone": "enterprise",
+        "rule": "deny-all-log",
+        "to_zone": "stor-mgmt"
+      },
+      "hops": [
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/4 (zone enterprise): 10.20.2.0/24 connected on ae1.200, zone stor-mgmt"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone enterprise: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "deny-all-log",
+          "what": "deny-all-log: deny, zone enterprise to stor-mgmt"
+        }
+      ],
+      "id": "enterprise/stor-mgmt",
+      "kind": "connect",
+      "layer": "policy",
+      "mode": "log-line",
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43036
+        }
+      ],
+      "row": "enterprise",
+      "sport": 43036
+    },
+    {
+      "address": "192.0.2.18",
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "client_kind": "client",
+      "column": "egress",
+      "expect": {
+        "action": "deny",
+        "connect": "refused",
+        "device": "fw",
+        "from_zone": "enterprise",
+        "rule": "deny-all-log",
+        "to_zone": "uplink"
+      },
+      "fw": {
+        "from_zone": "enterprise",
+        "rule": "deny-all-log",
+        "to_zone": "uplink"
+      },
+      "hops": [
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/4 (zone enterprise): 0.0.0.0/0 via 198.51.100.1 on ethernet1/5 (default-uplink), zone uplink"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone enterprise: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "deny-all-log",
+          "what": "deny-all-log: deny, zone enterprise to uplink"
+        }
+      ],
+      "id": "enterprise/egress",
+      "kind": "connect",
+      "layer": "policy",
+      "mode": "log-line",
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43040
+        }
+      ],
+      "row": "enterprise",
+      "sport": 43040
+    },
+    {
+      "address": "10.20.11.200",
+      "client": "ops-client",
+      "client_addr": "192.0.2.2",
+      "client_kind": "client",
+      "column": "gw-internal",
+      "expect": {
+        "connect": "connected"
+      },
+      "fw": {
+        "from_zone": "operator-vpn",
+        "rule": "operator-to-internal-gateway",
+        "to_zone": "ingress"
+      },
+      "hops": [
+        {
+          "device": "ops-gw",
+          "row": "routing",
+          "what": "into the IPsec tunnel to the firewall (ops-gw, proxy ID ingress): 10.20.11.200 is in its remote selector"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on tunnel.1 (zone operator-vpn): 10.20.11.0/24 connected on ae1.110, zone ingress"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone operator-vpn: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "operator-to-internal-gateway",
+          "what": "operator-to-internal-gateway: allow, zone operator-vpn to ingress"
+        }
+      ],
+      "id": "operator/gw-internal",
+      "kind": "connect",
+      "layer": null,
+      "mode": "allowed",
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43044
+        }
+      ],
+      "row": "operator",
+      "sport": 43044
+    },
+    {
+      "address": "10.20.11.210",
+      "client": "ops-client",
+      "client_addr": "192.0.2.2",
+      "client_kind": "client",
+      "column": "gw-users",
+      "expect": {
+        "action": "deny",
+        "connect": "refused",
+        "device": "fw",
+        "from_zone": "operator-vpn",
+        "rule": "deny-all-log",
+        "to_zone": "ingress"
+      },
+      "fw": {
+        "from_zone": "operator-vpn",
+        "rule": "deny-all-log",
+        "to_zone": "ingress"
+      },
+      "hops": [
+        {
+          "device": "ops-gw",
+          "row": "routing",
+          "what": "into the IPsec tunnel to the firewall (ops-gw, proxy ID ingress): 10.20.11.210 is in its remote selector"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on tunnel.1 (zone operator-vpn): 10.20.11.0/24 connected on ae1.110, zone ingress"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone operator-vpn: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "deny-all-log",
+          "what": "deny-all-log: deny, zone operator-vpn to ingress"
+        }
+      ],
+      "id": "operator/gw-users",
+      "kind": "connect",
+      "layer": "policy",
+      "mode": "log-line",
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43048
+        }
+      ],
+      "row": "operator",
+      "sport": 43048
+    },
+    {
+      "address": "10.20.11.200",
+      "client": "ops-client",
+      "client_addr": "192.0.2.2",
+      "client_kind": "client",
+      "column": "chat",
+      "expect": {
+        "status": 200
+      },
+      "fw": {
+        "from_zone": "operator-vpn",
+        "rule": "operator-to-internal-gateway",
+        "to_zone": "ingress"
+      },
+      "gateway": "gw-internal",
+      "hops": [
+        {
+          "device": "ops-dns",
+          "row": "view",
+          "what": "view public-operator: no record for llm.ai.tarnwick.example (NXDOMAIN); the request pinned to 10.20.11.200"
+        },
+        {
+          "device": "ops-gw",
+          "row": "routing",
+          "what": "into the IPsec tunnel to the firewall (ops-gw, proxy ID ingress): 10.20.11.200 is in its remote selector"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on tunnel.1 (zone operator-vpn): 10.20.11.0/24 connected on ae1.110, zone ingress"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone operator-vpn: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "operator-to-internal-gateway",
+          "what": "operator-to-internal-gateway: allow, zone operator-vpn to ingress"
+        },
+        {
+          "device": "gw-internal",
+          "route": "models-gw-internal",
+          "row": "routeset",
+          "what": "HTTPRoute models-gw-internal, /models: the API gateway (api-gateway)"
+        },
+        {
+          "device": "api-gateway",
+          "row": "key",
+          "what": "chat's consumer group: its own key 200, staff's key 401"
+        }
+      ],
+      "hostname": "llm.ai.tarnwick.example",
+      "id": "operator/chat",
+      "kind": "model",
+      "layer": null,
+      "lookup": {
+        "answer": null,
+        "expect": "nxdomain",
+        "name": "llm.ai.tarnwick.example",
+        "resolver": "ops-dns",
+        "server": "192.0.2.10",
+        "view": "public-operator"
+      },
+      "mode": "allowed",
+      "note": "view public-operator holds no record for llm.ai.tarnwick.example: the request is pinned to 10.20.11.200, the population's answer for the users' hostname",
+      "pin": true,
+      "port": 443,
+      "requests": [
+        {
+          "body": {
+            "max_tokens": 1,
+            "messages": [
+              {
+                "content": "Say yes.",
+                "role": "user"
+              }
+            ],
+            "model": "chat"
+          },
+          "expect": {
+            "status": 200
+          },
+          "id": "own",
+          "key": "chat",
+          "method": "POST",
+          "sport": 43052,
+          "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+        },
+        {
+          "body": {
+            "max_tokens": 1,
+            "messages": [
+              {
+                "content": "Say yes.",
+                "role": "user"
+              }
+            ],
+            "model": "chat"
+          },
+          "expect": {
+            "layer": "key",
+            "message": "Authorization Failed",
+            "status": 401
+          },
+          "id": "other",
+          "key": "staff",
+          "method": "POST",
+          "sport": 43054,
+          "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+        }
+      ],
+      "route": "models-gw-internal",
+      "row": "operator",
+      "sport": 43052
+    },
+    {
+      "address": "10.20.11.200",
+      "client": "ops-client",
+      "client_addr": "192.0.2.2",
+      "client_kind": "client",
+      "column": "staff",
+      "expect": {
+        "status": 200
+      },
+      "fw": {
+        "from_zone": "operator-vpn",
+        "rule": "operator-to-internal-gateway",
+        "to_zone": "ingress"
+      },
+      "gateway": "gw-internal",
+      "hops": [
+        {
+          "device": "ops-dns",
+          "row": "view",
+          "what": "view public-operator: no record for llm.ai.tarnwick.example (NXDOMAIN); the request pinned to 10.20.11.200"
+        },
+        {
+          "device": "ops-gw",
+          "row": "routing",
+          "what": "into the IPsec tunnel to the firewall (ops-gw, proxy ID ingress): 10.20.11.200 is in its remote selector"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on tunnel.1 (zone operator-vpn): 10.20.11.0/24 connected on ae1.110, zone ingress"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone operator-vpn: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "operator-to-internal-gateway",
+          "what": "operator-to-internal-gateway: allow, zone operator-vpn to ingress"
+        },
+        {
+          "device": "gw-internal",
+          "route": "models-gw-internal",
+          "row": "routeset",
+          "what": "HTTPRoute models-gw-internal, /models: the API gateway (api-gateway)"
+        },
+        {
+          "device": "api-gateway",
+          "row": "key",
+          "what": "staff's consumer group: its own key 200, chat's key 401"
+        }
+      ],
+      "hostname": "llm.ai.tarnwick.example",
+      "id": "operator/staff",
+      "kind": "model",
+      "layer": null,
+      "lookup": {
+        "answer": null,
+        "expect": "nxdomain",
+        "name": "llm.ai.tarnwick.example",
+        "resolver": "ops-dns",
+        "server": "192.0.2.10",
+        "view": "public-operator"
+      },
+      "mode": "allowed",
+      "note": "view public-operator holds no record for llm.ai.tarnwick.example: the request is pinned to 10.20.11.200, the population's answer for the users' hostname",
+      "pin": true,
+      "port": 443,
+      "requests": [
+        {
+          "body": {
+            "max_tokens": 1,
+            "messages": [
+              {
+                "content": "Say yes.",
+                "role": "user"
+              }
+            ],
+            "model": "staff"
+          },
+          "expect": {
+            "status": 200
+          },
+          "id": "own",
+          "key": "staff",
+          "method": "POST",
+          "sport": 43056,
+          "url": "https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions"
+        },
+        {
+          "body": {
+            "max_tokens": 1,
+            "messages": [
+              {
+                "content": "Say yes.",
+                "role": "user"
+              }
+            ],
+            "model": "staff"
+          },
+          "expect": {
+            "layer": "key",
+            "message": "Authorization Failed",
+            "status": 401
+          },
+          "id": "other",
+          "key": "chat",
+          "method": "POST",
+          "sport": 43058,
+          "url": "https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions"
+        }
+      ],
+      "route": "models-gw-internal",
+      "row": "operator",
+      "sport": 43056
+    },
+    {
+      "address": "10.20.11.200",
+      "client": "ops-client",
+      "client_addr": "192.0.2.2",
+      "client_kind": "client",
+      "column": "admin",
+      "expect": {
+        "status": 200
+      },
+      "fw": {
+        "from_zone": "operator-vpn",
+        "rule": "operator-to-internal-gateway",
+        "to_zone": "ingress"
+      },
+      "gateway": "gw-internal",
+      "hops": [
+        {
+          "device": "ops-dns",
+          "row": "view",
+          "what": "view public-operator: no record for admin.ai.tarnwick.example (NXDOMAIN); the request pinned to 10.20.11.200"
+        },
+        {
+          "device": "ops-gw",
+          "row": "routing",
+          "what": "into the IPsec tunnel to the firewall (ops-gw, proxy ID ingress): 10.20.11.200 is in its remote selector"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on tunnel.1 (zone operator-vpn): 10.20.11.0/24 connected on ae1.110, zone ingress"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone operator-vpn: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "operator-to-internal-gateway",
+          "what": "operator-to-internal-gateway: allow, zone operator-vpn to ingress"
+        },
+        {
+          "device": "gw-internal",
+          "route": "echo-gw-internal",
+          "row": "routeset",
+          "what": "HTTPRoute echo-gw-internal, /echo: the test backend (echo)"
+        }
+      ],
+      "hostname": "admin.ai.tarnwick.example",
+      "id": "operator/admin",
+      "kind": "name",
+      "layer": null,
+      "lookup": {
+        "answer": null,
+        "expect": "nxdomain",
+        "name": "admin.ai.tarnwick.example",
+        "resolver": "ops-dns",
+        "server": "192.0.2.10",
+        "view": "public-operator"
+      },
+      "mode": "allowed",
+      "note": "view public-operator holds no record for admin.ai.tarnwick.example: the request is pinned to 10.20.11.200, the population's answer for the users' hostname",
+      "pin": true,
+      "port": 443,
+      "requests": [
+        {
+          "expect": {
+            "status": 200
+          },
+          "id": "request",
+          "marker": "sfab-matrix-operator-admin",
+          "method": "GET",
+          "sport": 43060,
+          "url": "https://admin.ai.tarnwick.example/echo?msg=sfab-matrix-operator-admin"
+        }
+      ],
+      "route": "echo-gw-internal",
+      "row": "operator",
+      "sport": 43060
+    },
+    {
+      "address": "10.20.1.10",
+      "client": "ops-client",
+      "client_addr": "192.0.2.2",
+      "client_kind": "client",
+      "column": "api-server",
+      "expect": {
+        "connect": "refused",
+        "counter": "flow_dos_pf_strictip",
+        "device": "fw",
+        "drop": "strict-ip",
+        "source_route": "by 192.0.2.0/30 out tunnel.1 (operator-site)"
+      },
+      "hops": [
+        {
+          "device": "ops-gw",
+          "row": "routing",
+          "what": "10.20.1.10 is in no tunnel selector: out via 192.0.2.21"
+        },
+        {
+          "dest": "10.20.1.0/24",
+          "device": "uplink-rtr",
+          "row": "routing",
+          "via": "198.51.100.2",
+          "what": "10.20.1.0/24 via 198.51.100.2 (inside-nodes)"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/5 (zone uplink): the source 192.0.2.2 is routed by 192.0.2.0/30 out tunnel.1 (operator-site), not over ethernet1/5, so zone protection's strict IP check (zp-internet) drops it before any rule"
+        }
+      ],
+      "id": "operator/api-server",
+      "kind": "connect",
+      "layer": "routing",
+      "mode": "silence",
+      "port": 6443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43064
+        }
+      ],
+      "row": "operator",
+      "sport": 43064
+    },
+    {
+      "address": "10.20.1.21",
+      "client": "ops-client",
+      "client_addr": "192.0.2.2",
+      "client_kind": "client",
+      "column": "node",
+      "expect": {
+        "connect": "refused",
+        "counter": "flow_dos_pf_strictip",
+        "device": "fw",
+        "drop": "strict-ip",
+        "source_route": "by 192.0.2.0/30 out tunnel.1 (operator-site)"
+      },
+      "hops": [
+        {
+          "device": "ops-gw",
+          "row": "routing",
+          "what": "10.20.1.21 is in no tunnel selector: out via 192.0.2.21"
+        },
+        {
+          "dest": "10.20.1.0/24",
+          "device": "uplink-rtr",
+          "row": "routing",
+          "via": "198.51.100.2",
+          "what": "10.20.1.0/24 via 198.51.100.2 (inside-nodes)"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/5 (zone uplink): the source 192.0.2.2 is routed by 192.0.2.0/30 out tunnel.1 (operator-site), not over ethernet1/5, so zone protection's strict IP check (zp-internet) drops it before any rule"
+        }
+      ],
+      "id": "operator/node",
+      "kind": "connect",
+      "layer": "routing",
+      "mode": "silence",
+      "port": 22,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43068
+        }
+      ],
+      "row": "operator",
+      "sport": 43068
+    },
+    {
+      "address": "10.20.9.21",
+      "client": "ops-client",
+      "client_addr": "192.0.2.2",
+      "client_kind": "client",
+      "column": "bmc",
+      "expect": {
+        "connect": "refused",
+        "counter": "flow_dos_pf_strictip",
+        "device": "fw",
+        "drop": "strict-ip",
+        "source_route": "by 192.0.2.0/30 out tunnel.1 (operator-site)"
+      },
+      "hops": [
+        {
+          "device": "ops-gw",
+          "row": "routing",
+          "what": "10.20.9.21 is in no tunnel selector: out via 192.0.2.21"
+        },
+        {
+          "dest": "10.20.9.0/24",
+          "device": "uplink-rtr",
+          "row": "routing",
+          "via": "198.51.100.2",
+          "what": "10.20.9.0/24 via 198.51.100.2 (inside-oob)"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/5 (zone uplink): the source 192.0.2.2 is routed by 192.0.2.0/30 out tunnel.1 (operator-site), not over ethernet1/5, so zone protection's strict IP check (zp-internet) drops it before any rule"
+        }
+      ],
+      "id": "operator/bmc",
+      "kind": "connect",
+      "layer": "routing",
+      "mode": "silence",
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43072
+        }
+      ],
+      "row": "operator",
+      "sport": 43072
+    },
+    {
+      "address": "10.20.12.31",
+      "client": "ops-client",
+      "client_addr": "192.0.2.2",
+      "client_kind": "client",
+      "column": "stor-data",
+      "expect": {
+        "connect": "refused",
+        "device": "uplink-rtr"
+      },
+      "hops": [
+        {
+          "device": "ops-gw",
+          "row": "routing",
+          "what": "10.20.12.31 is in no tunnel selector: out via 192.0.2.21"
+        },
+        {
+          "device": "uplink-rtr",
+          "row": "routing",
+          "what": "no route to 10.20.12.31"
+        }
+      ],
+      "id": "operator/stor-data",
+      "kind": "connect",
+      "layer": "routing",
+      "mode": "silence",
+      "port": 2049,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43076
+        }
+      ],
+      "row": "operator",
+      "sport": 43076
+    },
+    {
+      "address": "10.20.2.31",
+      "client": "ops-client",
+      "client_addr": "192.0.2.2",
+      "client_kind": "client",
+      "column": "stor-mgmt",
+      "expect": {
+        "connect": "refused",
+        "counter": "flow_dos_pf_strictip",
+        "device": "fw",
+        "drop": "strict-ip",
+        "source_route": "by 192.0.2.0/30 out tunnel.1 (operator-site)"
+      },
+      "hops": [
+        {
+          "device": "ops-gw",
+          "row": "routing",
+          "what": "10.20.2.31 is in no tunnel selector: out via 192.0.2.21"
+        },
+        {
+          "dest": "10.20.2.0/24",
+          "device": "uplink-rtr",
+          "row": "routing",
+          "via": "198.51.100.2",
+          "what": "10.20.2.0/24 via 198.51.100.2 (inside-stor-mgmt)"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/5 (zone uplink): the source 192.0.2.2 is routed by 192.0.2.0/30 out tunnel.1 (operator-site), not over ethernet1/5, so zone protection's strict IP check (zp-internet) drops it before any rule"
+        }
+      ],
+      "id": "operator/stor-mgmt",
+      "kind": "connect",
+      "layer": "routing",
+      "mode": "silence",
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43080
+        }
+      ],
+      "row": "operator",
+      "sport": 43080
+    },
+    {
+      "address": "192.0.2.18",
+      "client": "ops-client",
+      "client_addr": "192.0.2.2",
+      "client_kind": "client",
+      "column": "egress",
+      "expect": {
+        "connect": "connected"
+      },
+      "hops": [
+        {
+          "device": "ops-gw",
+          "row": "routing",
+          "what": "192.0.2.18 is in no tunnel selector: out via 192.0.2.21"
+        },
+        {
+          "device": "uplink-rtr",
+          "row": "routing",
+          "what": "192.0.2.16/30 connected on eth6"
+        }
+      ],
+      "id": "operator/egress",
+      "kind": "connect",
+      "layer": null,
+      "mode": "allowed",
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43084
+        }
+      ],
+      "row": "operator",
+      "sport": 43084
+    },
+    {
+      "address": "10.20.11.200",
+      "client": "k8s-cp2",
+      "client_addr": "10.20.1.12",
+      "client_kind": "vm-node",
+      "column": "gw-internal",
+      "expect": {
+        "connect": "connected"
+      },
+      "hops": [
+        {
+          "device": "k8s-cp2",
+          "row": null,
+          "what": "10.20.11.200 is a LoadBalancer address of k8s-cp2's own cluster: Cilium translates it to a Gateway pod at connect(), so nothing to it leaves the node and no firewall sees it"
+        }
+      ],
+      "id": "nodes/gw-internal",
+      "kind": "connect",
+      "layer": null,
+      "mode": "allowed",
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43088
+        }
+      ],
+      "row": "nodes",
+      "sport": 43088
+    },
+    {
+      "address": "10.20.11.210",
+      "client": "k8s-cp2",
+      "client_addr": "10.20.1.12",
+      "client_kind": "vm-node",
+      "column": "gw-users",
+      "expect": {
+        "connect": "connected"
+      },
+      "hops": [
+        {
+          "device": "k8s-cp2",
+          "row": null,
+          "what": "10.20.11.210 is a LoadBalancer address of k8s-cp2's own cluster: Cilium translates it to a Gateway pod at connect(), so nothing to it leaves the node and no firewall sees it"
+        }
+      ],
+      "id": "nodes/gw-users",
+      "kind": "connect",
+      "layer": null,
+      "mode": "allowed",
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43092
+        }
+      ],
+      "row": "nodes",
+      "sport": 43092
+    },
+    {
+      "address": "10.20.11.200",
+      "client": "k8s-cp2",
+      "client_addr": "10.20.1.12",
+      "client_kind": "vm-node",
+      "column": "chat",
+      "expect": {
+        "status": 200
+      },
+      "gateway": "gw-internal",
+      "hops": [
+        {
+          "device": "dns-res1",
+          "row": "view",
+          "what": "view internal: llm.ai.tarnwick.example A 10.20.11.200"
+        },
+        {
+          "device": "k8s-cp2",
+          "row": null,
+          "what": "10.20.11.200 is a LoadBalancer address of k8s-cp2's own cluster: Cilium translates it to a Gateway pod at connect(), so nothing to it leaves the node and no firewall sees it"
+        },
+        {
+          "device": "gw-internal",
+          "route": "models-gw-internal",
+          "row": "routeset",
+          "what": "HTTPRoute models-gw-internal, /models: the API gateway (api-gateway)"
+        },
+        {
+          "device": "api-gateway",
+          "row": "key",
+          "what": "chat's consumer group: its own key 200, staff's key 401"
+        }
+      ],
+      "hostname": "llm.ai.tarnwick.example",
+      "id": "nodes/chat",
+      "kind": "model",
+      "layer": null,
+      "lookup": {
+        "answer": "10.20.11.200",
+        "name": "llm.ai.tarnwick.example",
+        "resolver": "dns-res1",
+        "server": "10.20.13.21",
+        "view": "internal"
+      },
+      "mode": "allowed",
+      "port": 443,
+      "requests": [
+        {
+          "body": {
+            "max_tokens": 1,
+            "messages": [
+              {
+                "content": "Say yes.",
+                "role": "user"
+              }
+            ],
+            "model": "chat"
+          },
+          "expect": {
+            "status": 200
+          },
+          "id": "own",
+          "key": "chat",
+          "method": "POST",
+          "sport": 43096,
+          "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+        },
+        {
+          "body": {
+            "max_tokens": 1,
+            "messages": [
+              {
+                "content": "Say yes.",
+                "role": "user"
+              }
+            ],
+            "model": "chat"
+          },
+          "expect": {
+            "layer": "key",
+            "message": "Authorization Failed",
+            "status": 401
+          },
+          "id": "other",
+          "key": "staff",
+          "method": "POST",
+          "sport": 43098,
+          "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+        }
+      ],
+      "route": "models-gw-internal",
+      "row": "nodes",
+      "sport": 43096
+    },
+    {
+      "address": "10.20.11.200",
+      "client": "k8s-cp2",
+      "client_addr": "10.20.1.12",
+      "client_kind": "vm-node",
+      "column": "staff",
+      "expect": {
+        "status": 200
+      },
+      "gateway": "gw-internal",
+      "hops": [
+        {
+          "device": "dns-res1",
+          "row": "view",
+          "what": "view internal: llm.ai.tarnwick.example A 10.20.11.200"
+        },
+        {
+          "device": "k8s-cp2",
+          "row": null,
+          "what": "10.20.11.200 is a LoadBalancer address of k8s-cp2's own cluster: Cilium translates it to a Gateway pod at connect(), so nothing to it leaves the node and no firewall sees it"
+        },
+        {
+          "device": "gw-internal",
+          "route": "models-gw-internal",
+          "row": "routeset",
+          "what": "HTTPRoute models-gw-internal, /models: the API gateway (api-gateway)"
+        },
+        {
+          "device": "api-gateway",
+          "row": "key",
+          "what": "staff's consumer group: its own key 200, chat's key 401"
+        }
+      ],
+      "hostname": "llm.ai.tarnwick.example",
+      "id": "nodes/staff",
+      "kind": "model",
+      "layer": null,
+      "lookup": {
+        "answer": "10.20.11.200",
+        "name": "llm.ai.tarnwick.example",
+        "resolver": "dns-res1",
+        "server": "10.20.13.21",
+        "view": "internal"
+      },
+      "mode": "allowed",
+      "port": 443,
+      "requests": [
+        {
+          "body": {
+            "max_tokens": 1,
+            "messages": [
+              {
+                "content": "Say yes.",
+                "role": "user"
+              }
+            ],
+            "model": "staff"
+          },
+          "expect": {
+            "status": 200
+          },
+          "id": "own",
+          "key": "staff",
+          "method": "POST",
+          "sport": 43100,
+          "url": "https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions"
+        },
+        {
+          "body": {
+            "max_tokens": 1,
+            "messages": [
+              {
+                "content": "Say yes.",
+                "role": "user"
+              }
+            ],
+            "model": "staff"
+          },
+          "expect": {
+            "layer": "key",
+            "message": "Authorization Failed",
+            "status": 401
+          },
+          "id": "other",
+          "key": "chat",
+          "method": "POST",
+          "sport": 43102,
+          "url": "https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions"
+        }
+      ],
+      "route": "models-gw-internal",
+      "row": "nodes",
+      "sport": 43100
+    },
+    {
+      "address": "10.20.11.200",
+      "client": "k8s-cp2",
+      "client_addr": "10.20.1.12",
+      "client_kind": "vm-node",
+      "column": "admin",
+      "expect": {
+        "status": 200
+      },
+      "gateway": "gw-internal",
+      "hops": [
+        {
+          "device": "dns-res1",
+          "row": "view",
+          "what": "view internal: admin.ai.tarnwick.example A 10.20.11.200"
+        },
+        {
+          "device": "k8s-cp2",
+          "row": null,
+          "what": "10.20.11.200 is a LoadBalancer address of k8s-cp2's own cluster: Cilium translates it to a Gateway pod at connect(), so nothing to it leaves the node and no firewall sees it"
+        },
+        {
+          "device": "gw-internal",
+          "route": "echo-gw-internal",
+          "row": "routeset",
+          "what": "HTTPRoute echo-gw-internal, /echo: the test backend (echo)"
+        }
+      ],
+      "hostname": "admin.ai.tarnwick.example",
+      "id": "nodes/admin",
+      "kind": "name",
+      "layer": null,
+      "lookup": {
+        "answer": "10.20.11.200",
+        "name": "admin.ai.tarnwick.example",
+        "resolver": "dns-res1",
+        "server": "10.20.13.21",
+        "view": "internal"
+      },
+      "mode": "allowed",
+      "port": 443,
+      "requests": [
+        {
+          "expect": {
+            "status": 200
+          },
+          "id": "request",
+          "marker": "sfab-matrix-nodes-admin",
+          "method": "GET",
+          "sport": 43104,
+          "url": "https://admin.ai.tarnwick.example/echo?msg=sfab-matrix-nodes-admin"
+        }
+      ],
+      "route": "echo-gw-internal",
+      "row": "nodes",
+      "sport": 43104
+    },
+    {
+      "address": "10.20.1.10",
+      "client": "k8s-cp2",
+      "client_addr": "10.20.1.12",
+      "client_kind": "vm-node",
+      "column": "api-server",
+      "expect": {
+        "connect": "connected"
+      },
+      "hops": [
+        {
+          "device": null,
+          "row": null,
+          "what": "same segment (nodes): no routed hop, no firewall"
+        }
+      ],
+      "id": "nodes/api-server",
+      "kind": "connect",
+      "layer": null,
+      "mode": "allowed",
+      "port": 6443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43108
+        }
+      ],
+      "row": "nodes",
+      "sport": 43108
+    },
+    {
+      "address": "10.20.1.21",
+      "client": "k8s-cp2",
+      "client_addr": "10.20.1.12",
+      "client_kind": "vm-node",
+      "column": "node",
+      "expect": {
+        "connect": "connected"
+      },
+      "hops": [
+        {
+          "device": null,
+          "row": null,
+          "what": "same segment (nodes): no routed hop, no firewall"
+        }
+      ],
+      "id": "nodes/node",
+      "kind": "connect",
+      "layer": null,
+      "mode": "allowed",
+      "port": 22,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43112
+        }
+      ],
+      "row": "nodes",
+      "sport": 43112
+    },
+    {
+      "address": "10.20.9.21",
+      "client": "k8s-cp2",
+      "client_addr": "10.20.1.12",
+      "client_kind": "vm-node",
+      "column": "bmc",
+      "expect": {
+        "action": "deny",
+        "connect": "refused",
+        "device": "fw",
+        "from_zone": "k8s-nodes",
+        "rule": "deny-all-log",
+        "to_zone": "oob"
+      },
+      "fw": {
+        "from_zone": "k8s-nodes",
+        "rule": "deny-all-log",
+        "to_zone": "oob"
+      },
+      "hops": [
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ae1.100 (zone k8s-nodes): 10.20.9.0/24 connected on ethernet1/3, zone oob"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone k8s-nodes: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "deny-all-log",
+          "what": "deny-all-log: deny, zone k8s-nodes to oob"
+        }
+      ],
+      "id": "nodes/bmc",
+      "kind": "connect",
+      "layer": "policy",
+      "mode": "log-line",
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43116
+        }
+      ],
+      "row": "nodes",
+      "sport": 43116
+    },
+    {
+      "address": "10.20.12.31",
+      "client": "k8s-cp2",
+      "client_addr": "10.20.1.12",
+      "client_kind": "vm-node",
+      "column": "stor-data",
+      "expect": {
+        "connect": "refused",
+        "device": "fw"
+      },
+      "hops": [
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ae1.100 (zone k8s-nodes): 10.0.0.0/8 discard (discard-10): dropped before policy"
+        }
+      ],
+      "id": "nodes/stor-data",
+      "kind": "connect",
+      "layer": "routing",
+      "mode": "silence",
+      "port": 2049,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43120
+        }
+      ],
+      "row": "nodes",
+      "sport": 43120
+    },
+    {
+      "address": "10.20.2.31",
+      "client": "k8s-cp2",
+      "client_addr": "10.20.1.12",
+      "client_kind": "vm-node",
+      "column": "stor-mgmt",
+      "expect": {
+        "connect": "connected"
+      },
+      "fw": {
+        "from_zone": "k8s-nodes",
+        "rule": "csi-to-storage-api",
+        "to_zone": "stor-mgmt"
+      },
+      "hops": [
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ae1.100 (zone k8s-nodes): 10.20.2.0/24 connected on ae1.200, zone stor-mgmt"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone k8s-nodes: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "csi-to-storage-api",
+          "what": "csi-to-storage-api: allow, zone k8s-nodes to stor-mgmt"
+        }
+      ],
+      "id": "nodes/stor-mgmt",
+      "kind": "connect",
+      "layer": null,
+      "mode": "allowed",
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43124
+        }
+      ],
+      "row": "nodes",
+      "sport": 43124
+    },
+    {
+      "address": "192.0.2.18",
+      "client": "k8s-cp2",
+      "client_addr": "10.20.1.12",
+      "client_kind": "vm-node",
+      "column": "egress",
+      "expect": {
+        "action": "deny",
+        "connect": "refused",
+        "device": "fw",
+        "from_zone": "k8s-nodes",
+        "rule": "deny-all-log",
+        "to_zone": "uplink"
+      },
+      "fw": {
+        "from_zone": "k8s-nodes",
+        "rule": "deny-all-log",
+        "to_zone": "uplink"
+      },
+      "hops": [
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ae1.100 (zone k8s-nodes): 0.0.0.0/0 via 198.51.100.1 on ethernet1/5 (default-uplink), zone uplink"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": "internet-snat",
+          "what": "internet-snat: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "deny-all-log",
+          "what": "deny-all-log: deny, zone k8s-nodes to uplink"
+        }
+      ],
+      "id": "nodes/egress",
+      "kind": "connect",
+      "layer": "policy",
+      "mode": "log-line",
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43128
+        }
+      ],
+      "row": "nodes",
+      "sport": 43128
+    },
+    {
+      "address": "10.20.11.200",
+      "client": "web-client",
+      "client_addr": "192.0.2.18",
+      "client_kind": "client",
+      "column": "gw-internal",
+      "expect": {
+        "action": "deny",
+        "connect": "refused",
+        "device": "fw",
+        "from_zone": "uplink",
+        "rule": "deny-all-log",
+        "to_zone": "ingress"
+      },
+      "fw": {
+        "from_zone": "uplink",
+        "rule": "deny-all-log",
+        "to_zone": "ingress"
+      },
+      "hops": [
+        {
+          "dest": "10.20.11.0/24",
+          "device": "uplink-rtr",
+          "row": "routing",
+          "via": "198.51.100.2",
+          "what": "10.20.11.0/24 via 198.51.100.2 (inside-ingress)"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/5 (zone uplink): 10.20.11.0/24 connected on ae1.110, zone ingress"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone uplink: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "deny-all-log",
+          "what": "deny-all-log: deny, zone uplink to ingress"
+        }
+      ],
+      "id": "web/gw-internal",
+      "kind": "connect",
+      "layer": "policy",
+      "mode": "log-line",
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43132
+        }
+      ],
+      "row": "web",
+      "sport": 43132
+    },
+    {
+      "address": "10.20.11.210",
+      "client": "web-client",
+      "client_addr": "192.0.2.18",
+      "client_kind": "client",
+      "column": "gw-users",
+      "expect": {
+        "action": "deny",
+        "connect": "refused",
+        "device": "fw",
+        "from_zone": "uplink",
+        "rule": "deny-all-log",
+        "to_zone": "ingress"
+      },
+      "fw": {
+        "from_zone": "uplink",
+        "rule": "deny-all-log",
+        "to_zone": "ingress"
+      },
+      "hops": [
+        {
+          "dest": "10.20.11.0/24",
+          "device": "uplink-rtr",
+          "row": "routing",
+          "via": "198.51.100.2",
+          "what": "10.20.11.0/24 via 198.51.100.2 (inside-ingress)"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/5 (zone uplink): 10.20.11.0/24 connected on ae1.110, zone ingress"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone uplink: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "deny-all-log",
+          "what": "deny-all-log: deny, zone uplink to ingress"
+        }
+      ],
+      "id": "web/gw-users",
+      "kind": "connect",
+      "layer": "policy",
+      "mode": "log-line",
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43136
+        }
+      ],
+      "row": "web",
+      "sport": 43136
+    },
+    {
+      "address": "198.51.100.2",
+      "client": "web-client",
+      "client_addr": "192.0.2.18",
+      "client_kind": "client",
+      "column": "chat",
+      "expect": {
+        "action": "deny",
+        "connect": "refused",
+        "device": "fw",
+        "from_zone": "uplink",
+        "rule": "deny-all-log",
+        "to_zone": "uplink"
+      },
+      "hops": [
+        {
+          "device": "ops-dns",
+          "row": "view",
+          "what": "view public-operator: no record for llm.ai.tarnwick.example (NXDOMAIN); the request pinned to 198.51.100.2"
+        },
+        {
+          "device": "uplink-rtr",
+          "row": "routing",
+          "what": "198.51.100.0/29 connected on eth1"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/5 (zone uplink): 198.51.100.2 is the firewall's own address on ethernet1/5, zone uplink"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone uplink: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "deny-all-log",
+          "what": "deny-all-log: deny, zone uplink to uplink"
+        }
+      ],
+      "hostname": "llm.ai.tarnwick.example",
+      "id": "web/chat",
+      "kind": "model",
+      "layer": "policy",
+      "lookup": {
+        "answer": null,
+        "expect": "nxdomain",
+        "name": "llm.ai.tarnwick.example",
+        "resolver": "ops-dns",
+        "server": "192.0.2.10",
+        "view": "public-operator"
+      },
+      "mode": "log-line",
+      "note": "view public-operator holds no record for llm.ai.tarnwick.example: the request is pinned to 198.51.100.2, the population's answer for the users' hostname",
+      "pin": true,
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43140
+        }
+      ],
+      "row": "web",
+      "sport": 43140
+    },
+    {
+      "address": "198.51.100.2",
+      "client": "web-client",
+      "client_addr": "192.0.2.18",
+      "client_kind": "client",
+      "column": "staff",
+      "expect": {
+        "action": "deny",
+        "connect": "refused",
+        "device": "fw",
+        "from_zone": "uplink",
+        "rule": "deny-all-log",
+        "to_zone": "uplink"
+      },
+      "hops": [
+        {
+          "device": "ops-dns",
+          "row": "view",
+          "what": "view public-operator: no record for llm.ai.tarnwick.example (NXDOMAIN); the request pinned to 198.51.100.2"
+        },
+        {
+          "device": "uplink-rtr",
+          "row": "routing",
+          "what": "198.51.100.0/29 connected on eth1"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/5 (zone uplink): 198.51.100.2 is the firewall's own address on ethernet1/5, zone uplink"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone uplink: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "deny-all-log",
+          "what": "deny-all-log: deny, zone uplink to uplink"
+        }
+      ],
+      "hostname": "llm.ai.tarnwick.example",
+      "id": "web/staff",
+      "kind": "model",
+      "layer": "policy",
+      "lookup": {
+        "answer": null,
+        "expect": "nxdomain",
+        "name": "llm.ai.tarnwick.example",
+        "resolver": "ops-dns",
+        "server": "192.0.2.10",
+        "view": "public-operator"
+      },
+      "mode": "log-line",
+      "note": "view public-operator holds no record for llm.ai.tarnwick.example: the request is pinned to 198.51.100.2, the population's answer for the users' hostname",
+      "pin": true,
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43144
+        }
+      ],
+      "row": "web",
+      "sport": 43144
+    },
+    {
+      "address": "198.51.100.2",
+      "client": "web-client",
+      "client_addr": "192.0.2.18",
+      "client_kind": "client",
+      "column": "admin",
+      "expect": {
+        "action": "deny",
+        "connect": "refused",
+        "device": "fw",
+        "from_zone": "uplink",
+        "rule": "deny-all-log",
+        "to_zone": "uplink"
+      },
+      "hops": [
+        {
+          "device": "ops-dns",
+          "row": "view",
+          "what": "view public-operator: no record for admin.ai.tarnwick.example (NXDOMAIN); the request pinned to 198.51.100.2"
+        },
+        {
+          "device": "uplink-rtr",
+          "row": "routing",
+          "what": "198.51.100.0/29 connected on eth1"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/5 (zone uplink): 198.51.100.2 is the firewall's own address on ethernet1/5, zone uplink"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone uplink: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "deny-all-log",
+          "what": "deny-all-log: deny, zone uplink to uplink"
+        }
+      ],
+      "hostname": "admin.ai.tarnwick.example",
+      "id": "web/admin",
+      "kind": "name",
+      "layer": "policy",
+      "lookup": {
+        "answer": null,
+        "expect": "nxdomain",
+        "name": "admin.ai.tarnwick.example",
+        "resolver": "ops-dns",
+        "server": "192.0.2.10",
+        "view": "public-operator"
+      },
+      "mode": "log-line",
+      "note": "view public-operator holds no record for admin.ai.tarnwick.example: the request is pinned to 198.51.100.2, the population's answer for the users' hostname",
+      "pin": true,
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43148
+        }
+      ],
+      "row": "web",
+      "sport": 43148
+    },
+    {
+      "address": "10.20.1.10",
+      "client": "web-client",
+      "client_addr": "192.0.2.18",
+      "client_kind": "client",
+      "column": "api-server",
+      "expect": {
+        "action": "deny",
+        "connect": "refused",
+        "device": "fw",
+        "from_zone": "uplink",
+        "rule": "deny-all-log",
+        "to_zone": "k8s-nodes"
+      },
+      "fw": {
+        "from_zone": "uplink",
+        "rule": "deny-all-log",
+        "to_zone": "k8s-nodes"
+      },
+      "hops": [
+        {
+          "dest": "10.20.1.0/24",
+          "device": "uplink-rtr",
+          "row": "routing",
+          "via": "198.51.100.2",
+          "what": "10.20.1.0/24 via 198.51.100.2 (inside-nodes)"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/5 (zone uplink): 10.20.1.0/24 connected on ae1.100, zone k8s-nodes"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone uplink: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "deny-all-log",
+          "what": "deny-all-log: deny, zone uplink to k8s-nodes"
+        }
+      ],
+      "id": "web/api-server",
+      "kind": "connect",
+      "layer": "policy",
+      "mode": "log-line",
+      "port": 6443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43152
+        }
+      ],
+      "row": "web",
+      "sport": 43152
+    },
+    {
+      "address": "10.20.1.21",
+      "client": "web-client",
+      "client_addr": "192.0.2.18",
+      "client_kind": "client",
+      "column": "node",
+      "expect": {
+        "action": "deny",
+        "connect": "refused",
+        "device": "fw",
+        "from_zone": "uplink",
+        "rule": "deny-all-log",
+        "to_zone": "k8s-nodes"
+      },
+      "fw": {
+        "from_zone": "uplink",
+        "rule": "deny-all-log",
+        "to_zone": "k8s-nodes"
+      },
+      "hops": [
+        {
+          "dest": "10.20.1.0/24",
+          "device": "uplink-rtr",
+          "row": "routing",
+          "via": "198.51.100.2",
+          "what": "10.20.1.0/24 via 198.51.100.2 (inside-nodes)"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/5 (zone uplink): 10.20.1.0/24 connected on ae1.100, zone k8s-nodes"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone uplink: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "deny-all-log",
+          "what": "deny-all-log: deny, zone uplink to k8s-nodes"
+        }
+      ],
+      "id": "web/node",
+      "kind": "connect",
+      "layer": "policy",
+      "mode": "log-line",
+      "port": 22,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43156
+        }
+      ],
+      "row": "web",
+      "sport": 43156
+    },
+    {
+      "address": "10.20.9.21",
+      "client": "web-client",
+      "client_addr": "192.0.2.18",
+      "client_kind": "client",
+      "column": "bmc",
+      "expect": {
+        "action": "deny",
+        "connect": "refused",
+        "device": "fw",
+        "from_zone": "uplink",
+        "rule": "deny-all-log",
+        "to_zone": "oob"
+      },
+      "fw": {
+        "from_zone": "uplink",
+        "rule": "deny-all-log",
+        "to_zone": "oob"
+      },
+      "hops": [
+        {
+          "dest": "10.20.9.0/24",
+          "device": "uplink-rtr",
+          "row": "routing",
+          "via": "198.51.100.2",
+          "what": "10.20.9.0/24 via 198.51.100.2 (inside-oob)"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/5 (zone uplink): 10.20.9.0/24 connected on ethernet1/3, zone oob"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone uplink: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "deny-all-log",
+          "what": "deny-all-log: deny, zone uplink to oob"
+        }
+      ],
+      "id": "web/bmc",
+      "kind": "connect",
+      "layer": "policy",
+      "mode": "log-line",
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43160
+        }
+      ],
+      "row": "web",
+      "sport": 43160
+    },
+    {
+      "address": "10.20.12.31",
+      "client": "web-client",
+      "client_addr": "192.0.2.18",
+      "client_kind": "client",
+      "column": "stor-data",
+      "expect": {
+        "connect": "refused",
+        "device": "uplink-rtr"
+      },
+      "hops": [
+        {
+          "device": "uplink-rtr",
+          "row": "routing",
+          "what": "no route to 10.20.12.31"
+        }
+      ],
+      "id": "web/stor-data",
+      "kind": "connect",
+      "layer": "routing",
+      "mode": "silence",
+      "port": 2049,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43164
+        }
+      ],
+      "row": "web",
+      "sport": 43164
+    },
+    {
+      "address": "10.20.2.31",
+      "client": "web-client",
+      "client_addr": "192.0.2.18",
+      "client_kind": "client",
+      "column": "stor-mgmt",
+      "expect": {
+        "action": "deny",
+        "connect": "refused",
+        "device": "fw",
+        "from_zone": "uplink",
+        "rule": "deny-all-log",
+        "to_zone": "stor-mgmt"
+      },
+      "fw": {
+        "from_zone": "uplink",
+        "rule": "deny-all-log",
+        "to_zone": "stor-mgmt"
+      },
+      "hops": [
+        {
+          "dest": "10.20.2.0/24",
+          "device": "uplink-rtr",
+          "row": "routing",
+          "via": "198.51.100.2",
+          "what": "10.20.2.0/24 via 198.51.100.2 (inside-stor-mgmt)"
+        },
+        {
+          "device": "fw",
+          "row": "routing",
+          "what": "in on ethernet1/5 (zone uplink): 10.20.2.0/24 connected on ae1.200, zone stor-mgmt"
+        },
+        {
+          "device": "fw",
+          "row": "nat",
+          "rule": null,
+          "what": "no NAT rule from zone uplink: no translation"
+        },
+        {
+          "device": "fw",
+          "row": "policy",
+          "rule": "deny-all-log",
+          "what": "deny-all-log: deny, zone uplink to stor-mgmt"
+        }
+      ],
+      "id": "web/stor-mgmt",
+      "kind": "connect",
+      "layer": "policy",
+      "mode": "log-line",
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43168
+        }
+      ],
+      "row": "web",
+      "sport": 43168
+    },
+    {
+      "address": "192.0.2.18",
+      "client": "web-client",
+      "client_addr": "192.0.2.18",
+      "client_kind": "client",
+      "column": "egress",
+      "expect": {
+        "connect": "connected"
+      },
+      "hops": [
+        {
+          "device": null,
+          "row": null,
+          "what": "same segment (web): no routed hop, no firewall"
+        }
+      ],
+      "id": "web/egress",
+      "kind": "connect",
+      "layer": null,
+      "mode": "allowed",
+      "port": 443,
+      "requests": [
+        {
+          "id": "connect",
+          "sport": 43172
+        }
+      ],
+      "row": "web",
+      "sport": 43172
+    }
+  ],
+  "columns": [
+    {
+      "address": "10.20.11.200",
+      "id": "gw-internal",
+      "kind": "connect",
+      "label": "Internal Gateway",
+      "port": 443,
+      "ref": "vip:gw-internal",
+      "what": "gw-internal's VIP"
+    },
+    {
+      "address": "10.20.11.210",
+      "id": "gw-users",
+      "kind": "connect",
+      "label": "Users' Gateway",
+      "port": 443,
+      "ref": "vip:gw-users",
+      "what": "gw-users's VIP"
+    },
+    {
+      "hostname": "llm.ai.tarnwick.example",
+      "id": "chat",
+      "kind": "model",
+      "label": "Route to chat",
+      "model": "chat",
+      "other": "staff",
+      "path": "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions",
+      "port": 443
+    },
+    {
+      "hostname": "llm.ai.tarnwick.example",
+      "id": "staff",
+      "kind": "model",
+      "label": "Route to staff",
+      "model": "staff",
+      "other": "chat",
+      "path": "/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions",
+      "port": 443
+    },
+    {
+      "hostname": "admin.ai.tarnwick.example",
+      "id": "admin",
+      "kind": "name",
+      "label": "Admin hostnames",
+      "path": "/echo",
+      "port": 443
+    },
+    {
+      "address": "10.20.1.10",
+      "id": "api-server",
+      "kind": "connect",
+      "label": "API server",
+      "port": 6443,
+      "ref": "api",
+      "what": "the API server's VIP"
+    },
+    {
+      "address": "10.20.1.21",
+      "id": "node",
+      "kind": "connect",
+      "label": "A node, k8s-gpu1",
+      "port": 22,
+      "ref": "node:k8s-gpu1",
+      "what": "k8s-gpu1's address"
+    },
+    {
+      "address": "10.20.9.21",
+      "id": "bmc",
+      "kind": "connect",
+      "label": "A BMC, k8s-gpu1's",
+      "port": 443,
+      "ref": "oob:k8s-gpu1",
+      "what": "k8s-gpu1's BMC address"
+    },
+    {
+      "address": "10.20.12.31",
+      "id": "stor-data",
+      "kind": "connect",
+      "label": "Storage data",
+      "port": 2049,
+      "ref": "data:truenas1",
+      "what": "truenas1's data address"
+    },
+    {
+      "address": "10.20.2.31",
+      "id": "stor-mgmt",
+      "kind": "connect",
+      "label": "Storage management",
+      "port": 443,
+      "ref": "mgmt:truenas1",
+      "what": "truenas1's management address"
+    },
+    {
+      "address": "192.0.2.18",
+      "id": "egress",
+      "kind": "connect",
+      "label": "An internet host, web-client",
+      "port": 443,
+      "ref": "node:web-client",
+      "what": "web-client's address"
+    }
+  ],
+  "counts": {
+    "401": 6,
+    "404": 1,
+    "allowed": 17,
+    "cells": 44,
+    "forbidden": 27,
+    "log-line": 18,
+    "silence": 8
+  },
+  "firewall": "fw",
+  "gateway_namespace": "gateways",
+  "lab": "sfab-ch02",
+  "labels": {
+    "audience": "tarnwick.example/audience",
+    "decision": "decision.tarnwick.example/id"
+  },
+  "retries": 1,
+  "routers": [
+    "uplink-rtr"
+  ],
+  "rows": [
+    {
+      "address": "10.24.10.10",
+      "answer": "10.20.11.210",
+      "client": "ent-client",
+      "id": "enterprise",
+      "kind": "client",
+      "label": "Staff",
+      "resolver": "ent-dns",
+      "resolver_address": "10.24.10.53",
+      "translated": false,
+      "view": "enterprise",
+      "view_decision": "dec-view-enterprise",
+      "zones": [
+        "enterprise"
+      ]
+    },
+    {
+      "address": "192.0.2.2",
+      "answer": "10.20.11.200",
+      "client": "ops-client",
+      "id": "operator",
+      "kind": "client",
+      "label": "Operator",
+      "resolver": "ops-dns",
+      "resolver_address": "192.0.2.10",
+      "translated": false,
+      "view": "public-operator",
+      "view_decision": "dec-view-public",
+      "zones": [
+        "operator-vpn"
+      ]
+    },
+    {
+      "address": "10.20.1.12",
+      "answer": "10.20.11.200",
+      "client": "k8s-cp2",
+      "id": "nodes",
+      "kind": "vm-node",
+      "label": "Nodes",
+      "resolver": "dns-res1",
+      "resolver_address": "10.20.13.21",
+      "translated": false,
+      "view": "internal",
+      "view_decision": "dec-view-internal",
+      "zones": [
+        "k8s-nodes",
+        "bastion"
+      ]
+    },
+    {
+      "address": "192.0.2.18",
+      "answer": "198.51.100.2",
+      "client": "web-client",
+      "id": "web",
+      "kind": "client",
+      "label": "Internet host",
+      "resolver": "ops-dns",
+      "resolver_address": "192.0.2.10",
+      "translated": false,
+      "view": "public-operator",
+      "view_decision": "dec-view-public",
+      "zones": [
+        "uplink"
+      ]
+    }
+  ],
+  "schema": 1,
+  "silence": {
+    "cells": [
+      "enterprise/stor-data",
+      "operator/api-server",
+      "operator/node",
+      "operator/bmc",
+      "operator/stor-data",
+      "operator/stor-mgmt",
+      "nodes/stor-data",
+      "web/stor-data"
+    ],
+    "evidence": "a capture at the hop, beside the route table or drop counter of the device without the route",
+    "strict_ip": [
+      "operator/api-server",
+      "operator/node",
+      "operator/bmc",
+      "operator/stor-mgmt"
+    ]
+  },
+  "timeout_s": 4
+}

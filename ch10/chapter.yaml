@@ -1,0 +1,41 @@
+# Chapter 10, "Tenant Isolation on the Firewall", lab sfab-ch10.
+#
+# Build A's state many at step 10: chapter 9's lab plus the internet users' translation and rule,
+# which the spec adds from step 10: NAT dnat-internet-gateway (from isp to isp, the firewall's own isp
+# address 198.51.100.10 on tcp/443, to the internet Gateway's VIP 10.20.11.220; first of the NAT
+# rulebase) and security rule isp-to-internet-gateway (from isp to ingress, the pre-NAT address, ssl;
+# the 24th rule, deny-all-log the 25th rule). Internet users arrive translated, the staff routed and the operator
+# tunneled, both untranslated, keyed on the zone each arrives in. No node is added (30). make up
+# deploys the whole step from wiped disks. It extends chapter 9's lab (metadata only).
+lab: sfab-ch10
+profile: a
+state: many
+slice:
+  nodes: [fe, rail, oob, fw, k8s-gpu1, k8s-gpu2, k8s-cp1, k8s-cp2, k8s-cp3, bastion, inet-registry, uplink-rtr, ops-client, ops-dns, ent-client, isp-rtr, inet-client, inet-dns-auth, inet-dns-res]
+features: {k8s: true, serving: true, storage_setup: false}
+prints: []
+extends: ch09
+variants: {}
+
+# The zone-keyed NAT trace (trace.sh, common/trace/lib-nattrace.sh; rendered to gen/trace.json): one
+# held HTTPS request per population to its own Gateway at the answer its resolver gives it, as
+# chapter 4's sessions (the connection held after the reply while the firewall's session table is
+# read), each with its capture pair: the ISP router's link and the bundle's legs for the internet
+# users (translated from the published address to the internet Gateway's VIP), the firewall's
+# enterprise port and the legs for the staff (routed, untranslated), the legs alone for the operator
+# (its uplink carries ESP; untranslated through its tunnel). The judge follows each SYN by its
+# sequence number from the outside point to the one leg that carries it.
+trace:
+  nat:
+    populations: [internet, enterprise, operator]
+    hold_s: 20
+    sport: 42936
+
+# The held connections (hold.sh, common/trace/lib-hold.sh, and the audit's zone-nat group; rendered to
+# gen/tenancy.json): 8 keep-alive HTTPS connections a population (the staff, the operator, the
+# internet users, each from its own client to its own Gateway's /echo), each used again every 20 s
+# and held 120 s, plus one chat completion a population with its own caller's key. The firewall
+# counts each zone's sessions to its Gateway while they are held: 8, up to the chat request and a
+# slack of 2 more.
+tenancy:
+  hold: {n: 8, hold_s: 120, every_s: 20, sport: 44500, slack: 2}

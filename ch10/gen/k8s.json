@@ -1,0 +1,985 @@
+{
+  "admin": {
+    "kubeconfig": "/etc/kubernetes/admin.conf",
+    "node": "k8s-cp1",
+    "user_config": "/etc/sfab/k8s/kubeadm-user.yaml"
+  },
+  "api": {
+    "control": [
+      "k8s-cp1",
+      "k8s-cp2",
+      "k8s-cp3"
+    ],
+    "endpoint": "k8s.ai.tarnwick.example:6443",
+    "init": "k8s-cp1",
+    "kube_vip_lease": "kube-system/plndr-cp-lock",
+    "port": 6443,
+    "vip": "10.20.1.10"
+  },
+  "apply": [
+    "05-namespaces.yaml",
+    "07-operators.yaml",
+    "10-gateway-api-crds.yaml",
+    "12-multus-daemonset-thick.yaml",
+    "30-lb-pools.yaml",
+    "31-l2-announcement.yaml",
+    "40-pki.yaml",
+    "50-gateways.yaml",
+    "55-test-backend.yaml",
+    "57-identity.yaml",
+    "58-network-policy.yaml"
+  ],
+  "certificates": [
+    {
+      "dns": [
+        "*.ai.tarnwick.example"
+      ],
+      "duration": "2160h",
+      "gateway": "gw-internal",
+      "id": "gw-internal",
+      "namespace": "gateways",
+      "renew_before": "360h",
+      "secret": "gw-internal-tls"
+    },
+    {
+      "dns": [
+        "*.ai.tarnwick.example"
+      ],
+      "duration": "2160h",
+      "gateway": "gw-users",
+      "id": "gw-users",
+      "namespace": "gateways",
+      "renew_before": "360h",
+      "secret": "gw-users-tls"
+    },
+    {
+      "dns": [
+        "*.ai.tarnwick.example"
+      ],
+      "duration": "2160h",
+      "gateway": "gw-inet",
+      "id": "gw-inet",
+      "namespace": "gateways",
+      "renew_before": "360h",
+      "secret": "gw-inet-tls"
+    }
+  ],
+  "charts": [
+    {
+      "chart": "cert-manager",
+      "namespace": "cert-manager",
+      "phase": "k8s",
+      "release": "cert-manager",
+      "values": "21-cert-manager-values.yaml",
+      "version": "v1.21.2"
+    }
+  ],
+  "cilium": {
+    "chart": "oci://192.0.2.6:5000/charts/cilium",
+    "devices": [
+      "bond0",
+      "bond0.110"
+    ],
+    "namespace": "kube-system",
+    "release": "cilium",
+    "version": "1.19.7"
+  },
+  "edge": {
+    "nodes": [
+      "k8s-ingress1",
+      "k8s-ingress2"
+    ],
+    "selector": {
+      "node-role.tarnwick.example/ingress": ""
+    }
+  },
+  "gateway_api": "v1.4.1",
+  "gateway_namespace": "gateways",
+  "gateways": {
+    "gw-inet": {
+      "allowed_routes": {
+        "from": "Selector",
+        "label": "routes.tarnwick.example/gw-inet",
+        "namespaces": [
+          "echo",
+          "inference"
+        ]
+      },
+      "audience": "internet",
+      "cec": "gateways/cilium-gateway-gw-inet",
+      "hostnames": [
+        "llm.ai.tarnwick.example"
+      ],
+      "l2_lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-inet",
+      "l2_policy": "gateways-internet",
+      "listener": {
+        "certificate": "gw-inet",
+        "hostname": "*.ai.tarnwick.example",
+        "name": "https",
+        "port": 443,
+        "secret": "gw-inet-tls"
+      },
+      "pool": "gw-inet",
+      "pool_range": [
+        "10.20.11.220",
+        "10.20.11.224"
+      ],
+      "service": "cilium-gateway-gw-inet",
+      "vip": "10.20.11.220"
+    },
+    "gw-internal": {
+      "allowed_routes": {
+        "from": "Selector",
+        "label": "routes.tarnwick.example/gw-internal",
+        "namespaces": [
+          "echo",
+          "identity",
+          "inference",
+          "serving"
+        ]
+      },
+      "audience": "internal",
+      "cec": "gateways/cilium-gateway-gw-internal",
+      "hostnames": [
+        "llm.ai.tarnwick.example",
+        "admin.ai.tarnwick.example",
+        "grafana.ai.tarnwick.example"
+      ],
+      "l2_lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-internal",
+      "l2_policy": "gateways-internal",
+      "listener": {
+        "certificate": "gw-internal",
+        "hostname": "*.ai.tarnwick.example",
+        "name": "https",
+        "port": 443,
+        "secret": "gw-internal-tls"
+      },
+      "pool": "gw-internal",
+      "pool_range": [
+        "10.20.11.200",
+        "10.20.11.209"
+      ],
+      "service": "cilium-gateway-gw-internal",
+      "vip": "10.20.11.200"
+    },
+    "gw-users": {
+      "allowed_routes": {
+        "from": "Selector",
+        "label": "routes.tarnwick.example/gw-users",
+        "namespaces": [
+          "echo",
+          "identity",
+          "inference"
+        ]
+      },
+      "audience": "enterprise",
+      "cec": "gateways/cilium-gateway-gw-users",
+      "hostnames": [
+        "llm.ai.tarnwick.example"
+      ],
+      "l2_lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-users",
+      "l2_policy": "gateways-enterprise",
+      "listener": {
+        "certificate": "gw-users",
+        "hostname": "*.ai.tarnwick.example",
+        "name": "https",
+        "port": 443,
+        "secret": "gw-users-tls"
+      },
+      "pool": "gw-users",
+      "pool_range": [
+        "10.20.11.210",
+        "10.20.11.214"
+      ],
+      "service": "cilium-gateway-gw-users",
+      "vip": "10.20.11.210"
+    }
+  },
+  "identity": {
+    "audience": "ai-gateway",
+    "clients": [
+      {
+        "id": "staff-cli",
+        "name": "Tarnwick staff tools",
+        "secret_env": "SFAB_IDP_CLIENT_STAFF_CLI"
+      }
+    ],
+    "configmap": "idp-config",
+    "file": "57-identity.yaml",
+    "gateways": [
+      "gw-internal",
+      "gw-users"
+    ],
+    "hashes": {
+      "SFAB_IDP_HASH_ENT_CLIENT": "SFAB_IDP_PASSWORD_ENT_CLIENT"
+    },
+    "hostname": "id.ai.tarnwick.example",
+    "image": "docker.io/dexidp/dex@sha256:fd4ab5d117005b927433133f1d7db7cc30fbb537c377912b75b349edff47df01",
+    "issuer": "https://id.ai.tarnwick.example",
+    "jwks_uri": "http://idp.identity.svc.cluster.local:5556/keys",
+    "keys_h": 6,
+    "name": "idp",
+    "namespace": "identity",
+    "people": [
+      {
+        "email": "ent-client@tarnwick.example",
+        "hash_env": "SFAB_IDP_HASH_ENT_CLIENT",
+        "id": "ent-client",
+        "name": "Staff member at ent-client",
+        "node": "ent-client",
+        "password_env": "SFAB_IDP_PASSWORD_ENT_CLIENT",
+        "user_id": "2bede32b-083f-5c16-931f-c7baf7061443"
+      }
+    ],
+    "port": 5556,
+    "provider": "dex",
+    "replicas": 1,
+    "routes": {
+      "gw-internal": "idp-gw-internal",
+      "gw-users": "idp-gw-users"
+    },
+    "scope": "openid email profile audience:server:client_id:ai-gateway",
+    "secret": "idp-credentials",
+    "secrets": [
+      "SFAB_IDP_CLIENT_STAFF_CLI",
+      "SFAB_IDP_PASSWORD_ENT_CLIENT"
+    ],
+    "service": "idp.identity.svc.cluster.local",
+    "since": 7,
+    "token_path": "/token",
+    "token_ttl_m": 60
+  },
+  "inference": {
+    "callers": [
+      {
+        "audience": "enterprise",
+        "audience_models": [
+          "chat",
+          "staff"
+        ],
+        "consumers": [],
+        "expires": "2027-04-30",
+        "id": "batch",
+        "kind": "application",
+        "limit": {
+          "count": 3000,
+          "window_s": 60
+        },
+        "models": [
+          "chat"
+        ],
+        "owner": "data-platform",
+        "people": []
+      },
+      {
+        "audience": "enterprise",
+        "audience_models": [
+          "chat",
+          "staff"
+        ],
+        "consumers": [],
+        "expires": "2027-04-30",
+        "id": "helpdesk",
+        "kind": "application",
+        "limit": {
+          "count": 3000,
+          "window_s": 60
+        },
+        "models": [
+          "staff"
+        ],
+        "owner": "service-desk",
+        "people": []
+      },
+      {
+        "audience": "enterprise",
+        "audience_models": [
+          "chat",
+          "staff"
+        ],
+        "consumers": [
+          {
+            "person": "ent-client",
+            "subject": "ent-client@tarnwick.example",
+            "username": "staff_ent_client"
+          }
+        ],
+        "expires": null,
+        "id": "staff",
+        "kind": "people",
+        "limit": {
+          "count": 600,
+          "window_s": 60
+        },
+        "models": [
+          "chat",
+          "staff"
+        ],
+        "owner": null,
+        "people": [
+          "ent-client"
+        ]
+      },
+      {
+        "audience": "internet",
+        "audience_models": [
+          "chat"
+        ],
+        "consumers": [],
+        "expires": "2027-04-30",
+        "id": "inetapp",
+        "kind": "application",
+        "limit": {
+          "count": 600,
+          "window_s": 60
+        },
+        "models": [
+          "chat"
+        ],
+        "owner": "partner-apps",
+        "people": []
+      }
+    ],
+    "callers_on": true,
+    "configmaps": {
+      "config": "api-gateway-config",
+      "plugins": "api-gateway-plugins",
+      "router": "router-config",
+      "routes": "api-gateway-routes"
+    },
+    "deployments": [
+      "api-gateway",
+      "router"
+    ],
+    "files": {
+      "base": "60-inference-base.yaml",
+      "keys": "61-inference-keys.yaml",
+      "layer": "62-inference.yaml"
+    },
+    "gateway": {
+      "image": "docker.io/apache/apisix@sha256:57a4001b6fb865d844c5f099069423c98b469f876bfba7ae88bbafc6ddd3748b",
+      "name": "api-gateway",
+      "port": 9080,
+      "replicas": 2,
+      "uid": 636,
+      "upstream_timeout_s": 600
+    },
+    "hostname": "llm.ai.tarnwick.example",
+    "job": "inference-keys",
+    "key_format": "Bearer {key}",
+    "key_sa": "inference-keys",
+    "keys": {
+      "backend": {
+        "field": "key",
+        "from": {
+          "namespace": "serving",
+          "secret": "llm-api-key"
+        },
+        "secret": "backend-key"
+      },
+      "master": {
+        "field": "key",
+        "prefix": "sk-tw-router",
+        "secret": "router-master-key"
+      },
+      "models": {
+        "prefix": "sk-tw",
+        "secret": "api-keys"
+      }
+    },
+    "keys_image": "192.0.2.6:5000/sfab/keys:4",
+    "labels": {
+      "prefix": "tarnwick.example"
+    },
+    "models": [
+      {
+        "api_base": "http://chat.serving.svc.cluster.local:8080/v1",
+        "audiences": [
+          "internal",
+          "enterprise",
+          "internet"
+        ],
+        "callers": [
+          "batch",
+          "staff",
+          "inetapp"
+        ],
+        "copies": [
+          "a",
+          "b",
+          "c"
+        ],
+        "name": "chat",
+        "path": "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7",
+        "route_id": "a48b3df9-3b7f-58f0-9c52-c6f3004f05f7",
+        "service": "chat.serving.svc.cluster.local"
+      },
+      {
+        "api_base": "http://staff.serving.svc.cluster.local:8080/v1",
+        "audiences": [
+          "internal",
+          "enterprise"
+        ],
+        "callers": [
+          "helpdesk",
+          "staff"
+        ],
+        "copies": [
+          "a",
+          "b"
+        ],
+        "name": "staff",
+        "path": "/models/8242d5c4-9bce-5497-8414-f5bad94fdd84",
+        "route_id": "8242d5c4-9bce-5497-8414-f5bad94fdd84",
+        "service": "staff.serving.svc.cluster.local"
+      }
+    ],
+    "namespace": "inference",
+    "oidc": {
+      "audience": "ai-gateway",
+      "claim": "email",
+      "issuer": "https://id.ai.tarnwick.example",
+      "jwks_uri": "http://idp.identity.svc.cluster.local:5556/keys"
+    },
+    "path": "/models",
+    "placement": {
+      "nodeSelector": {
+        "node-role.tarnwick.example/ingress": ""
+      },
+      "tolerations": [
+        {
+          "effect": "NoSchedule",
+          "key": "node-role.tarnwick.example/ingress",
+          "operator": "Exists"
+        }
+      ]
+    },
+    "probe": {
+      "name": "key-probe",
+      "port": 9080,
+      "sa": "key-probe",
+      "selector": "app.kubernetes.io/name=api-gateway"
+    },
+    "rejected": {
+      "code": 401,
+      "message": "Authorization Failed"
+    },
+    "router": {
+      "attempt_timeout_s": 280,
+      "host": "router.inference.svc.cluster.local",
+      "image": "ghcr.io/berriai/litellm@sha256:5ce1ebf7f26ed82501b598e0ebecd4fe63d0e61817178427d4df86f2a16729ec",
+      "name": "router",
+      "port": 4000,
+      "replicas": 2,
+      "retries": 1,
+      "stream_timeout_s": 60
+    },
+    "routes": [
+      {
+        "audience": "internal",
+        "decision": "dec-routeset-internal",
+        "gateway": "gw-internal",
+        "hostnames": [
+          "llm.ai.tarnwick.example"
+        ],
+        "name": "models-gw-internal",
+        "namespace": "gateways",
+        "rules": [
+          {
+            "model": null,
+            "path": "/models"
+          }
+        ],
+        "section": "https"
+      },
+      {
+        "audience": "enterprise",
+        "decision": "dec-routeset-enterprise",
+        "gateway": "gw-users",
+        "hostnames": [
+          "llm.ai.tarnwick.example"
+        ],
+        "name": "models-gw-users",
+        "namespace": "gateways",
+        "rules": [
+          {
+            "model": "chat",
+            "path": "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7"
+          },
+          {
+            "model": "staff",
+            "path": "/models/8242d5c4-9bce-5497-8414-f5bad94fdd84"
+          }
+        ],
+        "section": "https"
+      },
+      {
+        "audience": "internet",
+        "decision": "dec-routeset-internet",
+        "gateway": "gw-inet",
+        "hostnames": [
+          "llm.ai.tarnwick.example"
+        ],
+        "name": "models-gw-inet",
+        "namespace": "gateways",
+        "rules": [
+          {
+            "model": "chat",
+            "path": "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7"
+          }
+        ],
+        "section": "https"
+      }
+    ],
+    "serving_namespace": "serving",
+    "timeouts": {
+      "backend_request_s": 620,
+      "gateway_read_s": 600,
+      "request_s": 620,
+      "router_attempt_s": 280,
+      "router_retries": 1,
+      "router_stream_s": 60
+    },
+    "www_authenticate": "Bearer realm=\"llm.ai.tarnwick.example\""
+  },
+  "issuer": {
+    "intermediate": "platform",
+    "kind": "ClusterIssuer",
+    "name": "lab-ca",
+    "namespace": "cert-manager",
+    "secret": "lab-ca"
+  },
+  "l2_lease": {
+    "client_qps": 50,
+    "duration": "3s",
+    "failover_ms": [
+      2000,
+      4000
+    ],
+    "renew_deadline": "1s",
+    "renew_qps": 3.0,
+    "retry_period": "200ms",
+    "services": 3,
+    "tuned": true
+  },
+  "l2_policies": {
+    "by_gateway": {
+      "gw-inet": "gateways-internet",
+      "gw-internal": "gateways-internal",
+      "gw-users": "gateways-enterprise"
+    },
+    "mode": "per-audience"
+  },
+  "l2_policy": null,
+  "lab": "sfab-ch10",
+  "multus": {
+    "daemonset": "kube-system/kube-multus-ds",
+    "file": "12-multus-daemonset-thick.yaml",
+    "image": "ghcr.io/k8snetworkplumbingwg/multus-cni@sha256:84873accf7adac86589558e97038b846f6a748e82dc163620cc4fe63fd175a8c",
+    "version": "v4.3.0"
+  },
+  "network_policy": {
+    "base": [
+      {
+        "name": "default-deny",
+        "namespace": "echo"
+      },
+      {
+        "name": "allow-gateways-to-backend",
+        "namespace": "echo"
+      },
+      {
+        "name": "default-deny",
+        "namespace": "identity"
+      },
+      {
+        "name": "allow-to-idp",
+        "namespace": "identity"
+      }
+    ],
+    "files": {
+      "base": "58-network-policy.yaml",
+      "inference": "63-inference-policy.yaml"
+    },
+    "inference": [
+      {
+        "name": "default-deny",
+        "namespace": "inference"
+      },
+      {
+        "name": "allow-api-gateway",
+        "namespace": "inference"
+      },
+      {
+        "name": "allow-router",
+        "namespace": "inference"
+      },
+      {
+        "name": "allow-key-jobs",
+        "namespace": "inference"
+      },
+      {
+        "name": "allow-key-probe",
+        "namespace": "inference"
+      },
+      {
+        "name": "default-deny",
+        "namespace": "serving"
+      },
+      {
+        "name": "allow-to-servers",
+        "namespace": "serving"
+      },
+      {
+        "name": "allow-key-job",
+        "namespace": "serving"
+      }
+    ]
+  },
+  "nodes": {
+    "k8s-cp1": {
+      "address": "10.20.1.11",
+      "labels": {
+        "node-role.tarnwick.example/control": ""
+      },
+      "role": "init"
+    },
+    "k8s-cp2": {
+      "address": "10.20.1.12",
+      "labels": {
+        "node-role.tarnwick.example/control": ""
+      },
+      "role": "join-control"
+    },
+    "k8s-cp3": {
+      "address": "10.20.1.13",
+      "labels": {
+        "node-role.tarnwick.example/control": ""
+      },
+      "role": "join-control"
+    },
+    "k8s-gpu1": {
+      "address": "10.20.1.21",
+      "labels": {
+        "node-role.tarnwick.example/gpu": ""
+      },
+      "role": "join-worker"
+    },
+    "k8s-gpu2": {
+      "address": "10.20.1.22",
+      "labels": {
+        "node-role.tarnwick.example/gpu": ""
+      },
+      "role": "join-worker"
+    },
+    "k8s-ingress1": {
+      "address": "10.20.1.31",
+      "labels": {
+        "node-role.tarnwick.example/ingress": ""
+      },
+      "role": "join-worker"
+    },
+    "k8s-ingress2": {
+      "address": "10.20.1.32",
+      "labels": {
+        "node-role.tarnwick.example/ingress": ""
+      },
+      "role": "join-worker"
+    }
+  },
+  "operators": {
+    "cluster_role": "view",
+    "group": "operators",
+    "users": [
+      "admin"
+    ],
+    "validity_h": 8
+  },
+  "pod_encryption": "wireguard",
+  "schema": 1,
+  "secrets_encryption": {
+    "config": "/etc/kubernetes/enc/config.yaml",
+    "dir": "/etc/kubernetes/enc",
+    "provider": "secretbox",
+    "resources": [
+      "secrets"
+    ]
+  },
+  "serving": {
+    "env": "serving.env",
+    "image": "192.0.2.6:5000/sfab/serving:b11382-2",
+    "key": {
+      "field": "key",
+      "prefix": "sk-tw-serving",
+      "secret": "llm-api-key"
+    },
+    "keys_image": "192.0.2.6:5000/sfab/keys:4",
+    "load": {
+      "client": "ops-client",
+      "exec": "docker exec -i sfab-ch10-ops-client",
+      "population": "operator",
+      "resolve": "serve.ai.tarnwick.example:443:10.20.11.200",
+      "url": "https://serve.ai.tarnwick.example/chat/v1"
+    },
+    "models": [
+      {
+        "alias": "chat",
+        "bytes": 14526258464,
+        "copies": [
+          "a",
+          "b",
+          "c"
+        ],
+        "file": "LFM2.5-24B-A2B-Q4_K_M.gguf",
+        "name": "chat",
+        "route_id": "a48b3df9-3b7f-58f0-9c52-c6f3004f05f7",
+        "spans": [
+          "c"
+        ]
+      },
+      {
+        "alias": "staff",
+        "bytes": 16464440224,
+        "copies": [
+          "a",
+          "b"
+        ],
+        "file": "Qwen3.8-27B-UD-Q4_K_M.gguf",
+        "name": "staff",
+        "route_id": "8242d5c4-9bce-5497-8414-f5bad94fdd84",
+        "spans": []
+      }
+    ],
+    "nads": [
+      {
+        "master": "rail3",
+        "mtu": 9000,
+        "name": "rail3",
+        "prefix": "10.21.3.0/24"
+      },
+      {
+        "master": "rail4",
+        "mtu": 9000,
+        "name": "rail4",
+        "prefix": "10.21.4.0/24"
+      },
+      {
+        "master": "rail5",
+        "mtu": 9000,
+        "name": "rail5",
+        "prefix": "10.21.5.0/24"
+      },
+      {
+        "master": "rail6",
+        "mtu": 9000,
+        "name": "rail6",
+        "prefix": "10.21.6.0/24"
+      },
+      {
+        "master": "rail7",
+        "mtu": 9000,
+        "name": "rail7",
+        "prefix": "10.21.7.0/24"
+      }
+    ],
+    "namespace": "serving",
+    "placement": [
+      {
+        "address": "10.21.3.100/24",
+        "controller": "chat-a-server",
+        "copy": "a",
+        "decision": "dec-place-chat",
+        "index": 0,
+        "mac": "02:5a:fe:03:00:64",
+        "model": "chat",
+        "nad": "rail3",
+        "node": "k8s-gpu1",
+        "pod": "chat-a-server-0",
+        "rail": 3,
+        "role": "server"
+      },
+      {
+        "address": "10.21.3.101/24",
+        "controller": "chat-a-worker0",
+        "copy": "a",
+        "decision": "dec-place-chat",
+        "index": 0,
+        "mac": "02:5a:fe:03:00:65",
+        "model": "chat",
+        "nad": "rail3",
+        "node": "k8s-gpu1",
+        "pod": "chat-a-worker0-0",
+        "rail": 3,
+        "role": "worker"
+      },
+      {
+        "address": "10.21.6.100/24",
+        "controller": "chat-b-server",
+        "copy": "b",
+        "decision": "dec-place-chat",
+        "index": 0,
+        "mac": "02:5a:fe:06:00:64",
+        "model": "chat",
+        "nad": "rail6",
+        "node": "k8s-gpu2",
+        "pod": "chat-b-server-0",
+        "rail": 6,
+        "role": "server"
+      },
+      {
+        "address": "10.21.6.101/24",
+        "controller": "chat-b-worker0",
+        "copy": "b",
+        "decision": "dec-place-chat",
+        "index": 0,
+        "mac": "02:5a:fe:06:00:65",
+        "model": "chat",
+        "nad": "rail6",
+        "node": "k8s-gpu2",
+        "pod": "chat-b-worker0-0",
+        "rail": 6,
+        "role": "worker"
+      },
+      {
+        "address": "10.21.7.100/24",
+        "controller": "chat-c-server",
+        "copy": "c",
+        "decision": "dec-place-chat",
+        "index": 0,
+        "mac": "02:5a:fe:07:00:64",
+        "model": "chat",
+        "nad": "rail7",
+        "node": "k8s-gpu1",
+        "pod": "chat-c-server-0",
+        "rail": 7,
+        "role": "server"
+      },
+      {
+        "address": "10.21.7.101/24",
+        "controller": "chat-c-worker0",
+        "copy": "c",
+        "decision": "dec-place-chat",
+        "index": 0,
+        "mac": "02:5a:fe:07:00:65",
+        "model": "chat",
+        "nad": "rail7",
+        "node": "k8s-gpu2",
+        "pod": "chat-c-worker0-0",
+        "rail": 7,
+        "role": "worker"
+      },
+      {
+        "address": "10.21.7.102/24",
+        "controller": "chat-c-worker1",
+        "copy": "c",
+        "decision": "dec-place-chat",
+        "index": 1,
+        "mac": "02:5a:fe:07:00:66",
+        "model": "chat",
+        "nad": "rail7",
+        "node": "k8s-gpu1",
+        "pod": "chat-c-worker1-0",
+        "rail": 7,
+        "role": "worker"
+      },
+      {
+        "address": "10.21.4.100/24",
+        "controller": "staff-a-server",
+        "copy": "a",
+        "decision": "dec-place-staff",
+        "index": 0,
+        "mac": "02:5a:fe:04:00:64",
+        "model": "staff",
+        "nad": "rail4",
+        "node": "k8s-gpu1",
+        "pod": "staff-a-server-0",
+        "rail": 4,
+        "role": "server"
+      },
+      {
+        "address": "10.21.4.101/24",
+        "controller": "staff-a-worker0",
+        "copy": "a",
+        "decision": "dec-place-staff",
+        "index": 0,
+        "mac": "02:5a:fe:04:00:65",
+        "model": "staff",
+        "nad": "rail4",
+        "node": "k8s-gpu1",
+        "pod": "staff-a-worker0-0",
+        "rail": 4,
+        "role": "worker"
+      },
+      {
+        "address": "10.21.5.100/24",
+        "controller": "staff-b-server",
+        "copy": "b",
+        "decision": "dec-place-staff",
+        "index": 0,
+        "mac": "02:5a:fe:05:00:64",
+        "model": "staff",
+        "nad": "rail5",
+        "node": "k8s-gpu2",
+        "pod": "staff-b-server-0",
+        "rail": 5,
+        "role": "server"
+      },
+      {
+        "address": "10.21.5.101/24",
+        "controller": "staff-b-worker0",
+        "copy": "b",
+        "decision": "dec-place-staff",
+        "index": 0,
+        "mac": "02:5a:fe:05:00:65",
+        "model": "staff",
+        "nad": "rail5",
+        "node": "k8s-gpu2",
+        "pod": "staff-b-worker0-0",
+        "rail": 5,
+        "role": "worker"
+      }
+    ],
+    "ports": {
+      "http": 8080,
+      "rail_probe": 50053,
+      "rpc": 50052
+    },
+    "readiness": {
+      "failure_threshold": 2,
+      "period_s": 2,
+      "timeout_s": 2
+    },
+    "route": {
+      "backend_request": "900s",
+      "gateway": "gw-internal",
+      "hostname": "serve.ai.tarnwick.example",
+      "name": "serving",
+      "namespace": "gateways",
+      "request": "900s",
+      "section": "https"
+    },
+    "weights": {
+      "dir": "images/models",
+      "guest": "/srv/models",
+      "nodes": [
+        "k8s-gpu1",
+        "k8s-gpu2"
+      ],
+      "tag": "models"
+    }
+  },
+  "test_backend": {
+    "deployment": "echo",
+    "namespace": "echo",
+    "path": "/echo",
+    "port": 8080,
+    "replicas": 2,
+    "routes": {
+      "gw-inet": "echo-gw-inet",
+      "gw-internal": "echo-gw-internal",
+      "gw-users": "echo-gw-users"
+    },
+    "service": "echo"
+  },
+  "version": "v1.35.8"
+}

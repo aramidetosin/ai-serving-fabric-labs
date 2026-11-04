@@ -1,0 +1,2372 @@
+{
+  "budget": {
+    "floor_gib": 16.0,
+    "layer_gib": 40.0,
+    "mem_gib": 55.0,
+    "need_gib": 71.0,
+    "state_base_gib": 1.0,
+    "state_gib": 25.0,
+    "vcpu_overcommit": 2,
+    "vcpus": 26.0
+  },
+  "build": "A",
+  "ca": null,
+  "chapter": 5,
+  "clabdir": "clab-sfab-ch05",
+  "dns": {
+    "admin": [
+      "admin.ai.tarnwick.example",
+      "grafana.ai.tarnwick.example"
+    ],
+    "identity": [],
+    "internal": [
+      "serve.ai.tarnwick.example"
+    ],
+    "records": {
+      "k8s-gpu1.ai.tarnwick.example": "10.20.1.21",
+      "k8s-gpu2.ai.tarnwick.example": "10.20.1.22",
+      "k8s.ai.tarnwick.example": "10.20.1.10"
+    },
+    "resolvers": {
+      "corporate": {
+        "clients": [
+          "10.24.10.0/24"
+        ],
+        "kind": "dnsmasq",
+        "local": [
+          "ent-client",
+          "ent-dns"
+        ],
+        "servers": [],
+        "to": []
+      },
+      "inside": {
+        "clients": [
+          "10.20.1.0/24",
+          "10.20.11.0/24",
+          "10.20.2.0/24",
+          "10.20.3.0/24",
+          "10.20.9.0/24",
+          "10.20.13.0/24",
+          "10.20.14.0/24"
+        ],
+        "kind": "bind-recursive",
+        "local": [],
+        "servers": [],
+        "to": []
+      }
+    },
+    "tsig": [],
+    "users": [
+      "llm.ai.tarnwick.example"
+    ],
+    "views": {
+      "enterprise": {
+        "answer_address": "10.20.11.210",
+        "infra": false,
+        "kind": "bind-auth",
+        "match_cidrs": [
+          "10.24.10.53/32"
+        ],
+        "names": [
+          "llm.ai.tarnwick.example"
+        ],
+        "recursion": false,
+        "server": "dns-auth1",
+        "servers": []
+      },
+      "internal": {
+        "answer_address": "10.20.11.200",
+        "infra": true,
+        "kind": "bind-auth",
+        "match_cidrs": [
+          "10.20.13.21/32",
+          "10.20.14.21/32"
+        ],
+        "names": [
+          "llm.ai.tarnwick.example",
+          "admin.ai.tarnwick.example",
+          "grafana.ai.tarnwick.example",
+          "serve.ai.tarnwick.example"
+        ],
+        "recursion": false,
+        "server": "dns-auth1",
+        "servers": []
+      },
+      "public-operator": {
+        "answer_address": "198.51.100.2",
+        "infra": false,
+        "kind": "bind-auth",
+        "match_cidrs": [
+          "192.0.2.0/26"
+        ],
+        "names": [],
+        "recursion": false,
+        "server": "ops-dns",
+        "servers": []
+      }
+    },
+    "wildcard": null,
+    "zone": "ai.tarnwick.example"
+  },
+  "extends": null,
+  "features": {
+    "k8s": false,
+    "serving": false,
+    "storage_setup": false
+  },
+  "gateways": {
+    "gw-internal": {
+      "audience": "internal",
+      "decision": "dec-routeset-internal",
+      "hostnames": [
+        "llm.ai.tarnwick.example",
+        "admin.ai.tarnwick.example",
+        "grafana.ai.tarnwick.example"
+      ],
+      "pool": [
+        "10.20.11.200",
+        "10.20.11.209"
+      ],
+      "pool_cidrs": [
+        "10.20.11.200/29",
+        "10.20.11.208/31"
+      ],
+      "segment": "ingress",
+      "vip": "10.20.11.200"
+    },
+    "gw-users": {
+      "audience": "enterprise",
+      "decision": "dec-routeset-enterprise",
+      "hostnames": [
+        "llm.ai.tarnwick.example"
+      ],
+      "pool": [
+        "10.20.11.210",
+        "10.20.11.214"
+      ],
+      "pool_cidrs": [
+        "10.20.11.210/31",
+        "10.20.11.212/31",
+        "10.20.11.214/32"
+      ],
+      "segment": "ingress",
+      "vip": "10.20.11.210"
+    }
+  },
+  "groups": {
+    "fe": [
+      "fe-sw1",
+      "fe-sw2"
+    ],
+    "gpu": [
+      "k8s-gpu1",
+      "k8s-gpu2"
+    ],
+    "oob": [
+      "oob-sw"
+    ],
+    "rail": [
+      "rail-sw1",
+      "rail-sw2"
+    ]
+  },
+  "guest": {
+    "tables": {
+      "mgmt": 150,
+      "oob": 100,
+      "rail_base": 300
+    },
+    "user": "admin"
+  },
+  "harness": {
+    "capture_snaplen": 256,
+    "pcap_max_mib": 5,
+    "probe_retries": 1,
+    "rtt_cutoff_s": 1,
+    "trace_settle_s": 3
+  },
+  "host": {
+    "boot_batch": 8,
+    "startup_delay_s": 180,
+    "tick": 10000
+  },
+  "images": {
+    "sfab/vm-node:6-k8s1.35.8": {
+      "digest": null,
+      "key": "vm_node",
+      "pulled": false
+    },
+    "vrnetlab/dell_sonic:4.6.0": {
+      "digest": null,
+      "key": "dell_sonic",
+      "pulled": false
+    }
+  },
+  "k8s": null,
+  "kinds": {
+    "dell_sonic": [
+      "fe-sw1",
+      "fe-sw2",
+      "oob-sw",
+      "rail-sw1",
+      "rail-sw2"
+    ],
+    "vm-node": [
+      "k8s-gpu1",
+      "k8s-gpu2"
+    ]
+  },
+  "known": [
+    "L1",
+    "L10",
+    "L11",
+    "L2",
+    "L3",
+    "L4",
+    "L5",
+    "L6",
+    "L7",
+    "L8",
+    "L9"
+  ],
+  "lab": "sfab-ch05",
+  "links": [
+    {
+      "a": "fe-sw1:eth1",
+      "attachment": "fe.peer-link",
+      "b": "fe-sw2:eth1",
+      "id": "fe-sw1:eth1",
+      "kind": "peer-link",
+      "mode": "trunk",
+      "mtu": null,
+      "pc": 1,
+      "rail": null,
+      "vlans": [
+        100,
+        110,
+        120,
+        130,
+        131,
+        200,
+        300,
+        3966
+      ]
+    },
+    {
+      "a": "fe-sw1:eth2",
+      "attachment": "fe.peer-link",
+      "b": "fe-sw2:eth2",
+      "id": "fe-sw1:eth2",
+      "kind": "peer-link",
+      "mode": "trunk",
+      "mtu": null,
+      "pc": 1,
+      "rail": null,
+      "vlans": [
+        100,
+        110,
+        120,
+        130,
+        131,
+        200,
+        300,
+        3966
+      ]
+    },
+    {
+      "a": "fe-sw1:eth13",
+      "attachment": "fe.keepalive",
+      "b": "fe-sw2:eth13",
+      "id": "fe-sw1:eth13",
+      "kind": "keepalive",
+      "mode": null,
+      "mtu": null,
+      "pc": null,
+      "rail": null,
+      "vlans": []
+    },
+    {
+      "a": "k8s-gpu1:eth1",
+      "attachment": "k8s-gpu1.bond",
+      "b": "fe-sw1:eth7",
+      "id": "k8s-gpu1:eth1",
+      "kind": "bundle",
+      "mode": "access",
+      "mtu": null,
+      "pc": 21,
+      "rail": null,
+      "vlans": [
+        100
+      ]
+    },
+    {
+      "a": "k8s-gpu1:eth2",
+      "attachment": "k8s-gpu1.bond",
+      "b": "fe-sw2:eth7",
+      "id": "k8s-gpu1:eth2",
+      "kind": "bundle",
+      "mode": "access",
+      "mtu": null,
+      "pc": 21,
+      "rail": null,
+      "vlans": [
+        100
+      ]
+    },
+    {
+      "a": "k8s-gpu1:eth3",
+      "attachment": "k8s-gpu1.oob",
+      "b": "oob-sw:eth1",
+      "id": "k8s-gpu1:eth3",
+      "kind": "oob",
+      "mode": "access",
+      "mtu": null,
+      "pc": null,
+      "rail": null,
+      "vlans": [
+        90
+      ]
+    },
+    {
+      "a": "k8s-gpu1:eth4",
+      "attachment": "k8s-gpu1.rail1",
+      "b": "rail-sw1:eth1",
+      "id": "k8s-gpu1:eth4",
+      "kind": "rail",
+      "mode": "access",
+      "mtu": null,
+      "pc": null,
+      "rail": 1,
+      "vlans": [
+        101
+      ]
+    },
+    {
+      "a": "k8s-gpu1:eth5",
+      "attachment": "k8s-gpu1.rail2",
+      "b": "rail-sw2:eth1",
+      "id": "k8s-gpu1:eth5",
+      "kind": "rail",
+      "mode": "access",
+      "mtu": null,
+      "pc": null,
+      "rail": 2,
+      "vlans": [
+        102
+      ]
+    },
+    {
+      "a": "k8s-gpu1:eth6",
+      "attachment": "k8s-gpu1.rail3",
+      "b": "rail-sw1:eth2",
+      "id": "k8s-gpu1:eth6",
+      "kind": "rail",
+      "mode": "access",
+      "mtu": null,
+      "pc": null,
+      "rail": 3,
+      "vlans": [
+        103
+      ]
+    },
+    {
+      "a": "k8s-gpu1:eth7",
+      "attachment": "k8s-gpu1.rail4",
+      "b": "rail-sw2:eth2",
+      "id": "k8s-gpu1:eth7",
+      "kind": "rail",
+      "mode": "access",
+      "mtu": null,
+      "pc": null,
+      "rail": 4,
+      "vlans": [
+        104
+      ]
+    },
+    {
+      "a": "k8s-gpu1:eth8",
+      "attachment": "k8s-gpu1.rail5",
+      "b": "rail-sw1:eth3",
+      "id": "k8s-gpu1:eth8",
+      "kind": "rail",
+      "mode": "access",
+      "mtu": null,
+      "pc": null,
+      "rail": 5,
+      "vlans": [
+        105
+      ]
+    },
+    {
+      "a": "k8s-gpu1:eth9",
+      "attachment": "k8s-gpu1.rail6",
+      "b": "rail-sw2:eth3",
+      "id": "k8s-gpu1:eth9",
+      "kind": "rail",
+      "mode": "access",
+      "mtu": null,
+      "pc": null,
+      "rail": 6,
+      "vlans": [
+        106
+      ]
+    },
+    {
+      "a": "k8s-gpu1:eth10",
+      "attachment": "k8s-gpu1.rail7",
+      "b": "rail-sw1:eth4",
+      "id": "k8s-gpu1:eth10",
+      "kind": "rail",
+      "mode": "access",
+      "mtu": null,
+      "pc": null,
+      "rail": 7,
+      "vlans": [
+        107
+      ]
+    },
+    {
+      "a": "k8s-gpu1:eth11",
+      "attachment": "k8s-gpu1.rail8",
+      "b": "rail-sw2:eth4",
+      "id": "k8s-gpu1:eth11",
+      "kind": "rail",
+      "mode": "access",
+      "mtu": null,
+      "pc": null,
+      "rail": 8,
+      "vlans": [
+        108
+      ]
+    },
+    {
+      "a": "k8s-gpu2:eth1",
+      "attachment": "k8s-gpu2.bond",
+      "b": "fe-sw1:eth8",
+      "id": "k8s-gpu2:eth1",
+      "kind": "bundle",
+      "mode": "access",
+      "mtu": null,
+      "pc": 22,
+      "rail": null,
+      "vlans": [
+        100
+      ]
+    },
+    {
+      "a": "k8s-gpu2:eth2",
+      "attachment": "k8s-gpu2.bond",
+      "b": "fe-sw2:eth8",
+      "id": "k8s-gpu2:eth2",
+      "kind": "bundle",
+      "mode": "access",
+      "mtu": null,
+      "pc": 22,
+      "rail": null,
+      "vlans": [
+        100
+      ]
+    },
+    {
+      "a": "k8s-gpu2:eth3",
+      "attachment": "k8s-gpu2.oob",
+      "b": "oob-sw:eth2",
+      "id": "k8s-gpu2:eth3",
+      "kind": "oob",
+      "mode": "access",
+      "mtu": null,
+      "pc": null,
+      "rail": null,
+      "vlans": [
+        90
+      ]
+    },
+    {
+      "a": "k8s-gpu2:eth4",
+      "attachment": "k8s-gpu2.rail1",
+      "b": "rail-sw1:eth5",
+      "id": "k8s-gpu2:eth4",
+      "kind": "rail",
+      "mode": "access",
+      "mtu": null,
+      "pc": null,
+      "rail": 1,
+      "vlans": [
+        101
+      ]
+    },
+    {
+      "a": "k8s-gpu2:eth5",
+      "attachment": "k8s-gpu2.rail2",
+      "b": "rail-sw2:eth5",
+      "id": "k8s-gpu2:eth5",
+      "kind": "rail",
+      "mode": "access",
+      "mtu": null,
+      "pc": null,
+      "rail": 2,
+      "vlans": [
+        102
+      ]
+    },
+    {
+      "a": "k8s-gpu2:eth6",
+      "attachment": "k8s-gpu2.rail3",
+      "b": "rail-sw1:eth6",
+      "id": "k8s-gpu2:eth6",
+      "kind": "rail",
+      "mode": "access",
+      "mtu": null,
+      "pc": null,
+      "rail": 3,
+      "vlans": [
+        103
+      ]
+    },
+    {
+      "a": "k8s-gpu2:eth7",
+      "attachment": "k8s-gpu2.rail4",
+      "b": "rail-sw2:eth6",
+      "id": "k8s-gpu2:eth7",
+      "kind": "rail",
+      "mode": "access",
+      "mtu": null,
+      "pc": null,
+      "rail": 4,
+      "vlans": [
+        104
+      ]
+    },
+    {
+      "a": "k8s-gpu2:eth8",
+      "attachment": "k8s-gpu2.rail5",
+      "b": "rail-sw1:eth7",
+      "id": "k8s-gpu2:eth8",
+      "kind": "rail",
+      "mode": "access",
+      "mtu": null,
+      "pc": null,
+      "rail": 5,
+      "vlans": [
+        105
+      ]
+    },
+    {
+      "a": "k8s-gpu2:eth9",
+      "attachment": "k8s-gpu2.rail6",
+      "b": "rail-sw2:eth7",
+      "id": "k8s-gpu2:eth9",
+      "kind": "rail",
+      "mode": "access",
+      "mtu": null,
+      "pc": null,
+      "rail": 6,
+      "vlans": [
+        106
+      ]
+    },
+    {
+      "a": "k8s-gpu2:eth10",
+      "attachment": "k8s-gpu2.rail7",
+      "b": "rail-sw1:eth8",
+      "id": "k8s-gpu2:eth10",
+      "kind": "rail",
+      "mode": "access",
+      "mtu": null,
+      "pc": null,
+      "rail": 7,
+      "vlans": [
+        107
+      ]
+    },
+    {
+      "a": "k8s-gpu2:eth11",
+      "attachment": "k8s-gpu2.rail8",
+      "b": "rail-sw2:eth8",
+      "id": "k8s-gpu2:eth11",
+      "kind": "rail",
+      "mode": "access",
+      "mtu": null,
+      "pc": null,
+      "rail": 8,
+      "vlans": [
+        108
+      ]
+    }
+  ],
+  "mgmt": {
+    "bridge": "sfab-a-mgmt",
+    "gw": "172.21.40.1",
+    "network": "sfab-a-mgmt",
+    "subnet": "172.21.40.0/24"
+  },
+  "naming": {
+    "lab_re": "^sfab-(ch[0-9]{2}[a-z]?|m[0-9]+)$"
+  },
+  "nodes": {
+    "fe-sw1": {
+      "access": {},
+      "budget": {
+        "layer_gib": 8.0,
+        "mem_gib": 4.6,
+        "state_gib": 0.0,
+        "vcpus": 2.0
+      },
+      "clab_kind": "dell_sonic",
+      "container": "sfab-ch05-fe-sw1",
+      "edge": [
+        "PortChannel21",
+        "PortChannel22"
+      ],
+      "eths": [
+        "eth1",
+        "eth2",
+        "eth7",
+        "eth8",
+        "eth13"
+      ],
+      "group": "fe",
+      "image": "vrnetlab/dell_sonic:4.6.0",
+      "keepalive": {
+        "address": "10.20.255.0/31",
+        "backup_address": "10.20.255.4/31",
+        "backup_interface": "Vlan3966",
+        "backup_peer": "10.20.255.5",
+        "backup_vlan": 3966,
+        "eth": "eth13",
+        "mtu": 9216,
+        "peer_address": "10.20.255.1",
+        "port": "Ethernet12",
+        "vrf": "VrfMclagKa"
+      },
+      "kind": "dell_sonic",
+      "mclag": {
+        "backup": {
+          "interval": 1,
+          "peer_ip": "10.20.255.5",
+          "source_ip": "10.20.255.4",
+          "vrf": "VrfMclagKa"
+        },
+        "domain": 1,
+        "peer": "fe-sw2",
+        "peer_ip": "10.20.255.1",
+        "peer_link": "PortChannel1",
+        "session_vrf": "VrfMclagKa",
+        "source_ip": "10.20.255.0",
+        "system_mac": "02:5a:00:00:00:01"
+      },
+      "mgmt": "172.21.40.11",
+      "nics": {
+        "eth1": {
+          "desc": "peer-link-1",
+          "link": "fe-sw1:eth1",
+          "native": "Ethernet0",
+          "peer": "fe-sw2:eth1",
+          "role": "peer-link",
+          "vlans": [
+            100,
+            110,
+            120,
+            130,
+            131,
+            200,
+            300,
+            3966
+          ]
+        },
+        "eth13": {
+          "desc": "mclag-keepalive",
+          "link": "fe-sw1:eth13",
+          "mtu": 9216,
+          "native": "Ethernet12",
+          "peer": "fe-sw2:eth13",
+          "role": "keepalive"
+        },
+        "eth2": {
+          "desc": "peer-link-2",
+          "link": "fe-sw1:eth2",
+          "native": "Ethernet1",
+          "peer": "fe-sw2:eth2",
+          "role": "peer-link",
+          "vlans": [
+            100,
+            110,
+            120,
+            130,
+            131,
+            200,
+            300,
+            3966
+          ]
+        },
+        "eth7": {
+          "desc": "k8s-gpu1-eth1",
+          "link": "k8s-gpu1:eth1",
+          "native": "Ethernet6",
+          "peer": "k8s-gpu1:eth1",
+          "role": "bundle-member",
+          "vlan": 100
+        },
+        "eth8": {
+          "desc": "k8s-gpu2-eth1",
+          "link": "k8s-gpu2:eth1",
+          "native": "Ethernet7",
+          "peer": "k8s-gpu2:eth1",
+          "role": "bundle-member",
+          "vlan": 100
+        }
+      },
+      "num_nics": 13,
+      "pair": "fe",
+      "partner": "fe-sw2",
+      "passthrough": true,
+      "portchannels": {
+        "PortChannel1": {
+          "edge": false,
+          "id": 1,
+          "kind": "peer-link",
+          "mclag": false,
+          "member_eths": [
+            "eth1",
+            "eth2"
+          ],
+          "members": [
+            "Ethernet0",
+            "Ethernet1"
+          ],
+          "mode": "trunk",
+          "mtu": 9216,
+          "peer_node": null,
+          "tagged": [],
+          "vlans": [
+            100,
+            110,
+            120,
+            130,
+            131,
+            200,
+            300,
+            3966
+          ]
+        },
+        "PortChannel21": {
+          "edge": true,
+          "id": 21,
+          "kind": "mclag",
+          "mclag": true,
+          "member_eths": [
+            "eth7"
+          ],
+          "members": [
+            "Ethernet6"
+          ],
+          "mode": "access",
+          "mtu": 9216,
+          "peer_node": "k8s-gpu1",
+          "tagged": [
+            120
+          ],
+          "vlans": [
+            100
+          ]
+        },
+        "PortChannel22": {
+          "edge": true,
+          "id": 22,
+          "kind": "mclag",
+          "mclag": true,
+          "member_eths": [
+            "eth8"
+          ],
+          "members": [
+            "Ethernet7"
+          ],
+          "mode": "access",
+          "mtu": 9216,
+          "peer_node": "k8s-gpu2",
+          "tagged": [
+            120
+          ],
+          "vlans": [
+            100
+          ]
+        }
+      },
+      "rails": [],
+      "requires": [],
+      "role": "mclag_member",
+      "section": "switches",
+      "sflow": false,
+      "storm": {
+        "kbps": {
+          "broadcast": 10000,
+          "unknown-multicast": 10000,
+          "unknown-unicast": 10000
+        },
+        "ports": [
+          "Ethernet6",
+          "Ethernet7"
+        ]
+      },
+      "stp": "pvst",
+      "vlans": [
+        100,
+        110,
+        120,
+        130,
+        131,
+        200,
+        300
+      ]
+    },
+    "fe-sw2": {
+      "access": {},
+      "budget": {
+        "layer_gib": 8.0,
+        "mem_gib": 4.6,
+        "state_gib": 0.0,
+        "vcpus": 2.0
+      },
+      "clab_kind": "dell_sonic",
+      "container": "sfab-ch05-fe-sw2",
+      "edge": [
+        "PortChannel21",
+        "PortChannel22"
+      ],
+      "eths": [
+        "eth1",
+        "eth2",
+        "eth7",
+        "eth8",
+        "eth13"
+      ],
+      "group": "fe",
+      "image": "vrnetlab/dell_sonic:4.6.0",
+      "keepalive": {
+        "address": "10.20.255.1/31",
+        "backup_address": "10.20.255.5/31",
+        "backup_interface": "Vlan3966",
+        "backup_peer": "10.20.255.4",
+        "backup_vlan": 3966,
+        "eth": "eth13",
+        "mtu": 9216,
+        "peer_address": "10.20.255.0",
+        "port": "Ethernet12",
+        "vrf": "VrfMclagKa"
+      },
+      "kind": "dell_sonic",
+      "mclag": {
+        "backup": {
+          "interval": 1,
+          "peer_ip": "10.20.255.4",
+          "source_ip": "10.20.255.5",
+          "vrf": "VrfMclagKa"
+        },
+        "domain": 1,
+        "peer": "fe-sw1",
+        "peer_ip": "10.20.255.0",
+        "peer_link": "PortChannel1",
+        "session_vrf": "VrfMclagKa",
+        "source_ip": "10.20.255.1",
+        "system_mac": "02:5a:00:00:00:01"
+      },
+      "mgmt": "172.21.40.12",
+      "nics": {
+        "eth1": {
+          "desc": "peer-link-1",
+          "link": "fe-sw1:eth1",
+          "native": "Ethernet0",
+          "peer": "fe-sw1:eth1",
+          "role": "peer-link",
+          "vlans": [
+            100,
+            110,
+            120,
+            130,
+            131,
+            200,
+            300,
+            3966
+          ]
+        },
+        "eth13": {
+          "desc": "mclag-keepalive",
+          "link": "fe-sw1:eth13",
+          "mtu": 9216,
+          "native": "Ethernet12",
+          "peer": "fe-sw1:eth13",
+          "role": "keepalive"
+        },
+        "eth2": {
+          "desc": "peer-link-2",
+          "link": "fe-sw1:eth2",
+          "native": "Ethernet1",
+          "peer": "fe-sw1:eth2",
+          "role": "peer-link",
+          "vlans": [
+            100,
+            110,
+            120,
+            130,
+            131,
+            200,
+            300,
+            3966
+          ]
+        },
+        "eth7": {
+          "desc": "k8s-gpu1-eth2",
+          "link": "k8s-gpu1:eth2",
+          "native": "Ethernet6",
+          "peer": "k8s-gpu1:eth2",
+          "role": "bundle-member",
+          "vlan": 100
+        },
+        "eth8": {
+          "desc": "k8s-gpu2-eth2",
+          "link": "k8s-gpu2:eth2",
+          "native": "Ethernet7",
+          "peer": "k8s-gpu2:eth2",
+          "role": "bundle-member",
+          "vlan": 100
+        }
+      },
+      "num_nics": 13,
+      "pair": "fe",
+      "partner": "fe-sw1",
+      "passthrough": true,
+      "portchannels": {
+        "PortChannel1": {
+          "edge": false,
+          "id": 1,
+          "kind": "peer-link",
+          "mclag": false,
+          "member_eths": [
+            "eth1",
+            "eth2"
+          ],
+          "members": [
+            "Ethernet0",
+            "Ethernet1"
+          ],
+          "mode": "trunk",
+          "mtu": 9216,
+          "peer_node": null,
+          "tagged": [],
+          "vlans": [
+            100,
+            110,
+            120,
+            130,
+            131,
+            200,
+            300,
+            3966
+          ]
+        },
+        "PortChannel21": {
+          "edge": true,
+          "id": 21,
+          "kind": "mclag",
+          "mclag": true,
+          "member_eths": [
+            "eth7"
+          ],
+          "members": [
+            "Ethernet6"
+          ],
+          "mode": "access",
+          "mtu": 9216,
+          "peer_node": "k8s-gpu1",
+          "tagged": [
+            120
+          ],
+          "vlans": [
+            100
+          ]
+        },
+        "PortChannel22": {
+          "edge": true,
+          "id": 22,
+          "kind": "mclag",
+          "mclag": true,
+          "member_eths": [
+            "eth8"
+          ],
+          "members": [
+            "Ethernet7"
+          ],
+          "mode": "access",
+          "mtu": 9216,
+          "peer_node": "k8s-gpu2",
+          "tagged": [
+            120
+          ],
+          "vlans": [
+            100
+          ]
+        }
+      },
+      "rails": [],
+      "requires": [],
+      "role": "mclag_member",
+      "section": "switches",
+      "sflow": false,
+      "storm": {
+        "kbps": {
+          "broadcast": 10000,
+          "unknown-multicast": 10000,
+          "unknown-unicast": 10000
+        },
+        "ports": [
+          "Ethernet6",
+          "Ethernet7"
+        ]
+      },
+      "stp": "pvst",
+      "vlans": [
+        100,
+        110,
+        120,
+        130,
+        131,
+        200,
+        300
+      ]
+    },
+    "k8s-gpu1": {
+      "address": "10.20.1.21/24",
+      "bond": {
+        "address": "10.20.1.21/24",
+        "gateway": null,
+        "mac": "02:5a:6f:00:00:01",
+        "members": [
+          "eth1",
+          "eth2"
+        ],
+        "mtu": 9000,
+        "name": "bond0",
+        "pc": 21,
+        "vlan": 100,
+        "vlan_ifs": [
+          {
+            "address": "10.20.12.21/24",
+            "mtu": 9000,
+            "name": "bond0.120",
+            "segment": "storage-data",
+            "table": null,
+            "vlan": 120
+          }
+        ]
+      },
+      "budget": {
+        "layer_gib": 0.0,
+        "mem_gib": 16.0,
+        "state_gib": 12.0,
+        "vcpus": 8.0
+      },
+      "clab_kind": "linux",
+      "container": "sfab-ch05-k8s-gpu1",
+      "disk_gib": 80,
+      "dns_role": null,
+      "eths": [
+        "eth1",
+        "eth2",
+        "eth3",
+        "eth4",
+        "eth5",
+        "eth6",
+        "eth7",
+        "eth8",
+        "eth9",
+        "eth10",
+        "eth11"
+      ],
+      "gateway": null,
+      "group": "gpu",
+      "guest_user": "admin",
+      "ifaces": {},
+      "image": "sfab/vm-node:6-k8s1.35.8",
+      "k8s": "join-worker",
+      "kind": "vm-node",
+      "mgmt": "172.21.40.111",
+      "nics": {
+        "eth1": {
+          "link": "k8s-gpu1:eth1",
+          "mac": "02:5a:6f:00:00:01",
+          "mtu": 9000,
+          "peer": "fe-sw1:eth7",
+          "role": "bond-member",
+          "vlan": 100
+        },
+        "eth10": {
+          "ifname": "rail7",
+          "link": "k8s-gpu1:eth10",
+          "mac": "02:5a:6f:00:00:0a",
+          "mtu": 9000,
+          "peer": "rail-sw1:eth4",
+          "rail": 7,
+          "role": "rail",
+          "vlan": 107
+        },
+        "eth11": {
+          "ifname": "rail8",
+          "link": "k8s-gpu1:eth11",
+          "mac": "02:5a:6f:00:00:0b",
+          "mtu": 9000,
+          "peer": "rail-sw2:eth4",
+          "rail": 8,
+          "role": "rail",
+          "vlan": 108
+        },
+        "eth2": {
+          "link": "k8s-gpu1:eth2",
+          "mac": "02:5a:6f:00:00:02",
+          "mtu": 9000,
+          "peer": "fe-sw2:eth7",
+          "role": "bond-member",
+          "vlan": 100
+        },
+        "eth3": {
+          "address": "10.20.9.21/24",
+          "link": "k8s-gpu1:eth3",
+          "mac": "02:5a:6f:00:00:03",
+          "peer": "oob-sw:eth1",
+          "role": "oob",
+          "vlan": 90
+        },
+        "eth4": {
+          "ifname": "rail1",
+          "link": "k8s-gpu1:eth4",
+          "mac": "02:5a:6f:00:00:04",
+          "mtu": 9000,
+          "peer": "rail-sw1:eth1",
+          "rail": 1,
+          "role": "rail",
+          "vlan": 101
+        },
+        "eth5": {
+          "ifname": "rail2",
+          "link": "k8s-gpu1:eth5",
+          "mac": "02:5a:6f:00:00:05",
+          "mtu": 9000,
+          "peer": "rail-sw2:eth1",
+          "rail": 2,
+          "role": "rail",
+          "vlan": 102
+        },
+        "eth6": {
+          "ifname": "rail3",
+          "link": "k8s-gpu1:eth6",
+          "mac": "02:5a:6f:00:00:06",
+          "mtu": 9000,
+          "peer": "rail-sw1:eth2",
+          "rail": 3,
+          "role": "rail",
+          "vlan": 103
+        },
+        "eth7": {
+          "ifname": "rail4",
+          "link": "k8s-gpu1:eth7",
+          "mac": "02:5a:6f:00:00:07",
+          "mtu": 9000,
+          "peer": "rail-sw2:eth2",
+          "rail": 4,
+          "role": "rail",
+          "vlan": 104
+        },
+        "eth8": {
+          "ifname": "rail5",
+          "link": "k8s-gpu1:eth8",
+          "mac": "02:5a:6f:00:00:08",
+          "mtu": 9000,
+          "peer": "rail-sw1:eth3",
+          "rail": 5,
+          "role": "rail",
+          "vlan": 105
+        },
+        "eth9": {
+          "ifname": "rail6",
+          "link": "k8s-gpu1:eth9",
+          "mac": "02:5a:6f:00:00:09",
+          "mtu": 9000,
+          "peer": "rail-sw2:eth3",
+          "rail": 6,
+          "role": "rail",
+          "vlan": 106
+        }
+      },
+      "oob": {
+        "address": "10.20.9.21/24",
+        "eth": "eth3",
+        "gateway": null,
+        "netns": "bmc",
+        "services": [
+          "ssh",
+          "https"
+        ],
+        "table": 100
+      },
+      "rails": {
+        "1": {
+          "address": "10.21.1.11/24",
+          "eth": "eth4",
+          "ifname": "rail1",
+          "switch": "rail-sw1",
+          "switch_eth": "eth1",
+          "switch_native": "Ethernet0"
+        },
+        "2": {
+          "address": "10.21.2.11/24",
+          "eth": "eth5",
+          "ifname": "rail2",
+          "switch": "rail-sw2",
+          "switch_eth": "eth1",
+          "switch_native": "Ethernet0"
+        },
+        "3": {
+          "address": "10.21.3.11/24",
+          "eth": "eth6",
+          "ifname": "rail3",
+          "switch": "rail-sw1",
+          "switch_eth": "eth2",
+          "switch_native": "Ethernet1"
+        },
+        "4": {
+          "address": "10.21.4.11/24",
+          "eth": "eth7",
+          "ifname": "rail4",
+          "switch": "rail-sw2",
+          "switch_eth": "eth2",
+          "switch_native": "Ethernet1"
+        },
+        "5": {
+          "address": "10.21.5.11/24",
+          "eth": "eth8",
+          "ifname": "rail5",
+          "switch": "rail-sw1",
+          "switch_eth": "eth3",
+          "switch_native": "Ethernet2"
+        },
+        "6": {
+          "address": "10.21.6.11/24",
+          "eth": "eth9",
+          "ifname": "rail6",
+          "switch": "rail-sw2",
+          "switch_eth": "eth3",
+          "switch_native": "Ethernet2"
+        },
+        "7": {
+          "address": "10.21.7.11/24",
+          "eth": "eth10",
+          "ifname": "rail7",
+          "switch": "rail-sw1",
+          "switch_eth": "eth4",
+          "switch_native": "Ethernet3"
+        },
+        "8": {
+          "address": "10.21.8.11/24",
+          "eth": "eth11",
+          "ifname": "rail8",
+          "switch": "rail-sw2",
+          "switch_eth": "eth4",
+          "switch_native": "Ethernet3"
+        }
+      },
+      "relay": {
+        "bridge": "relay0",
+        "namespaces": [
+          "gpu1",
+          "gpu2",
+          "gpu3",
+          "gpu4",
+          "gpu5",
+          "gpu6",
+          "gpu7",
+          "gpu8"
+        ],
+        "prefix": "10.21.250.0/24",
+        "rp_filter": 2
+      },
+      "requires": [],
+      "resolver": "dns-res1",
+      "resolver_address": "10.20.13.21",
+      "resolvers": [
+        "dns-res1",
+        "dns-res2"
+      ],
+      "role": "gpu",
+      "section": "hosts",
+      "vlan": 100
+    },
+    "k8s-gpu2": {
+      "address": "10.20.1.22/24",
+      "bond": {
+        "address": "10.20.1.22/24",
+        "gateway": null,
+        "mac": "02:5a:70:00:00:01",
+        "members": [
+          "eth1",
+          "eth2"
+        ],
+        "mtu": 9000,
+        "name": "bond0",
+        "pc": 22,
+        "vlan": 100,
+        "vlan_ifs": [
+          {
+            "address": "10.20.12.22/24",
+            "mtu": 9000,
+            "name": "bond0.120",
+            "segment": "storage-data",
+            "table": null,
+            "vlan": 120
+          }
+        ]
+      },
+      "budget": {
+        "layer_gib": 0.0,
+        "mem_gib": 16.0,
+        "state_gib": 12.0,
+        "vcpus": 8.0
+      },
+      "clab_kind": "linux",
+      "container": "sfab-ch05-k8s-gpu2",
+      "disk_gib": 80,
+      "dns_role": null,
+      "eths": [
+        "eth1",
+        "eth2",
+        "eth3",
+        "eth4",
+        "eth5",
+        "eth6",
+        "eth7",
+        "eth8",
+        "eth9",
+        "eth10",
+        "eth11"
+      ],
+      "gateway": null,
+      "group": "gpu",
+      "guest_user": "admin",
+      "ifaces": {},
+      "image": "sfab/vm-node:6-k8s1.35.8",
+      "k8s": "join-worker",
+      "kind": "vm-node",
+      "mgmt": "172.21.40.112",
+      "nics": {
+        "eth1": {
+          "link": "k8s-gpu2:eth1",
+          "mac": "02:5a:70:00:00:01",
+          "mtu": 9000,
+          "peer": "fe-sw1:eth8",
+          "role": "bond-member",
+          "vlan": 100
+        },
+        "eth10": {
+          "ifname": "rail7",
+          "link": "k8s-gpu2:eth10",
+          "mac": "02:5a:70:00:00:0a",
+          "mtu": 9000,
+          "peer": "rail-sw1:eth8",
+          "rail": 7,
+          "role": "rail",
+          "vlan": 107
+        },
+        "eth11": {
+          "ifname": "rail8",
+          "link": "k8s-gpu2:eth11",
+          "mac": "02:5a:70:00:00:0b",
+          "mtu": 9000,
+          "peer": "rail-sw2:eth8",
+          "rail": 8,
+          "role": "rail",
+          "vlan": 108
+        },
+        "eth2": {
+          "link": "k8s-gpu2:eth2",
+          "mac": "02:5a:70:00:00:02",
+          "mtu": 9000,
+          "peer": "fe-sw2:eth8",
+          "role": "bond-member",
+          "vlan": 100
+        },
+        "eth3": {
+          "address": "10.20.9.22/24",
+          "link": "k8s-gpu2:eth3",
+          "mac": "02:5a:70:00:00:03",
+          "peer": "oob-sw:eth2",
+          "role": "oob",
+          "vlan": 90
+        },
+        "eth4": {
+          "ifname": "rail1",
+          "link": "k8s-gpu2:eth4",
+          "mac": "02:5a:70:00:00:04",
+          "mtu": 9000,
+          "peer": "rail-sw1:eth5",
+          "rail": 1,
+          "role": "rail",
+          "vlan": 101
+        },
+        "eth5": {
+          "ifname": "rail2",
+          "link": "k8s-gpu2:eth5",
+          "mac": "02:5a:70:00:00:05",
+          "mtu": 9000,
+          "peer": "rail-sw2:eth5",
+          "rail": 2,
+          "role": "rail",
+          "vlan": 102
+        },
+        "eth6": {
+          "ifname": "rail3",
+          "link": "k8s-gpu2:eth6",
+          "mac": "02:5a:70:00:00:06",
+          "mtu": 9000,
+          "peer": "rail-sw1:eth6",
+          "rail": 3,
+          "role": "rail",
+          "vlan": 103
+        },
+        "eth7": {
+          "ifname": "rail4",
+          "link": "k8s-gpu2:eth7",
+          "mac": "02:5a:70:00:00:07",
+          "mtu": 9000,
+          "peer": "rail-sw2:eth6",
+          "rail": 4,
+          "role": "rail",
+          "vlan": 104
+        },
+        "eth8": {
+          "ifname": "rail5",
+          "link": "k8s-gpu2:eth8",
+          "mac": "02:5a:70:00:00:08",
+          "mtu": 9000,
+          "peer": "rail-sw1:eth7",
+          "rail": 5,
+          "role": "rail",
+          "vlan": 105
+        },
+        "eth9": {
+          "ifname": "rail6",
+          "link": "k8s-gpu2:eth9",
+          "mac": "02:5a:70:00:00:09",
+          "mtu": 9000,
+          "peer": "rail-sw2:eth7",
+          "rail": 6,
+          "role": "rail",
+          "vlan": 106
+        }
+      },
+      "oob": {
+        "address": "10.20.9.22/24",
+        "eth": "eth3",
+        "gateway": null,
+        "netns": "bmc",
+        "services": [
+          "ssh",
+          "https"
+        ],
+        "table": 100
+      },
+      "rails": {
+        "1": {
+          "address": "10.21.1.12/24",
+          "eth": "eth4",
+          "ifname": "rail1",
+          "switch": "rail-sw1",
+          "switch_eth": "eth5",
+          "switch_native": "Ethernet4"
+        },
+        "2": {
+          "address": "10.21.2.12/24",
+          "eth": "eth5",
+          "ifname": "rail2",
+          "switch": "rail-sw2",
+          "switch_eth": "eth5",
+          "switch_native": "Ethernet4"
+        },
+        "3": {
+          "address": "10.21.3.12/24",
+          "eth": "eth6",
+          "ifname": "rail3",
+          "switch": "rail-sw1",
+          "switch_eth": "eth6",
+          "switch_native": "Ethernet5"
+        },
+        "4": {
+          "address": "10.21.4.12/24",
+          "eth": "eth7",
+          "ifname": "rail4",
+          "switch": "rail-sw2",
+          "switch_eth": "eth6",
+          "switch_native": "Ethernet5"
+        },
+        "5": {
+          "address": "10.21.5.12/24",
+          "eth": "eth8",
+          "ifname": "rail5",
+          "switch": "rail-sw1",
+          "switch_eth": "eth7",
+          "switch_native": "Ethernet6"
+        },
+        "6": {
+          "address": "10.21.6.12/24",
+          "eth": "eth9",
+          "ifname": "rail6",
+          "switch": "rail-sw2",
+          "switch_eth": "eth7",
+          "switch_native": "Ethernet6"
+        },
+        "7": {
+          "address": "10.21.7.12/24",
+          "eth": "eth10",
+          "ifname": "rail7",
+          "switch": "rail-sw1",
+          "switch_eth": "eth8",
+          "switch_native": "Ethernet7"
+        },
+        "8": {
+          "address": "10.21.8.12/24",
+          "eth": "eth11",
+          "ifname": "rail8",
+          "switch": "rail-sw2",
+          "switch_eth": "eth8",
+          "switch_native": "Ethernet7"
+        }
+      },
+      "relay": {
+        "bridge": "relay0",
+        "namespaces": [
+          "gpu1",
+          "gpu2",
+          "gpu3",
+          "gpu4",
+          "gpu5",
+          "gpu6",
+          "gpu7",
+          "gpu8"
+        ],
+        "prefix": "10.21.250.0/24",
+        "rp_filter": 2
+      },
+      "requires": [],
+      "resolver": "dns-res1",
+      "resolver_address": "10.20.13.21",
+      "resolvers": [
+        "dns-res1",
+        "dns-res2"
+      ],
+      "role": "gpu",
+      "section": "hosts",
+      "vlan": 100
+    },
+    "oob-sw": {
+      "access": {
+        "Ethernet0": {
+          "edge": false,
+          "eth": "eth1",
+          "kind": "oob",
+          "mtu": null,
+          "peer": "k8s-gpu1:eth3",
+          "vlan": 90
+        },
+        "Ethernet1": {
+          "edge": false,
+          "eth": "eth2",
+          "kind": "oob",
+          "mtu": null,
+          "peer": "k8s-gpu2:eth3",
+          "vlan": 90
+        }
+      },
+      "budget": {
+        "layer_gib": 8.0,
+        "mem_gib": 4.6,
+        "state_gib": 0.0,
+        "vcpus": 2.0
+      },
+      "clab_kind": "dell_sonic",
+      "container": "sfab-ch05-oob-sw",
+      "edge": [],
+      "eths": [
+        "eth1",
+        "eth2"
+      ],
+      "group": "oob",
+      "image": "vrnetlab/dell_sonic:4.6.0",
+      "keepalive": null,
+      "kind": "dell_sonic",
+      "mclag": null,
+      "mgmt": "172.21.40.31",
+      "nics": {
+        "eth1": {
+          "desc": "k8s-gpu1-eth3",
+          "link": "k8s-gpu1:eth3",
+          "native": "Ethernet0",
+          "peer": "k8s-gpu1:eth3",
+          "role": "oob",
+          "vlan": 90
+        },
+        "eth2": {
+          "desc": "k8s-gpu2-eth3",
+          "link": "k8s-gpu2:eth3",
+          "native": "Ethernet1",
+          "peer": "k8s-gpu2:eth3",
+          "role": "oob",
+          "vlan": 90
+        }
+      },
+      "num_nics": 2,
+      "pair": null,
+      "partner": null,
+      "passthrough": false,
+      "portchannels": {},
+      "rails": [],
+      "requires": [],
+      "role": "oob_access",
+      "section": "switches",
+      "sflow": false,
+      "storm": {
+        "kbps": {},
+        "ports": []
+      },
+      "stp": null,
+      "vlans": [
+        90
+      ]
+    },
+    "rail-sw1": {
+      "access": {
+        "Ethernet0": {
+          "edge": true,
+          "eth": "eth1",
+          "kind": "rail",
+          "mtu": 9216,
+          "peer": "k8s-gpu1:eth4",
+          "vlan": 101
+        },
+        "Ethernet1": {
+          "edge": true,
+          "eth": "eth2",
+          "kind": "rail",
+          "mtu": 9216,
+          "peer": "k8s-gpu1:eth6",
+          "vlan": 103
+        },
+        "Ethernet2": {
+          "edge": true,
+          "eth": "eth3",
+          "kind": "rail",
+          "mtu": 9216,
+          "peer": "k8s-gpu1:eth8",
+          "vlan": 105
+        },
+        "Ethernet3": {
+          "edge": true,
+          "eth": "eth4",
+          "kind": "rail",
+          "mtu": 9216,
+          "peer": "k8s-gpu1:eth10",
+          "vlan": 107
+        },
+        "Ethernet4": {
+          "edge": true,
+          "eth": "eth5",
+          "kind": "rail",
+          "mtu": 9216,
+          "peer": "k8s-gpu2:eth4",
+          "vlan": 101
+        },
+        "Ethernet5": {
+          "edge": true,
+          "eth": "eth6",
+          "kind": "rail",
+          "mtu": 9216,
+          "peer": "k8s-gpu2:eth6",
+          "vlan": 103
+        },
+        "Ethernet6": {
+          "edge": true,
+          "eth": "eth7",
+          "kind": "rail",
+          "mtu": 9216,
+          "peer": "k8s-gpu2:eth8",
+          "vlan": 105
+        },
+        "Ethernet7": {
+          "edge": true,
+          "eth": "eth8",
+          "kind": "rail",
+          "mtu": 9216,
+          "peer": "k8s-gpu2:eth10",
+          "vlan": 107
+        }
+      },
+      "budget": {
+        "layer_gib": 8.0,
+        "mem_gib": 4.6,
+        "state_gib": 0.0,
+        "vcpus": 2.0
+      },
+      "clab_kind": "dell_sonic",
+      "container": "sfab-ch05-rail-sw1",
+      "edge": [
+        "Ethernet0",
+        "Ethernet1",
+        "Ethernet2",
+        "Ethernet3",
+        "Ethernet4",
+        "Ethernet5",
+        "Ethernet6",
+        "Ethernet7"
+      ],
+      "eths": [
+        "eth1",
+        "eth2",
+        "eth3",
+        "eth4",
+        "eth5",
+        "eth6",
+        "eth7",
+        "eth8"
+      ],
+      "group": "rail",
+      "image": "vrnetlab/dell_sonic:4.6.0",
+      "keepalive": null,
+      "kind": "dell_sonic",
+      "mclag": null,
+      "mgmt": "172.21.40.21",
+      "nics": {
+        "eth1": {
+          "desc": "k8s-gpu1-rail1",
+          "link": "k8s-gpu1:eth4",
+          "native": "Ethernet0",
+          "peer": "k8s-gpu1:eth4",
+          "rail": 1,
+          "role": "rail",
+          "vlan": 101
+        },
+        "eth2": {
+          "desc": "k8s-gpu1-rail3",
+          "link": "k8s-gpu1:eth6",
+          "native": "Ethernet1",
+          "peer": "k8s-gpu1:eth6",
+          "rail": 3,
+          "role": "rail",
+          "vlan": 103
+        },
+        "eth3": {
+          "desc": "k8s-gpu1-rail5",
+          "link": "k8s-gpu1:eth8",
+          "native": "Ethernet2",
+          "peer": "k8s-gpu1:eth8",
+          "rail": 5,
+          "role": "rail",
+          "vlan": 105
+        },
+        "eth4": {
+          "desc": "k8s-gpu1-rail7",
+          "link": "k8s-gpu1:eth10",
+          "native": "Ethernet3",
+          "peer": "k8s-gpu1:eth10",
+          "rail": 7,
+          "role": "rail",
+          "vlan": 107
+        },
+        "eth5": {
+          "desc": "k8s-gpu2-rail1",
+          "link": "k8s-gpu2:eth4",
+          "native": "Ethernet4",
+          "peer": "k8s-gpu2:eth4",
+          "rail": 1,
+          "role": "rail",
+          "vlan": 101
+        },
+        "eth6": {
+          "desc": "k8s-gpu2-rail3",
+          "link": "k8s-gpu2:eth6",
+          "native": "Ethernet5",
+          "peer": "k8s-gpu2:eth6",
+          "rail": 3,
+          "role": "rail",
+          "vlan": 103
+        },
+        "eth7": {
+          "desc": "k8s-gpu2-rail5",
+          "link": "k8s-gpu2:eth8",
+          "native": "Ethernet6",
+          "peer": "k8s-gpu2:eth8",
+          "rail": 5,
+          "role": "rail",
+          "vlan": 105
+        },
+        "eth8": {
+          "desc": "k8s-gpu2-rail7",
+          "link": "k8s-gpu2:eth10",
+          "native": "Ethernet7",
+          "peer": "k8s-gpu2:eth10",
+          "rail": 7,
+          "role": "rail",
+          "vlan": 107
+        }
+      },
+      "num_nics": 8,
+      "pair": null,
+      "partner": null,
+      "passthrough": false,
+      "portchannels": {},
+      "rails": [
+        1,
+        3,
+        5,
+        7
+      ],
+      "requires": [],
+      "role": "rail_vlan",
+      "section": "switches",
+      "sflow": false,
+      "storm": {
+        "kbps": {
+          "broadcast": 10000,
+          "unknown-multicast": 10000,
+          "unknown-unicast": 10000
+        },
+        "ports": [
+          "Ethernet0",
+          "Ethernet1",
+          "Ethernet2",
+          "Ethernet3",
+          "Ethernet4",
+          "Ethernet5",
+          "Ethernet6",
+          "Ethernet7"
+        ]
+      },
+      "stp": "pvst",
+      "vlans": [
+        101,
+        103,
+        105,
+        107
+      ]
+    },
+    "rail-sw2": {
+      "access": {
+        "Ethernet0": {
+          "edge": true,
+          "eth": "eth1",
+          "kind": "rail",
+          "mtu": 9216,
+          "peer": "k8s-gpu1:eth5",
+          "vlan": 102
+        },
+        "Ethernet1": {
+          "edge": true,
+          "eth": "eth2",
+          "kind": "rail",
+          "mtu": 9216,
+          "peer": "k8s-gpu1:eth7",
+          "vlan": 104
+        },
+        "Ethernet2": {
+          "edge": true,
+          "eth": "eth3",
+          "kind": "rail",
+          "mtu": 9216,
+          "peer": "k8s-gpu1:eth9",
+          "vlan": 106
+        },
+        "Ethernet3": {
+          "edge": true,
+          "eth": "eth4",
+          "kind": "rail",
+          "mtu": 9216,
+          "peer": "k8s-gpu1:eth11",
+          "vlan": 108
+        },
+        "Ethernet4": {
+          "edge": true,
+          "eth": "eth5",
+          "kind": "rail",
+          "mtu": 9216,
+          "peer": "k8s-gpu2:eth5",
+          "vlan": 102
+        },
+        "Ethernet5": {
+          "edge": true,
+          "eth": "eth6",
+          "kind": "rail",
+          "mtu": 9216,
+          "peer": "k8s-gpu2:eth7",
+          "vlan": 104
+        },
+        "Ethernet6": {
+          "edge": true,
+          "eth": "eth7",
+          "kind": "rail",
+          "mtu": 9216,
+          "peer": "k8s-gpu2:eth9",
+          "vlan": 106
+        },
+        "Ethernet7": {
+          "edge": true,
+          "eth": "eth8",
+          "kind": "rail",
+          "mtu": 9216,
+          "peer": "k8s-gpu2:eth11",
+          "vlan": 108
+        }
+      },
+      "budget": {
+        "layer_gib": 8.0,
+        "mem_gib": 4.6,
+        "state_gib": 0.0,
+        "vcpus": 2.0
+      },
+      "clab_kind": "dell_sonic",
+      "container": "sfab-ch05-rail-sw2",
+      "edge": [
+        "Ethernet0",
+        "Ethernet1",
+        "Ethernet2",
+        "Ethernet3",
+        "Ethernet4",
+        "Ethernet5",
+        "Ethernet6",
+        "Ethernet7"
+      ],
+      "eths": [
+        "eth1",
+        "eth2",
+        "eth3",
+        "eth4",
+        "eth5",
+        "eth6",
+        "eth7",
+        "eth8"
+      ],
+      "group": "rail",
+      "image": "vrnetlab/dell_sonic:4.6.0",
+      "keepalive": null,
+      "kind": "dell_sonic",
+      "mclag": null,
+      "mgmt": "172.21.40.22",
+      "nics": {
+        "eth1": {
+          "desc": "k8s-gpu1-rail2",
+          "link": "k8s-gpu1:eth5",
+          "native": "Ethernet0",
+          "peer": "k8s-gpu1:eth5",
+          "rail": 2,
+          "role": "rail",
+          "vlan": 102
+        },
+        "eth2": {
+          "desc": "k8s-gpu1-rail4",
+          "link": "k8s-gpu1:eth7",
+          "native": "Ethernet1",
+          "peer": "k8s-gpu1:eth7",
+          "rail": 4,
+          "role": "rail",
+          "vlan": 104
+        },
+        "eth3": {
+          "desc": "k8s-gpu1-rail6",
+          "link": "k8s-gpu1:eth9",
+          "native": "Ethernet2",
+          "peer": "k8s-gpu1:eth9",
+          "rail": 6,
+          "role": "rail",
+          "vlan": 106
+        },
+        "eth4": {
+          "desc": "k8s-gpu1-rail8",
+          "link": "k8s-gpu1:eth11",
+          "native": "Ethernet3",
+          "peer": "k8s-gpu1:eth11",
+          "rail": 8,
+          "role": "rail",
+          "vlan": 108
+        },
+        "eth5": {
+          "desc": "k8s-gpu2-rail2",
+          "link": "k8s-gpu2:eth5",
+          "native": "Ethernet4",
+          "peer": "k8s-gpu2:eth5",
+          "rail": 2,
+          "role": "rail",
+          "vlan": 102
+        },
+        "eth6": {
+          "desc": "k8s-gpu2-rail4",
+          "link": "k8s-gpu2:eth7",
+          "native": "Ethernet5",
+          "peer": "k8s-gpu2:eth7",
+          "rail": 4,
+          "role": "rail",
+          "vlan": 104
+        },
+        "eth7": {
+          "desc": "k8s-gpu2-rail6",
+          "link": "k8s-gpu2:eth9",
+          "native": "Ethernet6",
+          "peer": "k8s-gpu2:eth9",
+          "rail": 6,
+          "role": "rail",
+          "vlan": 106
+        },
+        "eth8": {
+          "desc": "k8s-gpu2-rail8",
+          "link": "k8s-gpu2:eth11",
+          "native": "Ethernet7",
+          "peer": "k8s-gpu2:eth11",
+          "rail": 8,
+          "role": "rail",
+          "vlan": 108
+        }
+      },
+      "num_nics": 8,
+      "pair": null,
+      "partner": null,
+      "passthrough": false,
+      "portchannels": {},
+      "rails": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "requires": [],
+      "role": "rail_vlan",
+      "section": "switches",
+      "sflow": false,
+      "storm": {
+        "kbps": {
+          "broadcast": 10000,
+          "unknown-multicast": 10000,
+          "unknown-unicast": 10000
+        },
+        "ports": [
+          "Ethernet0",
+          "Ethernet1",
+          "Ethernet2",
+          "Ethernet3",
+          "Ethernet4",
+          "Ethernet5",
+          "Ethernet6",
+          "Ethernet7"
+        ]
+      },
+      "stp": "pvst",
+      "vlans": [
+        102,
+        104,
+        106,
+        108
+      ]
+    }
+  },
+  "ntp": {
+    "allow": [
+      "nodes",
+      "ingress",
+      "stor-mgmt",
+      "bastion",
+      "oob",
+      "services-a",
+      "services-b"
+    ],
+    "local_stratum": 10,
+    "nts": false,
+    "reference_stratum": 2,
+    "servers": {},
+    "upstream": null
+  },
+  "order": [
+    "fe-sw1",
+    "fe-sw2",
+    "rail-sw1",
+    "rail-sw2",
+    "oob-sw",
+    "k8s-gpu1",
+    "k8s-gpu2"
+  ],
+  "org": {
+    "domain": "tarnwick.example",
+    "label_domain": "tarnwick.example",
+    "name": "Tarnwick",
+    "short": "tw",
+    "zone": "ai.tarnwick.example"
+  },
+  "populations": {
+    "enterprise": {
+      "answer": "vip:gw-users",
+      "answer_address": "10.20.11.210",
+      "audience": "enterprise",
+      "clients": [
+        "ent-client"
+      ],
+      "gateway": "gw-users",
+      "prefixes": [
+        "10.24.10.0/24"
+      ],
+      "resolver": "ent-dns",
+      "resolver_address": "10.24.10.53",
+      "resolvers": [
+        "ent-dns"
+      ],
+      "segments": [
+        "enterprise"
+      ],
+      "translated": false,
+      "zones": [
+        "enterprise"
+      ]
+    },
+    "nodes": {
+      "answer": "vip:gw-internal",
+      "answer_address": "10.20.11.200",
+      "audience": "internal",
+      "clients": [],
+      "gateway": "gw-internal",
+      "prefixes": [
+        "10.20.1.0/24",
+        "10.20.3.0/24"
+      ],
+      "resolver": "dns-res1",
+      "resolver_address": "10.20.13.21",
+      "resolvers": [
+        "dns-res1",
+        "dns-res2"
+      ],
+      "segments": [
+        "nodes",
+        "bastion"
+      ],
+      "translated": false,
+      "zones": [
+        "k8s-nodes",
+        "bastion"
+      ]
+    },
+    "operator": {
+      "answer": "vip:gw-internal",
+      "answer_address": "10.20.11.200",
+      "audience": "internal",
+      "clients": [
+        "ops-client"
+      ],
+      "gateway": "gw-internal",
+      "prefixes": [
+        "192.0.2.0/30"
+      ],
+      "resolver": "ops-dns",
+      "resolver_address": "192.0.2.10",
+      "resolvers": [
+        "ops-dns"
+      ],
+      "segments": [
+        "operator-site"
+      ],
+      "translated": false,
+      "zones": [
+        "operator-vpn"
+      ]
+    },
+    "web": {
+      "answer": "public",
+      "answer_address": "198.51.100.2",
+      "audience": "none",
+      "clients": [
+        "web-client"
+      ],
+      "gateway": null,
+      "prefixes": [
+        "192.0.2.16/30"
+      ],
+      "resolver": "ops-dns",
+      "resolver_address": "192.0.2.10",
+      "resolvers": [
+        "ops-dns"
+      ],
+      "segments": [
+        "web"
+      ],
+      "translated": false,
+      "zones": [
+        "uplink"
+      ]
+    }
+  },
+  "prefix": "sfab-ch05-",
+  "prints": [
+    "rail-sw1",
+    "rail-sw2"
+  ],
+  "profile": "a",
+  "registry": null,
+  "roles": {
+    "gpu": [
+      "k8s-gpu1",
+      "k8s-gpu2"
+    ],
+    "mclag_member": [
+      "fe-sw1",
+      "fe-sw2"
+    ],
+    "oob_access": [
+      "oob-sw"
+    ],
+    "rail_vlan": [
+      "rail-sw1",
+      "rail-sw2"
+    ]
+  },
+  "schema": 1,
+  "stages": {
+    "bastion": null,
+    "ca_init": false,
+    "cluster": false,
+    "fw": null,
+    "fw_bootstrap": false,
+    "guest_hold": true,
+    "guests": [
+      "k8s-gpu1",
+      "k8s-gpu2"
+    ],
+    "kubectl": null,
+    "modules": [
+      "bonding"
+    ],
+    "pairs": [
+      "fe"
+    ],
+    "serving": false,
+    "storage": [],
+    "storage_setup": false,
+    "switches": [
+      "fe-sw1",
+      "fe-sw2",
+      "oob-sw",
+      "rail-sw1",
+      "rail-sw2"
+    ],
+    "wait_fabric": "mclag"
+  },
+  "state": "one",
+  "step": 7,
+  "switch": {
+    "factory_mtu": 9100,
+    "max_mtu": 9216,
+    "max_nics": 56,
+    "mgmt_vrf": "mgmt",
+    "slirp": "10.0.0.0/24",
+    "user": "admin"
+  },
+  "timeouts": {
+    "cluster_poll_s": 30,
+    "cluster_polls": 240,
+    "events_quiet_s": 90,
+    "fabric_consecutive": 2,
+    "fabric_poll_s": 15,
+    "fabric_polls": 120,
+    "fw_enforced_pause_s": 20,
+    "fw_enforced_tries": 3,
+    "fw_healthy_s": 1800,
+    "guest_hold_poll_s": 5,
+    "guest_hold_s": 3600,
+    "settle_frontend": {
+      "bounce_after": 2,
+      "bounce_max_nodes": 4,
+      "clean_rounds": 3,
+      "max_rounds": 40,
+      "peer_offsets": [
+        1,
+        5,
+        11,
+        17,
+        23,
+        29
+      ]
+    },
+    "settle_rails": {
+      "clean_rounds": 2,
+      "max_rounds": 10
+    },
+    "stop_control_s": 180,
+    "stop_gpu_s": 300,
+    "stop_storage_s": 120,
+    "switch_boot_s": 1200,
+    "trident_poll_s": 15,
+    "trident_polls": 12
+  },
+  "trace": {
+    "rails": {
+      "count": 3,
+      "df_sizes": [
+        9000,
+        9001
+      ],
+      "flows": [
+        {
+          "id": "same-rail",
+          "rail": 1
+        },
+        {
+          "id": "cross-rail",
+          "rail": 1,
+          "to_rail": 2
+        }
+      ],
+      "from": "k8s-gpu1",
+      "interval_s": 0.5,
+      "points": [
+        {
+          "id": "1-k8s-gpu1-relay0",
+          "iface": "relay0",
+          "node": "k8s-gpu1"
+        },
+        {
+          "eth": "eth1",
+          "id": "2-rail-sw1-Ethernet0",
+          "node": "rail-sw1"
+        },
+        {
+          "eth": "eth1",
+          "id": "2-rail-sw2-Ethernet0",
+          "node": "rail-sw2"
+        },
+        {
+          "eth": "eth5",
+          "id": "3-rail-sw1-Ethernet4",
+          "node": "rail-sw1"
+        },
+        {
+          "eth": "eth5",
+          "id": "3-rail-sw2-Ethernet4",
+          "node": "rail-sw2"
+        },
+        {
+          "id": "4-k8s-gpu2-relay0",
+          "iface": "relay0",
+          "node": "k8s-gpu2"
+        }
+      ],
+      "to": "k8s-gpu2"
+    }
+  },
+  "variant": null,
+  "warnings": [],
+  "watchdog": {
+    "floor_gib": 16.0,
+    "order": [
+      "k8s-gpu2",
+      "k8s-gpu1"
+    ]
+  }
+}

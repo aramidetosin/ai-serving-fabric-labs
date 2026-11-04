@@ -1,0 +1,104 @@
+{
+  "fw": "fw",
+  "lab": "sfab-ch04",
+  "public": "198.51.100.2",
+  "pull": {
+    "cri": "unix:///run/containerd/containerd.sock",
+    "expect": {
+      "from_zone": "k8s-nodes",
+      "nat_rule": "internet-snat",
+      "rule": "nodes-to-registry",
+      "to_zone": "uplink"
+    },
+    "image": "docker.io/alpine/helm@sha256:e29ba4b553fa9648d0a35a9e29c8744c597a3e400d5574daf0f20a4c3854b852",
+    "image_key": "node_helm",
+    "node": "k8s-gpu2",
+    "node_addr": "10.20.1.22",
+    "points": [
+      {
+        "depth": 1,
+        "eth": "eth1",
+        "group": "inside",
+        "id": "1-fw-ae1-leg1",
+        "node": "fw",
+        "side": "inside",
+        "vlan": 100
+      },
+      {
+        "depth": 1,
+        "eth": "eth2",
+        "group": "inside",
+        "id": "1-fw-ae1-leg2",
+        "node": "fw",
+        "side": "inside",
+        "vlan": 100
+      },
+      {
+        "depth": 2,
+        "eth": "eth5",
+        "group": null,
+        "id": "2-fw-ethernet1-5",
+        "node": "fw",
+        "side": "outside",
+        "vlan": null
+      }
+    ],
+    "registry": "inet-registry",
+    "registry_addr": "192.0.2.6",
+    "registry_port": 5000,
+    "translated_src": "198.51.100.2"
+  },
+  "schema": 1,
+  "sessions": [
+    {
+      "ca_root": "/shared/ca/root.crt",
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "dst_addr": "10.20.11.210",
+      "expect": {
+        "from_zone": "enterprise",
+        "nat_rule": null,
+        "rule": "staff-to-users-gateway",
+        "status": 200,
+        "to_zone": "ingress"
+      },
+      "fqdn": "llm.ai.tarnwick.example",
+      "gateway": "gw-users",
+      "hold_s": 30,
+      "id": "enterprise",
+      "msg": "sfab-ch04-enterprise",
+      "path": "/echo?msg=sfab-ch04-enterprise",
+      "pin": false,
+      "port": 443,
+      "resolver": "ent-dns",
+      "sport": 42443,
+      "translated_addr": null,
+      "vip": "10.20.11.210"
+    },
+    {
+      "ca_root": "/shared/ca/root.crt",
+      "client": "ops-client",
+      "client_addr": "192.0.2.2",
+      "dst_addr": "10.20.11.200",
+      "expect": {
+        "from_zone": "operator-vpn",
+        "nat_rule": null,
+        "rule": "operator-to-internal-gateway",
+        "status": 200,
+        "to_zone": "ingress"
+      },
+      "fqdn": "llm.ai.tarnwick.example",
+      "gateway": "gw-internal",
+      "hold_s": 30,
+      "id": "operator",
+      "msg": "sfab-ch04-operator",
+      "path": "/echo?msg=sfab-ch04-operator",
+      "pin": true,
+      "port": 443,
+      "resolver": null,
+      "sport": 42444,
+      "translated_addr": null,
+      "vip": "10.20.11.200"
+    }
+  ]
+}

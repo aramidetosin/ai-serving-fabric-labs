@@ -1,0 +1,10 @@
+# A client (sfab/client): SLUG SURFACE COMMAND. The probes a client runs for its population are in
+# population.list.
+ip_addr              exec-json   ip -j addr show
+table_main           exec        ip route show
+table_mgmt           exec        ip route show table {inv.guest.tables.mgmt}
+tx_container         host        container_offloads
+container_links      host-json   container_links
+ping_gw              exec        ping -c 3 -W 2 {gateway}
+resolv_conf          exec        cat /etc/resolv.conf
+ca_bundle            exec        python3 -c 'import sys; r = open(sys.argv[1]).read().strip(); b = open(sys.argv[2]).read(); print("root in bundle" if r and r in b else "root not in bundle")' {ca_root} /etc/ssl/certs/ca-certificates.crt

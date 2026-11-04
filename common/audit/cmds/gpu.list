@@ -1,0 +1,7 @@
+# A GPU node, after vm-node.list: the in-node relay and the rails. {r} lines run once per rail.
+netns_list           guest       ip netns list
+ns_routes_{r}        guest       ip -n {ns} route show
+ns_rpf_{r}           guest       ip netns exec {ns} sh -c 'for f in /proc/sys/net/ipv4/conf/*/rp_filter; do d=${f%/rp_filter}; echo "${d##*/} $(cat "$f")"; done'
+same_rail_{r}        guest       ip netns exec {ns} ping -c 3 -W 2 -M do -s 8972 {peer_addr}
+cross_rail_{r}       guest       ip netns exec {ns} ping -c 3 -W 2 {next_peer_addr}
+cross_route_{r}      guest       ip -n {ns} route get {next_peer_addr}

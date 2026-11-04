@@ -1,0 +1,220 @@
+{
+  "breaks": {
+    "1a": {
+      "break": [
+        {
+          "element": "<destination><member>10.20.11.211</member></destination>",
+          "field": "destination",
+          "kind": "panos_api",
+          "members": [
+            "10.20.11.211"
+          ],
+          "node": "fw",
+          "op": "edit",
+          "order": [
+            "staff-to-users-gateway",
+            "ent-dns-to-platform-dns",
+            "staff-to-enterprise-dns",
+            "admins-to-bastion",
+            "bastion-to-firewall-admin",
+            "bastion-to-nodes",
+            "bastion-to-api",
+            "bastion-to-internal-gateway",
+            "bastion-to-stor-mgmt",
+            "bastion-to-bmc",
+            "bastion-to-services-admin",
+            "inside-to-gateway-ping",
+            "inside-to-resolvers",
+            "inside-to-ntp",
+            "resolvers-to-auth",
+            "auth-zone-transfer",
+            "ntp-upstream",
+            "nts-ke-upstream",
+            "nodes-to-registry",
+            "nodes-to-internal-gateway",
+            "csi-to-storage-api",
+            "operator-ike",
+            "operator-to-internal-gateway",
+            "deny-all-log"
+          ],
+          "rendered": [
+            "10.20.11.210"
+          ],
+          "rule": "staff-to-users-gateway",
+          "table": "security",
+          "xpath": "/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/security/rules/entry[@name='staff-to-users-gateway']/destination"
+        }
+      ],
+      "exercise": 4,
+      "expect_broken": [
+        {
+          "failing": "all",
+          "kind": "probe_share",
+          "probe": "users"
+        },
+        {
+          "failing": "all",
+          "kind": "probe_share",
+          "probe": "syn"
+        },
+        {
+          "kind": "syn_at",
+          "probe": "syn",
+          "seen": [
+            "fw-ethernet1-4"
+          ],
+          "seen_any": [],
+          "unseen": [
+            "fw-ethernet1-1",
+            "fw-ethernet1-2"
+          ]
+        },
+        {
+          "action": "deny",
+          "kind": "tlog_rule",
+          "node": "fw",
+          "probe": "syn",
+          "rule": "deny-all-log"
+        }
+      ],
+      "expect_healed": [
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "users"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "syn"
+        },
+        {
+          "kind": "syn_at",
+          "probe": "syn",
+          "seen": [
+            "fw-ethernet1-4"
+          ],
+          "seen_any": [
+            "fw-ethernet1-1",
+            "fw-ethernet1-2"
+          ],
+          "unseen": []
+        },
+        {
+          "action": "allow",
+          "kind": "tlog_rule",
+          "node": "fw",
+          "probe": "syn",
+          "rule": "staff-to-users-gateway"
+        }
+      ],
+      "heal": [
+        {
+          "element": "<destination><member>10.20.11.210</member></destination>",
+          "field": "destination",
+          "kind": "panos_api",
+          "members": [
+            "10.20.11.210"
+          ],
+          "node": "fw",
+          "op": "edit",
+          "order": [
+            "staff-to-users-gateway",
+            "ent-dns-to-platform-dns",
+            "staff-to-enterprise-dns",
+            "admins-to-bastion",
+            "bastion-to-firewall-admin",
+            "bastion-to-nodes",
+            "bastion-to-api",
+            "bastion-to-internal-gateway",
+            "bastion-to-stor-mgmt",
+            "bastion-to-bmc",
+            "bastion-to-services-admin",
+            "inside-to-gateway-ping",
+            "inside-to-resolvers",
+            "inside-to-ntp",
+            "resolvers-to-auth",
+            "auth-zone-transfer",
+            "ntp-upstream",
+            "nts-ke-upstream",
+            "nodes-to-registry",
+            "nodes-to-internal-gateway",
+            "csi-to-storage-api",
+            "operator-ike",
+            "operator-to-internal-gateway",
+            "deny-all-log"
+          ],
+          "rendered": [
+            "10.20.11.210"
+          ],
+          "rule": "staff-to-users-gateway",
+          "table": "security",
+          "xpath": "/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/security/rules/entry[@name='staff-to-users-gateway']/destination"
+        }
+      ],
+      "id": "1a",
+      "note": null,
+      "record": [
+        {
+          "client_addr": "10.24.10.10",
+          "count": 10,
+          "id": "users",
+          "interval_s": 0.5,
+          "kind": "probe_http",
+          "node": "ent-client",
+          "passes": 1,
+          "timeout_s": 5,
+          "url": "https://llm.ai.tarnwick.example/echo?msg=sfab-break-1a"
+        },
+        {
+          "capture": [
+            {
+              "eth": "eth4",
+              "id": "fw-ethernet1-4",
+              "ifname": "ethernet1/4",
+              "node": "fw",
+              "peer": "ent-client:eth1"
+            },
+            {
+              "eth": "eth1",
+              "id": "fw-ethernet1-1",
+              "ifname": "ethernet1/1",
+              "node": "fw",
+              "peer": "fe-sw1:eth3"
+            },
+            {
+              "eth": "eth2",
+              "id": "fw-ethernet1-2",
+              "ifname": "ethernet1/2",
+              "node": "fw",
+              "peer": "fe-sw2:eth3"
+            }
+          ],
+          "client_addr": "10.24.10.10",
+          "count": 3,
+          "dst_addr": "10.20.11.210",
+          "filter": "(host 10.24.10.10 and host 10.20.11.210 and tcp port 443) or (vlan and (host 10.24.10.10 and host 10.20.11.210 and tcp port 443))",
+          "id": "syn",
+          "kind": "probe_syn",
+          "node": "ent-client",
+          "passes": 1,
+          "port": 443,
+          "snaplen": 96,
+          "sport": 42150,
+          "timeout_s": 5,
+          "to": "vip:gw-users"
+        },
+        {
+          "kind": "fw_show",
+          "lines": [
+            "show running security-policy"
+          ],
+          "node": "fw"
+        }
+      ],
+      "title": "the enterprise rule's destination moved off the users' Gateway VIP"
+    }
+  },
+  "lab": "sfab-ch01",
+  "schema": 1
+}

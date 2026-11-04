@@ -1,0 +1,65 @@
+# sfab-ch02 democratic-csi release truenas-nfs: rendered from spec/profile-a.yaml; edit the spec and run make render
+# helm upgrade --install truenas-nfs democratic-csi -n democratic-csi -f 60-democratic-csi-nfs.yaml, after truenas-setup.py.
+# The driver calls truenas1's API on 10.20.2.31, its address in the data VLAN, as the user democratic-csi.
+# Its configuration, with the password, is the Secret truenas-nfs-driver-config in democratic-csi, which
+# truenas-setup.py writes from bootstrap/truenas1/setup.json; the chart needs driver.config.driver beside it.
+# NFS serves ReadWriteMany claims; shares are open to the data VLAN only.
+# Every image is pinned by digest (spec/versions.yaml); the snapshotter is off until the cluster has the snapshot CRDs.
+csiDriver:
+  name: org.democratic-csi.nfs
+storageClasses:
+  - name: truenas-nfs
+    defaultClass: false
+    reclaimPolicy: Delete
+    volumeBindingMode: Immediate
+    allowVolumeExpansion: true
+    parameters:
+      fsType: nfs
+      detachedVolumesFromSnapshots: "false"
+    mountOptions: []
+    labels:
+      decision.tarnwick.example/id: dec-storage-data-address
+volumeSnapshotClasses: []
+controller:
+  externalSnapshotter:
+    enabled: false
+  driver:
+    image:
+      registry: ghcr.io/democratic-csi/democratic-csi
+      tag: "next@sha256:c6d74146e10b8ea2e0efd1f688779b6db529a71b83887ca3de953e5226d374b7"
+  externalProvisioner:
+    image:
+      registry: registry.k8s.io/sig-storage/csi-provisioner
+      tag: "v3.6.0@sha256:6de50bacfd72627ffe4209e3db8ad7391d04ea6fb741bf51feab6c5dcfd80002"
+  externalAttacher:
+    image:
+      registry: registry.k8s.io/sig-storage/csi-attacher
+      tag: "v4.4.0@sha256:dbded4ebe299973e31d0ef55815eb07a990fc67872b14900a8e69232acae4f2d"
+  externalResizer:
+    image:
+      registry: registry.k8s.io/sig-storage/csi-resizer
+      tag: "v1.9.0@sha256:f1f352df97874442624fcef23eab04aa038f66cb0e361212f6ec09e92998184d"
+node:
+  hostPID: true
+  tolerations:
+    - operator: Exists
+  driver:
+    image:
+      registry: ghcr.io/democratic-csi/democratic-csi
+      tag: "next@sha256:c6d74146e10b8ea2e0efd1f688779b6db529a71b83887ca3de953e5226d374b7"
+  driverRegistrar:
+    image:
+      registry: registry.k8s.io/sig-storage/csi-node-driver-registrar
+      tag: "v2.9.0@sha256:cd21e19cd8bbd5bc56f1b4f1398a436e7897da2995d6d036c9729be3f4e456e6"
+  cleanup:
+    image:
+      registry: ghcr.io/democratic-csi/democratic-csi
+      tag: "next@sha256:c6d74146e10b8ea2e0efd1f688779b6db529a71b83887ca3de953e5226d374b7"
+csiProxy:
+  image:
+    registry: ghcr.io/democratic-csi/csi-grpc-proxy
+    tag: "v0.5.7@sha256:0240d0fba3cedd598036766b1865e88aa2eac9c16822df03d5d912a81128ebb6"
+driver:
+  existingConfigSecret: truenas-nfs-driver-config
+  config:
+    driver: freenas-api-nfs

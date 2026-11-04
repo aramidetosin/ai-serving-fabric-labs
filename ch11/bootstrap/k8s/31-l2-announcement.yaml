@@ -1,0 +1,55 @@
+# sfab-ch11 L2 announcement policies: rendered from spec/profile-a.yaml by render/k8s.py; edit the spec and run make render
+# One policy per audience (gateways-internal for gw-internal, gateways-enterprise for gw-users, gateways-internet for gw-inet), each
+# selecting its own Gateway's Service by the label tarnwick.example/audience: the VIP answered by ARP on
+# ^bond0\.110$, from the nodes labelled node-role.tarnwick.example/ingress; one lease per Service decides which node answers.
+# The leases run on tuned timers (cilium-config, 20-cilium-values.yaml): duration 3s, renew deadline 1s, retry period 200ms.
+apiVersion: cilium.io/v2alpha1
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  name: gateways-internal
+spec:
+  serviceSelector:
+    matchLabels:
+      tarnwick.example/audience: internal
+  nodeSelector:
+    matchExpressions:
+    - key: node-role.tarnwick.example/ingress
+      operator: Exists
+  interfaces:
+  - "^bond0\\.110$"
+  loadBalancerIPs: true
+  externalIPs: false
+---
+apiVersion: cilium.io/v2alpha1
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  name: gateways-enterprise
+spec:
+  serviceSelector:
+    matchLabels:
+      tarnwick.example/audience: enterprise
+  nodeSelector:
+    matchExpressions:
+    - key: node-role.tarnwick.example/ingress
+      operator: Exists
+  interfaces:
+  - "^bond0\\.110$"
+  loadBalancerIPs: true
+  externalIPs: false
+---
+apiVersion: cilium.io/v2alpha1
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  name: gateways-internet
+spec:
+  serviceSelector:
+    matchLabels:
+      tarnwick.example/audience: internet
+  nodeSelector:
+    matchExpressions:
+    - key: node-role.tarnwick.example/ingress
+      operator: Exists
+  interfaces:
+  - "^bond0\\.110$"
+  loadBalancerIPs: true
+  externalIPs: false

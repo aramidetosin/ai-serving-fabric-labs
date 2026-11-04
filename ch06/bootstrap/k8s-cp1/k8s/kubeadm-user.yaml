@@ -1,0 +1,28 @@
+# sfab-ch06 k8s-cp1 kubeadm kubeconfig user: rendered from spec/profile-a.yaml by render/k8s.py; edit the spec and run make render
+# kubeadm kubeconfig user --config, on the init node: each operator's short-lived kubeconfig for the bastion
+# (finish, operators). The client certificate is signed with the cluster CA kubeadm holds on this node.
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: ClusterConfiguration
+clusterName: sfab-ch06
+kubernetesVersion: v1.35.8
+imageRepository: registry.k8s.io
+controlPlaneEndpoint: k8s.ai.tarnwick.example:6443
+networking:
+  dnsDomain: cluster.local
+  podSubnet: "10.22.0.0/16"
+  serviceSubnet: "10.23.0.0/16"
+apiServer:
+  certSANs:
+  - k8s.ai.tarnwick.example
+  - "10.20.1.10"
+  extraArgs:
+  - name: encryption-provider-config
+    value: /etc/kubernetes/enc/config.yaml
+  extraVolumes:
+  - name: encryption
+    hostPath: /etc/kubernetes/enc
+    mountPath: /etc/kubernetes/enc
+    readOnly: true
+    pathType: DirectoryOrCreate
+proxy:
+  disabled: true

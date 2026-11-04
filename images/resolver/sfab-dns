@@ -1,0 +1,259 @@
+#!/usr/bin/env bash
+# sfab-dns: install and reload a DNS server's rendered configuration (render/dns.py), checking
+# every file before the running server sees it. It lives in images/resolver, the one image that runs
+# the lab's DNS servers (the bastion serves none from sfab/bastion:4 on).
+#
+#   sfab-dns start  [DIR]   install DIR (default /sfab/bootstrap) and start the server when it is
+#                           not running; a no-op when the live copy already matches DIR
+#   sfab-dns reload [DIR]   install DIR, then reload the running server (or start it)
+#   sfab-dns check  [DIR]   check DIR only; nothing changes
+#   sfab-dns stop           stop the server
+#   sfab-dns running        exit 0 when the server runs, 1 when it does not (prints nothing)
+#   sfab-dns status         the role, the live files' sha256, whether the server runs
+#
+# The role is ROLE, else DNS_ROLE from the init.env beside the render: bind-auth (an authoritative
+# server, its views' zones primary or secondary) and bind-recursive (a resolver) run named on
+# named.conf; dnsmasq runs dnsmasq on dnsmasq.conf. An install is transactional: the render is
+# copied into a staging directory with the TSIG keys the topology binds at TSIG_DIR (/sfab/tsig,
+# state/secrets/tsig: the keys of the views that transfer, made per lab, never rendered), and
+# checked there (named-checkconf on the staged copy, then named-checkzone on every primary zone it
+# names, or dnsmasq --test); only then is the live directory swapped, and a failed reload or start
+# puts the previous one back. A secondary zone has no file in the render: named takes it from its
+# primary into the working directory. Exit 0 when the server serves the new files, 1 when anything
+# failed (the old files keep serving).
+#
+# The render names its files under /etc/sfab/dns (the keys under /etc/sfab/dns/keys) and its rndc
+# key at /run/named/rndc.key. SFAB_DNS_LIVE and SFAB_RNDC_KEY move both (the tests); the installed
+# named.conf then names the moved paths. SFAB_NAMED_DIRS, SFAB_DNSMASQ_PID and SFAB_DNSMASQ_LOG
+# move the servers' run directories, pid file and log the same way, and SFAB_TSIG_DIR the keys.
+set -euo pipefail
+
+RENDER_LIVE=/etc/sfab/dns
+RENDER_RNDC_KEY=/run/named/rndc.key
+LIVE=${SFAB_DNS_LIVE:-$RENDER_LIVE}
+STAGE=${LIVE}.stage
+PREV=${LIVE}.prev
+RNDC_KEY=${SFAB_RNDC_KEY:-$RENDER_RNDC_KEY}
+# named's pid, log and working directories (render/dns.py PID_FILE, LOG_DIR, WORK_DIR).
+NAMED_DIRS=${SFAB_NAMED_DIRS:-/run/named /var/log/named /var/cache/bind /var/cache/bind/secondary}
+TSIG_DIR=${SFAB_TSIG_DIR:-${TSIG_DIR:-/sfab/tsig}}
+DNSMASQ_PID=${SFAB_DNSMASQ_PID:-/run/dnsmasq.pid}
+DNSMASQ_LOG=${SFAB_DNSMASQ_LOG:-/var/log/dnsmasq.log}
+
+log() { printf '[sfab-dns] %s\n' "$*"; }
+die() { log "FAIL: $*"; exit 1; }
+
+cmd=${1:-}
+SRC=${2:-/sfab/bootstrap}
+
+# The role, resolved once in the main shell (a die inside $(...) would end only the subshell).
+SERVER_ROLE=""
+resolve_role() {
+  local r=${ROLE:-}
+  if [ -z "$r" ] && [ -r "$SRC/init.env" ]; then
+    r=$(sed -n 's/^DNS_ROLE=//p' "$SRC/init.env" | tr -d "'\"")
+  fi
+  if [ -z "$r" ] && [ -r /sfab/bootstrap/init.env ]; then
+    r=$(sed -n 's/^DNS_ROLE=//p' /sfab/bootstrap/init.env | tr -d "'\"")
+  fi
+  case $r in
+    bind-auth|bind-recursive|dnsmasq) SERVER_ROLE=$r ;;
+    *) die "no DNS role (ROLE or DNS_ROLE in init.env is bind-auth, bind-recursive or dnsmasq, not '${r}')" ;;
+  esac
+}
+role() { printf '%s' "$SERVER_ROLE"; }
+
+# The user each server runs as: Debian and Ubuntu name BIND's bind, Alpine named.
+named_user() { if id -u bind >/dev/null 2>&1; then echo bind; elif id -u named >/dev/null 2>&1; then echo named; else echo root; fi; }
+dnsmasq_user() { if id -u dnsmasq >/dev/null 2>&1; then echo dnsmasq; else echo nobody; fi; }
+own() {  # own USER PATH...: chown, warning when it cannot (the server may then not read them)
+  local u=$1
+  shift
+  chown "$u:$(id -gn "$u" 2>/dev/null || echo "$u")" "$@" 2>/dev/null || log "warning: could not give $* to $u"
+}
+
+# The rendered BIND configuration.
+bind_src() {
+  if [ -f "$1/named.conf" ]; then echo "$1/named.conf"
+  else return 1; fi
+}
+
+rndc_key() {
+  [ -s "$RNDC_KEY" ] && return 0
+  mkdir -p "$(dirname "$RNDC_KEY")"
+  rndc-confgen -a -k rndc-key -c "$RNDC_KEY" >/dev/null 2>&1 || die "rndc-confgen could not write $RNDC_KEY"
+  own root "$RNDC_KEY"
+  chgrp "$(id -gn "$(named_user)" 2>/dev/null || echo root)" "$RNDC_KEY" 2>/dev/null || true
+  chmod 0640 "$RNDC_KEY"
+}
+
+# zone_files CONF: "<zone> <file>" for every primary zone statement (a zone with a file of the
+# render; a secondary's file is named's own), in order.
+zone_files() {
+  tr '\n' ' ' < "$1" | grep -o 'zone *"[^"]*" *{ *type primary;[^}]*file *"[^"]*"' |
+    sed -E 's/^zone *"([^"]*)".*file *"([^"]*)"$/\1 \2/'
+}
+secondary_zones() { tr '\n' ' ' < "$1" | grep -o 'zone *"[^"]*" *{ *type secondary;' | wc -l | tr -d ' '; }
+stub_zones() { tr '\n' ' ' < "$1" | grep -o 'zone *"[^"]*" *{ *type static-stub;' | wc -l | tr -d ' '; }
+
+# The TSIG keys the render includes, from the bound directory, readable by named only.
+stage_keys() {
+  local k u
+  grep -q "\"$LIVE/keys/" "$STAGE/named.conf" || return 0
+  [ -d "$TSIG_DIR" ] || die "named.conf includes TSIG keys, and $TSIG_DIR holds none (preflight makes them in state/secrets/tsig)"
+  mkdir -p "$STAGE/keys"
+  u=$(named_user)
+  for k in "$TSIG_DIR"/*.key; do
+    [ -f "$k" ] || continue
+    cp "$k" "$STAGE/keys/"
+  done
+  chmod 0750 "$STAGE/keys"
+  chmod 0640 "$STAGE/keys"/*.key 2>/dev/null || true
+  chgrp -R "$(id -gn "$u" 2>/dev/null || echo root)" "$STAGE/keys" 2>/dev/null || true
+}
+
+stage_bind() {
+  local src conf z f rel n=0
+  src=$(bind_src "$SRC") || die "$SRC holds no named.conf (run make render)"
+  rm -rf "$STAGE"
+  mkdir -p "$STAGE/zones"
+  # The installed copy names the live paths (the same as the render's unless they were moved).
+  sed -e "s#\"$RENDER_LIVE/#\"$LIVE/#g" -e "s#\"$RENDER_RNDC_KEY\"#\"$RNDC_KEY\"#g" "$src" > "$STAGE/named.conf"
+  if [ -d "$SRC/zones" ]; then cp -R "$SRC/zones/." "$STAGE/zones/"; fi
+  conf=$STAGE/named.conf
+  rndc_key
+  stage_keys
+  # checked as staged: the copy's live paths point into the staging directory (its includes
+  # are read here, its zones by named-checkzone below)
+  sed -e "s#\"$LIVE/#\"$STAGE/#g" "$conf" > "$STAGE/.named.conf.check"
+  named-checkconf "$STAGE/.named.conf.check" || { rm -f "$STAGE/.named.conf.check"; die "named-checkconf refused $src"; }
+  rm -f "$STAGE/.named.conf.check"
+  while read -r z f; do
+    [ -n "$z" ] || continue
+    case $f in
+      "$LIVE"/*) rel=${f#"$LIVE"/} ;;
+      *) die "zone $z: file $f is outside $LIVE" ;;
+    esac
+    [ -f "$STAGE/$rel" ] || die "zone $z: $rel is not in $SRC"
+    named-checkzone -q "$z" "$STAGE/$rel" || { named-checkzone "$z" "$STAGE/$rel" || true; die "named-checkzone refused zone $z ($rel)"; }
+    n=$((n + 1))
+  done < <(zone_files "$conf")
+  [ $((n + $(secondary_zones "$conf") + $(stub_zones "$conf"))) -gt 0 ] || die "$src names no zone"
+  log "checked: $(basename "$src"), $n zone files, $(secondary_zones "$conf") secondary and $(stub_zones "$conf") static-stub zones"
+}
+
+stage_dnsmasq() {
+  [ -f "$SRC/dnsmasq.conf" ] || die "$SRC holds no dnsmasq.conf (run make render)"
+  rm -rf "$STAGE"
+  mkdir -p "$STAGE"
+  cp "$SRC/dnsmasq.conf" "$STAGE/dnsmasq.conf"
+  dnsmasq --test -C "$STAGE/dnsmasq.conf" >/dev/null 2>&1 || { dnsmasq --test -C "$STAGE/dnsmasq.conf" || true; die "dnsmasq --test refused dnsmasq.conf"; }
+  log "checked: dnsmasq.conf"
+}
+
+stage() { if [ "$(role)" = dnsmasq ]; then stage_dnsmasq; else stage_bind; fi; }
+
+same_as_live() { [ -d "$LIVE" ] && diff -r -q "$STAGE" "$LIVE" >/dev/null 2>&1; }
+
+swap() {
+  rm -rf "$PREV"
+  if [ -d "$LIVE" ]; then mv "$LIVE" "$PREV"; fi
+  mv "$STAGE" "$LIVE"
+}
+
+restore() {
+  [ -d "$PREV" ] || return 1
+  rm -rf "$LIVE.failed"
+  mv "$LIVE" "$LIVE.failed"
+  mv "$PREV" "$LIVE"
+  log "put the previous configuration back (the refused one is in $LIVE.failed)"
+}
+
+running() {
+  if [ "$(role)" = dnsmasq ]; then
+    [ -s "$DNSMASQ_PID" ] && kill -0 "$(cat "$DNSMASQ_PID")" 2>/dev/null
+  else
+    pgrep -x named >/dev/null 2>&1
+  fi
+}
+
+start_server() {
+  local u
+  if [ "$(role)" = dnsmasq ]; then
+    u=$(dnsmasq_user)
+    mkdir -p "$(dirname "$DNSMASQ_PID")" "$(dirname "$DNSMASQ_LOG")"
+    touch "$DNSMASQ_LOG"
+    own "$u" "$DNSMASQ_LOG"
+    dnsmasq -C "$LIVE/dnsmasq.conf" --pid-file="$DNSMASQ_PID" --user="$u" || return 1
+  else
+    u=$(named_user)
+    # shellcheck disable=SC2086  # NAMED_DIRS is a list of directories
+    mkdir -p $NAMED_DIRS
+    # shellcheck disable=SC2086
+    own "$u" $NAMED_DIRS
+    named -u "$u" -c "$LIVE/named.conf" || return 1
+  fi
+  sleep 1
+  running
+}
+
+stop_server() {
+  if [ "$(role)" = dnsmasq ]; then
+    if running; then kill "$(cat "$DNSMASQ_PID")" 2>/dev/null || true; fi
+  else
+    rndc -k "$RNDC_KEY" stop >/dev/null 2>&1 || pkill -x named 2>/dev/null || true
+  fi
+}
+
+reload_server() {
+  if [ "$(role)" = dnsmasq ]; then
+    # dnsmasq reads its configuration only at start.
+    if running; then kill "$(cat "$DNSMASQ_PID")" 2>/dev/null || true; sleep 1; fi
+    start_server
+  else
+    rndc -k "$RNDC_KEY" reload >/dev/null
+  fi
+}
+
+install_and() {  # install_and start|reload
+  stage
+  if [ "$1" = start ] && same_as_live; then
+    rm -rf "$STAGE"
+    if running; then log "live configuration current; server running"; return 0; fi
+    start_server || die "the server did not start on $LIVE"
+    log "started on $LIVE"
+    return 0
+  fi
+  swap
+  if running; then
+    if reload_server; then log "reloaded from $LIVE"; return 0; fi
+    if restore; then reload_server || true; fi
+    die "the reload failed; the previous configuration serves"
+  fi
+  if start_server; then log "started on $LIVE"; return 0; fi
+  if restore; then start_server || true; fi
+  die "the server did not start on the new configuration"
+}
+
+status() {
+  local f
+  log "role $(role); live $LIVE; server $(running && echo running || echo stopped)"
+  if [ -d "$LIVE" ]; then
+    find "$LIVE" -type f | sort | while read -r f; do
+      printf '  %s  %s\n' "$(sha256sum "$f" | cut -c1-16)" "${f#"$LIVE"/}"
+    done
+  fi
+}
+
+case $cmd in
+  start|reload|check|stop|running|status) resolve_role ;;
+esac
+case $cmd in
+  start) install_and start ;;
+  reload) install_and reload ;;
+  check) stage; rm -rf "$STAGE"; log "check passed" ;;
+  stop) stop_server; log "stopped" ;;
+  running) running ;;
+  status) status ;;
+  *) printf 'usage: sfab-dns start|reload|check [DIR] | stop | running | status\n' >&2; exit 2 ;;
+esac

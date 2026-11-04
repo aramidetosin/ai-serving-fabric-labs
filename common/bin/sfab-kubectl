@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# sfab-kubectl LABDIR [KUBECTL ARGS...]: the harness's kubectl for programs outside common/lib.sh
+# (the serving recipe's SERVING_KUBECTL, render/k8s.py): kubectl with the cluster's admin kubeconfig,
+# run on the lab's init node over SSH with the lab key, as common/lib.sh K runs it. The admin
+# kubeconfig never leaves the init node; the bastion holds none.
+#
+# LABDIR is the lab's render directory (ch06, or a variant's directory), absolute or relative to the
+# repository root; under the harness, SFAB_RENDERDIR and SFAB_STATEDIR (which common/lib.sh exports)
+# name the lab instead. Each argument reaches kubectl as one word (quoted for the remote shell), and
+# standard input passes through, so `sfab-kubectl ch06 apply -f - <manifest` works. Exit status is
+# kubectl's (255 when SSH fails). SFAB_KUBECONFIG_ADMIN names another kubeconfig on the node.
+set -euo pipefail
+
+ROOT=$(cd "$(dirname "$0")/../.." && pwd -P)
+[ $# -ge 1 ] || { echo "usage: sfab-kubectl LABDIR [KUBECTL ARGS...]" >&2; exit 2; }
+lab=$1
+shift
+case $lab in /*) dir=$lab ;; *) dir=$ROOT/$lab ;; esac
+# run by the harness (common/lib.sh exports both): its lab's render and state directories, which a
+# test's lab copy has in place of the checkout's
+dir=${SFAB_RENDERDIR:-$dir}
+inv=$dir/gen/inventory.json
+[ -f "$inv" ] || { echo "sfab-kubectl: no $inv (run make render)" >&2; exit 2; }
+read -r user addr < <(python3 - "$inv" <<'PY'
+import json, sys
+d = json.load(open(sys.argv[1], encoding="utf-8"))
+node = (d.get("stages") or {}).get("kubectl")
+if not node:
+    raise SystemExit("sfab-kubectl: the lab has no Kubernetes init node")
+print((d.get("guest") or {}).get("user") or "admin", d["nodes"][node]["mgmt"])
+PY
+)
+key=${SFAB_STATEDIR:-$dir/state}/secrets/lab_ed25519
+[ -f "$key" ] || { echo "sfab-kubectl: no lab key at $key (preflight makes it)" >&2; exit 2; }
+exec ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ConnectTimeout=10 \
+  -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -o BatchMode=yes -o IdentitiesOnly=yes -i "$key" "$user@$addr" \
+  "sudo env KUBECONFIG=${SFAB_KUBECONFIG_ADMIN:-/etc/kubernetes/admin.conf} kubectl $(printf '%q ' "$@")"

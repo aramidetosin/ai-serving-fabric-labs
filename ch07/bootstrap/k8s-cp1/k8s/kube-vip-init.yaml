@@ -1,0 +1,78 @@
+# sfab-ch07 k8s-cp1 kube-vip during kubeadm init: rendered from spec/profile-a.yaml by render/k8s.py; edit the spec and run make render
+# The static pod that holds the API VIP 10.20.1.10 on bond0 by ARP, the lease kube-system/plndr-cp-lock
+# deciding which control node answers. It calls the API on this node through the host alias below.
+# During kubeadm init only super-admin.conf can write the lease; cluster-bootstrap.sh moves the pod
+# to admin.conf (kube-vip.yaml) as soon as init has bound admin.conf's group to cluster-admin.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kube-vip
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: kube-vip
+spec:
+  hostNetwork: true
+  priorityClassName: system-node-critical
+  hostAliases:
+  - ip: "127.0.0.1"
+    hostnames:
+    - kubernetes
+  containers:
+  - name: kube-vip
+    image: ghcr.io/kube-vip/kube-vip:v1.1.2@sha256:840305b94ef2a89abb3b7fd2b09edfbde690d90052020da4dff90679fe892da2
+    imagePullPolicy: IfNotPresent
+    args:
+    - manager
+    env:
+    - name: vip_arp
+      value: "true"
+    - name: port
+      value: "6443"
+    - name: vip_nodename
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    - name: vip_interface
+      value: bond0
+    - name: vip_subnet
+      value: "32"
+    - name: address
+      value: "10.20.1.10"
+    - name: cp_enable
+      value: "true"
+    - name: cp_namespace
+      value: kube-system
+    - name: svc_enable
+      value: "false"
+    - name: vip_leaderelection
+      value: "true"
+    - name: vip_leasename
+      value: plndr-cp-lock
+    - name: vip_leaseduration
+      value: "5"
+    - name: vip_renewdeadline
+      value: "3"
+    - name: vip_retryperiod
+      value: "1"
+    securityContext:
+      capabilities:
+        drop:
+        - ALL
+        add:
+        - NET_ADMIN
+        - NET_RAW
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        memory: "256Mi"
+    volumeMounts:
+    - name: kubeconfig
+      mountPath: /etc/kubernetes/admin.conf
+      readOnly: true
+  volumes:
+  - name: kubeconfig
+    hostPath:
+      path: /etc/kubernetes/super-admin.conf
+      type: File

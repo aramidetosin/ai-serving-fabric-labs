@@ -1,0 +1,842 @@
+{
+  "bonded": [
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet3",
+          "node": "k8s-cp1",
+          "switch": "fe-sw1",
+          "switch_eth": "eth4"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet3",
+          "node": "k8s-cp1",
+          "switch": "fe-sw2",
+          "switch_eth": "eth4"
+        }
+      ],
+      "node": "k8s-cp1"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet4",
+          "node": "k8s-cp2",
+          "switch": "fe-sw1",
+          "switch_eth": "eth5"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet4",
+          "node": "k8s-cp2",
+          "switch": "fe-sw2",
+          "switch_eth": "eth5"
+        }
+      ],
+      "node": "k8s-cp2"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet5",
+          "node": "k8s-cp3",
+          "switch": "fe-sw1",
+          "switch_eth": "eth6"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet5",
+          "node": "k8s-cp3",
+          "switch": "fe-sw2",
+          "switch_eth": "eth6"
+        }
+      ],
+      "node": "k8s-cp3"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet6",
+          "node": "k8s-gpu1",
+          "switch": "fe-sw1",
+          "switch_eth": "eth7"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet6",
+          "node": "k8s-gpu1",
+          "switch": "fe-sw2",
+          "switch_eth": "eth7"
+        }
+      ],
+      "node": "k8s-gpu1"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet7",
+          "node": "k8s-gpu2",
+          "switch": "fe-sw1",
+          "switch_eth": "eth8"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet7",
+          "node": "k8s-gpu2",
+          "switch": "fe-sw2",
+          "switch_eth": "eth8"
+        }
+      ],
+      "node": "k8s-gpu2"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet13",
+          "node": "k8s-ingress1",
+          "switch": "fe-sw1",
+          "switch_eth": "eth14"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet13",
+          "node": "k8s-ingress1",
+          "switch": "fe-sw2",
+          "switch_eth": "eth14"
+        }
+      ],
+      "node": "k8s-ingress1"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet14",
+          "node": "k8s-ingress2",
+          "switch": "fe-sw1",
+          "switch_eth": "eth15"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet14",
+          "node": "k8s-ingress2",
+          "switch": "fe-sw2",
+          "switch_eth": "eth15"
+        }
+      ],
+      "node": "k8s-ingress2"
+    },
+    {
+      "bond": "bond0",
+      "kind": "bastion",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet8",
+          "node": "bastion",
+          "switch": "fe-sw1",
+          "switch_eth": "eth9"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet8",
+          "node": "bastion",
+          "switch": "fe-sw2",
+          "switch_eth": "eth9"
+        }
+      ],
+      "node": "bastion"
+    }
+  ],
+  "lab": "sfab-ch06",
+  "list": [
+    {
+      "dead_rails": [
+        1,
+        3,
+        5,
+        7
+      ],
+      "eths": [
+        "eth1",
+        "eth2",
+        "eth3",
+        "eth4",
+        "eth5",
+        "eth6",
+        "eth7",
+        "eth8"
+      ],
+      "expect": {
+        "dead_copies": [
+          "chat-c"
+        ],
+        "in_node": [
+          "chat-a",
+          "staff-b"
+        ],
+        "live_copies": [
+          "chat-a",
+          "chat-b",
+          "staff-a",
+          "staff-b"
+        ],
+        "services": {
+          "chat": {
+            "kind": "model",
+            "servers": [
+              "chat-a-server-0",
+              "chat-b-server-0",
+              "chat-c-server-0"
+            ],
+            "while_down": [
+              "chat-a-server-0",
+              "chat-b-server-0"
+            ]
+          },
+          "chat-a": {
+            "kind": "copy",
+            "servers": [
+              "chat-a-server-0"
+            ],
+            "while_down": [
+              "chat-a-server-0"
+            ]
+          },
+          "chat-b": {
+            "kind": "copy",
+            "servers": [
+              "chat-b-server-0"
+            ],
+            "while_down": [
+              "chat-b-server-0"
+            ]
+          },
+          "chat-c": {
+            "kind": "copy",
+            "servers": [
+              "chat-c-server-0"
+            ],
+            "while_down": []
+          },
+          "staff": {
+            "kind": "model",
+            "servers": [
+              "staff-a-server-0",
+              "staff-b-server-0"
+            ],
+            "while_down": [
+              "staff-a-server-0",
+              "staff-b-server-0"
+            ]
+          },
+          "staff-a": {
+            "kind": "copy",
+            "servers": [
+              "staff-a-server-0"
+            ],
+            "while_down": [
+              "staff-a-server-0"
+            ]
+          },
+          "staff-b": {
+            "kind": "copy",
+            "servers": [
+              "staff-b-server-0"
+            ],
+            "while_down": [
+              "staff-b-server-0"
+            ]
+          }
+        }
+      },
+      "faces": null,
+      "id": "dark-switch",
+      "kind": "serve-dark",
+      "klish": [
+        "configure terminal",
+        "interface range Ethernet0-7",
+        "shutdown",
+        "end"
+      ],
+      "natives": [
+        "Ethernet0",
+        "Ethernet1",
+        "Ethernet2",
+        "Ethernet3",
+        "Ethernet4",
+        "Ethernet5",
+        "Ethernet6",
+        "Ethernet7"
+      ],
+      "probes": [
+        "gateway",
+        "endpoints"
+      ],
+      "restore": [
+        "configure terminal",
+        "interface range Ethernet0-7",
+        "no shutdown",
+        "end"
+      ],
+      "switch": "rail-sw1",
+      "title": "every port of rail-sw1 shut with interface range under the Gateway probe, held, then no shutdown"
+    },
+    {
+      "dead_rails": [],
+      "eths": [
+        "eth8"
+      ],
+      "expect": {
+        "dead_copies": [
+          "chat-c"
+        ],
+        "in_node": [],
+        "live_copies": [
+          "chat-a",
+          "chat-b",
+          "staff-a",
+          "staff-b"
+        ],
+        "services": {
+          "chat": {
+            "kind": "model",
+            "servers": [
+              "chat-a-server-0",
+              "chat-b-server-0",
+              "chat-c-server-0"
+            ],
+            "while_down": [
+              "chat-a-server-0",
+              "chat-b-server-0"
+            ]
+          },
+          "chat-a": {
+            "kind": "copy",
+            "servers": [
+              "chat-a-server-0"
+            ],
+            "while_down": [
+              "chat-a-server-0"
+            ]
+          },
+          "chat-b": {
+            "kind": "copy",
+            "servers": [
+              "chat-b-server-0"
+            ],
+            "while_down": [
+              "chat-b-server-0"
+            ]
+          },
+          "chat-c": {
+            "kind": "copy",
+            "servers": [
+              "chat-c-server-0"
+            ],
+            "while_down": []
+          },
+          "staff": {
+            "kind": "model",
+            "servers": [
+              "staff-a-server-0",
+              "staff-b-server-0"
+            ],
+            "while_down": [
+              "staff-a-server-0",
+              "staff-b-server-0"
+            ]
+          },
+          "staff-a": {
+            "kind": "copy",
+            "servers": [
+              "staff-a-server-0"
+            ],
+            "while_down": [
+              "staff-a-server-0"
+            ]
+          },
+          "staff-b": {
+            "kind": "copy",
+            "servers": [
+              "staff-b-server-0"
+            ],
+            "while_down": [
+              "staff-b-server-0"
+            ]
+          }
+        }
+      },
+      "faces": {
+        "node": "k8s-gpu2",
+        "pod": "chat-c-worker0-0",
+        "rail": 7
+      },
+      "id": "worker-port",
+      "kind": "worker-port",
+      "klish": [
+        "configure terminal",
+        "interface Ethernet7",
+        "shutdown",
+        "end"
+      ],
+      "natives": [
+        "Ethernet7"
+      ],
+      "probes": [
+        "gateway",
+        "endpoints"
+      ],
+      "restore": [
+        "configure terminal",
+        "interface Ethernet7",
+        "no shutdown",
+        "end"
+      ],
+      "switch": "rail-sw1",
+      "title": "the rail-sw1 port facing chat-c's worker on k8s-gpu2 shut while chat-a and chat-b answer, held, then no shutdown"
+    },
+    {
+      "id": "rail-move",
+      "kind": "rail-move",
+      "moved": {
+        "address": "10.21.5.102/24",
+        "copy": "a",
+        "decision": "dec-place-chat",
+        "index": 0,
+        "mac": "02:5a:fe:05:00:66",
+        "master": "rail5",
+        "model": "chat",
+        "nad": "rail5",
+        "native": "Ethernet2",
+        "node": "k8s-gpu1",
+        "pod": "chat-a-worker0-0",
+        "rail": 5,
+        "role": "worker",
+        "switch": "rail-sw1",
+        "vlan": 105
+      },
+      "probes": [],
+      "row": {
+        "address": "10.21.3.101/24",
+        "copy": "a",
+        "decision": "dec-place-chat",
+        "index": 0,
+        "mac": "02:5a:fe:03:00:65",
+        "model": "chat",
+        "nad": "rail3",
+        "node": "k8s-gpu1",
+        "pod": "chat-a-worker0-0",
+        "rail": 3,
+        "role": "worker"
+      },
+      "title": "chat-a's worker0 moved to rail 5 in the table; the audit fails first, then the table is restored"
+    }
+  ],
+  "pair": {
+    "domain": 1,
+    "members": [
+      "fe-sw1",
+      "fe-sw2"
+    ],
+    "name": "fe",
+    "peer_link": {
+      "fe-sw1": {
+        "eths": [
+          "eth1",
+          "eth2"
+        ],
+        "members": [
+          "Ethernet0",
+          "Ethernet1"
+        ],
+        "portchannel": "PortChannel1"
+      },
+      "fe-sw2": {
+        "eths": [
+          "eth1",
+          "eth2"
+        ],
+        "members": [
+          "Ethernet0",
+          "Ethernet1"
+        ],
+        "portchannel": "PortChannel1"
+      }
+    },
+    "source_ip": {
+      "fe-sw1": "10.20.255.0",
+      "fe-sw2": "10.20.255.1"
+    },
+    "system_mac": "02:5a:00:00:00:01"
+  },
+  "probes": {
+    "endpoints": {
+      "interval_s": 1,
+      "namespace": "serving",
+      "services": [
+        {
+          "copy": null,
+          "kind": "model",
+          "model": "chat",
+          "name": "chat",
+          "servers": [
+            "chat-a-server-0",
+            "chat-b-server-0",
+            "chat-c-server-0"
+          ]
+        },
+        {
+          "copy": null,
+          "kind": "model",
+          "model": "staff",
+          "name": "staff",
+          "servers": [
+            "staff-a-server-0",
+            "staff-b-server-0"
+          ]
+        },
+        {
+          "copy": "a",
+          "kind": "copy",
+          "model": "chat",
+          "name": "chat-a",
+          "servers": [
+            "chat-a-server-0"
+          ]
+        },
+        {
+          "copy": "b",
+          "kind": "copy",
+          "model": "chat",
+          "name": "chat-b",
+          "servers": [
+            "chat-b-server-0"
+          ]
+        },
+        {
+          "copy": "c",
+          "kind": "copy",
+          "model": "chat",
+          "name": "chat-c",
+          "servers": [
+            "chat-c-server-0"
+          ]
+        },
+        {
+          "copy": "a",
+          "kind": "copy",
+          "model": "staff",
+          "name": "staff-a",
+          "servers": [
+            "staff-a-server-0"
+          ]
+        },
+        {
+          "copy": "b",
+          "kind": "copy",
+          "model": "staff",
+          "name": "staff-b",
+          "servers": [
+            "staff-b-server-0"
+          ]
+        }
+      ]
+    },
+    "gateway": {
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "gateway": "gw-users",
+      "hostname": "llm.ai.tarnwick.example",
+      "interval_s": 2,
+      "keys": {
+        "namespace": "inference",
+        "secret": "api-keys"
+      },
+      "max_tokens": 8,
+      "models": [
+        {
+          "model": "chat",
+          "model_name": "openai/chat",
+          "route_id": "a48b3df9-3b7f-58f0-9c52-c6f3004f05f7",
+          "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+        },
+        {
+          "every": 15,
+          "model": "staff",
+          "model_name": "openai/staff",
+          "route_id": "8242d5c4-9bce-5497-8414-f5bad94fdd84",
+          "url": "https://llm.ai.tarnwick.example/models/8242d5c4-9bce-5497-8414-f5bad94fdd84/v1/chat/completions"
+        }
+      ],
+      "resolve": null,
+      "timeout_s": 400,
+      "vip": "10.20.11.210"
+    }
+  },
+  "rail_switches": {
+    "rail-sw1": {
+      "eths": [
+        "eth1",
+        "eth2",
+        "eth3",
+        "eth4",
+        "eth5",
+        "eth6",
+        "eth7",
+        "eth8"
+      ],
+      "natives": [
+        "Ethernet0",
+        "Ethernet1",
+        "Ethernet2",
+        "Ethernet3",
+        "Ethernet4",
+        "Ethernet5",
+        "Ethernet6",
+        "Ethernet7"
+      ],
+      "rails": [
+        1,
+        3,
+        5,
+        7
+      ]
+    },
+    "rail-sw2": {
+      "eths": [
+        "eth1",
+        "eth2",
+        "eth3",
+        "eth4",
+        "eth5",
+        "eth6",
+        "eth7",
+        "eth8"
+      ],
+      "natives": [
+        "Ethernet0",
+        "Ethernet1",
+        "Ethernet2",
+        "Ethernet3",
+        "Ethernet4",
+        "Ethernet5",
+        "Ethernet6",
+        "Ethernet7"
+      ],
+      "rails": [
+        2,
+        4,
+        6,
+        8
+      ]
+    }
+  },
+  "schema": 1,
+  "serving": {
+    "copies": [
+      {
+        "copy": "a",
+        "id": "chat-a",
+        "model": "chat",
+        "nad": "rail3",
+        "rail": 3,
+        "server": {
+          "node": "k8s-gpu1",
+          "pod": "chat-a-server-0"
+        },
+        "workers": [
+          {
+            "index": 0,
+            "node": "k8s-gpu1",
+            "pod": "chat-a-worker0-0"
+          }
+        ]
+      },
+      {
+        "copy": "b",
+        "id": "chat-b",
+        "model": "chat",
+        "nad": "rail6",
+        "rail": 6,
+        "server": {
+          "node": "k8s-gpu2",
+          "pod": "chat-b-server-0"
+        },
+        "workers": [
+          {
+            "index": 0,
+            "node": "k8s-gpu2",
+            "pod": "chat-b-worker0-0"
+          }
+        ]
+      },
+      {
+        "copy": "c",
+        "id": "chat-c",
+        "model": "chat",
+        "nad": "rail7",
+        "rail": 7,
+        "server": {
+          "node": "k8s-gpu1",
+          "pod": "chat-c-server-0"
+        },
+        "workers": [
+          {
+            "index": 0,
+            "node": "k8s-gpu2",
+            "pod": "chat-c-worker0-0"
+          },
+          {
+            "index": 1,
+            "node": "k8s-gpu1",
+            "pod": "chat-c-worker1-0"
+          }
+        ]
+      },
+      {
+        "copy": "a",
+        "id": "staff-a",
+        "model": "staff",
+        "nad": "rail4",
+        "rail": 4,
+        "server": {
+          "node": "k8s-gpu1",
+          "pod": "staff-a-server-0"
+        },
+        "workers": [
+          {
+            "index": 0,
+            "node": "k8s-gpu1",
+            "pod": "staff-a-worker0-0"
+          }
+        ]
+      },
+      {
+        "copy": "b",
+        "id": "staff-b",
+        "model": "staff",
+        "nad": "rail5",
+        "rail": 5,
+        "server": {
+          "node": "k8s-gpu2",
+          "pod": "staff-b-server-0"
+        },
+        "workers": [
+          {
+            "index": 0,
+            "node": "k8s-gpu2",
+            "pod": "staff-b-worker0-0"
+          }
+        ]
+      }
+    ],
+    "inference_namespace": "inference",
+    "namespace": "serving",
+    "readiness": {
+      "failure_threshold": 2,
+      "period_s": 2,
+      "timeout_s": 2
+    },
+    "router": {
+      "attempt_timeout_s": 280,
+      "retries": 1
+    },
+    "services": [
+      {
+        "copy": null,
+        "kind": "model",
+        "model": "chat",
+        "name": "chat",
+        "servers": [
+          "chat-a-server-0",
+          "chat-b-server-0",
+          "chat-c-server-0"
+        ]
+      },
+      {
+        "copy": null,
+        "kind": "model",
+        "model": "staff",
+        "name": "staff",
+        "servers": [
+          "staff-a-server-0",
+          "staff-b-server-0"
+        ]
+      },
+      {
+        "copy": "a",
+        "kind": "copy",
+        "model": "chat",
+        "name": "chat-a",
+        "servers": [
+          "chat-a-server-0"
+        ]
+      },
+      {
+        "copy": "b",
+        "kind": "copy",
+        "model": "chat",
+        "name": "chat-b",
+        "servers": [
+          "chat-b-server-0"
+        ]
+      },
+      {
+        "copy": "c",
+        "kind": "copy",
+        "model": "chat",
+        "name": "chat-c",
+        "servers": [
+          "chat-c-server-0"
+        ]
+      },
+      {
+        "copy": "a",
+        "kind": "copy",
+        "model": "staff",
+        "name": "staff-a",
+        "servers": [
+          "staff-a-server-0"
+        ]
+      },
+      {
+        "copy": "b",
+        "kind": "copy",
+        "model": "staff",
+        "name": "staff-b",
+        "servers": [
+          "staff-b-server-0"
+        ]
+      }
+    ]
+  },
+  "timing": {
+    "hold_s": 40,
+    "lead_s": 20,
+    "return_max_s": 600,
+    "tail_s": 30,
+    "whole_polls": 30
+  }
+}

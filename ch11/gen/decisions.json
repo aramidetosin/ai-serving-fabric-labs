@@ -1,0 +1,1398 @@
+{
+  "build": "A",
+  "forwarding": {
+    "decision": "dec-forwarding-only",
+    "switches": [
+      {
+        "decision": "dec-forwarding-only",
+        "name": "fe-sw1",
+        "ports": [
+          {
+            "decision": "dec-pair-l2-only",
+            "desc": "peer-link",
+            "port": "PortChannel1"
+          },
+          {
+            "decision": "dec-fw-every-gateway",
+            "desc": "fw-ae1",
+            "port": "PortChannel10"
+          }
+        ],
+        "role": "mclag_member",
+        "stamped": "the comment under the header of bootstrap/fe-sw1/startup-config.cfg"
+      },
+      {
+        "decision": "dec-forwarding-only",
+        "name": "fe-sw2",
+        "ports": [
+          {
+            "decision": "dec-pair-l2-only",
+            "desc": "peer-link",
+            "port": "PortChannel1"
+          },
+          {
+            "decision": "dec-fw-every-gateway",
+            "desc": "fw-ae1",
+            "port": "PortChannel10"
+          }
+        ],
+        "role": "mclag_member",
+        "stamped": "the comment under the header of bootstrap/fe-sw2/startup-config.cfg"
+      },
+      {
+        "decision": "dec-forwarding-only",
+        "name": "rail-sw1",
+        "ports": [],
+        "role": "rail_vlan",
+        "stamped": "the comment under the header of bootstrap/rail-sw1/startup-config.cfg"
+      },
+      {
+        "decision": "dec-forwarding-only",
+        "name": "rail-sw2",
+        "ports": [],
+        "role": "rail_vlan",
+        "stamped": "the comment under the header of bootstrap/rail-sw2/startup-config.cfg"
+      },
+      {
+        "decision": "dec-forwarding-only",
+        "name": "oob-sw",
+        "ports": [],
+        "role": "oob_access",
+        "stamped": "the comment under the header of bootstrap/oob-sw/startup-config.cfg"
+      }
+    ],
+    "what": "forwards frames and decides nothing, with no routing protocol and no address on any served VLAN, PortChannel or host port; an MCLAG member's only addresses are its two keepalive /31s, in a VRF nothing routes"
+  },
+  "lab": "sfab-ch11",
+  "label": "decision.tarnwick.example/id",
+  "org": "Tarnwick",
+  "other": [
+    {
+      "decision": "dec-storage-data-address",
+      "objects": [
+        "node truenas1"
+      ],
+      "why": "the storage classes carry NFS and NVMe/TCP to the storage system's data address on its own Layer 2 VLAN, and the CSI driver's API calls go to its management address: an addressing choice no layer refuses on"
+    }
+  ],
+  "plan": {
+    "forwarding": {
+      "decision": "dec-forwarding-only",
+      "switches": [
+        "fe-sw1",
+        "fe-sw2",
+        "rail-sw1",
+        "rail-sw2",
+        "oob-sw"
+      ]
+    },
+    "key": {
+      "configmap": "api-gateway-routes",
+      "file": "apisix.yaml",
+      "groups": {
+        "batch": "dec-key-batch",
+        "helpdesk": "dec-key-helpdesk",
+        "inetapp": "dec-key-inetapp",
+        "staff": "dec-key-staff"
+      },
+      "namespace": "inference",
+      "selector": "app.kubernetes.io/name=api-gateway"
+    },
+    "nat": {
+      "decisions": {
+        "dnat-internet-gateway": "dec-nat-internet",
+        "internet-snat": "dec-nat-internet-snat",
+        "no-nat-public": "dec-nat-no-land"
+      },
+      "firewall": "fw",
+      "rules": [
+        "dnat-internet-gateway",
+        "no-nat-public",
+        "internet-snat"
+      ]
+    },
+    "placement": {
+      "copies": {
+        "chat-a": "dec-place-chat",
+        "chat-b": "dec-place-chat",
+        "chat-c": "dec-place-chat",
+        "staff-a": "dec-place-staff",
+        "staff-b": "dec-place-staff"
+      },
+      "label": "decision.tarnwick.example/id",
+      "nads": {
+        "rail3": "dec-place-chat",
+        "rail4": "dec-place-staff",
+        "rail5": "dec-place-staff",
+        "rail6": "dec-place-chat",
+        "rail7": "dec-place-chat"
+      },
+      "namespace": "serving",
+      "table": "bootstrap/k8s/serving.env"
+    },
+    "policy": {
+      "decisions": {
+        "admins-to-bastion": "dec-policy-admins-to-bastion",
+        "auth-zone-transfer": "dec-policy-auth-zone-transfer",
+        "bastion-to-api": "dec-policy-bastion-to-api",
+        "bastion-to-bmc": "dec-policy-bastion-to-bmc",
+        "bastion-to-firewall-admin": "dec-policy-bastion-to-firewall-admin",
+        "bastion-to-internal-gateway": "dec-policy-bastion-to-internal-gateway",
+        "bastion-to-nodes": "dec-policy-bastion-to-nodes",
+        "bastion-to-services-admin": "dec-policy-bastion-to-services-admin",
+        "bastion-to-stor-mgmt": "dec-policy-bastion-to-stor-mgmt",
+        "csi-to-storage-api": "dec-policy-csi-to-storage-api",
+        "deny-all-log": "dec-policy-deny-all-log",
+        "ent-dns-to-platform-dns": "dec-policy-ent-dns-to-platform-dns",
+        "inside-to-gateway-ping": "dec-policy-inside-to-gateway-ping",
+        "inside-to-ntp": "dec-policy-inside-to-ntp",
+        "inside-to-resolvers": "dec-policy-inside-to-resolvers",
+        "isp-to-internet-gateway": "dec-nat-internet",
+        "nodes-to-internal-gateway": "dec-policy-nodes-to-internal-gateway",
+        "nodes-to-registry": "dec-policy-nodes-to-registry",
+        "ntp-upstream": "dec-policy-ntp-upstream",
+        "nts-ke-upstream": "dec-policy-nts-ke-upstream",
+        "operator-ike": "dec-policy-operator-ike",
+        "operator-to-internal-gateway": "dec-policy-operator-vpn",
+        "resolvers-to-auth": "dec-policy-resolvers-to-auth",
+        "staff-to-enterprise-dns": "dec-policy-staff-to-enterprise-dns",
+        "staff-to-users-gateway": "dec-policy-enterprise-users"
+      },
+      "firewall": "fw",
+      "rules": [
+        "staff-to-users-gateway",
+        "ent-dns-to-platform-dns",
+        "staff-to-enterprise-dns",
+        "admins-to-bastion",
+        "bastion-to-firewall-admin",
+        "bastion-to-nodes",
+        "bastion-to-api",
+        "bastion-to-internal-gateway",
+        "bastion-to-stor-mgmt",
+        "bastion-to-bmc",
+        "bastion-to-services-admin",
+        "inside-to-gateway-ping",
+        "inside-to-resolvers",
+        "inside-to-ntp",
+        "resolvers-to-auth",
+        "auth-zone-transfer",
+        "ntp-upstream",
+        "nts-ke-upstream",
+        "nodes-to-registry",
+        "nodes-to-internal-gateway",
+        "csi-to-storage-api",
+        "operator-ike",
+        "operator-to-internal-gateway",
+        "isp-to-internet-gateway",
+        "deny-all-log"
+      ]
+    },
+    "routeset": {
+      "audience_label": "tarnwick.example/audience",
+      "label": "decision.tarnwick.example/id",
+      "routes": [
+        {
+          "decision": "dec-routeset-internal",
+          "gateway": "gw-internal",
+          "name": "models-gw-internal",
+          "namespace": "inference"
+        },
+        {
+          "decision": "dec-routeset-enterprise",
+          "gateway": "gw-users",
+          "name": "models-gw-users",
+          "namespace": "inference"
+        },
+        {
+          "decision": "dec-routeset-internet",
+          "gateway": "gw-inet",
+          "name": "models-gw-inet",
+          "namespace": "inference"
+        },
+        {
+          "decision": "dec-routeset-internal",
+          "gateway": "gw-internal",
+          "name": "serving",
+          "namespace": "serving"
+        },
+        {
+          "decision": "dec-routeset-internal",
+          "gateway": "gw-internal",
+          "name": "echo-gw-internal",
+          "namespace": "echo"
+        },
+        {
+          "decision": "dec-routeset-enterprise",
+          "gateway": "gw-users",
+          "name": "echo-gw-users",
+          "namespace": "echo"
+        },
+        {
+          "decision": "dec-routeset-internet",
+          "gateway": "gw-inet",
+          "name": "echo-gw-inet",
+          "namespace": "echo"
+        }
+      ]
+    },
+    "routing": {
+      "firewall": "fw",
+      "routers": [
+        {
+          "conf": "/sfab/bootstrap/frr.conf",
+          "node": "uplink-rtr"
+        },
+        {
+          "conf": "/sfab/bootstrap/frr.conf",
+          "node": "isp-rtr"
+        }
+      ]
+    },
+    "view": {
+      "lookups": [
+        {
+          "answer": "10.20.11.210",
+          "client": "ent-client",
+          "decision": "dec-view-enterprise",
+          "kind": "client",
+          "name": "llm.ai.tarnwick.example",
+          "population": "enterprise",
+          "server": "10.24.10.53",
+          "view": "enterprise"
+        },
+        {
+          "answer": null,
+          "client": "ops-client",
+          "decision": "dec-view-public",
+          "kind": "client",
+          "name": "llm.ai.tarnwick.example",
+          "population": "operator",
+          "server": "192.0.2.10",
+          "view": "public-operator"
+        },
+        {
+          "answer": "10.20.11.200",
+          "client": "k8s-cp2",
+          "decision": "dec-view-internal",
+          "kind": "vm-node",
+          "name": "llm.ai.tarnwick.example",
+          "population": "nodes",
+          "server": "10.20.13.21",
+          "view": "internal"
+        },
+        {
+          "answer": null,
+          "client": "web-client",
+          "decision": "dec-view-public",
+          "kind": "client",
+          "name": "llm.ai.tarnwick.example",
+          "population": "web",
+          "server": "192.0.2.10",
+          "view": "public-operator"
+        },
+        {
+          "answer": "198.51.100.10",
+          "client": "inet-client",
+          "decision": "dec-view-public",
+          "kind": "client",
+          "name": "llm.ai.tarnwick.example",
+          "population": "internet",
+          "server": "203.0.113.10",
+          "view": "public-internet"
+        }
+      ],
+      "zones": [
+        {
+          "decision": "dec-view-internal",
+          "file": "db.internal.ai.tarnwick.example",
+          "holds": true,
+          "name": "llm.ai.tarnwick.example",
+          "server": "dns-auth1",
+          "view": "internal"
+        },
+        {
+          "decision": "dec-view-enterprise",
+          "file": "db.enterprise.ai.tarnwick.example",
+          "holds": true,
+          "name": "llm.ai.tarnwick.example",
+          "server": "dns-auth1",
+          "view": "enterprise"
+        },
+        {
+          "decision": "dec-view-public",
+          "file": "db.public-operator.ai.tarnwick.example",
+          "holds": false,
+          "name": "llm.ai.tarnwick.example",
+          "server": "ops-dns",
+          "view": "public-operator"
+        },
+        {
+          "decision": "dec-view-public",
+          "file": "db.public-internet.ai.tarnwick.example",
+          "holds": true,
+          "name": "llm.ai.tarnwick.example",
+          "server": "inet-dns-auth",
+          "view": "public-internet"
+        }
+      ]
+    }
+  },
+  "rows": [
+    {
+      "decision": "Which address a population gets for a name",
+      "evidence": "The answer dig returns on the population's own client",
+      "id": "view",
+      "layer": "Resolver view",
+      "note": "a wrong answer moves the request to another layer's refusal",
+      "object": "The platform's authoritative pair, with an internal view for the platform's resolvers and an enterprise view for the corporate resolver; a public server on the internet side that publishes the users' name from Chapter 9; the uplink side's server publishes none",
+      "objects": [
+        {
+          "answer": "10.20.11.200",
+          "decision": "dec-view-internal",
+          "device": "dns-auth1",
+          "kind": "DNS view",
+          "match": [
+            "node:dns-res1",
+            "node:dns-res2"
+          ],
+          "name": "internal",
+          "server_kind": "bind-auth",
+          "servers": [
+            "dns-auth1",
+            "dns-auth2"
+          ],
+          "stamped": "zone file comments, bootstrap/dns-auth1/zones/db.internal.ai.tarnwick.example, and the view's comment in named.conf"
+        },
+        {
+          "answer": "10.20.11.210",
+          "decision": "dec-view-enterprise",
+          "device": "dns-auth1",
+          "kind": "DNS view",
+          "match": [
+            "node:ent-dns"
+          ],
+          "name": "enterprise",
+          "server_kind": "bind-auth",
+          "servers": [
+            "dns-auth1",
+            "dns-auth2"
+          ],
+          "stamped": "zone file comments, bootstrap/dns-auth1/zones/db.enterprise.ai.tarnwick.example, and the view's comment in named.conf"
+        },
+        {
+          "answer": "198.51.100.2",
+          "decision": "dec-view-public",
+          "device": "ops-dns",
+          "kind": "DNS view",
+          "match": [
+            "operator"
+          ],
+          "name": "public-operator",
+          "server_kind": "bind-auth",
+          "servers": [
+            "ops-dns"
+          ],
+          "stamped": "zone file comments, bootstrap/ops-dns/zones/db.public-operator.ai.tarnwick.example, and the view's comment in named.conf"
+        },
+        {
+          "answer": "198.51.100.10",
+          "decision": "dec-view-public",
+          "device": "inet-dns-auth",
+          "kind": "DNS view",
+          "match": [
+            "internet"
+          ],
+          "name": "public-internet",
+          "server_kind": "bind-auth",
+          "servers": [
+            "inet-dns-auth"
+          ],
+          "stamped": "zone file comments, bootstrap/inet-dns-auth/zones/db.public-internet.ai.tarnwick.example, and the view's comment in named.conf"
+        }
+      ],
+      "owner": "resolver",
+      "prefix": "dec-view-",
+      "refusal": "none"
+    },
+    {
+      "decision": "Whether a route to the destination exists, looked up on ingress",
+      "evidence": "The route table of each device on the path; for silence, the table of the device without the route, beside a capture at that hop",
+      "id": "routing",
+      "layer": "Routing",
+      "object": "The firewall's one routing instance, which holds its gateway subnets as connected routes, the operator's site through the tunnel, the internet users' prefix through the ISP link, a default route toward the uplink and discard routes for the rest of RFC 1918; the uplink router, which holds a static route to each of the firewall's gateway subnets via the public address; the ISP router, which holds its customers and the firewall's link and no inside route",
+      "objects": [
+        {
+          "decision": "dec-route-connected-ae1-100",
+          "dest": "10.20.1.0/24",
+          "device": "fw",
+          "kind": "connected subnet",
+          "name": "ae1.100",
+          "stamped": "not stamped on the firewall",
+          "zone": "k8s-nodes"
+        },
+        {
+          "decision": "dec-route-connected-ae1-110",
+          "dest": "10.20.11.0/24",
+          "device": "fw",
+          "kind": "connected subnet",
+          "name": "ae1.110",
+          "stamped": "not stamped on the firewall",
+          "zone": "ingress"
+        },
+        {
+          "decision": "dec-route-connected-ae1-200",
+          "dest": "10.20.2.0/24",
+          "device": "fw",
+          "kind": "connected subnet",
+          "name": "ae1.200",
+          "stamped": "not stamped on the firewall",
+          "zone": "stor-mgmt"
+        },
+        {
+          "decision": "dec-route-connected-ae1-300",
+          "dest": "10.20.3.0/24",
+          "device": "fw",
+          "kind": "connected subnet",
+          "name": "ae1.300",
+          "stamped": "not stamped on the firewall",
+          "zone": "bastion"
+        },
+        {
+          "decision": "dec-route-connected-ae1-130",
+          "dest": "10.20.13.0/24",
+          "device": "fw",
+          "kind": "connected subnet",
+          "name": "ae1.130",
+          "stamped": "not stamped on the firewall",
+          "zone": "services"
+        },
+        {
+          "decision": "dec-route-connected-ae1-131",
+          "dest": "10.20.14.0/24",
+          "device": "fw",
+          "kind": "connected subnet",
+          "name": "ae1.131",
+          "stamped": "not stamped on the firewall",
+          "zone": "services"
+        },
+        {
+          "decision": "dec-route-connected-ethernet1-3",
+          "dest": "10.20.9.0/24",
+          "device": "fw",
+          "kind": "connected subnet",
+          "name": "ethernet1/3",
+          "stamped": "not stamped on the firewall",
+          "zone": "oob"
+        },
+        {
+          "decision": "dec-route-connected-ethernet1-4",
+          "dest": "10.24.10.8/30",
+          "device": "fw",
+          "kind": "connected subnet",
+          "name": "ethernet1/4",
+          "stamped": "not stamped on the firewall",
+          "zone": "enterprise"
+        },
+        {
+          "decision": "dec-route-connected-ethernet1-7",
+          "dest": "10.24.10.52/30",
+          "device": "fw",
+          "kind": "connected subnet",
+          "name": "ethernet1/7",
+          "stamped": "not stamped on the firewall",
+          "zone": "enterprise"
+        },
+        {
+          "decision": "dec-route-connected-ethernet1-5",
+          "dest": "198.51.100.0/29",
+          "device": "fw",
+          "kind": "connected subnet",
+          "name": "ethernet1/5",
+          "stamped": "not stamped on the firewall",
+          "zone": "uplink"
+        },
+        {
+          "decision": "dec-route-connected-ethernet1-6",
+          "dest": "198.51.100.8/30",
+          "device": "fw",
+          "kind": "connected subnet",
+          "name": "ethernet1/6",
+          "stamped": "not stamped on the firewall",
+          "zone": "isp"
+        },
+        {
+          "decision": "dec-route-default-uplink",
+          "dest": "0.0.0.0/0",
+          "device": "fw",
+          "interface": "ethernet1/5",
+          "kind": "static route",
+          "name": "default-uplink",
+          "nexthop": "198.51.100.1",
+          "stamped": "not stamped on the firewall"
+        },
+        {
+          "decision": "dec-route-operator-site",
+          "dest": "192.0.2.0/30",
+          "device": "fw",
+          "interface": "tunnel.1",
+          "kind": "static route",
+          "name": "operator-site",
+          "nexthop": null,
+          "stamped": "not stamped on the firewall"
+        },
+        {
+          "decision": "dec-route-isp-customers",
+          "dest": "203.0.113.0/26",
+          "device": "fw",
+          "interface": "ethernet1/6",
+          "kind": "static route",
+          "name": "isp-customers",
+          "nexthop": "198.51.100.9",
+          "stamped": "not stamped on the firewall"
+        },
+        {
+          "decision": "dec-route-discard-10",
+          "dest": "10.0.0.0/8",
+          "device": "fw",
+          "interface": null,
+          "kind": "static route",
+          "name": "discard-10",
+          "nexthop": null,
+          "stamped": "not stamped on the firewall"
+        },
+        {
+          "decision": "dec-route-discard-172-16",
+          "dest": "172.16.0.0/12",
+          "device": "fw",
+          "interface": null,
+          "kind": "static route",
+          "name": "discard-172-16",
+          "nexthop": null,
+          "stamped": "not stamped on the firewall"
+        },
+        {
+          "decision": "dec-route-discard-192-168",
+          "dest": "192.168.0.0/16",
+          "device": "fw",
+          "interface": null,
+          "kind": "static route",
+          "name": "discard-192-168",
+          "nexthop": null,
+          "stamped": "not stamped on the firewall"
+        },
+        {
+          "decision": "dec-route-operator-site",
+          "dest": "192.0.2.0/30",
+          "device": "uplink-rtr",
+          "kind": "static route",
+          "name": "operator-site",
+          "nexthop": "192.0.2.22",
+          "stamped": "its comment line in bootstrap/uplink-rtr/frr.conf"
+        },
+        {
+          "decision": "dec-route-inside-via-fw",
+          "dest": "10.20.1.0/24",
+          "device": "uplink-rtr",
+          "kind": "static route",
+          "name": "inside-nodes",
+          "nexthop": "198.51.100.2",
+          "stamped": "its comment line in bootstrap/uplink-rtr/frr.conf"
+        },
+        {
+          "decision": "dec-route-inside-via-fw",
+          "dest": "10.20.11.0/24",
+          "device": "uplink-rtr",
+          "kind": "static route",
+          "name": "inside-ingress",
+          "nexthop": "198.51.100.2",
+          "stamped": "its comment line in bootstrap/uplink-rtr/frr.conf"
+        },
+        {
+          "decision": "dec-route-inside-via-fw",
+          "dest": "10.20.2.0/24",
+          "device": "uplink-rtr",
+          "kind": "static route",
+          "name": "inside-stor-mgmt",
+          "nexthop": "198.51.100.2",
+          "stamped": "its comment line in bootstrap/uplink-rtr/frr.conf"
+        },
+        {
+          "decision": "dec-route-inside-via-fw",
+          "dest": "10.20.3.0/24",
+          "device": "uplink-rtr",
+          "kind": "static route",
+          "name": "inside-bastion",
+          "nexthop": "198.51.100.2",
+          "stamped": "its comment line in bootstrap/uplink-rtr/frr.conf"
+        },
+        {
+          "decision": "dec-route-inside-via-fw",
+          "dest": "10.20.13.0/24",
+          "device": "uplink-rtr",
+          "kind": "static route",
+          "name": "inside-services-a",
+          "nexthop": "198.51.100.2",
+          "stamped": "its comment line in bootstrap/uplink-rtr/frr.conf"
+        },
+        {
+          "decision": "dec-route-inside-via-fw",
+          "dest": "10.20.14.0/24",
+          "device": "uplink-rtr",
+          "kind": "static route",
+          "name": "inside-services-b",
+          "nexthop": "198.51.100.2",
+          "stamped": "its comment line in bootstrap/uplink-rtr/frr.conf"
+        },
+        {
+          "decision": "dec-route-inside-via-fw",
+          "dest": "10.20.9.0/24",
+          "device": "uplink-rtr",
+          "kind": "static route",
+          "name": "inside-oob",
+          "nexthop": "198.51.100.2",
+          "stamped": "its comment line in bootstrap/uplink-rtr/frr.conf"
+        },
+        {
+          "decision": "dec-route-inside-via-fw",
+          "dest": "10.24.10.0/24",
+          "device": "uplink-rtr",
+          "kind": "static route",
+          "name": "inside-enterprise",
+          "nexthop": "198.51.100.2",
+          "stamped": "its comment line in bootstrap/uplink-rtr/frr.conf"
+        }
+      ],
+      "owner": "firewall, and the routers in front of it",
+      "prefix": "dec-route-",
+      "refusal": "silence"
+    },
+    {
+      "decision": "Which address a request leaves or lands with, keyed on the pre-NAT zone",
+      "evidence": "The session's NAT rule and translated address",
+      "id": "nat",
+      "layer": "NAT",
+      "note": "an untranslated request goes on to policy",
+      "object": "The NAT rulebase: the internet users' destination NAT from the isp zone on the firewall's own isp address to the internet Gateway's VIP, the no-translation rule for the public address and source NAT for the allowlisted egress; nothing is published on the uplink",
+      "objects": [
+        {
+          "decision": "dec-nat-internet",
+          "device": "fw",
+          "from": [
+            "isp"
+          ],
+          "kind": "NAT rule",
+          "name": "dnat-internet-gateway",
+          "stamped": "the rule's description",
+          "to": [
+            "isp"
+          ],
+          "translation": "destination 10.20.11.220"
+        },
+        {
+          "decision": "dec-nat-no-land",
+          "device": "fw",
+          "from": [
+            "k8s-nodes",
+            "services"
+          ],
+          "kind": "NAT rule",
+          "name": "no-nat-public",
+          "stamped": "the rule's description",
+          "to": [
+            "uplink"
+          ],
+          "translation": "none"
+        },
+        {
+          "decision": "dec-nat-internet-snat",
+          "device": "fw",
+          "from": [
+            "k8s-nodes",
+            "services"
+          ],
+          "kind": "NAT rule",
+          "name": "internet-snat",
+          "stamped": "the rule's description",
+          "to": [
+            "uplink"
+          ],
+          "translation": "source, ethernet1/5's address"
+        }
+      ],
+      "owner": "firewall",
+      "prefix": "dec-nat-",
+      "refusal": "none"
+    },
+    {
+      "decision": "Allow or deny, and log, on the original addresses and the post-NAT zone",
+      "evidence": "The traffic log line naming the rule",
+      "id": "policy",
+      "layer": "Security policy",
+      "object": "The security rulebase of App-ID rules, each with the profile group, closing with deny-all-log, the predefined intrazone and interzone rules set to deny",
+      "objects": [
+        {
+          "action": "allow",
+          "decision": "dec-policy-enterprise-users",
+          "device": "fw",
+          "from": [
+            "enterprise"
+          ],
+          "kind": "security rule",
+          "name": "staff-to-users-gateway",
+          "stamped": "the rule's description",
+          "to": [
+            "ingress"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-ent-dns-to-platform-dns",
+          "device": "fw",
+          "from": [
+            "enterprise"
+          ],
+          "kind": "security rule",
+          "name": "ent-dns-to-platform-dns",
+          "stamped": "the rule's description",
+          "to": [
+            "services"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-staff-to-enterprise-dns",
+          "device": "fw",
+          "from": [
+            "enterprise"
+          ],
+          "kind": "security rule",
+          "name": "staff-to-enterprise-dns",
+          "stamped": "the rule's description",
+          "to": [
+            "enterprise"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-admins-to-bastion",
+          "device": "fw",
+          "from": [
+            "enterprise",
+            "operator-vpn"
+          ],
+          "kind": "security rule",
+          "name": "admins-to-bastion",
+          "stamped": "the rule's description",
+          "to": [
+            "bastion"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-bastion-to-firewall-admin",
+          "device": "fw",
+          "from": [
+            "bastion"
+          ],
+          "kind": "security rule",
+          "name": "bastion-to-firewall-admin",
+          "stamped": "the rule's description",
+          "to": [
+            "bastion"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-bastion-to-nodes",
+          "device": "fw",
+          "from": [
+            "bastion"
+          ],
+          "kind": "security rule",
+          "name": "bastion-to-nodes",
+          "stamped": "the rule's description",
+          "to": [
+            "k8s-nodes"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-bastion-to-api",
+          "device": "fw",
+          "from": [
+            "bastion"
+          ],
+          "kind": "security rule",
+          "name": "bastion-to-api",
+          "stamped": "the rule's description",
+          "to": [
+            "k8s-nodes"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-bastion-to-internal-gateway",
+          "device": "fw",
+          "from": [
+            "bastion"
+          ],
+          "kind": "security rule",
+          "name": "bastion-to-internal-gateway",
+          "stamped": "the rule's description",
+          "to": [
+            "ingress"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-bastion-to-stor-mgmt",
+          "device": "fw",
+          "from": [
+            "bastion"
+          ],
+          "kind": "security rule",
+          "name": "bastion-to-stor-mgmt",
+          "stamped": "the rule's description",
+          "to": [
+            "stor-mgmt"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-bastion-to-bmc",
+          "device": "fw",
+          "from": [
+            "bastion"
+          ],
+          "kind": "security rule",
+          "name": "bastion-to-bmc",
+          "stamped": "the rule's description",
+          "to": [
+            "oob"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-bastion-to-services-admin",
+          "device": "fw",
+          "from": [
+            "bastion"
+          ],
+          "kind": "security rule",
+          "name": "bastion-to-services-admin",
+          "stamped": "the rule's description",
+          "to": [
+            "services"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-inside-to-gateway-ping",
+          "device": "fw",
+          "from": [
+            "k8s-nodes",
+            "ingress",
+            "stor-mgmt",
+            "services",
+            "bastion",
+            "oob",
+            "enterprise"
+          ],
+          "kind": "security rule",
+          "name": "inside-to-gateway-ping",
+          "stamped": "the rule's description",
+          "to": [
+            "k8s-nodes",
+            "ingress",
+            "stor-mgmt",
+            "services",
+            "bastion",
+            "oob",
+            "enterprise"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-inside-to-resolvers",
+          "device": "fw",
+          "from": [
+            "k8s-nodes",
+            "ingress",
+            "stor-mgmt",
+            "bastion",
+            "oob",
+            "services"
+          ],
+          "kind": "security rule",
+          "name": "inside-to-resolvers",
+          "stamped": "the rule's description",
+          "to": [
+            "services"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-inside-to-ntp",
+          "device": "fw",
+          "from": [
+            "k8s-nodes",
+            "ingress",
+            "stor-mgmt",
+            "bastion",
+            "oob",
+            "services"
+          ],
+          "kind": "security rule",
+          "name": "inside-to-ntp",
+          "stamped": "the rule's description",
+          "to": [
+            "services"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-resolvers-to-auth",
+          "device": "fw",
+          "from": [
+            "services"
+          ],
+          "kind": "security rule",
+          "name": "resolvers-to-auth",
+          "stamped": "the rule's description",
+          "to": [
+            "services"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-auth-zone-transfer",
+          "device": "fw",
+          "from": [
+            "services"
+          ],
+          "kind": "security rule",
+          "name": "auth-zone-transfer",
+          "stamped": "the rule's description",
+          "to": [
+            "services"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-ntp-upstream",
+          "device": "fw",
+          "from": [
+            "services"
+          ],
+          "kind": "security rule",
+          "name": "ntp-upstream",
+          "stamped": "the rule's description",
+          "to": [
+            "uplink"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-nts-ke-upstream",
+          "device": "fw",
+          "from": [
+            "services"
+          ],
+          "kind": "security rule",
+          "name": "nts-ke-upstream",
+          "stamped": "the rule's description",
+          "to": [
+            "uplink"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-nodes-to-registry",
+          "device": "fw",
+          "from": [
+            "k8s-nodes"
+          ],
+          "kind": "security rule",
+          "name": "nodes-to-registry",
+          "stamped": "the rule's description",
+          "to": [
+            "uplink"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-nodes-to-internal-gateway",
+          "device": "fw",
+          "from": [
+            "k8s-nodes"
+          ],
+          "kind": "security rule",
+          "name": "nodes-to-internal-gateway",
+          "stamped": "the rule's description",
+          "to": [
+            "ingress"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-csi-to-storage-api",
+          "device": "fw",
+          "from": [
+            "k8s-nodes"
+          ],
+          "kind": "security rule",
+          "name": "csi-to-storage-api",
+          "stamped": "the rule's description",
+          "to": [
+            "stor-mgmt"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-operator-ike",
+          "device": "fw",
+          "from": [
+            "uplink"
+          ],
+          "kind": "security rule",
+          "name": "operator-ike",
+          "stamped": "the rule's description",
+          "to": [
+            "uplink"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-policy-operator-vpn",
+          "device": "fw",
+          "from": [
+            "operator-vpn"
+          ],
+          "kind": "security rule",
+          "name": "operator-to-internal-gateway",
+          "stamped": "the rule's description",
+          "to": [
+            "ingress"
+          ]
+        },
+        {
+          "action": "allow",
+          "decision": "dec-nat-internet",
+          "device": "fw",
+          "from": [
+            "isp"
+          ],
+          "kind": "security rule",
+          "name": "isp-to-internet-gateway",
+          "stamped": "the rule's description",
+          "to": [
+            "ingress"
+          ]
+        },
+        {
+          "action": "deny",
+          "decision": "dec-policy-deny-all-log",
+          "device": "fw",
+          "from": [
+            "any"
+          ],
+          "kind": "security rule",
+          "name": "deny-all-log",
+          "stamped": "the rule's description",
+          "to": [
+            "any"
+          ]
+        }
+      ],
+      "owner": "firewall",
+      "prefix": "dec-policy-",
+      "refusal": "log-line"
+    },
+    {
+      "decision": "Whether a hostname and path exist for the audience behind that Gateway",
+      "evidence": "The HTTP status the Gateway returns, and for a refusal, no line in the API gateway's log",
+      "id": "routeset",
+      "layer": "Route set",
+      "object": "Each Gateway's HTTPRoutes: the internal Gateway's /models/ prefix and admin hostnames, the users' Gateway's one path per model, the internet Gateway's one path, chat's",
+      "objects": [
+        {
+          "decision": "dec-routeset-internal",
+          "device": "gw-internal",
+          "gateway": "gw-internal",
+          "hostnames": [
+            "llm.ai.tarnwick.example"
+          ],
+          "kind": "HTTPRoute",
+          "models": [
+            "all"
+          ],
+          "name": "models-gw-internal",
+          "namespace": "inference",
+          "paths": [
+            "/models"
+          ],
+          "stamped": "the HTTPRoute's label decision.tarnwick.example/id",
+          "to": "the API gateway (api-gateway)"
+        },
+        {
+          "decision": "dec-routeset-enterprise",
+          "device": "gw-users",
+          "gateway": "gw-users",
+          "hostnames": [
+            "llm.ai.tarnwick.example"
+          ],
+          "kind": "HTTPRoute",
+          "models": [
+            "chat",
+            "staff"
+          ],
+          "name": "models-gw-users",
+          "namespace": "inference",
+          "paths": [
+            "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7",
+            "/models/8242d5c4-9bce-5497-8414-f5bad94fdd84"
+          ],
+          "stamped": "the HTTPRoute's label decision.tarnwick.example/id",
+          "to": "the API gateway (api-gateway)"
+        },
+        {
+          "decision": "dec-routeset-internet",
+          "device": "gw-inet",
+          "gateway": "gw-inet",
+          "hostnames": [
+            "llm.ai.tarnwick.example"
+          ],
+          "kind": "HTTPRoute",
+          "models": [
+            "chat"
+          ],
+          "name": "models-gw-inet",
+          "namespace": "inference",
+          "paths": [
+            "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7"
+          ],
+          "stamped": "the HTTPRoute's label decision.tarnwick.example/id",
+          "to": "the API gateway (api-gateway)"
+        },
+        {
+          "decision": "dec-routeset-internal",
+          "device": "gw-internal",
+          "gateway": "gw-internal",
+          "hostnames": [
+            "serve.ai.tarnwick.example"
+          ],
+          "kind": "HTTPRoute",
+          "models": [
+            "chat",
+            "staff"
+          ],
+          "name": "serving",
+          "namespace": "serving",
+          "paths": [
+            "/chat",
+            "/staff"
+          ],
+          "stamped": "the HTTPRoute's label decision.tarnwick.example/id",
+          "to": "the serving recipe's Services"
+        },
+        {
+          "decision": "dec-routeset-internal",
+          "device": "gw-internal",
+          "gateway": "gw-internal",
+          "hostnames": [
+            "llm.ai.tarnwick.example",
+            "admin.ai.tarnwick.example",
+            "grafana.ai.tarnwick.example"
+          ],
+          "kind": "HTTPRoute",
+          "models": [],
+          "name": "echo-gw-internal",
+          "namespace": "echo",
+          "paths": [
+            "/echo"
+          ],
+          "stamped": "the HTTPRoute's label decision.tarnwick.example/id",
+          "to": "the test backend (echo)"
+        },
+        {
+          "decision": "dec-routeset-enterprise",
+          "device": "gw-users",
+          "gateway": "gw-users",
+          "hostnames": [
+            "llm.ai.tarnwick.example"
+          ],
+          "kind": "HTTPRoute",
+          "models": [],
+          "name": "echo-gw-users",
+          "namespace": "echo",
+          "paths": [
+            "/echo"
+          ],
+          "stamped": "the HTTPRoute's label decision.tarnwick.example/id",
+          "to": "the test backend (echo)"
+        },
+        {
+          "decision": "dec-routeset-internet",
+          "device": "gw-inet",
+          "gateway": "gw-inet",
+          "hostnames": [
+            "llm.ai.tarnwick.example"
+          ],
+          "kind": "HTTPRoute",
+          "models": [],
+          "name": "echo-gw-inet",
+          "namespace": "echo",
+          "paths": [
+            "/echo"
+          ],
+          "stamped": "the HTTPRoute's label decision.tarnwick.example/id",
+          "to": "the test backend (echo)"
+        }
+      ],
+      "owner": "Gateway",
+      "prefix": "dec-routeset-",
+      "refusal": "404"
+    },
+    {
+      "decision": "Whether the caller may use the model",
+      "evidence": "The API gateway's 401 with the message it gives an unknown credential, the same for a credential of a caller the model's route does not admit; it names neither the credential nor its consumer",
+      "id": "key",
+      "layer": "Caller",
+      "object": "One route per model, admitting the consumer groups of the callers that may call it; one group per caller, its consumers an application's keys or the people its identity provider signs in",
+      "objects": [
+        {
+          "caller_kind": "application",
+          "decision": "dec-key-batch",
+          "device": "api-gateway",
+          "kind": "consumer group",
+          "models": [
+            "chat"
+          ],
+          "name": "batch",
+          "route": "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7",
+          "stamped": "the consumer group's desc in the ConfigMap api-gateway-routes"
+        },
+        {
+          "caller_kind": "application",
+          "decision": "dec-key-helpdesk",
+          "device": "api-gateway",
+          "kind": "consumer group",
+          "models": [
+            "staff"
+          ],
+          "name": "helpdesk",
+          "route": "/models/8242d5c4-9bce-5497-8414-f5bad94fdd84",
+          "stamped": "the consumer group's desc in the ConfigMap api-gateway-routes"
+        },
+        {
+          "caller_kind": "people",
+          "decision": "dec-key-staff",
+          "device": "api-gateway",
+          "kind": "consumer group",
+          "models": [
+            "chat",
+            "staff"
+          ],
+          "name": "staff",
+          "route": "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7, /models/8242d5c4-9bce-5497-8414-f5bad94fdd84",
+          "stamped": "the consumer group's desc in the ConfigMap api-gateway-routes"
+        },
+        {
+          "caller_kind": "application",
+          "decision": "dec-key-inetapp",
+          "device": "api-gateway",
+          "kind": "consumer group",
+          "models": [
+            "chat"
+          ],
+          "name": "inetapp",
+          "route": "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7",
+          "stamped": "the consumer group's desc in the ConfigMap api-gateway-routes"
+        }
+      ],
+      "owner": "API gateway",
+      "prefix": "dec-key-",
+      "refusal": "401"
+    },
+    {
+      "decision": "Which rail a replica's workers answer from",
+      "evidence": "Each pod's network-status annotation read against the table, and the worker's rail port counter",
+      "id": "placement",
+      "layer": "Placement",
+      "note": "a dead rail removes a copy, not the model",
+      "object": "The placement table, and each replica's Multus attachment, one per rail",
+      "objects": [
+        {
+          "attachment": "rail3",
+          "decision": "dec-place-chat",
+          "device": "cluster",
+          "kind": "model copy",
+          "name": "chat-a",
+          "rail": 3,
+          "server": "k8s-gpu1",
+          "stamped": "the placement table's decision column, each pod's label and the attachment's annotation",
+          "workers": [
+            "k8s-gpu1"
+          ]
+        },
+        {
+          "attachment": "rail6",
+          "decision": "dec-place-chat",
+          "device": "cluster",
+          "kind": "model copy",
+          "name": "chat-b",
+          "rail": 6,
+          "server": "k8s-gpu2",
+          "stamped": "the placement table's decision column, each pod's label and the attachment's annotation",
+          "workers": [
+            "k8s-gpu2"
+          ]
+        },
+        {
+          "attachment": "rail7",
+          "decision": "dec-place-chat",
+          "device": "cluster",
+          "kind": "model copy",
+          "name": "chat-c",
+          "rail": 7,
+          "server": "k8s-gpu1",
+          "stamped": "the placement table's decision column, each pod's label and the attachment's annotation",
+          "workers": [
+            "k8s-gpu2",
+            "k8s-gpu1"
+          ]
+        },
+        {
+          "attachment": "rail4",
+          "decision": "dec-place-staff",
+          "device": "cluster",
+          "kind": "model copy",
+          "name": "staff-a",
+          "rail": 4,
+          "server": "k8s-gpu1",
+          "stamped": "the placement table's decision column, each pod's label and the attachment's annotation",
+          "workers": [
+            "k8s-gpu1"
+          ]
+        },
+        {
+          "attachment": "rail5",
+          "decision": "dec-place-staff",
+          "device": "cluster",
+          "kind": "model copy",
+          "name": "staff-b",
+          "rail": 5,
+          "server": "k8s-gpu2",
+          "stamped": "the placement table's decision column, each pod's label and the attachment's annotation",
+          "workers": [
+            "k8s-gpu2"
+          ]
+        }
+      ],
+      "owner": "cluster",
+      "prefix": "dec-place-",
+      "refusal": "none"
+    }
+  ],
+  "schema": 1
+}

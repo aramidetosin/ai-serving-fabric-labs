@@ -1,0 +1,7 @@
+# The operator site's VPN router (sfab/vpngw, strongSwan): SLUG SURFACE COMMAND. judge.py's firewall
+# group judges these beside the firewall's own SA reads: the container is healthy (its HEALTHCHECK
+# finds charon running), and swanctl reaches charon and lists the tunnel's IKE SA and one child SA
+# per proxy ID. A swanctl that cannot reach charon's VICI socket fails here even while the tunnel is up.
+container_health     host        container_health
+swanctl_sas          exec        swanctl --list-sas
+swanctl_conns        exec        swanctl --list-conns

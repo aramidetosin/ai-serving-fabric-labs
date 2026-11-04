@@ -1,0 +1,27 @@
+[Unit]
+Description=sfab cluster bootstrap: kubeadm init or join, kube-vip, and on the init node the Gateway API CRDs and Cilium
+Documentation=file:/opt/sfab/bin/cluster-bootstrap.sh
+# The data network first (the bond, the API VIP's hosts entry, the resolver), and containerd.
+After=sfab-netsetup.service containerd.service network-online.target
+Requires=sfab-netsetup.service containerd.service
+Wants=network-online.target
+# Only a Kubernetes node carries its cluster files (render/k8s.py, seeded by vm-init.sh).
+ConditionPathExists=/etc/sfab/k8s/cluster.env
+# Restart=on-failure retries for as long as it takes: a joining node waits on the init node, and
+# the init node on the lab CA and the registry.
+StartLimitIntervalSec=0
+
+[Service]
+Type=oneshot
+# Inactive with status 0 once it is done: the finish stage waits for that, in this boot.
+RemainAfterExit=no
+ExecStart=/opt/sfab/bin/cluster-bootstrap.sh
+Restart=on-failure
+RestartSec=20
+# kubeadm init, the CRDs and Cilium take many minutes on the VM guests; nothing here may cut them.
+TimeoutStartSec=infinity
+StandardOutput=journal+console
+StandardError=journal+console
+
+[Install]
+WantedBy=multi-user.target

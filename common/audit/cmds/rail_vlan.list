@@ -1,0 +1,6 @@
+# A rail VLAN switch, after dell_sonic.list.
+interface_counters   klish       show interface counters
+# Loop protection and storm control on the rail access ports (judge.py l2-hygiene).
+running_stp          klish       show running-configuration spanning-tree
++bpdu_guard          klish       show spanning-tree bpdu-guard
+storm_control        klish       show storm-control

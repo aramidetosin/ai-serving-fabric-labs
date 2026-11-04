@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+# sfab-ntp: the time server of sfab/resolver (render/dns.py chrony_server, chrony_reference).
+#
+#   sfab-ntp start   [DIR]   check DIR/chrony.conf (default /sfab/bootstrap), install it live, and
+#                            start chronyd on it when it is not running
+#   sfab-ntp stop            stop chronyd
+#   sfab-ntp running         exit 0 when chronyd runs, 1 when it does not (prints nothing)
+#   sfab-ntp status          the live file's sha256, whether chronyd runs, and its sources and
+#                            tracking (chronyc on its local socket; the network command port is off)
+#
+# chronyd runs with -x: it never adjusts the clock, which is the lab host's own (a container shares
+# the host kernel's clock); it still follows its sources and serves time. It runs as the chrony
+# user. A reference serving NTS reads its key and chain from TLS_LIVE (/run/sfab/tls), which start
+# fills from TLS_DIR (state/tls/<node> bound read-only, root's 0600 key) with chrony as the owner.
+# SFAB_NTP_LIVE, SFAB_TLS_LIVE and SFAB_CHRONY_DIRS move the directories (the tests).
+set -euo pipefail
+
+LIVE=${SFAB_NTP_LIVE:-/etc/sfab/ntp}
+TLS_LIVE=${SFAB_TLS_LIVE:-/run/sfab/tls}
+DIRS=${SFAB_CHRONY_DIRS:-/run/chrony /var/lib/chrony}
+
+log() { printf '[sfab-ntp] %s\n' "$*"; }
+die() { log "FAIL: $*"; exit 1; }
+
+user() { if id -u chrony >/dev/null 2>&1; then echo chrony; elif id -u _chrony >/dev/null 2>&1; then echo _chrony; else echo root; fi; }
+running() { pgrep -x chronyd >/dev/null 2>&1; }
+
+install_tls() {
+  local u=$1
+  [ -n "${TLS_DIR:-}" ] || return 0
+  grep -q "^ntsserverkey " "$LIVE/chrony.conf" || return 0
+  [ -s "$TLS_DIR/tls.key" ] && [ -s "$TLS_DIR/chain.crt" ] || die "$TLS_DIR holds no tls.key and chain.crt (sfab-ca init on the lab host publishes them)"
+  mkdir -p "$TLS_LIVE"
+  install -m 0640 -o root -g "$(id -gn "$u" 2>/dev/null || echo root)" "$TLS_DIR/tls.key" "$TLS_LIVE/tls.key"
+  install -m 0644 "$TLS_DIR/chain.crt" "$TLS_LIVE/chain.crt"
+  log "NTS key and chain installed in $TLS_LIVE for $u"
+}
+
+start() {
+  local src=${1:-/sfab/bootstrap} u
+  [ -f "$src/chrony.conf" ] || die "$src holds no chrony.conf (run make render)"
+  u=$(user)
+  mkdir -p "$LIVE"
+  cp "$src/chrony.conf" "$LIVE/chrony.conf.new"
+  mv -f "$LIVE/chrony.conf.new" "$LIVE/chrony.conf"
+  # shellcheck disable=SC2086  # DIRS is a list of directories
+  mkdir -p $DIRS
+  # shellcheck disable=SC2086
+  chown "$u:$(id -gn "$u" 2>/dev/null || echo "$u")" $DIRS 2>/dev/null || true
+  # chronyd opens its command socket (chronyc as root) only in a directory others cannot read.
+  chmod 0750 /run/chrony 2>/dev/null || true
+  install_tls "$u"
+  chronyd -p -f "$LIVE/chrony.conf" >/dev/null || die "chronyd refused $src/chrony.conf"
+  if running; then log "chronyd already running"; return 0; fi
+  chronyd -x -u "$u" -f "$LIVE/chrony.conf" || die "chronyd did not start"
+  sleep 1
+  running || die "chronyd exited at start"
+  log "chronyd started on $LIVE/chrony.conf as $u (-x: the clock is never adjusted)"
+}
+
+stop() { pkill -x chronyd 2>/dev/null || true; }
+
+status() {
+  if [ -f "$LIVE/chrony.conf" ]; then printf '  %s  chrony.conf\n' "$(sha256sum "$LIVE/chrony.conf" | cut -c1-16)"; fi
+  if running; then
+    log "chronyd running"
+    chronyc -n sources 2>&1 || true
+    chronyc -n tracking 2>&1 || true
+    chronyc -n authdata 2>&1 || true
+  else
+    log "chronyd stopped"
+  fi
+}
+
+case ${1:-} in
+  start) shift; start "${1:-/sfab/bootstrap}" ;;
+  stop) stop ;;
+  running) running ;;
+  status) status ;;
+  *) printf 'usage: sfab-ntp start [DIR] | stop | running | status\n' >&2; exit 2 ;;
+esac

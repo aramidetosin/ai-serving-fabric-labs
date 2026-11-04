@@ -1,0 +1,167 @@
+{
+  "kind": "nat",
+  "lab": "sfab-ch10",
+  "points": [
+    {
+      "eth": "eth1",
+      "filter": "(tcp port 443) or (vlan and (tcp port 443))",
+      "id": "1-isp-rtr-eth1",
+      "node": "isp-rtr",
+      "role": "router-uplink"
+    },
+    {
+      "eth": "eth4",
+      "filter": "(tcp port 443) or (vlan and (tcp port 443))",
+      "id": "2-fw-ethernet1-4",
+      "ifname": "ethernet1/4",
+      "node": "fw",
+      "role": "fw-ingress"
+    },
+    {
+      "eth": "eth1",
+      "filter": "(tcp port 443) or (vlan and (tcp port 443))",
+      "id": "3-fw-ae1-leg1",
+      "ifname": "ethernet1/1",
+      "leg": 1,
+      "node": "fw",
+      "role": "leg"
+    },
+    {
+      "eth": "eth2",
+      "filter": "(tcp port 443) or (vlan and (tcp port 443))",
+      "id": "3-fw-ae1-leg2",
+      "ifname": "ethernet1/2",
+      "leg": 2,
+      "node": "fw",
+      "role": "leg"
+    }
+  ],
+  "schema": 1,
+  "sessions": [
+    {
+      "ca_root": "/shared/ca/root.crt",
+      "client": "inet-client",
+      "client_addr": "203.0.113.2",
+      "dst_addr": "198.51.100.10",
+      "entry": "1-isp-rtr-eth1",
+      "expect": {
+        "from_zone": "isp",
+        "nat_rule": "dnat-internet-gateway",
+        "rule": "isp-to-internet-gateway",
+        "status": 200,
+        "to_zone": "ingress"
+      },
+      "fqdn": "llm.ai.tarnwick.example",
+      "gateway": "gw-inet",
+      "hold_s": 20,
+      "hops": [
+        "198.51.100.8/30 connected on eth1",
+        "in on ethernet1/6 (zone isp): 198.51.100.10 is the firewall's own address on ethernet1/6, zone isp",
+        "dnat-internet-gateway: destination 198.51.100.10 translated to 10.20.11.220, zone ingress",
+        "isp-to-internet-gateway: allow, zone isp to ingress"
+      ],
+      "id": "internet",
+      "legs": [
+        "3-fw-ae1-leg1",
+        "3-fw-ae1-leg2"
+      ],
+      "msg": "sfab-trace-nat",
+      "path": "/echo?msg=sfab-trace-nat",
+      "pin": false,
+      "points": [
+        "1-isp-rtr-eth1",
+        "3-fw-ae1-leg1",
+        "3-fw-ae1-leg2"
+      ],
+      "port": 443,
+      "resolver": "inet-dns-res",
+      "sport": 42936,
+      "translated_addr": "10.20.11.220",
+      "vip": "10.20.11.220",
+      "vlan": 110
+    },
+    {
+      "ca_root": "/shared/ca/root.crt",
+      "client": "ent-client",
+      "client_addr": "10.24.10.10",
+      "dst_addr": "10.20.11.210",
+      "entry": "2-fw-ethernet1-4",
+      "expect": {
+        "from_zone": "enterprise",
+        "nat_rule": null,
+        "rule": "staff-to-users-gateway",
+        "status": 200,
+        "to_zone": "ingress"
+      },
+      "fqdn": "llm.ai.tarnwick.example",
+      "gateway": "gw-users",
+      "hold_s": 20,
+      "hops": [
+        "in on ethernet1/4 (zone enterprise): 10.20.11.0/24 connected on ae1.110, zone ingress",
+        "no NAT rule from zone enterprise: no translation",
+        "staff-to-users-gateway: allow, zone enterprise to ingress"
+      ],
+      "id": "enterprise",
+      "legs": [
+        "3-fw-ae1-leg1",
+        "3-fw-ae1-leg2"
+      ],
+      "msg": "sfab-trace-nat",
+      "path": "/echo?msg=sfab-trace-nat",
+      "pin": false,
+      "points": [
+        "2-fw-ethernet1-4",
+        "3-fw-ae1-leg1",
+        "3-fw-ae1-leg2"
+      ],
+      "port": 443,
+      "resolver": "ent-dns",
+      "sport": 42937,
+      "translated_addr": null,
+      "vip": "10.20.11.210",
+      "vlan": 110
+    },
+    {
+      "ca_root": "/shared/ca/root.crt",
+      "client": "ops-client",
+      "client_addr": "192.0.2.2",
+      "dst_addr": "10.20.11.200",
+      "entry": null,
+      "expect": {
+        "from_zone": "operator-vpn",
+        "nat_rule": null,
+        "rule": "operator-to-internal-gateway",
+        "status": 200,
+        "to_zone": "ingress"
+      },
+      "fqdn": "llm.ai.tarnwick.example",
+      "gateway": "gw-internal",
+      "hold_s": 20,
+      "hops": [
+        "into the IPsec tunnel to the firewall (ops-gw, proxy ID ingress): 10.20.11.200 is in its remote selector",
+        "in on tunnel.1 (zone operator-vpn): 10.20.11.0/24 connected on ae1.110, zone ingress",
+        "no NAT rule from zone operator-vpn: no translation",
+        "operator-to-internal-gateway: allow, zone operator-vpn to ingress"
+      ],
+      "id": "operator",
+      "legs": [
+        "3-fw-ae1-leg1",
+        "3-fw-ae1-leg2"
+      ],
+      "msg": "sfab-trace-nat",
+      "path": "/echo?msg=sfab-trace-nat",
+      "pin": false,
+      "points": [
+        "3-fw-ae1-leg1",
+        "3-fw-ae1-leg2"
+      ],
+      "port": 443,
+      "resolver": "ops-dns",
+      "sport": 42938,
+      "translated_addr": null,
+      "vip": "10.20.11.200",
+      "vlan": 110
+    }
+  ],
+  "snaplen": 256
+}

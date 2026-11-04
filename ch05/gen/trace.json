@@ -1,0 +1,435 @@
+{
+  "count": 3,
+  "df": [
+    {
+      "direction": "forward",
+      "dst_addr": "10.21.1.12",
+      "flow": "same-rail",
+      "icmp_id": 5201,
+      "id": "same-rail-forward-9000",
+      "node": "k8s-gpu1",
+      "ns": "gpu1",
+      "payload": 8972,
+      "size": 9000,
+      "src_addr": "10.21.1.11"
+    },
+    {
+      "direction": "forward",
+      "dst_addr": "10.21.1.12",
+      "flow": "same-rail",
+      "icmp_id": 5202,
+      "id": "same-rail-forward-9001",
+      "node": "k8s-gpu1",
+      "ns": "gpu1",
+      "payload": 8973,
+      "size": 9001,
+      "src_addr": "10.21.1.11"
+    },
+    {
+      "direction": "reverse",
+      "dst_addr": "10.21.1.11",
+      "flow": "same-rail",
+      "icmp_id": 5203,
+      "id": "same-rail-reverse-9000",
+      "node": "k8s-gpu2",
+      "ns": "gpu1",
+      "payload": 8972,
+      "size": 9000,
+      "src_addr": "10.21.1.12"
+    },
+    {
+      "direction": "reverse",
+      "dst_addr": "10.21.1.11",
+      "flow": "same-rail",
+      "icmp_id": 5204,
+      "id": "same-rail-reverse-9001",
+      "node": "k8s-gpu2",
+      "ns": "gpu1",
+      "payload": 8973,
+      "size": 9001,
+      "src_addr": "10.21.1.12"
+    },
+    {
+      "direction": "forward",
+      "dst_addr": "10.21.2.12",
+      "flow": "cross-rail",
+      "icmp_id": 5205,
+      "id": "cross-rail-forward-9000",
+      "node": "k8s-gpu1",
+      "ns": "gpu1",
+      "payload": 8972,
+      "size": 9000,
+      "src_addr": "10.21.1.11"
+    },
+    {
+      "direction": "forward",
+      "dst_addr": "10.21.2.12",
+      "flow": "cross-rail",
+      "icmp_id": 5206,
+      "id": "cross-rail-forward-9001",
+      "node": "k8s-gpu1",
+      "ns": "gpu1",
+      "payload": 8973,
+      "size": 9001,
+      "src_addr": "10.21.1.11"
+    },
+    {
+      "direction": "reverse",
+      "dst_addr": "10.21.1.11",
+      "flow": "cross-rail",
+      "icmp_id": 5207,
+      "id": "cross-rail-reverse-9000",
+      "node": "k8s-gpu2",
+      "ns": "gpu2",
+      "payload": 8972,
+      "size": 9000,
+      "src_addr": "10.21.2.12"
+    },
+    {
+      "direction": "reverse",
+      "dst_addr": "10.21.1.11",
+      "flow": "cross-rail",
+      "icmp_id": 5208,
+      "id": "cross-rail-reverse-9001",
+      "node": "k8s-gpu2",
+      "ns": "gpu2",
+      "payload": 8973,
+      "size": 9001,
+      "src_addr": "10.21.2.12"
+    }
+  ],
+  "dst": {
+    "bridge": "relay0",
+    "mtu": 9000,
+    "node": "k8s-gpu2",
+    "relay_prefix": "10.21.250.0/24"
+  },
+  "filter": "icmp",
+  "flows": [
+    {
+      "dst_addr": "10.21.1.12",
+      "dst_node": "k8s-gpu2",
+      "expect": {
+        "hops": [
+          "10.21.1.12"
+        ],
+        "ttl": 64
+      },
+      "icmp_id": 5101,
+      "id": "same-rail",
+      "kind": "same",
+      "rail": 1,
+      "reply_rail": 1,
+      "reply_switch": "rail-sw1",
+      "request_rail": 1,
+      "request_switch": "rail-sw1",
+      "src_addr": "10.21.1.11",
+      "src_node": "k8s-gpu1",
+      "src_ns": "gpu1",
+      "to_rail": 1,
+      "via": null,
+      "via_src": null
+    },
+    {
+      "dst_addr": "10.21.2.12",
+      "dst_node": "k8s-gpu2",
+      "expect": {
+        "hops": [
+          "10.21.2.11",
+          "10.21.2.12"
+        ],
+        "ttl": 63
+      },
+      "icmp_id": 5102,
+      "id": "cross-rail",
+      "kind": "cross",
+      "rail": 1,
+      "reply_rail": 1,
+      "reply_switch": "rail-sw1",
+      "request_rail": 2,
+      "request_switch": "rail-sw2",
+      "src_addr": "10.21.1.11",
+      "src_node": "k8s-gpu1",
+      "src_ns": "gpu1",
+      "to_rail": 2,
+      "via": "10.21.250.2",
+      "via_src": "10.21.1.11"
+    }
+  ],
+  "interval_s": 0.5,
+  "kind": "rails",
+  "lab": "sfab-ch05",
+  "points": [
+    {
+      "depth": 1,
+      "eth": null,
+      "expect": {
+        "cross-rail": {
+          "reply": null,
+          "request": 64
+        },
+        "same-rail": {
+          "reply": null,
+          "request": null
+        }
+      },
+      "faces": null,
+      "id": "1-k8s-gpu1-relay0",
+      "iface": "relay0",
+      "native": null,
+      "node": "k8s-gpu1",
+      "rail": null,
+      "where": "guest"
+    },
+    {
+      "depth": 2,
+      "eth": "eth1",
+      "expect": {
+        "cross-rail": {
+          "reply": 63,
+          "request": null
+        },
+        "same-rail": {
+          "reply": 64,
+          "request": 64
+        }
+      },
+      "faces": "k8s-gpu1",
+      "id": "2-rail-sw1-Ethernet0",
+      "iface": null,
+      "native": "Ethernet0",
+      "node": "rail-sw1",
+      "rail": 1,
+      "where": "switch"
+    },
+    {
+      "depth": 2,
+      "eth": "eth1",
+      "expect": {
+        "cross-rail": {
+          "reply": null,
+          "request": 63
+        },
+        "same-rail": {
+          "reply": null,
+          "request": null
+        }
+      },
+      "faces": "k8s-gpu1",
+      "id": "2-rail-sw2-Ethernet0",
+      "iface": null,
+      "native": "Ethernet0",
+      "node": "rail-sw2",
+      "rail": 2,
+      "where": "switch"
+    },
+    {
+      "depth": 3,
+      "eth": "eth5",
+      "expect": {
+        "cross-rail": {
+          "reply": 63,
+          "request": null
+        },
+        "same-rail": {
+          "reply": 64,
+          "request": 64
+        }
+      },
+      "faces": "k8s-gpu2",
+      "id": "3-rail-sw1-Ethernet4",
+      "iface": null,
+      "native": "Ethernet4",
+      "node": "rail-sw1",
+      "rail": 1,
+      "where": "switch"
+    },
+    {
+      "depth": 3,
+      "eth": "eth5",
+      "expect": {
+        "cross-rail": {
+          "reply": null,
+          "request": 63
+        },
+        "same-rail": {
+          "reply": null,
+          "request": null
+        }
+      },
+      "faces": "k8s-gpu2",
+      "id": "3-rail-sw2-Ethernet4",
+      "iface": null,
+      "native": "Ethernet4",
+      "node": "rail-sw2",
+      "rail": 2,
+      "where": "switch"
+    },
+    {
+      "depth": 4,
+      "eth": null,
+      "expect": {
+        "cross-rail": {
+          "reply": 64,
+          "request": null
+        },
+        "same-rail": {
+          "reply": null,
+          "request": null
+        }
+      },
+      "faces": null,
+      "id": "4-k8s-gpu2-relay0",
+      "iface": "relay0",
+      "native": null,
+      "node": "k8s-gpu2",
+      "rail": null,
+      "where": "guest"
+    }
+  ],
+  "rails": [
+    {
+      "dst_addr": "10.21.1.12",
+      "dst_eth": "eth4",
+      "dst_ifname": "rail1",
+      "dst_native": "Ethernet4",
+      "dst_ns": "gpu1",
+      "dst_switch_eth": "eth5",
+      "r": 1,
+      "src_addr": "10.21.1.11",
+      "src_eth": "eth4",
+      "src_ifname": "rail1",
+      "src_native": "Ethernet0",
+      "src_ns": "gpu1",
+      "src_switch_eth": "eth1",
+      "switch": "rail-sw1",
+      "vlan": 101
+    },
+    {
+      "dst_addr": "10.21.2.12",
+      "dst_eth": "eth5",
+      "dst_ifname": "rail2",
+      "dst_native": "Ethernet4",
+      "dst_ns": "gpu2",
+      "dst_switch_eth": "eth5",
+      "r": 2,
+      "src_addr": "10.21.2.11",
+      "src_eth": "eth5",
+      "src_ifname": "rail2",
+      "src_native": "Ethernet0",
+      "src_ns": "gpu2",
+      "src_switch_eth": "eth1",
+      "switch": "rail-sw2",
+      "vlan": 102
+    },
+    {
+      "dst_addr": "10.21.3.12",
+      "dst_eth": "eth6",
+      "dst_ifname": "rail3",
+      "dst_native": "Ethernet5",
+      "dst_ns": "gpu3",
+      "dst_switch_eth": "eth6",
+      "r": 3,
+      "src_addr": "10.21.3.11",
+      "src_eth": "eth6",
+      "src_ifname": "rail3",
+      "src_native": "Ethernet1",
+      "src_ns": "gpu3",
+      "src_switch_eth": "eth2",
+      "switch": "rail-sw1",
+      "vlan": 103
+    },
+    {
+      "dst_addr": "10.21.4.12",
+      "dst_eth": "eth7",
+      "dst_ifname": "rail4",
+      "dst_native": "Ethernet5",
+      "dst_ns": "gpu4",
+      "dst_switch_eth": "eth6",
+      "r": 4,
+      "src_addr": "10.21.4.11",
+      "src_eth": "eth7",
+      "src_ifname": "rail4",
+      "src_native": "Ethernet1",
+      "src_ns": "gpu4",
+      "src_switch_eth": "eth2",
+      "switch": "rail-sw2",
+      "vlan": 104
+    },
+    {
+      "dst_addr": "10.21.5.12",
+      "dst_eth": "eth8",
+      "dst_ifname": "rail5",
+      "dst_native": "Ethernet6",
+      "dst_ns": "gpu5",
+      "dst_switch_eth": "eth7",
+      "r": 5,
+      "src_addr": "10.21.5.11",
+      "src_eth": "eth8",
+      "src_ifname": "rail5",
+      "src_native": "Ethernet2",
+      "src_ns": "gpu5",
+      "src_switch_eth": "eth3",
+      "switch": "rail-sw1",
+      "vlan": 105
+    },
+    {
+      "dst_addr": "10.21.6.12",
+      "dst_eth": "eth9",
+      "dst_ifname": "rail6",
+      "dst_native": "Ethernet6",
+      "dst_ns": "gpu6",
+      "dst_switch_eth": "eth7",
+      "r": 6,
+      "src_addr": "10.21.6.11",
+      "src_eth": "eth9",
+      "src_ifname": "rail6",
+      "src_native": "Ethernet2",
+      "src_ns": "gpu6",
+      "src_switch_eth": "eth3",
+      "switch": "rail-sw2",
+      "vlan": 106
+    },
+    {
+      "dst_addr": "10.21.7.12",
+      "dst_eth": "eth10",
+      "dst_ifname": "rail7",
+      "dst_native": "Ethernet7",
+      "dst_ns": "gpu7",
+      "dst_switch_eth": "eth8",
+      "r": 7,
+      "src_addr": "10.21.7.11",
+      "src_eth": "eth10",
+      "src_ifname": "rail7",
+      "src_native": "Ethernet3",
+      "src_ns": "gpu7",
+      "src_switch_eth": "eth4",
+      "switch": "rail-sw1",
+      "vlan": 107
+    },
+    {
+      "dst_addr": "10.21.8.12",
+      "dst_eth": "eth11",
+      "dst_ifname": "rail8",
+      "dst_native": "Ethernet7",
+      "dst_ns": "gpu8",
+      "dst_switch_eth": "eth8",
+      "r": 8,
+      "src_addr": "10.21.8.11",
+      "src_eth": "eth11",
+      "src_ifname": "rail8",
+      "src_native": "Ethernet3",
+      "src_ns": "gpu8",
+      "src_switch_eth": "eth4",
+      "switch": "rail-sw2",
+      "vlan": 108
+    }
+  ],
+  "schema": 1,
+  "src": {
+    "bridge": "relay0",
+    "mtu": 9000,
+    "node": "k8s-gpu1",
+    "relay_prefix": "10.21.250.0/24"
+  }
+}

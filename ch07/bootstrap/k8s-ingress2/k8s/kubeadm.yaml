@@ -1,0 +1,27 @@
+# sfab-ch07 k8s-ingress2 kubeadm join (join-worker): rendered from spec/profile-a.yaml by render/k8s.py; edit the spec and run make render
+# kubeadm join --config, from a 0600 copy that cluster-bootstrap.sh makes at run time by appending
+# the lab's join token (/shared/cluster/kubeadm.env) and the pin of the cluster CA's public key
+# (/shared/cluster/ca/ca.crt) to the bootstrapToken mapping that ends this file. The CA is
+# verified, never skipped.
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: JoinConfiguration
+nodeRegistration:
+  name: k8s-ingress2
+  criSocket: unix:///run/containerd/containerd.sock
+  kubeletExtraArgs:
+  - name: node-ip
+    value: "10.20.1.32"
+  - name: node-labels
+    value: node-role.tarnwick.example/ingress=
+  taints:
+  - key: node-role.tarnwick.example/ingress
+    effect: NoSchedule
+timeouts:
+  controlPlaneComponentHealthCheck: "10m0s"
+  kubeletHealthCheck: "10m0s"
+  discovery: "10m0s"
+  tlsBootstrap: "10m0s"
+discovery:
+  bootstrapToken:
+    apiServerEndpoint: k8s.ai.tarnwick.example:6443
+# cluster-bootstrap.sh appends token and caCertHashes here at run time

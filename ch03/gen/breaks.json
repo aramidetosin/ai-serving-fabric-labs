@@ -1,0 +1,251 @@
+{
+  "breaks": {
+    "3a": {
+      "break": [
+        {
+          "context": "interface PortChannel 10",
+          "fallback": [
+            "configure terminal",
+            "interface PortChannel 10",
+            "no switchport trunk allowed Vlan 200",
+            "end"
+          ],
+          "fallback_lines": [
+            "no switchport trunk allowed Vlan 200"
+          ],
+          "kind": "klish",
+          "lines": [
+            "switchport trunk allowed Vlan remove 200"
+          ],
+          "node": "fe-sw2",
+          "session": [
+            "configure terminal",
+            "interface PortChannel 10",
+            "switchport trunk allowed Vlan remove 200",
+            "end"
+          ]
+        }
+      ],
+      "exercise": 4,
+      "expect_broken": [
+        {
+          "kind": "vlan_member",
+          "mode": null,
+          "node": "fe-sw2",
+          "port": "PortChannel10",
+          "present": false,
+          "vlan": 200
+        },
+        {
+          "kind": "vlan_member",
+          "mode": "T",
+          "node": "fe-sw1",
+          "port": "PortChannel10",
+          "present": true,
+          "vlan": 200
+        },
+        {
+          "failing": "some",
+          "kind": "probe_share",
+          "probe": "bastion-stor-mgmt"
+        }
+      ],
+      "expect_healed": [
+        {
+          "kind": "vlan_member",
+          "mode": "T",
+          "node": "fe-sw2",
+          "port": "PortChannel10",
+          "present": true,
+          "vlan": 200
+        },
+        {
+          "kind": "vlan_member",
+          "mode": "T",
+          "node": "fe-sw1",
+          "port": "PortChannel10",
+          "present": true,
+          "vlan": 200
+        },
+        {
+          "kind": "parity",
+          "node": "fe-sw2"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "bastion-stor-mgmt"
+        }
+      ],
+      "heal": [
+        {
+          "kind": "restore",
+          "node": "fe-sw2"
+        }
+      ],
+      "id": "3a",
+      "note": null,
+      "record": [
+        {
+          "kind": "show",
+          "lines": [
+            "show vlan",
+            "show running-configuration interface PortChannel 10",
+            "show mclag brief"
+          ],
+          "node": "fe-sw1"
+        },
+        {
+          "kind": "show",
+          "lines": [
+            "show vlan",
+            "show running-configuration interface PortChannel 10",
+            "show mclag brief"
+          ],
+          "node": "fe-sw2"
+        },
+        {
+          "client_addr": "10.20.3.10",
+          "count": 60,
+          "dst": "truenas1",
+          "dst_addr": "10.20.2.31",
+          "id": "bastion-stor-mgmt",
+          "interval_s": 0.5,
+          "kind": "probe_tcp",
+          "node": "bastion",
+          "passes": 3,
+          "port": 443,
+          "timeout_s": 2
+        }
+      ],
+      "title": "VLAN 200 allowed on the firewall PortChannel on fe-sw1 only"
+    },
+    "3b": {
+      "break": [
+        {
+          "context": "interface Ethernet11",
+          "fallback": [],
+          "fallback_lines": [],
+          "kind": "klish",
+          "lines": [
+            "shutdown"
+          ],
+          "node": "fe-sw1",
+          "session": [
+            "configure terminal",
+            "interface Ethernet11",
+            "shutdown",
+            "end"
+          ]
+        }
+      ],
+      "exercise": 5,
+      "expect_broken": [
+        {
+          "kind": "mclag_iface",
+          "local": "down",
+          "node": "fe-sw1",
+          "portchannel": "PortChannel32",
+          "remote": "up",
+          "status": "down/up"
+        },
+        {
+          "kind": "mclag_iface",
+          "local": "up",
+          "node": "fe-sw2",
+          "portchannel": "PortChannel32",
+          "remote": "down",
+          "status": "up/down"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "bastion-stor-mgmt"
+        }
+      ],
+      "expect_healed": [
+        {
+          "kind": "mclag_iface",
+          "local": "up",
+          "node": "fe-sw1",
+          "portchannel": "PortChannel32",
+          "remote": "up",
+          "status": "up/up"
+        },
+        {
+          "kind": "mclag_iface",
+          "local": "up",
+          "node": "fe-sw2",
+          "portchannel": "PortChannel32",
+          "remote": "up",
+          "status": "up/up"
+        },
+        {
+          "kind": "parity",
+          "node": "fe-sw1"
+        },
+        {
+          "failing": "none",
+          "kind": "probe_share",
+          "probe": "bastion-stor-mgmt"
+        }
+      ],
+      "heal": [
+        {
+          "context": "interface Ethernet11",
+          "fallback": [],
+          "fallback_lines": [],
+          "kind": "klish",
+          "lines": [
+            "no shutdown"
+          ],
+          "node": "fe-sw1",
+          "session": [
+            "configure terminal",
+            "interface Ethernet11",
+            "no shutdown",
+            "end"
+          ]
+        }
+      ],
+      "id": "3b",
+      "note": null,
+      "record": [
+        {
+          "kind": "show",
+          "lines": [
+            "show mclag brief",
+            "show interface status",
+            "show running-configuration interface PortChannel 32"
+          ],
+          "node": "fe-sw1"
+        },
+        {
+          "kind": "show",
+          "lines": [
+            "show mclag brief",
+            "show interface status",
+            "show running-configuration interface PortChannel 32"
+          ],
+          "node": "fe-sw2"
+        },
+        {
+          "client_addr": "10.20.3.10",
+          "count": 60,
+          "dst": "truenas1",
+          "dst_addr": "10.20.2.31",
+          "id": "bastion-stor-mgmt",
+          "interval_s": 0.5,
+          "kind": "probe_tcp",
+          "node": "bastion",
+          "passes": 3,
+          "port": 443,
+          "timeout_s": 2
+        }
+      ],
+      "title": "one leg of TrueNAS's management bond (fe-sw1 Ethernet11) shut, the bond on its fe-sw2 leg"
+    }
+  },
+  "lab": "sfab-ch03",
+  "schema": 1
+}

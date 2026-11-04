@@ -1,0 +1,23 @@
+# sfab-ch02 L2 announcement policy: rendered from spec/profile-a.yaml by render/k8s.py; edit the spec and run make render
+# The Gateway Services' VIPs answered by ARP on ^bond0\.110$, from the nodes labelled
+# node-role.tarnwick.example/ingress; one lease per Service decides which node answers.
+apiVersion: cilium.io/v2alpha1
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  name: gateways
+spec:
+  serviceSelector:
+    matchExpressions:
+    - key: tarnwick.example/lb-pool
+      operator: In
+      values:
+      - gw-internal
+      - gw-users
+  nodeSelector:
+    matchExpressions:
+    - key: node-role.tarnwick.example/ingress
+      operator: Exists
+  interfaces:
+  - "^bond0\\.110$"
+  loadBalancerIPs: true
+  externalIPs: false

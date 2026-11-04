@@ -1,0 +1,456 @@
+# sfab-ch08: rendered from spec/profile-a.yaml and ch08/chapter.yaml; edit the spec and run make render.
+# Build A, state many, step 8. Containers are sfab-ch08-<node>, the lab directory clab-sfab-ch08/.
+# No credential is referenced here: the nodes that log in with a password keep their kinds'
+# default logins, which the harness reads from each container. No secret is written here.
+name: sfab-ch08
+prefix: __lab-name
+mgmt:
+  network: sfab-a-mgmt
+  bridge: sfab-a-mgmt
+  ipv4-subnet: 172.21.40.0/24
+  ipv4-gw: "172.21.40.1"
+topology:
+  nodes:
+    fe-sw1:
+      kind: dell_sonic
+      image: vrnetlab/dell_sonic:4.6.0
+      mgmt-ipv4: "172.21.40.11"
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        CLAB_MGMT_PASSTHROUGH: "true"
+        NUM_NICS: "19"
+      binds:
+        - bootstrap/fe-sw1/startup-config.cfg:/config/startup-config.cfg:ro
+    fe-sw2:
+      kind: dell_sonic
+      image: vrnetlab/dell_sonic:4.6.0
+      mgmt-ipv4: "172.21.40.12"
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        CLAB_MGMT_PASSTHROUGH: "true"
+        NUM_NICS: "19"
+      binds:
+        - bootstrap/fe-sw2/startup-config.cfg:/config/startup-config.cfg:ro
+    rail-sw1:
+      kind: dell_sonic
+      image: vrnetlab/dell_sonic:4.6.0
+      mgmt-ipv4: "172.21.40.21"
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        NUM_NICS: "8"
+      binds:
+        - bootstrap/rail-sw1/startup-config.cfg:/config/startup-config.cfg:ro
+    rail-sw2:
+      kind: dell_sonic
+      image: vrnetlab/dell_sonic:4.6.0
+      mgmt-ipv4: "172.21.40.22"
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        NUM_NICS: "8"
+      binds:
+        - bootstrap/rail-sw2/startup-config.cfg:/config/startup-config.cfg:ro
+    oob-sw:
+      kind: dell_sonic
+      image: vrnetlab/dell_sonic:4.6.0
+      mgmt-ipv4: "172.21.40.31"
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        NUM_NICS: "8"
+      binds:
+        - bootstrap/oob-sw/startup-config.cfg:/config/startup-config.cfg:ro
+    fw:
+      kind: paloalto_panos
+      image: vrnetlab/paloalto_pa-vm:12.1.2
+      mgmt-ipv4: "172.21.40.40"
+      startup-config: bootstrap/fw/startup-config.xml
+      env:
+        QEMU_CPU: "host"
+        QEMU_MEMORY: "16384"
+        QEMU_SMP: "8"
+    k8s-cp1:
+      kind: linux
+      image: sfab/vm-node:6-k8s1.35.8
+      mgmt-ipv4: "172.21.40.101"
+      restart-policy: "no"
+      devices: [/dev/kvm, /dev/net/tun]
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        SFAB_LAB: "sfab-ch08"
+        SFAB_NODE: "k8s-cp1"
+        VM_DISK_GIB: "40"
+        VM_MEMORY_MB: "8192"
+        VM_NICS: "eth1 eth2 eth3"
+        VM_SMP: "4"
+        VM_TX_OFF: "1"
+      binds:
+        - bootstrap/k8s-cp1:/sfab/bootstrap:ro
+        - state/nodes/k8s-cp1:/vm
+        - state/shared:/shared
+        - state/secrets/authorized_keys:/sfab/authorized_keys:ro
+    k8s-cp2:
+      kind: linux
+      image: sfab/vm-node:6-k8s1.35.8
+      mgmt-ipv4: "172.21.40.102"
+      restart-policy: "no"
+      devices: [/dev/kvm, /dev/net/tun]
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        SFAB_LAB: "sfab-ch08"
+        SFAB_NODE: "k8s-cp2"
+        VM_DISK_GIB: "40"
+        VM_MEMORY_MB: "8192"
+        VM_NICS: "eth1 eth2 eth3"
+        VM_SMP: "4"
+        VM_TX_OFF: "1"
+      binds:
+        - bootstrap/k8s-cp2:/sfab/bootstrap:ro
+        - state/nodes/k8s-cp2:/vm
+        - state/shared:/shared
+        - state/secrets/authorized_keys:/sfab/authorized_keys:ro
+    k8s-cp3:
+      kind: linux
+      image: sfab/vm-node:6-k8s1.35.8
+      mgmt-ipv4: "172.21.40.103"
+      restart-policy: "no"
+      devices: [/dev/kvm, /dev/net/tun]
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        SFAB_LAB: "sfab-ch08"
+        SFAB_NODE: "k8s-cp3"
+        VM_DISK_GIB: "40"
+        VM_MEMORY_MB: "8192"
+        VM_NICS: "eth1 eth2 eth3"
+        VM_SMP: "4"
+        VM_TX_OFF: "1"
+      binds:
+        - bootstrap/k8s-cp3:/sfab/bootstrap:ro
+        - state/nodes/k8s-cp3:/vm
+        - state/shared:/shared
+        - state/secrets/authorized_keys:/sfab/authorized_keys:ro
+    k8s-gpu1:
+      kind: linux
+      image: sfab/vm-node:6-k8s1.35.8
+      mgmt-ipv4: "172.21.40.111"
+      restart-policy: "no"
+      devices: [/dev/kvm, /dev/net/tun]
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        SFAB_LAB: "sfab-ch08"
+        SFAB_NODE: "k8s-gpu1"
+        VM_DISK_GIB: "80"
+        VM_MEMORY_MB: "43008"
+        VM_NICS: "eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11"
+        VM_SMP: "12"
+        VM_TX_OFF: "1"
+      binds:
+        - bootstrap/k8s-gpu1:/sfab/bootstrap:ro
+        - state/nodes/k8s-gpu1:/vm
+        - state/shared:/shared
+        - state/secrets/authorized_keys:/sfab/authorized_keys:ro
+        - ../images/models:/models:ro
+    k8s-gpu2:
+      kind: linux
+      image: sfab/vm-node:6-k8s1.35.8
+      mgmt-ipv4: "172.21.40.112"
+      restart-policy: "no"
+      devices: [/dev/kvm, /dev/net/tun]
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        SFAB_LAB: "sfab-ch08"
+        SFAB_NODE: "k8s-gpu2"
+        VM_DISK_GIB: "80"
+        VM_MEMORY_MB: "43008"
+        VM_NICS: "eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11"
+        VM_SMP: "12"
+        VM_TX_OFF: "1"
+      binds:
+        - bootstrap/k8s-gpu2:/sfab/bootstrap:ro
+        - state/nodes/k8s-gpu2:/vm
+        - state/shared:/shared
+        - state/secrets/authorized_keys:/sfab/authorized_keys:ro
+        - ../images/models:/models:ro
+    k8s-ingress1:
+      kind: linux
+      image: sfab/vm-node:6-k8s1.35.8
+      mgmt-ipv4: "172.21.40.104"
+      restart-policy: "no"
+      devices: [/dev/kvm, /dev/net/tun]
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        SFAB_LAB: "sfab-ch08"
+        SFAB_NODE: "k8s-ingress1"
+        VM_DISK_GIB: "40"
+        VM_MEMORY_MB: "6144"
+        VM_NICS: "eth1 eth2 eth3"
+        VM_SMP: "4"
+        VM_TX_OFF: "1"
+      binds:
+        - bootstrap/k8s-ingress1:/sfab/bootstrap:ro
+        - state/nodes/k8s-ingress1:/vm
+        - state/shared:/shared
+        - state/secrets/authorized_keys:/sfab/authorized_keys:ro
+    k8s-ingress2:
+      kind: linux
+      image: sfab/vm-node:6-k8s1.35.8
+      mgmt-ipv4: "172.21.40.105"
+      restart-policy: "no"
+      devices: [/dev/kvm, /dev/net/tun]
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        SFAB_LAB: "sfab-ch08"
+        SFAB_NODE: "k8s-ingress2"
+        VM_DISK_GIB: "40"
+        VM_MEMORY_MB: "6144"
+        VM_NICS: "eth1 eth2 eth3"
+        VM_SMP: "4"
+        VM_TX_OFF: "1"
+      binds:
+        - bootstrap/k8s-ingress2:/sfab/bootstrap:ro
+        - state/nodes/k8s-ingress2:/vm
+        - state/shared:/shared
+        - state/secrets/authorized_keys:/sfab/authorized_keys:ro
+    bastion:
+      kind: linux
+      image: sfab/bastion:4
+      mgmt-ipv4: "172.21.40.50"
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        SFAB_LAB: "sfab-ch08"
+        SFAB_NODE: "bastion"
+      binds:
+        - bootstrap/bastion:/sfab/bootstrap:ro
+        - state/secrets/authorized_keys:/sfab/authorized_keys:ro
+        - state/operators:/sfab/operators:ro
+        - state/shared/ca:/shared/ca:ro
+    dns-auth1:
+      kind: linux
+      image: sfab/resolver:3
+      mgmt-ipv4: "172.21.40.56"
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        SFAB_LAB: "sfab-ch08"
+        SFAB_NODE: "dns-auth1"
+      binds:
+        - bootstrap/dns-auth1:/sfab/bootstrap:ro
+        - state/shared/ca:/shared/ca:ro
+        - state/secrets/tsig:/sfab/tsig:ro
+      exec:
+        - /usr/local/sbin/sfab-init.sh
+    dns-res1:
+      kind: linux
+      image: sfab/resolver:3
+      mgmt-ipv4: "172.21.40.57"
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        SFAB_LAB: "sfab-ch08"
+        SFAB_NODE: "dns-res1"
+      binds:
+        - bootstrap/dns-res1:/sfab/bootstrap:ro
+        - state/shared/ca:/shared/ca:ro
+      exec:
+        - /usr/local/sbin/sfab-init.sh
+    dns-auth2:
+      kind: linux
+      image: sfab/resolver:3
+      mgmt-ipv4: "172.21.40.58"
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        SFAB_LAB: "sfab-ch08"
+        SFAB_NODE: "dns-auth2"
+      binds:
+        - bootstrap/dns-auth2:/sfab/bootstrap:ro
+        - state/shared/ca:/shared/ca:ro
+        - state/secrets/tsig:/sfab/tsig:ro
+      exec:
+        - /usr/local/sbin/sfab-init.sh
+    dns-res2:
+      kind: linux
+      image: sfab/resolver:3
+      mgmt-ipv4: "172.21.40.59"
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        SFAB_LAB: "sfab-ch08"
+        SFAB_NODE: "dns-res2"
+      binds:
+        - bootstrap/dns-res2:/sfab/bootstrap:ro
+        - state/shared/ca:/shared/ca:ro
+      exec:
+        - /usr/local/sbin/sfab-init.sh
+    uplink-rtr:
+      kind: linux
+      image: sfab/frr:10.5.4-3
+      mgmt-ipv4: "172.21.40.61"
+      env:
+        SFAB_LAB: "sfab-ch08"
+        SFAB_NODE: "uplink-rtr"
+      binds:
+        - bootstrap/uplink-rtr:/sfab/bootstrap:ro
+        - state/secrets/authorized_keys:/sfab/authorized_keys:ro
+    ops-gw:
+      kind: linux
+      image: sfab/vpngw:3
+      mgmt-ipv4: "172.21.40.64"
+      env:
+        SFAB_LAB: "sfab-ch08"
+        SFAB_NODE: "ops-gw"
+      binds:
+        - bootstrap/ops-gw:/sfab/bootstrap:ro
+        - state/secrets/authorized_keys:/sfab/authorized_keys:ro
+        - state/shared/ca:/shared/ca:ro
+        - state/secrets/ipsec:/sfab/ipsec:ro
+      exec:
+        - /usr/local/sbin/sfab-init.sh
+    ops-client:
+      kind: linux
+      image: sfab/client:2
+      mgmt-ipv4: "172.21.40.81"
+      env:
+        SFAB_LAB: "sfab-ch08"
+        SFAB_NODE: "ops-client"
+      binds:
+        - bootstrap/ops-client:/sfab/bootstrap:ro
+        - state/shared/ca:/shared/ca:ro
+      exec:
+        - /usr/local/sbin/sfab-init.sh
+    inet-registry:
+      kind: linux
+      image: sfab/registry:3
+      mgmt-ipv4: "172.21.40.70"
+      env:
+        SFAB_LAB: "sfab-ch08"
+        SFAB_NODE: "inet-registry"
+      binds:
+        - bootstrap/inet-registry:/sfab/bootstrap:ro
+        - ../images/registry/data:/var/lib/registry:ro
+        - state/shared/ca:/shared/ca:ro
+        - state/tls/inet-registry:/sfab/tls:ro
+      exec:
+        - /usr/local/sbin/sfab-init.sh
+    inet-ntp:
+      kind: linux
+      image: sfab/resolver:3
+      mgmt-ipv4: "172.21.40.63"
+      env:
+        SFAB_LAB: "sfab-ch08"
+        SFAB_NODE: "inet-ntp"
+      binds:
+        - bootstrap/inet-ntp:/sfab/bootstrap:ro
+        - state/shared/ca:/shared/ca:ro
+        - state/tls/inet-ntp:/sfab/tls:ro
+      exec:
+        - /usr/local/sbin/sfab-init.sh
+    ops-dns:
+      kind: linux
+      image: sfab/resolver:3
+      mgmt-ipv4: "172.21.40.53"
+      env:
+        SFAB_LAB: "sfab-ch08"
+        SFAB_NODE: "ops-dns"
+      binds:
+        - bootstrap/ops-dns:/sfab/bootstrap:ro
+        - state/shared/ca:/shared/ca:ro
+      exec:
+        - /usr/local/sbin/sfab-init.sh
+    ent-client:
+      kind: linux
+      image: sfab/client:2
+      mgmt-ipv4: "172.21.40.82"
+      env:
+        SFAB_LAB: "sfab-ch08"
+        SFAB_NODE: "ent-client"
+      binds:
+        - bootstrap/ent-client:/sfab/bootstrap:ro
+        - state/shared/ca:/shared/ca:ro
+      exec:
+        - /usr/local/sbin/sfab-init.sh
+    ent-dns:
+      kind: linux
+      image: sfab/resolver:3
+      mgmt-ipv4: "172.21.40.55"
+      env:
+        SFAB_LAB: "sfab-ch08"
+        SFAB_NODE: "ent-dns"
+      binds:
+        - bootstrap/ent-dns:/sfab/bootstrap:ro
+        - state/shared/ca:/shared/ca:ro
+      exec:
+        - /usr/local/sbin/sfab-init.sh
+  links:
+    - endpoints: ["bastion:eth1", "fe-sw1:eth9"]  # bastion.bond, fe-sw1 Ethernet8
+    - endpoints: ["bastion:eth2", "fe-sw2:eth9"]  # bastion.bond, fe-sw2 Ethernet8
+    - endpoints: ["dns-auth1:eth1", "fe-sw1:eth16"]  # dns-auth1.bond, fe-sw1 Ethernet15
+    - endpoints: ["dns-auth1:eth2", "fe-sw2:eth16"]  # dns-auth1.bond, fe-sw2 Ethernet15
+    - endpoints: ["dns-auth2:eth1", "fe-sw1:eth18"]  # dns-auth2.bond, fe-sw1 Ethernet17
+    - endpoints: ["dns-auth2:eth2", "fe-sw2:eth18"]  # dns-auth2.bond, fe-sw2 Ethernet17
+    - endpoints: ["dns-res1:eth1", "fe-sw1:eth17"]  # dns-res1.bond, fe-sw1 Ethernet16
+    - endpoints: ["dns-res1:eth2", "fe-sw2:eth17"]  # dns-res1.bond, fe-sw2 Ethernet16
+    - endpoints: ["dns-res2:eth1", "fe-sw1:eth19"]  # dns-res2.bond, fe-sw1 Ethernet18
+    - endpoints: ["dns-res2:eth2", "fe-sw2:eth19"]  # dns-res2.bond, fe-sw2 Ethernet18
+    - endpoints: ["fe-sw1:eth1", "fe-sw2:eth1"]  # fe.peer-link, fe-sw1 Ethernet0, fe-sw2 Ethernet0
+    - endpoints: ["fe-sw1:eth2", "fe-sw2:eth2"]  # fe.peer-link, fe-sw1 Ethernet1, fe-sw2 Ethernet1
+    - endpoints: ["fe-sw1:eth13", "fe-sw2:eth13"]  # fe.keepalive, fe-sw1 Ethernet12, fe-sw2 Ethernet12
+    - endpoints: ["fw:eth1", "fe-sw1:eth3"]  # fw.ae1, fe-sw1 Ethernet2
+    - endpoints: ["fw:eth2", "fe-sw2:eth3"]  # fw.ae1, fe-sw2 Ethernet2
+    - endpoints: ["fw:eth3", "oob-sw:eth3"]  # fw.oob, oob-sw Ethernet2
+    - endpoints: ["fw:eth4", "ent-client:eth1"]  # fw.enterprise
+    - endpoints: ["fw:eth5", "uplink-rtr:eth1"]  # fw.uplink
+    - endpoints: ["fw:eth7", "ent-dns:eth1"]  # fw.enterprise-dns
+    - endpoints: ["inet-ntp:eth1", "uplink-rtr:eth5"]  # inet-ntp.uplink
+    - endpoints: ["inet-registry:eth1", "uplink-rtr:eth3"]  # inet-registry.uplink
+    - endpoints: ["k8s-cp1:eth1", "fe-sw1:eth4"]  # k8s-cp1.bond, fe-sw1 Ethernet3
+    - endpoints: ["k8s-cp1:eth2", "fe-sw2:eth4"]  # k8s-cp1.bond, fe-sw2 Ethernet3
+    - endpoints: ["k8s-cp1:eth3", "oob-sw:eth4"]  # k8s-cp1.oob, oob-sw Ethernet3
+    - endpoints: ["k8s-cp2:eth1", "fe-sw1:eth5"]  # k8s-cp2.bond, fe-sw1 Ethernet4
+    - endpoints: ["k8s-cp2:eth2", "fe-sw2:eth5"]  # k8s-cp2.bond, fe-sw2 Ethernet4
+    - endpoints: ["k8s-cp2:eth3", "oob-sw:eth5"]  # k8s-cp2.oob, oob-sw Ethernet4
+    - endpoints: ["k8s-cp3:eth1", "fe-sw1:eth6"]  # k8s-cp3.bond, fe-sw1 Ethernet5
+    - endpoints: ["k8s-cp3:eth2", "fe-sw2:eth6"]  # k8s-cp3.bond, fe-sw2 Ethernet5
+    - endpoints: ["k8s-cp3:eth3", "oob-sw:eth6"]  # k8s-cp3.oob, oob-sw Ethernet5
+    - endpoints: ["k8s-gpu1:eth1", "fe-sw1:eth7"]  # k8s-gpu1.bond, fe-sw1 Ethernet6
+    - endpoints: ["k8s-gpu1:eth2", "fe-sw2:eth7"]  # k8s-gpu1.bond, fe-sw2 Ethernet6
+    - endpoints: ["k8s-gpu1:eth3", "oob-sw:eth1"]  # k8s-gpu1.oob, oob-sw Ethernet0
+    - endpoints: ["k8s-gpu1:eth4", "rail-sw1:eth1"]  # k8s-gpu1.rail1, rail-sw1 Ethernet0
+    - endpoints: ["k8s-gpu1:eth5", "rail-sw2:eth1"]  # k8s-gpu1.rail2, rail-sw2 Ethernet0
+    - endpoints: ["k8s-gpu1:eth6", "rail-sw1:eth2"]  # k8s-gpu1.rail3, rail-sw1 Ethernet1
+    - endpoints: ["k8s-gpu1:eth7", "rail-sw2:eth2"]  # k8s-gpu1.rail4, rail-sw2 Ethernet1
+    - endpoints: ["k8s-gpu1:eth8", "rail-sw1:eth3"]  # k8s-gpu1.rail5, rail-sw1 Ethernet2
+    - endpoints: ["k8s-gpu1:eth9", "rail-sw2:eth3"]  # k8s-gpu1.rail6, rail-sw2 Ethernet2
+    - endpoints: ["k8s-gpu1:eth10", "rail-sw1:eth4"]  # k8s-gpu1.rail7, rail-sw1 Ethernet3
+    - endpoints: ["k8s-gpu1:eth11", "rail-sw2:eth4"]  # k8s-gpu1.rail8, rail-sw2 Ethernet3
+    - endpoints: ["k8s-gpu2:eth1", "fe-sw1:eth8"]  # k8s-gpu2.bond, fe-sw1 Ethernet7
+    - endpoints: ["k8s-gpu2:eth2", "fe-sw2:eth8"]  # k8s-gpu2.bond, fe-sw2 Ethernet7
+    - endpoints: ["k8s-gpu2:eth3", "oob-sw:eth2"]  # k8s-gpu2.oob, oob-sw Ethernet1
+    - endpoints: ["k8s-gpu2:eth4", "rail-sw1:eth5"]  # k8s-gpu2.rail1, rail-sw1 Ethernet4
+    - endpoints: ["k8s-gpu2:eth5", "rail-sw2:eth5"]  # k8s-gpu2.rail2, rail-sw2 Ethernet4
+    - endpoints: ["k8s-gpu2:eth6", "rail-sw1:eth6"]  # k8s-gpu2.rail3, rail-sw1 Ethernet5
+    - endpoints: ["k8s-gpu2:eth7", "rail-sw2:eth6"]  # k8s-gpu2.rail4, rail-sw2 Ethernet5
+    - endpoints: ["k8s-gpu2:eth8", "rail-sw1:eth7"]  # k8s-gpu2.rail5, rail-sw1 Ethernet6
+    - endpoints: ["k8s-gpu2:eth9", "rail-sw2:eth7"]  # k8s-gpu2.rail6, rail-sw2 Ethernet6
+    - endpoints: ["k8s-gpu2:eth10", "rail-sw1:eth8"]  # k8s-gpu2.rail7, rail-sw1 Ethernet7
+    - endpoints: ["k8s-gpu2:eth11", "rail-sw2:eth8"]  # k8s-gpu2.rail8, rail-sw2 Ethernet7
+    - endpoints: ["k8s-ingress1:eth1", "fe-sw1:eth14"]  # k8s-ingress1.bond, fe-sw1 Ethernet13
+    - endpoints: ["k8s-ingress1:eth2", "fe-sw2:eth14"]  # k8s-ingress1.bond, fe-sw2 Ethernet13
+    - endpoints: ["k8s-ingress1:eth3", "oob-sw:eth7"]  # k8s-ingress1.oob, oob-sw Ethernet6
+    - endpoints: ["k8s-ingress2:eth1", "fe-sw1:eth15"]  # k8s-ingress2.bond, fe-sw1 Ethernet14
+    - endpoints: ["k8s-ingress2:eth2", "fe-sw2:eth15"]  # k8s-ingress2.bond, fe-sw2 Ethernet14
+    - endpoints: ["k8s-ingress2:eth3", "oob-sw:eth8"]  # k8s-ingress2.oob, oob-sw Ethernet7
+    - endpoints: ["ops-client:eth1", "ops-gw:eth2"]  # ops-client.site
+    - endpoints: ["ops-dns:eth1", "uplink-rtr:eth4"]  # ops-dns.uplink
+    - endpoints: ["ops-gw:eth1", "uplink-rtr:eth7"]  # ops-gw.uplink

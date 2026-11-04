@@ -1,0 +1,21 @@
+# sfab-ch02 lab CA, the root: rendered from spec/profile-a.yaml by render/ca.py; edit the spec and run make render
+# sfab-ca makes the root key and self-signs the root from this file once, on the first
+# `sfab-ca init` on the lab host. The key never leaves the lab's state/ca, which no node binds,
+# and signs only the intermediates; make wipe starts a new CA.
+[sfab]
+key = ec-p256
+days = 3650
+role = root
+
+[req]
+prompt = no
+distinguished_name = dn
+
+[dn]
+O = Tarnwick
+CN = Tarnwick Lab Root CA
+
+[ext]
+basicConstraints = critical,CA:TRUE,pathlen:1
+keyUsage = critical,keyCertSign,cRLSign
+subjectKeyIdentifier = hash

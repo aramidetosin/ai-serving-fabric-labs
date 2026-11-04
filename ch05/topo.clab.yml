@@ -1,0 +1,133 @@
+# sfab-ch05: rendered from spec/profile-a.yaml and ch05/chapter.yaml; edit the spec and run make render.
+# Build A, state one, step 7. Containers are sfab-ch05-<node>, the lab directory clab-sfab-ch05/.
+# No credential is referenced here: the nodes that log in with a password keep their kinds'
+# default logins, which the harness reads from each container. No secret is written here.
+name: sfab-ch05
+prefix: __lab-name
+mgmt:
+  network: sfab-a-mgmt
+  bridge: sfab-a-mgmt
+  ipv4-subnet: 172.21.40.0/24
+  ipv4-gw: "172.21.40.1"
+topology:
+  nodes:
+    fe-sw1:
+      kind: dell_sonic
+      image: vrnetlab/dell_sonic:4.6.0
+      mgmt-ipv4: "172.21.40.11"
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        CLAB_MGMT_PASSTHROUGH: "true"
+        NUM_NICS: "13"
+      binds:
+        - bootstrap/fe-sw1/startup-config.cfg:/config/startup-config.cfg:ro
+    fe-sw2:
+      kind: dell_sonic
+      image: vrnetlab/dell_sonic:4.6.0
+      mgmt-ipv4: "172.21.40.12"
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        CLAB_MGMT_PASSTHROUGH: "true"
+        NUM_NICS: "13"
+      binds:
+        - bootstrap/fe-sw2/startup-config.cfg:/config/startup-config.cfg:ro
+    rail-sw1:
+      kind: dell_sonic
+      image: vrnetlab/dell_sonic:4.6.0
+      mgmt-ipv4: "172.21.40.21"
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        NUM_NICS: "8"
+      binds:
+        - bootstrap/rail-sw1/startup-config.cfg:/config/startup-config.cfg:ro
+    rail-sw2:
+      kind: dell_sonic
+      image: vrnetlab/dell_sonic:4.6.0
+      mgmt-ipv4: "172.21.40.22"
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        NUM_NICS: "8"
+      binds:
+        - bootstrap/rail-sw2/startup-config.cfg:/config/startup-config.cfg:ro
+    oob-sw:
+      kind: dell_sonic
+      image: vrnetlab/dell_sonic:4.6.0
+      mgmt-ipv4: "172.21.40.31"
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        NUM_NICS: "2"
+      binds:
+        - bootstrap/oob-sw/startup-config.cfg:/config/startup-config.cfg:ro
+    k8s-gpu1:
+      kind: linux
+      image: sfab/vm-node:6-k8s1.35.8
+      mgmt-ipv4: "172.21.40.111"
+      restart-policy: "no"
+      devices: [/dev/kvm, /dev/net/tun]
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        SFAB_LAB: "sfab-ch05"
+        SFAB_NODE: "k8s-gpu1"
+        VM_DISK_GIB: "80"
+        VM_MEMORY_MB: "16384"
+        VM_NICS: "eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11"
+        VM_SMP: "8"
+        VM_TX_OFF: "1"
+      binds:
+        - bootstrap/k8s-gpu1:/sfab/bootstrap:ro
+        - state/nodes/k8s-gpu1:/vm
+        - state/shared:/shared
+        - state/secrets/authorized_keys:/sfab/authorized_keys:ro
+    k8s-gpu2:
+      kind: linux
+      image: sfab/vm-node:6-k8s1.35.8
+      mgmt-ipv4: "172.21.40.112"
+      restart-policy: "no"
+      devices: [/dev/kvm, /dev/net/tun]
+      sysctls:
+        net.ipv6.conf.default.disable_ipv6: "1"
+      env:
+        SFAB_LAB: "sfab-ch05"
+        SFAB_NODE: "k8s-gpu2"
+        VM_DISK_GIB: "80"
+        VM_MEMORY_MB: "16384"
+        VM_NICS: "eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10 eth11"
+        VM_SMP: "8"
+        VM_TX_OFF: "1"
+      binds:
+        - bootstrap/k8s-gpu2:/sfab/bootstrap:ro
+        - state/nodes/k8s-gpu2:/vm
+        - state/shared:/shared
+        - state/secrets/authorized_keys:/sfab/authorized_keys:ro
+  links:
+    - endpoints: ["fe-sw1:eth1", "fe-sw2:eth1"]  # fe.peer-link, fe-sw1 Ethernet0, fe-sw2 Ethernet0
+    - endpoints: ["fe-sw1:eth2", "fe-sw2:eth2"]  # fe.peer-link, fe-sw1 Ethernet1, fe-sw2 Ethernet1
+    - endpoints: ["fe-sw1:eth13", "fe-sw2:eth13"]  # fe.keepalive, fe-sw1 Ethernet12, fe-sw2 Ethernet12
+    - endpoints: ["k8s-gpu1:eth1", "fe-sw1:eth7"]  # k8s-gpu1.bond, fe-sw1 Ethernet6
+    - endpoints: ["k8s-gpu1:eth2", "fe-sw2:eth7"]  # k8s-gpu1.bond, fe-sw2 Ethernet6
+    - endpoints: ["k8s-gpu1:eth3", "oob-sw:eth1"]  # k8s-gpu1.oob, oob-sw Ethernet0
+    - endpoints: ["k8s-gpu1:eth4", "rail-sw1:eth1"]  # k8s-gpu1.rail1, rail-sw1 Ethernet0
+    - endpoints: ["k8s-gpu1:eth5", "rail-sw2:eth1"]  # k8s-gpu1.rail2, rail-sw2 Ethernet0
+    - endpoints: ["k8s-gpu1:eth6", "rail-sw1:eth2"]  # k8s-gpu1.rail3, rail-sw1 Ethernet1
+    - endpoints: ["k8s-gpu1:eth7", "rail-sw2:eth2"]  # k8s-gpu1.rail4, rail-sw2 Ethernet1
+    - endpoints: ["k8s-gpu1:eth8", "rail-sw1:eth3"]  # k8s-gpu1.rail5, rail-sw1 Ethernet2
+    - endpoints: ["k8s-gpu1:eth9", "rail-sw2:eth3"]  # k8s-gpu1.rail6, rail-sw2 Ethernet2
+    - endpoints: ["k8s-gpu1:eth10", "rail-sw1:eth4"]  # k8s-gpu1.rail7, rail-sw1 Ethernet3
+    - endpoints: ["k8s-gpu1:eth11", "rail-sw2:eth4"]  # k8s-gpu1.rail8, rail-sw2 Ethernet3
+    - endpoints: ["k8s-gpu2:eth1", "fe-sw1:eth8"]  # k8s-gpu2.bond, fe-sw1 Ethernet7
+    - endpoints: ["k8s-gpu2:eth2", "fe-sw2:eth8"]  # k8s-gpu2.bond, fe-sw2 Ethernet7
+    - endpoints: ["k8s-gpu2:eth3", "oob-sw:eth2"]  # k8s-gpu2.oob, oob-sw Ethernet1
+    - endpoints: ["k8s-gpu2:eth4", "rail-sw1:eth5"]  # k8s-gpu2.rail1, rail-sw1 Ethernet4
+    - endpoints: ["k8s-gpu2:eth5", "rail-sw2:eth5"]  # k8s-gpu2.rail2, rail-sw2 Ethernet4
+    - endpoints: ["k8s-gpu2:eth6", "rail-sw1:eth6"]  # k8s-gpu2.rail3, rail-sw1 Ethernet5
+    - endpoints: ["k8s-gpu2:eth7", "rail-sw2:eth6"]  # k8s-gpu2.rail4, rail-sw2 Ethernet5
+    - endpoints: ["k8s-gpu2:eth8", "rail-sw1:eth7"]  # k8s-gpu2.rail5, rail-sw1 Ethernet6
+    - endpoints: ["k8s-gpu2:eth9", "rail-sw2:eth7"]  # k8s-gpu2.rail6, rail-sw2 Ethernet6
+    - endpoints: ["k8s-gpu2:eth10", "rail-sw1:eth8"]  # k8s-gpu2.rail7, rail-sw1 Ethernet7
+    - endpoints: ["k8s-gpu2:eth11", "rail-sw2:eth8"]  # k8s-gpu2.rail8, rail-sw2 Ethernet7

@@ -1,0 +1,20 @@
+[Unit]
+Description=sfab node network: bond, management and out-of-band tables, rails or the in-node relay
+Documentation=file:/opt/sfab/bin/netsetup.sh
+# After networkd has configured eth0 (its default in the management table), and before anything
+# that needs the data network.
+After=local-fs.target systemd-networkd.service network-online.target
+Wants=network-online.target
+Before=containerd.service kubelet.service sfab-cluster.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# The seed carries the current node.env and scripts; install them before running them.
+ExecStartPre=/opt/sfab/bin/seed-sync.sh
+ExecStart=/opt/sfab/bin/netsetup.sh
+StandardOutput=journal+console
+StandardError=journal+console
+
+[Install]
+WantedBy=multi-user.target

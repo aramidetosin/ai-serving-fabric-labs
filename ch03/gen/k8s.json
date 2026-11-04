@@ -1,0 +1,255 @@
+{
+  "admin": {
+    "kubeconfig": "/etc/kubernetes/admin.conf",
+    "node": "k8s-cp1",
+    "user_config": "/etc/sfab/k8s/kubeadm-user.yaml"
+  },
+  "api": {
+    "control": [
+      "k8s-cp1",
+      "k8s-cp2",
+      "k8s-cp3"
+    ],
+    "endpoint": "k8s.ai.tarnwick.example:6443",
+    "init": "k8s-cp1",
+    "kube_vip_lease": "kube-system/plndr-cp-lock",
+    "port": 6443,
+    "vip": "10.20.1.10"
+  },
+  "apply": [
+    "05-namespaces.yaml",
+    "07-operators.yaml",
+    "10-gateway-api-crds.yaml",
+    "30-lb-pools.yaml",
+    "31-l2-announcement.yaml",
+    "40-pki.yaml",
+    "50-gateways.yaml",
+    "55-test-backend.yaml",
+    "58-network-policy.yaml"
+  ],
+  "certificates": [
+    {
+      "dns": [
+        "*.ai.tarnwick.example"
+      ],
+      "duration": "2160h",
+      "gateway": "gw-internal",
+      "id": "gw-internal",
+      "namespace": "gateways",
+      "renew_before": "360h",
+      "secret": "gw-internal-tls"
+    },
+    {
+      "dns": [
+        "*.ai.tarnwick.example"
+      ],
+      "duration": "2160h",
+      "gateway": "gw-users",
+      "id": "gw-users",
+      "namespace": "gateways",
+      "renew_before": "360h",
+      "secret": "gw-users-tls"
+    }
+  ],
+  "charts": [
+    {
+      "chart": "cert-manager",
+      "namespace": "cert-manager",
+      "phase": "k8s",
+      "release": "cert-manager",
+      "values": "21-cert-manager-values.yaml",
+      "version": "v1.21.2"
+    },
+    {
+      "chart": "democratic-csi",
+      "namespace": "democratic-csi",
+      "phase": "storage",
+      "release": "truenas-nvmeof",
+      "values": "60-democratic-csi-nvmeof.yaml",
+      "version": "0.15.1"
+    },
+    {
+      "chart": "democratic-csi",
+      "namespace": "democratic-csi",
+      "phase": "storage",
+      "release": "truenas-nfs",
+      "values": "60-democratic-csi-nfs.yaml",
+      "version": "0.15.1"
+    }
+  ],
+  "cilium": {
+    "chart": "oci://192.0.2.6:5000/charts/cilium",
+    "devices": [
+      "bond0",
+      "bond0.110"
+    ],
+    "namespace": "kube-system",
+    "release": "cilium",
+    "version": "1.19.7"
+  },
+  "edge": {
+    "nodes": [
+      "k8s-ingress1",
+      "k8s-ingress2"
+    ],
+    "selector": {
+      "node-role.tarnwick.example/ingress": ""
+    }
+  },
+  "gateway_api": "v1.4.1",
+  "gateway_namespace": "gateways",
+  "gateways": {
+    "gw-internal": {
+      "audience": "internal",
+      "hostnames": [
+        "llm.ai.tarnwick.example",
+        "admin.ai.tarnwick.example",
+        "grafana.ai.tarnwick.example"
+      ],
+      "l2_lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-internal",
+      "listener": {
+        "certificate": "gw-internal",
+        "hostname": "*.ai.tarnwick.example",
+        "name": "https",
+        "port": 443,
+        "secret": "gw-internal-tls"
+      },
+      "pool": "gw-internal",
+      "pool_range": [
+        "10.20.11.200",
+        "10.20.11.209"
+      ],
+      "service": "cilium-gateway-gw-internal",
+      "vip": "10.20.11.200"
+    },
+    "gw-users": {
+      "audience": "enterprise",
+      "hostnames": [
+        "llm.ai.tarnwick.example"
+      ],
+      "l2_lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-users",
+      "listener": {
+        "certificate": "gw-users",
+        "hostname": "*.ai.tarnwick.example",
+        "name": "https",
+        "port": 443,
+        "secret": "gw-users-tls"
+      },
+      "pool": "gw-users",
+      "pool_range": [
+        "10.20.11.210",
+        "10.20.11.214"
+      ],
+      "service": "cilium-gateway-gw-users",
+      "vip": "10.20.11.210"
+    }
+  },
+  "issuer": {
+    "intermediate": "platform",
+    "kind": "ClusterIssuer",
+    "name": "lab-ca",
+    "namespace": "cert-manager",
+    "secret": "lab-ca"
+  },
+  "l2_policy": "gateways",
+  "lab": "sfab-ch03",
+  "network_policy": {
+    "base": [
+      {
+        "name": "default-deny",
+        "namespace": "echo"
+      },
+      {
+        "name": "allow-gateways-to-backend",
+        "namespace": "echo"
+      }
+    ],
+    "files": {
+      "base": "58-network-policy.yaml",
+      "inference": "63-inference-policy.yaml"
+    },
+    "inference": []
+  },
+  "nodes": {
+    "k8s-cp1": {
+      "address": "10.20.1.11",
+      "labels": {
+        "node-role.tarnwick.example/control": ""
+      },
+      "role": "init"
+    },
+    "k8s-cp2": {
+      "address": "10.20.1.12",
+      "labels": {
+        "node-role.tarnwick.example/control": ""
+      },
+      "role": "join-control"
+    },
+    "k8s-cp3": {
+      "address": "10.20.1.13",
+      "labels": {
+        "node-role.tarnwick.example/control": ""
+      },
+      "role": "join-control"
+    },
+    "k8s-gpu1": {
+      "address": "10.20.1.21",
+      "labels": {
+        "node-role.tarnwick.example/gpu": ""
+      },
+      "role": "join-worker"
+    },
+    "k8s-gpu2": {
+      "address": "10.20.1.22",
+      "labels": {
+        "node-role.tarnwick.example/gpu": ""
+      },
+      "role": "join-worker"
+    },
+    "k8s-ingress1": {
+      "address": "10.20.1.31",
+      "labels": {
+        "node-role.tarnwick.example/ingress": ""
+      },
+      "role": "join-worker"
+    },
+    "k8s-ingress2": {
+      "address": "10.20.1.32",
+      "labels": {
+        "node-role.tarnwick.example/ingress": ""
+      },
+      "role": "join-worker"
+    }
+  },
+  "operators": {
+    "cluster_role": "view",
+    "group": "operators",
+    "users": [
+      "admin"
+    ],
+    "validity_h": 8
+  },
+  "pod_encryption": "wireguard",
+  "schema": 1,
+  "secrets_encryption": {
+    "config": "/etc/kubernetes/enc/config.yaml",
+    "dir": "/etc/kubernetes/enc",
+    "provider": "secretbox",
+    "resources": [
+      "secrets"
+    ]
+  },
+  "test_backend": {
+    "deployment": "echo",
+    "namespace": "echo",
+    "path": "/echo",
+    "port": 8080,
+    "replicas": 2,
+    "routes": {
+      "gw-internal": "echo-gw-internal",
+      "gw-users": "echo-gw-users"
+    },
+    "service": "echo"
+  },
+  "version": "v1.35.8"
+}

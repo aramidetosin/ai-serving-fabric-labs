@@ -1,0 +1,215 @@
+# sfab-ch08 network policy: the API gateway, the router and the models: rendered from spec/profile-a.yaml by render/k8s.py; edit the spec and run make render
+# Applied by finish after the serving recipe and the API gateway. Default deny in both namespaces, then the
+# request path: the Gateways' Envoy to the API gateway, the API gateway to the router (and the IdP's keys),
+# the router to the model servers. The rails are macvlan attachments, outside Cilium's policy.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: default-deny
+  namespace: inference
+spec:
+  description: "every pod in inference: no ingress and no egress but what an allow names"
+  endpointSelector: {}
+  ingress:
+  - {}
+  egress:
+  - {}
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-api-gateway
+  namespace: inference
+spec:
+  description: "the API gateway: in from the Gateways' Envoy and the key probe; out to the router, the IdP's keys and DNS"
+  endpointSelector:
+    matchLabels:
+      k8s:app.kubernetes.io/name: api-gateway
+  ingress:
+  - fromEntities:
+    - ingress
+    toPorts:
+    - ports:
+      - port: "9080"
+        protocol: TCP
+  - fromEndpoints:
+    - matchLabels:
+        k8s:app.kubernetes.io/component: key-probe
+        k8s:app.kubernetes.io/part-of: inference
+        k8s:io.kubernetes.pod.namespace: inference
+    toPorts:
+    - ports:
+      - port: "9080"
+        protocol: TCP
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:app.kubernetes.io/name: router
+        k8s:io.kubernetes.pod.namespace: inference
+    toPorts:
+    - ports:
+      - port: "4000"
+        protocol: TCP
+  - toEndpoints:
+    - matchLabels:
+        k8s:app.kubernetes.io/name: idp
+        k8s:io.kubernetes.pod.namespace: identity
+    toPorts:
+    - ports:
+      - port: "5556"
+        protocol: TCP
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s:k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: UDP
+      - port: "53"
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-router
+  namespace: inference
+spec:
+  description: "the router: in from the API gateway; out to the model servers and DNS"
+  endpointSelector:
+    matchLabels:
+      k8s:app.kubernetes.io/name: router
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        k8s:app.kubernetes.io/name: api-gateway
+        k8s:io.kubernetes.pod.namespace: inference
+    toPorts:
+    - ports:
+      - port: "4000"
+        protocol: TCP
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:app.kubernetes.io/name: serving
+        k8s:app.kubernetes.io/component: server
+        k8s:io.kubernetes.pod.namespace: serving
+    toPorts:
+    - ports:
+      - port: "8080"
+        protocol: TCP
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s:k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: UDP
+      - port: "53"
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-key-jobs
+  namespace: inference
+spec:
+  description: "the key Jobs: out to the API server"
+  endpointSelector:
+    matchLabels:
+      k8s:app.kubernetes.io/component: keys
+      k8s:app.kubernetes.io/part-of: inference
+  egress:
+  - toEntities:
+    - kube-apiserver
+    toPorts:
+    - ports:
+      - port: "6443"
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-key-probe
+  namespace: inference
+spec:
+  description: "the key probe: out to the API server (it lists the API gateway's pods) and to each API gateway pod"
+  endpointSelector:
+    matchLabels:
+      k8s:app.kubernetes.io/component: key-probe
+      k8s:app.kubernetes.io/part-of: inference
+  egress:
+  - toEntities:
+    - kube-apiserver
+    toPorts:
+    - ports:
+      - port: "6443"
+        protocol: TCP
+  - toEndpoints:
+    - matchLabels:
+        k8s:app.kubernetes.io/name: api-gateway
+        k8s:io.kubernetes.pod.namespace: inference
+    toPorts:
+    - ports:
+      - port: "9080"
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: default-deny
+  namespace: serving
+spec:
+  description: "every pod in serving: no ingress and no egress but what an allow names"
+  endpointSelector: {}
+  ingress:
+  - {}
+  egress:
+  - {}
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-to-servers
+  namespace: serving
+spec:
+  description: "the model servers: in from the router and from the Gateways' Envoy (the recipe's own route)"
+  endpointSelector:
+    matchLabels:
+      k8s:app.kubernetes.io/name: serving
+      k8s:app.kubernetes.io/component: server
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        k8s:app.kubernetes.io/name: router
+        k8s:io.kubernetes.pod.namespace: inference
+    toPorts:
+    - ports:
+      - port: "8080"
+        protocol: TCP
+  - fromEntities:
+    - ingress
+    toPorts:
+    - ports:
+      - port: "8080"
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-key-job
+  namespace: serving
+spec:
+  description: "the recipe's key Job: out to the API server"
+  endpointSelector:
+    matchLabels:
+      k8s:app.kubernetes.io/name: serving
+      k8s:app.kubernetes.io/component: key
+  egress:
+  - toEntities:
+    - kube-apiserver
+    toPorts:
+    - ports:
+      - port: "6443"
+        protocol: TCP

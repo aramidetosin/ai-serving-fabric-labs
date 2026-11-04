@@ -1,0 +1,314 @@
+{
+  "bonded": [
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet3",
+          "node": "k8s-cp1",
+          "switch": "fe-sw1",
+          "switch_eth": "eth4"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet3",
+          "node": "k8s-cp1",
+          "switch": "fe-sw2",
+          "switch_eth": "eth4"
+        }
+      ],
+      "node": "k8s-cp1"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet4",
+          "node": "k8s-cp2",
+          "switch": "fe-sw1",
+          "switch_eth": "eth5"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet4",
+          "node": "k8s-cp2",
+          "switch": "fe-sw2",
+          "switch_eth": "eth5"
+        }
+      ],
+      "node": "k8s-cp2"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet5",
+          "node": "k8s-cp3",
+          "switch": "fe-sw1",
+          "switch_eth": "eth6"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet5",
+          "node": "k8s-cp3",
+          "switch": "fe-sw2",
+          "switch_eth": "eth6"
+        }
+      ],
+      "node": "k8s-cp3"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet6",
+          "node": "k8s-gpu1",
+          "switch": "fe-sw1",
+          "switch_eth": "eth7"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet6",
+          "node": "k8s-gpu1",
+          "switch": "fe-sw2",
+          "switch_eth": "eth7"
+        }
+      ],
+      "node": "k8s-gpu1"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet7",
+          "node": "k8s-gpu2",
+          "switch": "fe-sw1",
+          "switch_eth": "eth8"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet7",
+          "node": "k8s-gpu2",
+          "switch": "fe-sw2",
+          "switch_eth": "eth8"
+        }
+      ],
+      "node": "k8s-gpu2"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet13",
+          "node": "k8s-ingress1",
+          "switch": "fe-sw1",
+          "switch_eth": "eth14"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet13",
+          "node": "k8s-ingress1",
+          "switch": "fe-sw2",
+          "switch_eth": "eth14"
+        }
+      ],
+      "node": "k8s-ingress1"
+    },
+    {
+      "bond": "bond0",
+      "kind": "vm-node",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet14",
+          "node": "k8s-ingress2",
+          "switch": "fe-sw1",
+          "switch_eth": "eth15"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet14",
+          "node": "k8s-ingress2",
+          "switch": "fe-sw2",
+          "switch_eth": "eth15"
+        }
+      ],
+      "node": "k8s-ingress2"
+    },
+    {
+      "bond": "bond0",
+      "kind": "bastion",
+      "members": [
+        {
+          "eth": "eth1",
+          "native": "Ethernet8",
+          "node": "bastion",
+          "switch": "fe-sw1",
+          "switch_eth": "eth9"
+        },
+        {
+          "eth": "eth2",
+          "native": "Ethernet8",
+          "node": "bastion",
+          "switch": "fe-sw2",
+          "switch_eth": "eth9"
+        }
+      ],
+      "node": "bastion"
+    }
+  ],
+  "lab": "sfab-ch04",
+  "list": [
+    {
+      "capture": {
+        "eths": [
+          "eth1",
+          "eth2",
+          "eth5"
+        ],
+        "filter": "icmp and host 10.20.1.12 and host 198.51.100.2"
+      },
+      "counter": "flow_policy_nat_land",
+      "diag": {
+        "destination": "198.51.100.2",
+        "source": "10.20.1.12",
+        "stages": [
+          "receive",
+          "drop"
+        ]
+      },
+      "fw": "fw",
+      "id": "land",
+      "kind": "fw_nat_removed",
+      "nat": {
+        "element": "<entry name=\"no-nat-public\"><from><member>k8s-nodes</member><member>services</member></from><to><member>uplink</member></to><source><member>any</member></source><destination><member>198.51.100.2</member></destination><service>any</service><description>dec-nat-no-land</description></entry>",
+        "order": [
+          "no-nat-public",
+          "internet-snat"
+        ],
+        "place": {
+          "dst": "internet-snat",
+          "where": "before"
+        },
+        "rule": "no-nat-public",
+        "rules_xpath": "/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/nat/rules",
+        "table": "nat",
+        "xpath": "/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/nat/rules/entry[@name='no-nat-public']"
+      },
+      "probe": "public",
+      "title": "no-nat-public removed, a node's requests to the public address discarded as a LAND attack"
+    },
+    {
+      "capture": {
+        "eths": [
+          "eth1",
+          "eth2",
+          "eth5"
+        ],
+        "filter": "udp port 123 or udp port 53"
+      },
+      "domain": "ai.tarnwick.example",
+      "element": "<entry name=\"ntp\"><source><interface>ethernet1/5</interface><address>198.51.100.2/29</address></source></entry>",
+      "expect_rule": "deny-all-log",
+      "from": {
+        "address": "10.20.13.1",
+        "interface": "ae1.130",
+        "zone": "services"
+      },
+      "fw": "fw",
+      "id": "ntp-uplink",
+      "kind": "fw_service_route",
+      "port": 123,
+      "restore_element": "<entry name=\"ntp\"><source><interface>ae1.130</interface><address>10.20.13.1/24</address></source></entry>",
+      "restore_rule": "inside-to-ntp",
+      "server": "10.20.13.21",
+      "server_zone": "services",
+      "service": "ntp",
+      "title": "the firewall's own NTP and DNS sent from the uplink by their service routes, dropped by deny-all-log",
+      "to": {
+        "address": "198.51.100.2",
+        "interface": "ethernet1/5",
+        "zone": "uplink"
+      },
+      "with": [
+        {
+          "element": "<entry name=\"dns\"><source><interface>ethernet1/5</interface><address>198.51.100.2/29</address></source></entry>",
+          "port": 53,
+          "restore_element": "<entry name=\"dns\"><source><interface>ae1.130</interface><address>10.20.13.1/24</address></source></entry>",
+          "restore_rule": "inside-to-resolvers",
+          "server": "10.20.13.21",
+          "service": "dns",
+          "xpath": "/config/devices/entry[@name='localhost.localdomain']/deviceconfig/system/route/service/entry[@name='dns']"
+        }
+      ],
+      "xpath": "/config/devices/entry[@name='localhost.localdomain']/deviceconfig/system/route/service/entry[@name='ntp']"
+    }
+  ],
+  "pair": {
+    "domain": 1,
+    "members": [
+      "fe-sw1",
+      "fe-sw2"
+    ],
+    "name": "fe",
+    "peer_link": {
+      "fe-sw1": {
+        "eths": [
+          "eth1",
+          "eth2"
+        ],
+        "members": [
+          "Ethernet0",
+          "Ethernet1"
+        ],
+        "portchannel": "PortChannel1"
+      },
+      "fe-sw2": {
+        "eths": [
+          "eth1",
+          "eth2"
+        ],
+        "members": [
+          "Ethernet0",
+          "Ethernet1"
+        ],
+        "portchannel": "PortChannel1"
+      }
+    },
+    "source_ip": {
+      "fe-sw1": "10.20.255.0",
+      "fe-sw2": "10.20.255.1"
+    },
+    "system_mac": "02:5a:00:00:00:01"
+  },
+  "probes": {
+    "public": {
+      "count": 5,
+      "dst": "public",
+      "dst_addr": "198.51.100.2",
+      "interval_s": 0.5,
+      "src": "k8s-cp2",
+      "src_addr": "10.20.1.12",
+      "src_kind": "vm-node",
+      "timeout_s": 1
+    }
+  },
+  "schema": 1,
+  "timing": {
+    "log_pause_s": 10,
+    "ntp_wait_s": 300,
+    "settle_s": 5
+  }
+}

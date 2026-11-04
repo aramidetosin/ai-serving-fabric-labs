@@ -1,0 +1,184 @@
+{
+  "api_gateway": {
+    "name": "api-gateway",
+    "namespace": "inference",
+    "port": 9080,
+    "selector": "app.kubernetes.io/name=api-gateway"
+  },
+  "client": {
+    "address": "10.24.10.10",
+    "ca_root": "/shared/ca/root.crt",
+    "node": "ent-client",
+    "pin": false,
+    "resolve": null,
+    "resolver": "ent-dns"
+  },
+  "copies": [
+    {
+      "copy": "a",
+      "nad": "rail3",
+      "rail": 3,
+      "server": {
+        "address": "10.21.3.100",
+        "node": "k8s-gpu1",
+        "pod": "chat-a-server-0"
+      },
+      "service": "chat-a",
+      "spans": false,
+      "switch": "rail-sw1",
+      "switch_ports": [
+        {
+          "eth": "eth2",
+          "faces": "k8s-gpu1",
+          "id": "6-rail-sw1-Ethernet1",
+          "native": "Ethernet1",
+          "node": "rail-sw1"
+        }
+      ],
+      "workers": [
+        {
+          "address": "10.21.3.101",
+          "node": "k8s-gpu1",
+          "pod": "chat-a-worker0-0",
+          "remote": false
+        }
+      ]
+    },
+    {
+      "copy": "b",
+      "nad": "rail6",
+      "rail": 6,
+      "server": {
+        "address": "10.21.6.100",
+        "node": "k8s-gpu2",
+        "pod": "chat-b-server-0"
+      },
+      "service": "chat-b",
+      "spans": false,
+      "switch": "rail-sw2",
+      "switch_ports": [
+        {
+          "eth": "eth7",
+          "faces": "k8s-gpu2",
+          "id": "6-rail-sw2-Ethernet6",
+          "native": "Ethernet6",
+          "node": "rail-sw2"
+        }
+      ],
+      "workers": [
+        {
+          "address": "10.21.6.101",
+          "node": "k8s-gpu2",
+          "pod": "chat-b-worker0-0",
+          "remote": false
+        }
+      ]
+    },
+    {
+      "copy": "c",
+      "nad": "rail7",
+      "rail": 7,
+      "server": {
+        "address": "10.21.7.100",
+        "node": "k8s-gpu1",
+        "pod": "chat-c-server-0"
+      },
+      "service": "chat-c",
+      "spans": true,
+      "switch": "rail-sw1",
+      "switch_ports": [
+        {
+          "eth": "eth4",
+          "faces": "k8s-gpu1",
+          "id": "6-rail-sw1-Ethernet3",
+          "native": "Ethernet3",
+          "node": "rail-sw1"
+        },
+        {
+          "eth": "eth8",
+          "faces": "k8s-gpu2",
+          "id": "6-rail-sw1-Ethernet7",
+          "native": "Ethernet7",
+          "node": "rail-sw1"
+        }
+      ],
+      "workers": [
+        {
+          "address": "10.21.7.101",
+          "node": "k8s-gpu2",
+          "pod": "chat-c-worker0-0",
+          "remote": true
+        },
+        {
+          "address": "10.21.7.102",
+          "node": "k8s-gpu1",
+          "pod": "chat-c-worker1-0",
+          "remote": false
+        }
+      ]
+    }
+  ],
+  "expect": {
+    "api_base": "http://chat.serving.svc.cluster.local:8080/v1",
+    "model_name": "openai/chat",
+    "status": 200
+  },
+  "gateway": {
+    "lease": "kube-system/cilium-l2announce-gateways-cilium-gateway-gw-users",
+    "name": "gw-users",
+    "port": 443,
+    "route": "models-gw-users",
+    "service": "cilium-gateway-gw-users",
+    "vip": "10.20.11.210"
+  },
+  "hostname": "llm.ai.tarnwick.example",
+  "keys": {
+    "backend": {
+      "field": "key",
+      "secret": "backend-key"
+    },
+    "capture": false,
+    "master": {
+      "field": "key",
+      "secret": "router-master-key"
+    },
+    "model": "chat",
+    "namespace": "inference",
+    "router_path": "/engines/chat/chat/completions",
+    "secret": "api-keys"
+  },
+  "kind": "serving",
+  "lab": "sfab-ch06",
+  "max_tokens": 16,
+  "model": "chat",
+  "path": "/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions",
+  "pin": {
+    "container": "server",
+    "copy": "c",
+    "server": "chat-c-server-0",
+    "tries": 12
+  },
+  "refuse": null,
+  "route_id": "a48b3df9-3b7f-58f0-9c52-c6f3004f05f7",
+  "router": {
+    "name": "router",
+    "namespace": "inference",
+    "port": 4000,
+    "selector": "app.kubernetes.io/name=router"
+  },
+  "schema": 1,
+  "serving": {
+    "http_port": 8080,
+    "namespace": "serving",
+    "rail_probe_port": 50053,
+    "rpc_port": 50052
+  },
+  "snaplen": {
+    "http": 66,
+    "keyed": 2048,
+    "rail": 128,
+    "vip": 96
+  },
+  "sport": 42606,
+  "url": "https://llm.ai.tarnwick.example/models/a48b3df9-3b7f-58f0-9c52-c6f3004f05f7/v1/chat/completions"
+}

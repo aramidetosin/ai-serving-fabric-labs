@@ -1,0 +1,152 @@
+# sfab-ch11 test backend: rendered from spec/profile-a.yaml by render/k8s.py; edit the spec and run make render
+# A plain HTTP server behind the Gateways, before any model is served: agnhost netexec --http-port=8080,
+# whose /echo?msg=<text> answers <text>. One HTTPRoute per Gateway lists that Gateway's own hostnames,
+# so a name sent to a Gateway that does not carry it matches no route and gets the Gateway's 404.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echo
+  namespace: echo
+  labels:
+    app.kubernetes.io/name: echo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: echo
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: echo
+    spec:
+      containers:
+      - name: echo
+        image: registry.k8s.io/e2e-test-images/agnhost:2.59@sha256:10ed98804c877e505e17bced991682b6fd50ab1da9cddcd19935b48d645da40a
+        args:
+        - netexec
+        - "--http-port=8080"
+        ports:
+        - name: http
+          containerPort: 8080
+        readinessProbe:
+          tcpSocket:
+            port: http
+          periodSeconds: 5
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "16Mi"
+          limits:
+            memory: "64Mi"
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 65534
+          capabilities:
+            drop:
+            - ALL
+          seccompProfile:
+            type: RuntimeDefault
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: echo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: echo
+  namespace: echo
+  labels:
+    app.kubernetes.io/name: echo
+spec:
+  selector:
+    app.kubernetes.io/name: echo
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+    protocol: TCP
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: echo-gw-internal
+  namespace: echo
+  labels:
+    tarnwick.example/audience: internal
+    decision.tarnwick.example/id: dec-routeset-internal
+spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: gw-internal
+    namespace: gateways
+    sectionName: https
+  hostnames:
+  - llm.ai.tarnwick.example
+  - admin.ai.tarnwick.example
+  - grafana.ai.tarnwick.example
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /echo
+    backendRefs:
+    - name: echo
+      port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: echo-gw-users
+  namespace: echo
+  labels:
+    tarnwick.example/audience: enterprise
+    decision.tarnwick.example/id: dec-routeset-enterprise
+spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: gw-users
+    namespace: gateways
+    sectionName: https
+  hostnames:
+  - llm.ai.tarnwick.example
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /echo
+    backendRefs:
+    - name: echo
+      port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: echo-gw-inet
+  namespace: echo
+  labels:
+    tarnwick.example/audience: internet
+    decision.tarnwick.example/id: dec-routeset-internet
+spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: gw-inet
+    namespace: gateways
+    sectionName: https
+  hostnames:
+  - llm.ai.tarnwick.example
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /echo
+    backendRefs:
+    - name: echo
+      port: 8080
