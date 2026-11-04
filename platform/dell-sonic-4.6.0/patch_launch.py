@@ -110,6 +110,61 @@ NEW_STARTUP = '''    def startup_config(self):
 
 '''
 
+NIC_CHECK = '''# The guest's own NIC check: guest ethN must sit on virtio device N. The echo is quoted apart so that the
+# console's echo of the command line does not match the result the launcher waits for.
+NIC_CHECK = (
+    'r=ok; for p in /sys/class/net/eth*; do n=${p##*/eth}; '
+    '[ "$(basename "$(readlink "$p/device")")" = "virtio$n" ] || r=bad; done; echo "SFAB_NICS"="$r"'
+)
+MAX_NIC_RESTARTS = 3
+
+'''
+
+NEW_NIC_METHODS = '''    def nic_names_in_order(self):
+        """True unless the guest reports an ethN that is not on virtio device N."""
+        self.wait_write(NIC_CHECK, None)
+        ridx, _match, _res = self.tn.expect([rb"SFAB_NICS=ok", rb"SFAB_NICS=bad"], 60)
+        # expect() may have consumed the prompt the next wait needs, so ask for a new one
+        self.wait_write("", None)
+        return ridx != 1
+
+    def fresh_overlay(self):
+        """Start the next boot from the image again. A disk cut off this early in its first boot does
+        not finish its first-boot services on the boot after it."""
+        overlay = re.sub(r"(\\.[^.]+$)", r"-overlay\\1", self.image)
+        os.remove(overlay)
+        subprocess.run(["qemu-img", "create", "-f", "qcow2", "-F", self._overlay_disk_image_format(),
+                        "-b", self.image, overlay], check=True, stdout=subprocess.DEVNULL)
+
+    def clear_tc_rules(self):
+        """Take the eth<->tap rules off the container's NICs. They point at the taps that went away
+        with the VM, and the tap scripts add them again when the VM starts."""
+        for name in os.listdir("/sys/class/net"):
+            if re.match(r"^eth[0-9]+$", name):
+                subprocess.run(["tc", "qdisc", "del", "dev", name, "clsact"],
+                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+'''
+
+NIC_CHECK_CALL = '''            self.logger.info("Login completed")
+
+            # The guest kernel can name its virtio NICs out of order at boot, which puts each port on
+            # another port's wire. Nothing is configured yet, so boot the VM again and look again.
+            if not self.nic_names_in_order():
+                if self.nic_restarts < MAX_NIC_RESTARTS:
+                    self.nic_restarts += 1
+                    self.logger.warning("guest NIC names out of order, restarting the VM (%d of %d)"
+                                        % (self.nic_restarts, MAX_NIC_RESTARTS))
+                    self.stop()
+                    self.clear_tc_rules()
+                    self.fresh_overlay()
+                    self.spins = 0
+                    self.start()
+                    return
+                self.logger.error("guest NIC names still out of order after %d restarts" % MAX_NIC_RESTARTS)
+
+'''
+
 # NUM_NICS: the data NIC count per node (the upstream launcher fixes 10; a rail leaf needs 12)
 if "        self.num_nics = 10\n" in s:
     s = s.replace("        self.num_nics = 10\n", "        self.num_nics = int(os.getenv(\"NUM_NICS\", \"10\"))\n")
@@ -120,6 +175,23 @@ s = s[:a] + NEW_BOOTSTRAP + s[b:]
 a = s.index("    def startup_config(self):")
 b = s.index("class Dell_SONiC(vrnetlab.VR):")
 s = s[:a] + NEW_STARTUP + s[b:]
+# the guest's NIC order, checked after login and before anything is configured
+anchor = 'DEFAULT_PASSWORD = "YourPaSsWoRd"\n'
+if anchor in s:
+    s = s.replace(anchor, anchor + "\n" + NIC_CHECK, 1)
+else:
+    anchor = "\ndef handle_SIGCHLD(_signal, _frame):\n"
+    assert s.count(anchor) == 1
+    s = s.replace(anchor, "\n" + NIC_CHECK + anchor.lstrip("\n"), 1)
+anchor = "        self.hostname = hostname\n"
+assert s.count(anchor) == 1
+s = s.replace(anchor, anchor + "        self.nic_restarts = 0\n")
+anchor = '            self.logger.info("Login completed")\n\n'
+assert s.count(anchor) == 1
+s = s.replace(anchor, NIC_CHECK_CALL)
+anchor = "    def bootstrap_config(self):"
+assert s.count(anchor) == 1
+s = s.replace(anchor, NEW_NIC_METHODS + anchor)
 if "\nimport time\n" not in s:
     s = s.replace("import sys\n", "import sys\nimport time\n", 1)
 s = s.replace("        if self.spins > 300:", "        if self.spins > 3000:")

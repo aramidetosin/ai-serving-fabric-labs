@@ -38,6 +38,8 @@ In the commands below, `LABS` holds the path of your checkout of this repository
 
 3. `make docker-image` builds `vrnetlab/dell_sonic:4.6.0`. The Dockerfile at the pin builds from `ghcr.io/srl-labs/vrnetlab-base:0.3.0`, which Docker pulls by that tag.
 
+The guest kernel can name its virtio NICs out of order at boot, which puts each port on another port's wire or the management address on a data NIC. After login and before it configures anything, the launcher checks that each guest `ethN` sits on virtio device N. If one does not, it restarts the VM from a fresh overlay disk and checks again, up to 3 times; after that it logs an error and carries on, so the lab's boot checks report the fault.
+
 ## What the launcher changes, and why
 
 Each change answers a failure this image showed, or a need of the labs, under the upstream launcher.
