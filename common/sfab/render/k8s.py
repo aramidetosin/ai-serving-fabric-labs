@@ -156,13 +156,14 @@ NODE_FILES = {"env": "cluster.env", "kubeadm": "kubeadm.yaml", "kube_vip": "kube
 # it there, and it never leaves the node), and the operators' defaults (k8s.operators).
 ADMIN_KUBECONFIG = "/etc/kubernetes/admin.conf"
 OPERATORS = {"users": [], "group": "operators", "cluster_role": "view", "validity_h": 8}
-# The built-in view role reads namespaced objects only, so an operator could not list the nodes. Its
-# companion role reads the cluster-scoped objects an operator inspects, and still no Secret.
+# The built-in view role reads namespaced core objects only, so an operator could not list the nodes,
+# and it does not cover custom resources. Its companion role reads the cluster-scoped objects an
+# operator inspects and the Gateway API's kinds in every namespace, and still no Secret.
 OPERATOR_CLUSTER_READ = [
     ("", ["nodes", "namespaces", "persistentvolumes"]),
     ("storage.k8s.io", ["storageclasses", "csidrivers", "csinodes", "volumeattachments"]),
     ("networking.k8s.io", ["ingressclasses"]),
-    ("gateway.networking.k8s.io", ["gatewayclasses"]),
+    ("gateway.networking.k8s.io", ["gatewayclasses", "gateways", "httproutes", "grpcroutes", "referencegrants", "backendtlspolicies"]),
     ("apiextensions.k8s.io", ["customresourcedefinitions"]),
     ("scheduling.k8s.io", ["priorityclasses"]),
     ("node.k8s.io", ["runtimeclasses"]),
@@ -546,7 +547,7 @@ def operators_manifest(model: Model, ctx) -> str:
         f"bastion carries a client certificate in that group, issued on the init node for {o['validity_h']} hours by",
         "kubeadm kubeconfig user (finish, operators); no standing cluster-admin credential leaves the init node.",
         f"{o['cluster_role']} reads namespaced objects only, so the group is also bound to {o['group']}-cluster-view,",
-        "which reads the cluster-scoped objects (nodes, namespaces, volumes, classes, CRDs) and no Secret.",
+        "which reads the cluster-scoped objects (nodes, namespaces, volumes, classes, CRDs) and the Gateway API kinds in every namespace, and no Secret.",
     ]
     subjects = [{"apiGroup": "rbac.authorization.k8s.io", "kind": "Group", "name": o["group"]}]
     doc = {"apiVersion": "rbac.authorization.k8s.io/v1", "kind": "ClusterRoleBinding",

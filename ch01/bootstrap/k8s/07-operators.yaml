@@ -3,7 +3,7 @@
 # bastion carries a client certificate in that group, issued on the init node for 8 hours by
 # kubeadm kubeconfig user (finish, operators); no standing cluster-admin credential leaves the init node.
 # view reads namespaced objects only, so the group is also bound to operators-cluster-view,
-# which reads the cluster-scoped objects (nodes, namespaces, volumes, classes, CRDs) and no Secret.
+# which reads the cluster-scoped objects (nodes, namespaces, volumes, classes, CRDs) and the Gateway API kinds in every namespace, and no Secret.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -55,6 +55,11 @@ rules:
   - gateway.networking.k8s.io
   resources:
   - gatewayclasses
+  - gateways
+  - httproutes
+  - grpcroutes
+  - referencegrants
+  - backendtlspolicies
   verbs:
   - get
   - list
